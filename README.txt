@@ -1,6 +1,6 @@
 This is the repository for the ALTA Project
 
-Repositor Organization
+Repository Organization
 
-data/ : contains the data fitting techniques are tested against.
+data/ : contains the data for which the fitting techniques are tested against.
 
