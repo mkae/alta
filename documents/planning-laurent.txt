@@ -1,0 +1,90 @@
+
+PLanning Laurent B.
+
+
+I) Vertical Segment en C++
+
+  1.1 Implementation 1D de l'algo de minimisation quadratique
+         *  Avec ALgo de Eigen 
+         *  CGAL 
+         
+ 1.1.1 Données 
+         *  exponentiel(-x^2) ou autre
+         *  theta_h = 0  pour le chrome et le nickel voire d'autres
+         *  theta_d = 0 pour le chrome et le nickel voire d'autres
+         * Test en f(cos(theta_h) ), f(cos(theta_d))
+         * Test sur les SPD pour les matériaux rétro-diffusés
+         *  Test en 1D sur les lobes retro-diffusés
+
+  1.1.2 Tests et analyses de la méthode
+        * Influence du parcours (numérateur vs dénominateur)
+        * Choix du delta
+        * Tester pour un fit effectué si les fonctions qui ont le même nombres de coefficients sont aussi solution 
+           et si leur erreur MSE est meilleure non
+
+        * Pour un ensemble de fonctions de bases et de coefficients données.  
+          Ré-itération du fit en ajoutant aléatoirement une fonction de base.
+          Vérification que le résultat est le même.
+
+  1.1.3  Effectuer un bench pour savoir combien de temps il faut pour tester  K fonctions rationnelles    
+  1.1.4   Faire un retour à Désiré sur le soldeur Pré-eigen et éventuellement comparaison CGAL
+  1.1.5   Visualisation en matlab ou autre des fits.  Vérifier si BRDF explorer vaut le coup (peut être plus sur les hautes dimensions)
+
+   =====    =====    =====    =====    ===== 
+ 
+   1.2 Implémentation 2D des Vertical Segments
+        1.2.1 Données
+           * Données brdf en theta_h, theta_d  et cos.
+           * Données brdf mieux filtrées sur les angles rasants et sur les lobes spéculaires
+           * Données d'albédo dépendant du point de vue \rho( View ) = \int brdf( View,L) cos(theta_L) dL
+           * Données Environment Map plus ou moins filtrés.
+           * Données Rétro (hopefully) 
+   
+        1.2.2 Attention au parcours
+      
+        1.2.2 Benchs  
+     
+        ===> Décider ici de passer via Magma au GPU ?
+
+   1.3 Implémentation 3D des VS
+        1.3.1 Donnés de CDF des matériaux RBRDF
+        1.4.1 Données 3D de Matusik ?    
+  
+   1.4 Implémentation 4D
+      1.4.1 Données 
+           *  BRDF Ngan anisotropes
+
+
+
+===> Pas forcément dans l'ordre indiqué ci-dessous.
+
+II) Non-linear Fitting
+    
+    2.1 Implémentation avec Eigen de Désiré
+    2.2 Modèle de BRDF classique multi-lobes supportant la rétro-diffusion ou avec ajout de lobe rétro ou back vector
+     
+III)  Recherche sur les Vertical Segments
+
+  3.1  Test d'autres bases de fonctions en cosinus et sinus
+  2.2. Compression des couleurs avec fit "vectoriel" en XYZ
+  2.3. Intégration de critère qui permette de garantir que le fit va se trouver dans l'enveloppe convexe des segments
+  2.4  Contraindre le fit avec CDF et CDF^{-1} pour que les deux fits soient garantis d être l inverse de l autre
+  2.5. Intégration direct du produit BRDF * Incident Lighting
+  2.6. Comparaisons avec le DCA en 2D,3D,4D ?
+
+
+
+IV) Visualisateur multidimensionnel de données
+
+  * Viewer QT avec   http://qwtplot3d.sourceforge.net/
+  * VTK ? ou autre ?
+   
+
+Autres notes: 
+
+Notes avec Gael:  
+ - Fitting NURBS (revient à tester une autre bases de fonctions)
+ - Partir d une fonction interpolante pour fitter ?
+ - Fitter dans des intervalles puis faire un fit non-lineaire à partir de là mais contraint aux intervalles ?
+ - Fitter de maniere a garantir que les oscillations ne sortent pas de la bande d'intervalle ? ( demande à Oliver son avis)
+
