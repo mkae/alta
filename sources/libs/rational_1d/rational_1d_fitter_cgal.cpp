@@ -1,4 +1,4 @@
-#include "rational_1d_fitter.h"
+#include "rational_1d_fitter_cgal.h"
 
 #include <CGAL/basic.h>
 #include <CGAL/QP_models.h>
@@ -90,6 +90,12 @@ std::ostream& operator<< (std::ostream& out, const rational_1d& r)
 
 void rational_1d_data::load(const std::string& filename) 
 {
+	load(filename, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max()) ;
+
+}
+		
+void rational_1d_data::load(const std::string& filename, float min, float max) 
+{
 	std::ifstream file(filename) ;
 	_min =  std::numeric_limits<float>::max() ;
 	_max = -std::numeric_limits<float>::max() ;
@@ -120,22 +126,30 @@ void rational_1d_data::load(const std::string& filename)
 			linestream >> dy ;
 		} else {
 			// TODO Specify the delta in case
-			dy = 0.1f ;
+			dy = 0.001f ;
 		}
-		
-		std::vector<float> v ;
-		v.push_back(x) ;
-		v.push_back(y-dy) ;
-		v.push_back(y+dy) ;
-		_data.push_back(v) ;
 
-		// Update min and max
-		_min = std::min(_min, x) ;
-		_max = std::max(_max, x) ;
+		if(x <= max && x >= min)
+		{
+			std::vector<float> v ;
+			v.push_back(x) ;
+			v.push_back(y-dy) ;
+			v.push_back(y+dy) ;
+			_data.push_back(v) ;
+
+			// Update min and max
+			_min = std::min(_min, x) ;
+			_max = std::max(_max, x) ;
+		}
 	}
 
 	// Sort the vector
 	std::sort(_data.begin(), _data.end(), [](const std::vector<float>& a, const std::vector<float>& b){return (a[0]<b[0]);});
+
+	for(int i=0; i<_data.size(); ++i)
+	{
+		std::cout << _data[i][0] << ", " << _data[i][1] << ", " << _data[i][2] << std::endl ;
+	}
 
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
 	std::cout << "<<INFO>> data inside [" << _min << ", " << _max << "]" << std::endl ;
@@ -180,16 +194,13 @@ typedef CGAL::Quadratic_program<float> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
 		
 // Fitting a data
-rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data)
+bool rational_1d_fitter::fit_data(const rational_1d_data& data, rational_1d& fit)
 {
-	return fit_data(data, 10, 10) ;
+	return fit_data(data, 10, 10, fit) ;
 }
 
-rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data, int np, int nq) 
+bool rational_1d_fitter::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
 {
-	// The resulting ration function
-	rational_1d r ;
-
 	// by default, we have a nonnegative QP with Ax <= b
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
 
@@ -293,27 +304,33 @@ rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data, int np, i
 	// solve the program, using ET as the exact type
 //*
 	Solution s = CGAL::solve_quadratic_program(qp, ET()) ;
-	assert (s.solves_quadratic_program(qp)) ;
 /*/
 	Solution s = CGAL::solve_nonnegative_quadratic_program(qp, ET());
-	assert (s.solves_nonnegative_quadratic_program(qp));
 //*/
-	// Recopy the vector data
-	std::vector<float> p, q;
-	for(int i=0; i<np+nq; ++i)
+
+	if(s.solves_quadratic_program(qp))
 	{
-		const float v = (float)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
+		// Recopy the vector data
+		std::vector<float> p, q;
+		for(int i=0; i<np+nq; ++i)
+		{
+			const float v = (float)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
 
-		if(i < np)
-		{
-			p.push_back(v) ;
+			if(i < np)
+			{
+				p.push_back(v) ;
+			}
+			else
+			{
+				q.push_back(v) ;
+			}
 		}
-		else
-		{
-			q.push_back(v) ;
-		}
+
+		r = rational_1d(p, q);
+		return true;
 	}
-
-	r = rational_1d(p, q);
-	return r;
+	else
+	{
+		return false; 
+	}
 }

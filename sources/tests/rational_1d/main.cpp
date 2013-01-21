@@ -1,4 +1,5 @@
-#include <rational_1d_fitter.h>
+#include <rational_1d_fitter_cgal.h>
+//#include <rational_1d_fitter_eigen.h>
 
 #include <vector>
 #include <iostream>
@@ -23,20 +24,40 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
+	// Load the data
 	rational_1d_data data ;
-	data.load(args["input"]);
-	rational_1d_fitter fitter ;
-	rational_1d r = fitter.fit_data(data, args.get_int("np", 10), args.get_int("nq", 10)) ;
-
-	std::cout << r << std::endl ;
-
-//*
-	std::ofstream file(args["output"], std::ios_base::trunc);
-	const float dt = (data.max() - data.min()) / 100.0f ;
-	for(float x=data.min(); x<=data.max(); x+=dt)
+	if(args.is_defined("min") && args.is_defined("max"))
 	{
-		file << x << "\t" << r(x) << std::endl ;
+		data.load(args["input"], args.get_float("min", 0.0f), args.get_float("max", 1.0f));
 	}
-//*/
+	else
+	{
+		data.load(args["input"]);
+	}
+
+	// Fitting call
+	rational_1d_fitter fitter ;
+	rational_1d r ;
+	bool is_fitted = fitter.fit_data(data, args.get_int("np", 10), args.get_int("nq", 10), r) ;
+
+	// Display the result
+	if(is_fitted)
+	{
+		std::cout << r << std::endl ;
+
+		//*
+		std::ofstream file(args["output"], std::ios_base::trunc);
+		const float dt = (data.max() - data.min()) / 100.0f ;
+		for(float x=data.min(); x<=data.max(); x+=dt)
+		{
+			file << x << "\t" << r(x) << std::endl ;
+		}
+		//*/
+	}
+	else
+	{
+		std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
+	}
+
 	return 0 ;
 }

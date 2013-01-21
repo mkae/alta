@@ -45,6 +45,7 @@ class rational_1d_data // : public fitting_data
 
 		// Load data from a file
 		void load(const std::string& filename) ;
+		void load(const std::string& filename, float min, float max) ;
 
 		// Acces to data
 		bool get(int i, float& x, float& yl, float& yu) const ;
@@ -73,11 +74,11 @@ class rational_1d_fitter // : public fitting_algorithm
 	public: // methods
 
 		// Fitting a data object
-		rational_1d fit_data(const rational_1d_data& data) ;
+		virtual bool fit_data(const rational_1d_data& data, rational_1d& fit) ;
 
 		// Fitting a data object using np elements
 		// in the numerator and nq elements in the
 		// denominator
-		rational_1d fit_data(const rational_1d_data& data, int np, int nq) ;
+		virtual bool fit_data(const rational_1d_data& data, int np, int nq, rational_1d& fit) ;
 } ;
 
