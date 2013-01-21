@@ -28,6 +28,9 @@ class rational_1d : public std::function<float(float)>
 		void load(const std::string& filename) ;
 		void save() const ;
 
+		// STL stream ouput
+		friend std::ostream& operator<< (std::ostream& out, const rational_1d& r) ;
+
 	private: // data
 
 		// Store the coefficients for the moment, I assume
@@ -50,11 +53,19 @@ class rational_1d_data // : public fitting_data
 		// Get data size
 		int size() const ;
 
+		// Get min and max input parameters
+		float min() const ;
+		float max() const ; 
+
 	private: // data
 
 		// Store for each point of data, the upper
 		// and lower value
-		std::vector<std::vector<float> > data ;
+		std::vector<std::vector<float> > _data ;
+
+		// Store the min and max value on the input
+		// domain
+		float _min, _max ;
 } ;
 
 class rational_1d_fitter // : public fitting_algorithm
@@ -64,5 +75,9 @@ class rational_1d_fitter // : public fitting_algorithm
 		// Fitting a data object
 		rational_1d fit_data(const rational_1d_data& data) ;
 
+		// Fitting a data object using np elements
+		// in the numerator and nq elements in the
+		// denominator
+		rational_1d fit_data(const rational_1d_data& data, int np, int nq) ;
 } ;
 

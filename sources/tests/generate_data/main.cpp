@@ -8,8 +8,8 @@ int main(int argc, int argv)
 
 	for(int i=0; i<100; ++i)
 	{
-		const float x = i / (float)99.0f ;
-		const float y = 100.0f * exp(-100.0f * x*x) * x*x ;
+		const float x = i / (float)10.0f ;
+		const float y = exp(-0.2 * x*x) * x*x + 0.01 * (sin(0.3*x) * x*x);
 			
 		f << x << "\t" << y << "\t" << 0.01f << std::endl ;
 	}

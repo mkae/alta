@@ -4,8 +4,13 @@
 #include <CGAL/QP_models.h>
 #include <CGAL/QP_functions.h>
 #include <CGAL/MP_Float.h>
+
+#include <boost/regex.hpp>
+#include <string>
 #include <iostream>
 #include <fstream>
+#include <limits>
+#include <algorithm>
 
 rational_1d::rational_1d() 
 {
@@ -57,44 +62,117 @@ void rational_1d::save() const
 {
 }
 
+std::ostream& operator<< (std::ostream& out, const rational_1d& r) 
+{
+	std::cout << "p = [" ;
+	for(int i=0; i<r.a.size(); ++i)
+	{
+		if(i != 0)
+		{
+			std::cout << ", " ;
+		}
+		std::cout << r.a[i] ;
+	}
+	std::cout << "]" << std::endl ;
+
+	std::cout << "q = [" ;
+	for(int i=0; i<r.b.size(); ++i)
+	{
+		if(i != 0)
+		{
+			std::cout << ", " ;
+		}
+		std::cout << r.b[i] ;
+	}
+	std::cout << "]" << std::endl ;
+
+}
+
 void rational_1d_data::load(const std::string& filename) 
 {
 	std::ifstream file(filename) ;
+	_min =  std::numeric_limits<float>::max() ;
+	_max = -std::numeric_limits<float>::max() ;
+
+	if(!file.is_open())
+	{
+		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+	}
+
+	// N-Floats regexp
+	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)+");
 
 	float x, y, dy ;
 	while(file.good())
 	{
-		file >> x >> y >> dy ;
+		std::string line ;
+		std::getline(file, line) ;
+		std::stringstream linestream(line) ;
+		
+		// Discard incorrect lines
+		if(!boost::regex_match(line,e))
+		{
+			continue ;
+		}
+
+		linestream >> x >> y ;
+		if(linestream.good()) {
+			linestream >> dy ;
+		} else {
+			// TODO Specify the delta in case
+			dy = 0.1f ;
+		}
+		
 		std::vector<float> v ;
 		v.push_back(x) ;
 		v.push_back(y-dy) ;
 		v.push_back(y+dy) ;
-		data.push_back(v) ;
+		_data.push_back(v) ;
+
+		// Update min and max
+		_min = std::min(_min, x) ;
+		_max = std::max(_max, x) ;
 	}
+
+	// Sort the vector
+	std::sort(_data.begin(), _data.end(), [](const std::vector<float>& a, const std::vector<float>& b){return (a[0]<b[0]);});
+
+	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
+	std::cout << "<<INFO>> data inside [" << _min << ", " << _max << "]" << std::endl ;
 }
 
 bool rational_1d_data::get(int i, float& x, float& yl, float& yu) const
 {
-	if(i >= data.size())
+	if(i >= (int)_data.size())
 	{
 		return false ;
 	}
 
-	x  = data[i][0] ;
-	yl = data[i][1] ;
-	yu = data[i][2] ;
+	x  = _data[i][0] ;
+	yl = _data[i][1] ;
+	yu = _data[i][2] ;
 
 	return true ;
 }
 
 const std::vector<float>& rational_1d_data::operator[](int i) const
 {
-	return data[i] ;
+	return _data[i] ;
 }
 
 int rational_1d_data::size() const
 {
-	return data.size() ;
+	return _data.size() ;
+}
+
+float rational_1d_data::min() const 
+{
+	return _min ;
+}
+
+float rational_1d_data::max() const 
+{
+	return _max ;
 }
 
 typedef CGAL::MP_Float ET ;
@@ -104,6 +182,11 @@ typedef CGAL::Quadratic_program_solution<ET> Solution ;
 // Fitting a data
 rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data)
 {
+	return fit_data(data, 10, 10) ;
+}
+
+rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data, int np, int nq) 
+{
 	// The resulting ration function
 	rational_1d r ;
 
@@ -112,12 +195,11 @@ rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data)
 
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
-	int np = 10, nq = 10;
 	for(int i=0; i<np+nq; ++i)
 	{
 		qp.set_d(i, i, 1.0f) ; 
 	}
-
+	
 	// Each constraint (fitting interval or point
 	// add another dimension to the constraint
 	// matrix
@@ -168,12 +250,13 @@ rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data)
 
 	if(qp.is_linear() && !qp.is_nonnegative())
 	{
-		std::cerr << "Error here, should not be linear or negative!" << std::endl ;
+		std::cerr << "<<ERROR>> the problem should not be linear or negative!" << std::endl ;
 		throw ;
 	}
 
-#ifdef DEBUG
+#ifdef EXTREM_DEBUG
 	// Iterate over the rows
+	std::cout << std::endl ;
 	std::cout << "A = [" ;
 	for(int j=0; j<qp.get_m(); ++j)
 	{
@@ -188,13 +271,33 @@ rational_1d rational_1d_fitter::fit_data(const rational_1d_data& data)
 		std::cout << ";" ;
 		if(j < qp.get_n()-1) std::cout << std::endl ;
 	}
-	std::cout << "]" << std::endl ;
+	std::cout << "]" << std::endl << std::endl ;
+	
+	std::cout << std::endl ;
+	std::cout << "D = [" ;
+	for(int j=0; j<np+nq; ++j)
+	{
+		if(j == 0) std::cout << "   " ;
+
+		// Iterate over the columns
+		for(int i=0; i<np+nq; ++i)
+		{
+			if(i > 0) std::cout << ",\t" ;
+			std::cout << *(*(qp.get_d()+i) +j) ;
+		}
+		std::cout << ";" ;
+	}
+	std::cout << "]" << std::endl << std::endl ;
 #endif
 
 	// solve the program, using ET as the exact type
+//*
 	Solution s = CGAL::solve_quadratic_program(qp, ET()) ;
 	assert (s.solves_quadratic_program(qp)) ;
-
+/*/
+	Solution s = CGAL::solve_nonnegative_quadratic_program(qp, ET());
+	assert (s.solves_nonnegative_quadratic_program(qp));
+//*/
 	// Recopy the vector data
 	std::vector<float> p, q;
 	for(int i=0; i<np+nq; ++i)
