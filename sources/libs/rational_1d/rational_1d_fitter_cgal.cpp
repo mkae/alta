@@ -94,12 +94,11 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
-//*
 	for(int i=0; i<2*data.size(); ++i)	
 	{		
 		qp.set_b(i, delta * ci(i)) ;
 	}
-//*/
+
 #ifdef DEBUG
 	// Export some informations on the problem to solve
 	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;

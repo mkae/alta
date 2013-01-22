@@ -121,7 +121,7 @@ void rational_1d_data::load(const std::string& filename, double min, double max)
 			linestream >> dy ;
 		} else {
 			// TODO Specify the delta in case
-			dy = 0.1f ;
+			dy = 0.01f ;
 		}
 
 		if(x <= max && x >= min)
@@ -138,11 +138,23 @@ void rational_1d_data::load(const std::string& filename, double min, double max)
 		}
 	}
 
+	//TODO Test for small data
+/*	std::vector<std::vector<double> > temp ;
+	std::ofstream temp_out("temp.gnuplot", std::ios_base::trunc) ;
+	for(int i=0; i<20; ++i)
+	{
+		int k = (i * _data.size()) / 20 ;
+		temp_out << _data[k][0] << "\t" << _data[k][1] << "\t" << 0.5*(_data[k][2] - _data[k][1]) << std::endl ;
+		temp.push_back(_data[k]) ;
+	}
+	_data = temp ;
+*/
 	// Sort the vector
 	std::sort(_data.begin(), _data.end(), [](const std::vector<double>& a, const std::vector<double>& b){return (a[0]<b[0]);});
 
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
 	std::cout << "<<INFO>> data inside [" << _min << ", " << _max << "]" << std::endl ;
+	std::cout << "<<INFO>> " << _data.size() << " elements to fit" << std::endl ;
 }
 
 bool rational_1d_data::get(int i, double& x, double& yl, double& yu) const

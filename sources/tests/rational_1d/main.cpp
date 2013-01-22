@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 #include <core/args.h>
 
@@ -29,6 +30,14 @@ int main(int argc, char** argv)
 	if(args.is_defined("min") && args.is_defined("max"))
 	{
 		data.load(args["input"], args.get_float("min", 0.0f), args.get_float("max", 1.0f));
+	}
+	else if(args.is_defined("min") && !args.is_defined("max"))
+	{
+		data.load(args["input"], args.get_float("min", 0.0f), std::numeric_limits<double>::max());
+	}
+	else if(args.is_defined("min") && !args.is_defined("max"))
+	{
+		data.load(args["input"], -std::numeric_limits<double>::max(), args.get_float("min", 0.0f));
 	}
 	else
 	{

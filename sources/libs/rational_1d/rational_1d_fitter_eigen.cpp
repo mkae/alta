@@ -50,18 +50,18 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 				const double pi = r.p(data[i][0], j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
-				CI(j, 2*i+0) =  pi ;
-				CI(j, 2*i+1) = -pi ;
+				CI(j, 2*i+0) =   pi ;
+				CI(j, 2*i+1) = - pi ;
 			}
 			// Filling the q part
 			else
 			{
 				const double qi = r.q(data[i][0], j-np) ;
 				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
-				CI(j, 2*i+0) = -data[i][1] * qi ;
+				CI(j, 2*i+0) = - data[i][1] * qi ;
 				
 				a1_norm += qi*qi * (data[i][2]*data[i][2]) ;
-				CI(j, 2*i+1) = data[i][2] * qi ;
+				CI(j, 2*i+1) =   data[i][2] * qi ;
 			}
 		}
 	
