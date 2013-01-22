@@ -149,11 +149,7 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 #endif
 
 	// solve the program, using ET as the exact type
-//*
 	Solution s = CGAL::solve_quadratic_program(qp, ET()) ;
-/*/
-	Solution s = CGAL::solve_nonnegative_quadratic_program(qp, ET());
-//*/
 
 	bool solves_qp = s.solves_quadratic_program(qp)  ;
 	for(int i=0; i<np+nq; ++i)

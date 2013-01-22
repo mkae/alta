@@ -6,7 +6,12 @@
 #include <string>
 #include <tuple>
 
-class rational_1d : public std::function<double(double)> 
+// Interface
+#include <core/function.h>
+#include <core/data.h>
+#include <core/fitter.h>
+
+class rational_1d : public function
 {
 	public: // methods
 
@@ -36,24 +41,24 @@ class rational_1d : public std::function<double(double)>
 		std::vector<double> b ;
 } ;
 
-class rational_1d_data // : public fitting_data
+class rational_1d_data : public data
 {
 	public: // methods
 
 		// Load data from a file
-		void load(const std::string& filename) ;
-		void load(const std::string& filename, double min, double max) ;
+		virtual void load(const std::string& filename) ;
+		virtual void load(const std::string& filename, double min, double max) ;
 
 		// Acces to data
-		bool get(int i, double& x, double& yl, double& yu) const ;
-		const std::vector<double>& operator[](int i) const ;
+		virtual bool get(int i, double& x, double& yl, double& yu) const ;
+		virtual const std::vector<double>& operator[](int i) const ;
 
 		// Get data size
-		int size() const ;
+		virtual int size() const ;
 
 		// Get min and max input parameters
-		double min() const ;
-		double max() const ; 
+		virtual double min() const ;
+		virtual double max() const ; 
 
 	private: // data
 
@@ -66,7 +71,7 @@ class rational_1d_data // : public fitting_data
 		double _min, _max ;
 } ;
 
-class rational_1d_fitter // : public fitting_algorithm
+class rational_1d_fitter //: public fitter
 {
 	public: // methods
 

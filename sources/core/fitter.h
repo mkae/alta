@@ -7,7 +7,7 @@
  * Fitting interface for generic fitting algorithms
  *
  */
-template<class X, class Y> class fitter
+class fitter
 {
 	public:
 		
@@ -15,6 +15,6 @@ template<class X, class Y> class fitter
 		// underling function class. Return the best
 		// fit (along with fitting information ?)
 		//
-		virtual bool fit_data(const data<X, Y>& d, function<X, Y>& f) = 0 ;
+		virtual bool fit_data(const data* d, function* f) = 0 ;
 
 } ;

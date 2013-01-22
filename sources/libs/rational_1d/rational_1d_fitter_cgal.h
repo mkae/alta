@@ -7,7 +7,6 @@
 #include <tuple>
 
 // Personal include
-//#include <fitting_algorithm.h>
 #include "rational_1d_fitter.h"
 
 
