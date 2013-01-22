@@ -1,5 +1,5 @@
 #include <rational_1d_fitter_cgal.h>
-//#include <rational_1d_fitter_eigen.h>
+#include <rational_1d_fitter_eigen.h>
 
 #include <vector>
 #include <iostream>
@@ -36,9 +36,18 @@ int main(int argc, char** argv)
 	}
 
 	// Fitting call
-	rational_1d_fitter fitter ;
+	rational_1d_fitter* fitter ;
+	if(args.is_defined("algorithm") && args["algorithm"] == std::string("eigen"))
+	{
+		fitter = new rational_1d_fitter_eigen() ;
+	}
+	else
+	{
+		fitter = new rational_1d_fitter_cgal() ;
+	}
+	
 	rational_1d r ;
-	bool is_fitted = fitter.fit_data(data, args.get_int("np", 10), args.get_int("nq", 10), r) ;
+	bool is_fitted = fitter->fit_data(data, args.get_int("np", 10), args.get_int("nq", 10), r) ;
 
 	// Display the result
 	if(is_fitted)
@@ -58,6 +67,9 @@ int main(int argc, char** argv)
 	{
 		std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
 	}
+
+	// Clean data
+	delete fitter ;
 
 	return 0 ;
 }

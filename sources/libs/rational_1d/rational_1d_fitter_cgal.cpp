@@ -4,6 +4,7 @@
 #include <CGAL/QP_models.h>
 #include <CGAL/QP_functions.h>
 #include <CGAL/MP_Float.h>
+#include <Eigen/SVD>
 
 #include <boost/regex.hpp>
 #include <string>
@@ -12,194 +13,18 @@
 #include <limits>
 #include <algorithm>
 
-rational_1d::rational_1d() 
-{
-}
-
-rational_1d::rational_1d(const std::vector<float>& a,
-                         const std::vector<float>& b) :
-	a(a), b(b)
-{
-}
-rational_1d::~rational_1d()
-{
-}
-
-// Overload the function operator
-float rational_1d::operator()(float x) const 
-{
-	float p = 0.0f ;
-	float q = 0.0f ;
-
-	for(int i=a.size()-1; i>=0; --i)
-	{
-		p = x*p + a[i] ;
-	}
-
-	for(int i=b.size()-1; i>=0; --i)
-	{
-		q = x*q + b[i] ;
-	}
-
-	return p/q ;
-}
-		
-// Get the p_i and q_j function
-float rational_1d::p(float x, int i) const
-{
-	return pow(x, i) ;
-}
-float rational_1d::q(float x, int j) const 
-{
-	return pow(x, j) ;
-}
-
-// IO function to text files
-void rational_1d::load(const std::string& filename)
-{
-}
-void rational_1d::save() const
-{
-}
-
-std::ostream& operator<< (std::ostream& out, const rational_1d& r) 
-{
-	std::cout << "p = [" ;
-	for(int i=0; i<r.a.size(); ++i)
-	{
-		if(i != 0)
-		{
-			std::cout << ", " ;
-		}
-		std::cout << r.a[i] ;
-	}
-	std::cout << "]" << std::endl ;
-
-	std::cout << "q = [" ;
-	for(int i=0; i<r.b.size(); ++i)
-	{
-		if(i != 0)
-		{
-			std::cout << ", " ;
-		}
-		std::cout << r.b[i] ;
-	}
-	std::cout << "]" << std::endl ;
-
-}
-
-void rational_1d_data::load(const std::string& filename) 
-{
-	load(filename, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max()) ;
-
-}
-		
-void rational_1d_data::load(const std::string& filename, float min, float max) 
-{
-	std::ifstream file(filename) ;
-	_min =  std::numeric_limits<float>::max() ;
-	_max = -std::numeric_limits<float>::max() ;
-
-	if(!file.is_open())
-	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-	}
-
-	// N-Floats regexp
-	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)+");
-
-	float x, y, dy ;
-	while(file.good())
-	{
-		std::string line ;
-		std::getline(file, line) ;
-		std::stringstream linestream(line) ;
-		
-		// Discard incorrect lines
-		if(!boost::regex_match(line,e))
-		{
-			continue ;
-		}
-
-		linestream >> x >> y ;
-		if(linestream.good()) {
-			linestream >> dy ;
-		} else {
-			// TODO Specify the delta in case
-			dy = 0.001f ;
-		}
-
-		if(x <= max && x >= min)
-		{
-			std::vector<float> v ;
-			v.push_back(x) ;
-			v.push_back(y-dy) ;
-			v.push_back(y+dy) ;
-			_data.push_back(v) ;
-
-			// Update min and max
-			_min = std::min(_min, x) ;
-			_max = std::max(_max, x) ;
-		}
-	}
-
-	// Sort the vector
-	std::sort(_data.begin(), _data.end(), [](const std::vector<float>& a, const std::vector<float>& b){return (a[0]<b[0]);});
-
-	for(int i=0; i<_data.size(); ++i)
-	{
-		std::cout << _data[i][0] << ", " << _data[i][1] << ", " << _data[i][2] << std::endl ;
-	}
-
-	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
-	std::cout << "<<INFO>> data inside [" << _min << ", " << _max << "]" << std::endl ;
-}
-
-bool rational_1d_data::get(int i, float& x, float& yl, float& yu) const
-{
-	if(i >= (int)_data.size())
-	{
-		return false ;
-	}
-
-	x  = _data[i][0] ;
-	yl = _data[i][1] ;
-	yu = _data[i][2] ;
-
-	return true ;
-}
-
-const std::vector<float>& rational_1d_data::operator[](int i) const
-{
-	return _data[i] ;
-}
-
-int rational_1d_data::size() const
-{
-	return _data.size() ;
-}
-
-float rational_1d_data::min() const 
-{
-	return _min ;
-}
-
-float rational_1d_data::max() const 
-{
-	return _max ;
-}
 
 typedef CGAL::MP_Float ET ;
-typedef CGAL::Quadratic_program<float> Program ;
+typedef CGAL::Quadratic_program<double> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
 		
 // Fitting a data
-bool rational_1d_fitter::fit_data(const rational_1d_data& data, rational_1d& fit)
+bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, rational_1d& fit)
 {
 	return fit_data(data, 10, 10, fit) ;
 }
 
-bool rational_1d_fitter::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
+bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
 {
 	// by default, we have a nonnegative QP with Ax <= b
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
@@ -214,11 +39,13 @@ bool rational_1d_fitter::fit_data(const rational_1d_data& data, int np, int nq, 
 	// Each constraint (fitting interval or point
 	// add another dimension to the constraint
 	// matrix
+	Eigen::MatrixXd CI(2*data.size(), np+nq) ;
+	Eigen::VectorXd ci(2*data.size()) ;
 	for(int i=0; i<data.size(); ++i)	
 	{		
 		// Norm of the row vector
-		float a0_norm = 0.0f ;
-		float a1_norm = 0.0f ;
+		double a0_norm = 0.0f ;
+		double a1_norm = 0.0f ;
 
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
@@ -229,34 +56,52 @@ bool rational_1d_fitter::fit_data(const rational_1d_data& data, int np, int nq, 
 			// Filling the p part
 			if(j<np)
 			{
-				const float pi = r.p(data[i][0], j) ;
+				const double pi = r.p(data[i][0], j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				qp.set_a(j, 2*i+0,  pi) ;
 				qp.set_a(j, 2*i+1, -pi) ;
+				CI(2*i+0, j) =  pi ;
+				CI(2*i+1, j) = -pi ;
 			}
-			// Filling the q paret
+			// Filling the q part
 			else
 			{
-				const float qi = r.q(data[i][0], j-np) ;
+				const double qi = r.q(data[i][0], j-np) ;
 				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
 				qp.set_a(j, 2*i+0, -data[i][1] * qi) ;
+				CI(2*i+0, j) = -data[i][1] * qi ;
 				
 				a1_norm += qi*qi * (data[i][2]*data[i][2]) ;
 				qp.set_a(j, 2*i+1,  data[i][2] * qi) ;
+				CI(2*i+1, j) = data[i][2] * qi ;
 			}
 		}
 	
-		// Set the c vector, in Oliver's work it is
-		// using the max SVD value.
-		qp.set_b(2*i+0, a0_norm) ;
-		qp.set_b(2*i+1, a1_norm) ;
+		// Set the c vector, will later be updated using the
+		// delta parameter.
+		ci(2*i+0) = sqrt(a0_norm) ;
+		ci(2*i+1) = sqrt(a1_norm) ;
 	}
-
+	
+	// Update the ci column with the delta parameter
+	// (See Celis et al. 2007 p.12)
+	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
+	const double sigma_m = svd.singularValues()(std::min(2*data.size(), np+nq)-1) ;
+	const double sigma_M = svd.singularValues()(0) ;
+	const double delta = sigma_m / sigma_M ;
+#ifdef DEBUG
+	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
+#endif
+/*	for(int i=0; i<2*data.size(); ++i)	
+	{		
+		qp.set_b(i, delta * ci(i)) ;
+	}
+*/
 #ifdef DEBUG
 	// Export some informations on the problem to solve
-	std::cout << qp.get_n() << " variables" << std::endl ;
-	std::cout << qp.get_m() << " constraints" << std::endl ;
+	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;
+	std::cout << "<<DEBUG>> " << qp.get_m() << " constraints" << std::endl ;
 #endif
 
 	if(qp.is_linear() && !qp.is_nonnegative())
