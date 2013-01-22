@@ -11,7 +11,7 @@ int main(int argc, int argv)
 		const float x = i / (float)10.0f ;
 		const float y = exp(-10.0 * x*x) * x*x - 0.1 *x*x*x ;
 			
-		f << x << "\t" << y << "\t" << 0.01f << std::endl ;
+		f << x << "\t" << y << "\t" << 1.0f << std::endl ;
 	}
 
 	return 0 ;

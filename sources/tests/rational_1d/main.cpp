@@ -39,10 +39,12 @@ int main(int argc, char** argv)
 	rational_1d_fitter* fitter ;
 	if(args.is_defined("algorithm") && args["algorithm"] == std::string("eigen"))
 	{
+		std::cout << "<<INFO>> using Eigen method" << std::endl ;
 		fitter = new rational_1d_fitter_eigen() ;
 	}
 	else
 	{
+		std::cout << "<<INFO>> using CGAL method" << std::endl ;
 		fitter = new rational_1d_fitter_cgal() ;
 	}
 	
@@ -56,8 +58,8 @@ int main(int argc, char** argv)
 
 		//*
 		std::ofstream file(args["output"], std::ios_base::trunc);
-		const float dt = (data.max() - data.min()) / 100.0f ;
-		for(float x=data.min(); x<=data.max(); x+=dt)
+		const double dt = (data.max() - data.min()) / 100.0f ;
+		for(double x=data.min(); x<=data.max(); x+=dt)
 		{
 			file << x << "\t" << r(x) << std::endl ;
 		}

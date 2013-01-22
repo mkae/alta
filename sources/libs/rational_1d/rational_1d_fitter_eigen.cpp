@@ -35,8 +35,8 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 	for(int i=0; i<data.size(); ++i)	
 	{		
 		// Norm of the row vector
-		float a0_norm = 0.0f ;
-		float a1_norm = 0.0f ;
+		double a0_norm = 0.0f ;
+		double a1_norm = 0.0f ;
 
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
@@ -47,7 +47,7 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 			// Filling the p part
 			if(j<np)
 			{
-				const float pi = r.p(data[i][0], j) ;
+				const double pi = r.p(data[i][0], j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				CI(j, 2*i+0) =  pi ;
@@ -56,7 +56,7 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 			// Filling the q part
 			else
 			{
-				const float qi = r.q(data[i][0], j-np) ;
+				const double qi = r.q(data[i][0], j-np) ;
 				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
 				CI(j, 2*i+0) = -data[i][1] * qi ;
 				
@@ -92,19 +92,25 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 	Eigen::VectorXd x(np+nq) ;
 
 	double cost = solve_quadprog(G, g0, CE, ce, CI, ci, x) ;
-	bool prog_solved = cost != std::numeric_limits<double>::infinity() ;
+	bool solves_qp = cost != std::numeric_limits<double>::infinity() ;
+	
+	// Check the data
+	for(int i=0; i<np+nq; ++i)
+	{
+		solves_qp = solves_qp && !isnan(x(i)) && (x(i) != std::numeric_limits<double>::infinity()) ;
+	}
 
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> cost: " << cost << std::endl ;
 #endif
 
-	if(prog_solved)
+	if(solves_qp)
 	{
 		// Recopy the vector data
-		std::vector<float> p, q;
+		std::vector<double> p, q;
 		for(int i=0; i<np+nq; ++i)
 		{
-			const float v = x(i) ;
+			const double v = x(i) ;
 
 			if(i < np)
 			{

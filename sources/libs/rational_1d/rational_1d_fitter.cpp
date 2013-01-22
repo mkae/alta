@@ -11,8 +11,8 @@ rational_1d::rational_1d()
 {
 }
 
-rational_1d::rational_1d(const std::vector<float>& a,
-                         const std::vector<float>& b) :
+rational_1d::rational_1d(const std::vector<double>& a,
+                         const std::vector<double>& b) :
 	a(a), b(b)
 {
 }
@@ -21,10 +21,10 @@ rational_1d::~rational_1d()
 }
 
 // Overload the function operator
-float rational_1d::operator()(float x) const 
+double rational_1d::operator()(double x) const 
 {
-	float p = 0.0f ;
-	float q = 0.0f ;
+	double p = 0.0f ;
+	double q = 0.0f ;
 
 	for(int i=a.size()-1; i>=0; --i)
 	{
@@ -40,11 +40,11 @@ float rational_1d::operator()(float x) const
 }
 		
 // Get the p_i and q_j function
-float rational_1d::p(float x, int i) const
+double rational_1d::p(double x, int i) const
 {
 	return pow(x, i) ;
 }
-float rational_1d::q(float x, int j) const 
+double rational_1d::q(double x, int j) const 
 {
 	return pow(x, j) ;
 }
@@ -85,15 +85,15 @@ std::ostream& operator<< (std::ostream& out, const rational_1d& r)
 
 void rational_1d_data::load(const std::string& filename) 
 {
-	load(filename, -std::numeric_limits<float>::max(), std::numeric_limits<float>::max()) ;
+	load(filename, -std::numeric_limits<double>::max(), std::numeric_limits<double>::max()) ;
 
 }
 		
-void rational_1d_data::load(const std::string& filename, float min, float max) 
+void rational_1d_data::load(const std::string& filename, double min, double max) 
 {
 	std::ifstream file(filename) ;
-	_min =  std::numeric_limits<float>::max() ;
-	_max = -std::numeric_limits<float>::max() ;
+	_min =  std::numeric_limits<double>::max() ;
+	_max = -std::numeric_limits<double>::max() ;
 
 	if(!file.is_open())
 	{
@@ -103,7 +103,7 @@ void rational_1d_data::load(const std::string& filename, float min, float max)
 	// N-Floats regexp
 	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)+");
 
-	float x, y, dy ;
+	double x, y, dy ;
 	while(file.good())
 	{
 		std::string line ;
@@ -121,12 +121,12 @@ void rational_1d_data::load(const std::string& filename, float min, float max)
 			linestream >> dy ;
 		} else {
 			// TODO Specify the delta in case
-			dy = 0.001f ;
+			dy = 0.1f ;
 		}
 
 		if(x <= max && x >= min)
 		{
-			std::vector<float> v ;
+			std::vector<double> v ;
 			v.push_back(x) ;
 			v.push_back(y-dy) ;
 			v.push_back(y+dy) ;
@@ -139,13 +139,13 @@ void rational_1d_data::load(const std::string& filename, float min, float max)
 	}
 
 	// Sort the vector
-	std::sort(_data.begin(), _data.end(), [](const std::vector<float>& a, const std::vector<float>& b){return (a[0]<b[0]);});
+	std::sort(_data.begin(), _data.end(), [](const std::vector<double>& a, const std::vector<double>& b){return (a[0]<b[0]);});
 
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
 	std::cout << "<<INFO>> data inside [" << _min << ", " << _max << "]" << std::endl ;
 }
 
-bool rational_1d_data::get(int i, float& x, float& yl, float& yu) const
+bool rational_1d_data::get(int i, double& x, double& yl, double& yu) const
 {
 	if(i >= (int)_data.size())
 	{
@@ -159,7 +159,7 @@ bool rational_1d_data::get(int i, float& x, float& yl, float& yu) const
 	return true ;
 }
 
-const std::vector<float>& rational_1d_data::operator[](int i) const
+const std::vector<double>& rational_1d_data::operator[](int i) const
 {
 	return _data[i] ;
 }
@@ -169,12 +169,12 @@ int rational_1d_data::size() const
 	return _data.size() ;
 }
 
-float rational_1d_data::min() const 
+double rational_1d_data::min() const 
 {
 	return _min ;
 }
 
-float rational_1d_data::max() const 
+double rational_1d_data::max() const 
 {
 	return _max ;
 }

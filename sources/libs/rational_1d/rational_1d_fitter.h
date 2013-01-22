@@ -6,20 +6,20 @@
 #include <string>
 #include <tuple>
 
-class rational_1d : public std::function<float(float)> 
+class rational_1d : public std::function<double(double)> 
 {
 	public: // methods
 
 		rational_1d() ;
-		rational_1d(const std::vector<float>& a, const std::vector<float>& b) ;
+		rational_1d(const std::vector<double>& a, const std::vector<double>& b) ;
 		virtual ~rational_1d() ;
 
 		// Overload the function operator
-		virtual float operator()(float x) const ;
+		virtual double operator()(double x) const ;
 
 		// Get the p_i and q_j function
-		virtual float p(float x, int i) const ;
-		virtual float q(float x, int j) const ;
+		virtual double p(double x, int i) const ;
+		virtual double q(double x, int j) const ;
 
 		// IO function to text files
 		void load(const std::string& filename) ;
@@ -32,8 +32,8 @@ class rational_1d : public std::function<float(float)>
 
 		// Store the coefficients for the moment, I assume
 		// the functions to be polynomials.
-		std::vector<float> a ;
-		std::vector<float> b ;
+		std::vector<double> a ;
+		std::vector<double> b ;
 } ;
 
 class rational_1d_data // : public fitting_data
@@ -42,28 +42,28 @@ class rational_1d_data // : public fitting_data
 
 		// Load data from a file
 		void load(const std::string& filename) ;
-		void load(const std::string& filename, float min, float max) ;
+		void load(const std::string& filename, double min, double max) ;
 
 		// Acces to data
-		bool get(int i, float& x, float& yl, float& yu) const ;
-		const std::vector<float>& operator[](int i) const ;
+		bool get(int i, double& x, double& yl, double& yu) const ;
+		const std::vector<double>& operator[](int i) const ;
 
 		// Get data size
 		int size() const ;
 
 		// Get min and max input parameters
-		float min() const ;
-		float max() const ; 
+		double min() const ;
+		double max() const ; 
 
 	private: // data
 
 		// Store for each point of data, the upper
 		// and lower value
-		std::vector<std::vector<float> > _data ;
+		std::vector<std::vector<double> > _data ;
 
 		// Store the min and max value on the input
 		// domain
-		float _min, _max ;
+		double _min, _max ;
 } ;
 
 class rational_1d_fitter // : public fitting_algorithm

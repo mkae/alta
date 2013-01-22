@@ -12,6 +12,7 @@
 #include <fstream>
 #include <limits>
 #include <algorithm>
+#include <cmath>
 
 
 typedef CGAL::MP_Float ET ;
@@ -93,11 +94,12 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
-/*	for(int i=0; i<2*data.size(); ++i)	
+//*
+	for(int i=0; i<2*data.size(); ++i)	
 	{		
 		qp.set_b(i, delta * ci(i)) ;
 	}
-*/
+//*/
 #ifdef DEBUG
 	// Export some informations on the problem to solve
 	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;
@@ -153,13 +155,20 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 	Solution s = CGAL::solve_nonnegative_quadratic_program(qp, ET());
 //*/
 
-	if(s.solves_quadratic_program(qp))
+	bool solves_qp = s.solves_quadratic_program(qp)  ;
+	for(int i=0; i<np+nq; ++i)
+	{
+		const double v = (double)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
+		solves_qp = solves_qp && !isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
+	}
+
+	if(solves_qp)
 	{
 		// Recopy the vector data
-		std::vector<float> p, q;
+		std::vector<double> p, q;
 		for(int i=0; i<np+nq; ++i)
 		{
-			const float v = (float)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
+			const double v = CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
 
 			if(i < np)
 			{
