@@ -60,17 +60,17 @@ class arguments
 				return std::string() ;
 			}
 		} ;
-		float get_float(const std::string& key, float default_value = 0.0f)
+		float get_float(const std::string& key, float default_value = 0.0f) const
 		{
-			std::string value = _map[key] ;
+			std::string value = _map.at(key) ;
 			if(value.empty())
 				return default_value ;
 			else
 				return atof(value.c_str()) ;
 		} ;
-		int get_int(const std::string& key, int default_value = 0)
+		int get_int(const std::string& key, int default_value = 0) const
 		{
-			std::string value = _map[key] ;
+			std::string value = _map.at(key) ;
 			if(value.empty())
 				return default_value ;
 			else

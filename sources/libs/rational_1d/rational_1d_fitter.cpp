@@ -191,10 +191,36 @@ double rational_1d_data::max() const
 	return _max ;
 }
 
-void rational_1d_fitter::set_parameters(int min_np, int max_np, int min_nq, int max_nq)
+bool rational_1d_fitter::fit_data(const rational_1d_data& data, rational_1d& fit)
 {
-	_min_np = min_np ;
-	_min_nq = min_nq ;
-	_max_np = max_np ;
-	_max_nq = max_nq ;
+	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
+	int temp_np = _min_np, temp_nq = _min_nq ;
+	while(temp_np <= _max_np || temp_nq <= _max_nq)
+	{
+		if(fit_data(data, temp_np, temp_nq, fit))
+		{
+			return true ;
+		}
+
+		std::cout << "<<INFO>> fitt using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
+
+		if(temp_np <= _max_np)
+		{
+			++temp_np ;
+		}
+		if(temp_nq <= _max_nq)
+		{
+			++temp_nq ;
+		}
+	}
+
+	return false ;
+}
+
+void rational_1d_fitter::set_parameters(const arguments& args)
+{
+	_max_np = args.get_float("np", 10) ;
+	_max_nq = args.get_float("nq", 10) ;
+	_min_np = args.get_float("min-np", _max_np) ;
+	_min_nq = args.get_float("min-nq", _max_nq) ;
 }

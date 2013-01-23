@@ -20,32 +20,6 @@ typedef CGAL::Quadratic_program<ET> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
 typedef CGAL::Quadratic_program_options Options ;
 		
-// Fitting a data
-bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, rational_1d& fit)
-{
-	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
-	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np <= _max_np || temp_nq <= _max_nq)
-	{
-		if(fit_data(data, temp_np, temp_nq, fit))
-		{
-			return true ;
-		}
-
-		std::cout << "<<INFO>> fitt using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
-
-		if(temp_np <= _max_np)
-		{
-			++temp_np ;
-		}
-		if(temp_nq <= _max_nq)
-		{
-			++temp_nq ;
-		}
-	}
-
-	return false ;
-}
 
 bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
 {
@@ -93,7 +67,7 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 				const double qi = r.q(data[i][0], j-np) ;
 				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
 				qp.set_a(j, i, ET(-data[i][1] * qi)) ;
-				CI(j, i+data.size()) = -data[i][1] * qi ;
+				CI(j, i) = -data[i][1] * qi ;
 				
 				a1_norm += qi*qi * (data[i][2]*data[i][2]) ;
 				qp.set_a(j, i+data.size(),  ET(data[i][2] * qi)) ;

@@ -12,7 +12,13 @@ int main(int argc, char** argv)
 {
 	arguments args(argc, argv) ;
 	if(args.is_defined("help")) {
-		std::cout << argv[0] << " --np <int> --nq <int> --input <filename> --output <filename>" << std::endl ;
+		std::cout << argv[0] << " --algorithm {cgal|eigen} --min <float> --max <float> --min-np <int> --min-nq <int> --np <int> --nq <int> --input <filename> --output <filename>" << std::endl << std::endl ;
+		std::cout << " ....\"min\" defines the left boundary of the domain" << std::endl ;
+		std::cout << " ....\"max\" defines the right boundary of the domain" << std::endl ;
+		std::cout << " .\"min-np\" defines the minimum number of elements at the numerator" << std::endl ;
+		std::cout << " .....\"np\" defines the maxmimum number of elements at the numerator" << std::endl ;
+		std::cout << " .\"min-nq\" defines the minimum number of elements at the denominator" << std::endl ;
+		std::cout << " .....\"nq\" defines the maxmimum number of elements at the denominator" << std::endl ;
 		return 0 ;
 	}
 
@@ -56,7 +62,7 @@ int main(int argc, char** argv)
 		std::cout << "<<INFO>> using CGAL method" << std::endl ;
 		fitter = new rational_1d_fitter_cgal() ;
 	}
-	fitter->set_parameters(args.get_int("min-np", 10), args.get_int("np", 10), args.get_int("min-nq", 10), args.get_int("nq", 10)) ;
+	fitter->set_parameters(args) ;
 	
 	rational_1d r ;
 	bool is_fitted = fitter->fit_data(data, r) ;

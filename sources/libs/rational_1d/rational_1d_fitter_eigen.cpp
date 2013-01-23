@@ -7,12 +7,6 @@
 #include <iostream>
 #include <cfenv>
 
-// Fitting a data
-bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, rational_1d& fit)
-{
-	return fit_data(data, 10, 10, fit) ;
-}
-
 bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
 {
 	// Select the size of the result vector to be equal to the dimension 
@@ -35,8 +29,8 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 	for(int i=0; i<data.size(); ++i)	
 	{		
 		// Norm of the row vector
-		double a0_norm = 0.0f ;
-		double a1_norm = 0.0f ;
+		double a0_norm = 0.0 ;
+		double a1_norm = 0.0 ;
 
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
@@ -50,25 +44,25 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 				const double pi = r.p(data[i][0], j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
-				CI(j, 2*i+0) =   pi ;
-				CI(j, 2*i+1) = - pi ;
+				CI(j, i) =   pi ;
+				CI(j, i+data.size()) = - pi ;
 			}
 			// Filling the q part
 			else
 			{
 				const double qi = r.q(data[i][0], j-np) ;
 				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
-				CI(j, 2*i+0) = - data[i][1] * qi ;
+				CI(j, i) = - data[i][1] * qi ;
 				
 				a1_norm += qi*qi * (data[i][2]*data[i][2]) ;
-				CI(j, 2*i+1) =   data[i][2] * qi ;
+				CI(j, i+data.size()) =   data[i][2] * qi ;
 			}
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
-		ci(2*i+0) = -sqrt(a0_norm) ;
-		ci(2*i+1) = -sqrt(a1_norm) ;
+		ci(i) = -sqrt(a0_norm) ;
+		ci(i+data.size()) = -sqrt(a1_norm) ;
 	}
 	
 	// Update the ci column with the delta parameter
@@ -76,7 +70,25 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
 	const double sigma_m = svd.singularValues()(std::min(2*data.size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
+
+#ifdef DEBUG
+	std::cout << "<<DEBUG>> SVD = [ " ;
+	for(int i=0; i<std::min(2*data.size(), np+nq); ++i)
+	{
+		std::cout << svd.singularValues()(i) << ", " ;
+	}
+	std::cout << " ]" << std::endl ;
+#endif
+
 	const double delta = sigma_m / sigma_M ;
+	if(isnan(delta) || (abs(delta) == std::numeric_limits<double>::infinity()))
+	{
+#ifdef DEBUG
+		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
+#endif
+		return false ;
+	}
+
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_M << " / " << sigma_m << " = " << delta << std::endl ;
 #endif
@@ -92,7 +104,7 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 	Eigen::VectorXd x(np+nq) ;
 
 	double cost = solve_quadprog(G, g0, CE, ce, CI, ci, x) ;
-	bool solves_qp = cost != std::numeric_limits<double>::infinity() ;
+	bool solves_qp = abs(cost) != std::numeric_limits<double>::infinity() /*&& cost > 0*/ ;
 	
 	// Check the data
 	for(int i=0; i<np+nq; ++i)

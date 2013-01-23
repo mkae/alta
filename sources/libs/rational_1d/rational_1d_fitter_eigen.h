@@ -6,9 +6,6 @@ class rational_1d_fitter_eigen : public rational_1d_fitter
 {
 	public: // methods
 
-		// Fitting a data object
-		virtual bool fit_data(const rational_1d_data& data, rational_1d& fit) ;
-
 		// Fitting a data object using np elements
 		// in the numerator and nq elements in the
 		// denominator

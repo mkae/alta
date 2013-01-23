@@ -10,6 +10,7 @@
 #include <core/function.h>
 #include <core/data.h>
 #include <core/fitter.h>
+#include <core/args.h>
 
 class rational_1d : public function
 {
@@ -76,13 +77,13 @@ class rational_1d_fitter //: public fitter
 	public: // methods
 
 		// Fitting a data object
-		virtual bool fit_data(const rational_1d_data& data, rational_1d& fit) = 0;
+		virtual bool fit_data(const rational_1d_data& data, rational_1d& fit) ;
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const rational_1d_data& data, int np, int nq, rational_1d& fit) = 0;
+		virtual bool fit_data(const rational_1d_data& data, int np, int nq, rational_1d& fit) = 0 ;
 
-		virtual void set_parameters(int min_np, int max_np, int min_nq, int max_nq) ;
+		virtual void set_parameters(const arguments& args) ;
 
 	protected: // data
 
