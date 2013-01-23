@@ -254,4 +254,4 @@ bool rational_1d_fitter_cgal::fit_data(const data* d, int np, int nq, function*&
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_plugin_cgal,   rational_1d_fitter_cgal)
+Q_EXPORT_PLUGIN2(rational_fitter_cgal,   rational_1d_fitter_cgal)

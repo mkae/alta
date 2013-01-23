@@ -2,6 +2,7 @@
 
 #include "function.h"
 #include "data.h"
+#include "args.h"
 
 #include <QtPlugin>
 
@@ -19,6 +20,8 @@ class fitter
 		//
 		virtual bool fit_data(const data* d, function*& f) = 0 ;
 
+
+		virtual void set_parameters(const arguments& args) = 0 ;
 } ;
 
 Q_DECLARE_INTERFACE(fitter, "Fitter.Fitter") 

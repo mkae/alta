@@ -9,6 +9,10 @@
 #include <QDir>
 
 #include <iostream>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <limits>
 
 int main(int argc, char** argv)
 {
@@ -25,7 +29,7 @@ int main(int argc, char** argv)
 		QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
 
 		QObject *plugin = loader.instance();
-		if (plugin) {
+		if (plugin != nullptr) {
 
 			std::cout << "Loading plugin " << fileName.toStdString() << std::endl ;
 			if(dynamic_cast<function*>(plugin) != nullptr)
@@ -49,8 +53,39 @@ int main(int argc, char** argv)
 
 	arguments args(argc, argv) ;
 
+	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
+	{
+		fitters[0]->set_parameters(args) ;
 
-	std::cout << "Done" << std::endl ;
+		function* f = functions[0] ;
+		data*     d = datas[0] ;
+		bool is_fitted = fitters[0]->fit_data(d, f) ;
+
+		// Display the result
+		if(is_fitted)
+		{
+			std::cout << f << std::endl ;
+
+			//*
+			std::ofstream file(args["output"], std::ios_base::trunc);
+			const double dt = (d->max() - d->min()) / 100.0f ;
+			for(double x=d->min(); x<=d->max(); x+=dt)
+			{
+				file << x << "\t" << (*f)(x) << std::endl ;
+			}
+			//*/
+		}
+		else
+		{
+			std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
+		}
+
+	}	
+	else
+	{
+		std::cout << "<<ERROR>> not enough plugin defined" << std::endl ;
+	}
+
 
 	return 0 ;
 }
