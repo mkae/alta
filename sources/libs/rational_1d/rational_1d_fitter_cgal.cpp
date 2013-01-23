@@ -16,37 +16,59 @@
 
 
 typedef CGAL::MP_Float ET ;
-typedef CGAL::Quadratic_program<double> Program ;
+typedef CGAL::Quadratic_program<ET> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
+typedef CGAL::Quadratic_program_options Options ;
 		
 // Fitting a data
 bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, rational_1d& fit)
 {
-	return fit_data(data, 10, 10, fit) ;
+	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
+	int temp_np = _min_np, temp_nq = _min_nq ;
+	while(temp_np <= _max_np || temp_nq <= _max_nq)
+	{
+		if(fit_data(data, temp_np, temp_nq, fit))
+		{
+			return true ;
+		}
+
+		std::cout << "<<INFO>> fitt using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
+
+		if(temp_np <= _max_np)
+		{
+			++temp_np ;
+		}
+		if(temp_nq <= _max_nq)
+		{
+			++temp_nq ;
+		}
+	}
+
+	return false ;
 }
 
 bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
 {
-	// by default, we have a nonnegative QP with Ax <= b
+	// by default, we have a nonnegative QP with Ax - b >= 0
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
 
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
 	for(int i=0; i<np+nq; ++i)
 	{
-		qp.set_d(i, i, 1.0f) ; 
+		qp.set_d(i, i, 1.0) ; 
 	}
 	
 	// Each constraint (fitting interval or point
 	// add another dimension to the constraint
 	// matrix
-	Eigen::MatrixXd CI(2*data.size(), np+nq) ;
+	Eigen::MatrixXd CI(np+nq, 2*data.size()) ;
 	Eigen::VectorXd ci(2*data.size()) ;
 	for(int i=0; i<data.size(); ++i)	
 	{		
 		// Norm of the row vector
-		double a0_norm = 0.0f ;
-		double a1_norm = 0.0f ;
+		double a0_norm = 0.0 ;
+		double a1_norm = 0.0 ;
 
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
@@ -60,43 +82,61 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 				const double pi = r.p(data[i][0], j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
-				qp.set_a(j, 2*i+0,  pi) ;
-				qp.set_a(j, 2*i+1, -pi) ;
-				CI(2*i+0, j) =  pi ;
-				CI(2*i+1, j) = -pi ;
+				qp.set_a(j, i,  ET(pi)) ;
+				qp.set_a(j, i+data.size(), ET(-pi)) ;
+				CI(j, i) =  pi ;
+				CI(j, i+data.size()) = -pi ;
 			}
 			// Filling the q part
 			else
 			{
 				const double qi = r.q(data[i][0], j-np) ;
 				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
-				qp.set_a(j, 2*i+0, -data[i][1] * qi) ;
-				CI(2*i+0, j) = -data[i][1] * qi ;
+				qp.set_a(j, i, ET(-data[i][1] * qi)) ;
+				CI(j, i+data.size()) = -data[i][1] * qi ;
 				
 				a1_norm += qi*qi * (data[i][2]*data[i][2]) ;
-				qp.set_a(j, 2*i+1,  data[i][2] * qi) ;
-				CI(2*i+1, j) = data[i][2] * qi ;
+				qp.set_a(j, i+data.size(),  ET(data[i][2] * qi)) ;
+				CI(j, i+data.size()) = data[i][2] * qi ;
 			}
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
-		ci(2*i+0) = sqrt(a0_norm) ;
-		ci(2*i+1) = sqrt(a1_norm) ;
+		ci(i) = sqrt(a0_norm) ;
+		ci(i+data.size()) = sqrt(a1_norm) ;
 	}
-	
+
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
 	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
 	const double sigma_m = svd.singularValues()(std::min(2*data.size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
+
+#ifdef DEBUG
+	std::cout << "<<DEBUG>> SVD = [ " ;
+	for(int i=0; i<std::min(2*data.size(), np+nq); ++i)
+	{
+		std::cout << svd.singularValues()(i) << ", " ;
+	}
+	std::cout << " ]" << std::endl ;
+#endif
+	
 	const double delta = sigma_m / sigma_M ;
+	if(isnan(delta) || (abs(delta) == std::numeric_limits<double>::infinity()))
+	{
+#ifdef DEBUG
+		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
+#endif
+		return false ;
+	}
+
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	for(int i=0; i<2*data.size(); ++i)	
 	{		
-		qp.set_b(i, delta * ci(i)) ;
+		qp.set_b(i, ET(delta * ci(i))) ;
 	}
 
 #ifdef DEBUG
@@ -108,7 +148,7 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 	if(qp.is_linear() && !qp.is_nonnegative())
 	{
 		std::cerr << "<<ERROR>> the problem should not be linear or negative!" << std::endl ;
-		throw ;
+		return false ;
 	}
 
 #ifdef EXTREM_DEBUG
@@ -148,9 +188,18 @@ bool rational_1d_fitter_cgal::fit_data(const rational_1d_data& data, int np, int
 #endif
 
 	// solve the program, using ET as the exact type
-	Solution s = CGAL::solve_quadratic_program(qp, ET()) ;
+	Options  o ;
+	o.set_auto_validation(true) ;
+	Solution s = CGAL::solve_quadratic_program(qp, ET(), o) ;
 
-	bool solves_qp = s.solves_quadratic_program(qp)  ;
+#ifdef DEBUG
+	if(s.is_infeasible())
+	{
+		std::cout << "<<DEBUG>> the current program is infeasible" << std::endl ;
+	}
+#endif
+
+	bool solves_qp = !s.is_infeasible() && s.solves_quadratic_program(qp)  ;
 	for(int i=0; i<np+nq; ++i)
 	{
 		const double v = (double)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;

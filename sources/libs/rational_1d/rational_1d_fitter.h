@@ -78,9 +78,16 @@ class rational_1d_fitter //: public fitter
 		// Fitting a data object
 		virtual bool fit_data(const rational_1d_data& data, rational_1d& fit) = 0;
 
-		// Fitting a data object using np elements
-		// in the numerator and nq elements in the
-		// denominator
+		// Fitting a data object using np elements in the numerator and nq 
+		// elements in the denominator
 		virtual bool fit_data(const rational_1d_data& data, int np, int nq, rational_1d& fit) = 0;
+
+		virtual void set_parameters(int min_np, int max_np, int min_nq, int max_nq) ;
+
+	protected: // data
+
+		// min and Max usable np and nq values for the fitting
+		int _max_np, _max_nq ;
+		int _min_np, _min_nq ;
 } ;
 

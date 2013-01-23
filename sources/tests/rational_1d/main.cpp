@@ -56,9 +56,10 @@ int main(int argc, char** argv)
 		std::cout << "<<INFO>> using CGAL method" << std::endl ;
 		fitter = new rational_1d_fitter_cgal() ;
 	}
+	fitter->set_parameters(args.get_int("min-np", 10), args.get_int("np", 10), args.get_int("min-nq", 10), args.get_int("nq", 10)) ;
 	
 	rational_1d r ;
-	bool is_fitted = fitter->fit_data(data, args.get_int("np", 10), args.get_int("nq", 10), r) ;
+	bool is_fitted = fitter->fit_data(data, r) ;
 
 	// Display the result
 	if(is_fitted)

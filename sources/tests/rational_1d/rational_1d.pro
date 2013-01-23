@@ -1,5 +1,5 @@
 DEST_DIR = ../bin
-#CONFIG += debug
+CONFIG += debug
 INCLUDEPATH += ../../ ../../libs/rational_1d /home/belcour/Sources/Eigen/include/eigen3
 
 SOURCES += main.cpp															\

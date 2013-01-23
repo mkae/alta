@@ -190,3 +190,11 @@ double rational_1d_data::max() const
 {
 	return _max ;
 }
+
+void rational_1d_fitter::set_parameters(int min_np, int max_np, int min_nq, int max_nq)
+{
+	_min_np = min_np ;
+	_min_nq = min_nq ;
+	_max_np = max_np ;
+	_max_nq = max_nq ;
+}
