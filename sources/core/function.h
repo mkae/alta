@@ -3,6 +3,8 @@
 #include <functional>
 #include <string>
 
+#include <QtPlugin>
+
 class function : public std::function<double(double)>
 {
 	public: // methods
@@ -15,3 +17,5 @@ class function : public std::function<double(double)>
 		virtual void save() const = 0 ;
 
 } ;
+
+Q_DECLARE_INTERFACE(function, "Fitter.Function") 

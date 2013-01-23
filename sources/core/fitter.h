@@ -3,6 +3,8 @@
 #include "function.h"
 #include "data.h"
 
+#include <QtPlugin>
+
 /*
  * Fitting interface for generic fitting algorithms
  *
@@ -15,6 +17,8 @@ class fitter
 		// underling function class. Return the best
 		// fit (along with fitting information ?)
 		//
-		virtual bool fit_data(const data* d, function* f) = 0 ;
+		virtual bool fit_data(const data* d, function*& f) = 0 ;
 
 } ;
+
+Q_DECLARE_INTERFACE(fitter, "Fitter.Fitter") 

@@ -170,6 +170,15 @@ bool rational_1d_data::get(int i, double& x, double& yl, double& yu) const
 
 	return true ;
 }
+		
+int rational_1d_data::input_dimension() const 
+{
+	return 1 ;
+}
+int rational_1d_data::output_dimension() const
+{
+	return 1 ;
+}
 
 const std::vector<double>& rational_1d_data::operator[](int i) const
 {
@@ -191,7 +200,7 @@ double rational_1d_data::max() const
 	return _max ;
 }
 
-bool rational_1d_fitter::fit_data(const rational_1d_data& data, rational_1d& fit)
+bool rational_1d_fitter::fit_data(const rational_1d_data* data, rational_1d*& fit)
 {
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 	int temp_np = _min_np, temp_nq = _min_nq ;

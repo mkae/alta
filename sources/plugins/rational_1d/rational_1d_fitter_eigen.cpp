@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cfenv>
 
-bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, int nq, rational_1d& r) 
+bool rational_1d_fitter_eigen::fit_data(const rational_1d_data* data, int np, int nq, rational_1d*& r) 
 {
 	// Select the size of the result vector to be equal to the dimension 
 	// of p + q.
@@ -24,9 +24,9 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 	// Each constraint (fitting interval or point
 	// add another dimension to the constraint
 	// matrix
-	Eigen::MatrixXd CI(np+nq, 2*data.size()) ;
-	Eigen::VectorXd ci(2*data.size()) ;
-	for(int i=0; i<data.size(); ++i)	
+	Eigen::MatrixXd CI(np+nq, 2*data->size()) ;
+	Eigen::VectorXd ci(2*data->size()) ;
+	for(int i=0; i<data->size(); ++i)	
 	{		
 		// Norm of the row vector
 		double a0_norm = 0.0 ;
@@ -41,39 +41,39 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 			// Filling the p part
 			if(j<np)
 			{
-				const double pi = r.p(data[i][0], j) ;
+				const double pi = r->p((*data)[i][0], j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				CI(j, i) =   pi ;
-				CI(j, i+data.size()) = - pi ;
+				CI(j, i+data->size()) = - pi ;
 			}
 			// Filling the q part
 			else
 			{
-				const double qi = r.q(data[i][0], j-np) ;
-				a0_norm += qi*qi * (data[i][1]*data[i][1]) ;
-				CI(j, i) = - data[i][1] * qi ;
+				const double qi = r->q((*data)[i][0], j-np) ;
+				a0_norm += qi*qi * ((*data)[i][1]*(*data)[i][1]) ;
+				CI(j, i) = - (*data)[i][1] * qi ;
 				
-				a1_norm += qi*qi * (data[i][2]*data[i][2]) ;
-				CI(j, i+data.size()) =   data[i][2] * qi ;
+				a1_norm += qi*qi * ((*data)[i][2]*(*data)[i][2]) ;
+				CI(j, i+data->size()) =   (*data)[i][2] * qi ;
 			}
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
 		ci(i) = -sqrt(a0_norm) ;
-		ci(i+data.size()) = -sqrt(a1_norm) ;
+		ci(i+data->size()) = -sqrt(a1_norm) ;
 	}
 	
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
 	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
-	const double sigma_m = svd.singularValues()(std::min(2*data.size(), np+nq)-1) ;
+	const double sigma_m = svd.singularValues()(std::min(2*data->size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
 
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> SVD = [ " ;
-	for(int i=0; i<std::min(2*data.size(), np+nq); ++i)
+	for(int i=0; i<std::min(2*data->size(), np+nq); ++i)
 	{
 		std::cout << svd.singularValues()(i) << ", " ;
 	}
@@ -92,15 +92,15 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_M << " / " << sigma_m << " = " << delta << std::endl ;
 #endif
-	for(int i=0; i<2*data.size(); ++i)	
+	for(int i=0; i<2*data->size(); ++i)	
 	{		
 		ci(i) *= delta ;
 	}
 	
 	// solve the program, using ET as the exact type
 	Eigen::VectorXd g0(np+nq) ;
-	Eigen::MatrixXd CE(np+nq, 2*data.size()) ;
-	Eigen::VectorXd ce(2*data.size()) ;
+	Eigen::MatrixXd CE(np+nq, 2*data->size()) ;
+	Eigen::VectorXd ce(2*data->size()) ;
 	Eigen::VectorXd x(np+nq) ;
 
 	double cost = solve_quadprog(G, g0, CE, ce, CI, ci, x) ;
@@ -134,7 +134,12 @@ bool rational_1d_fitter_eigen::fit_data(const rational_1d_data& data, int np, in
 			}
 		}
 
-		r = rational_1d(p, q);
+
+		if(r != nullptr)
+		{
+			delete r ;
+		}
+		r = new rational_1d(p, q);
 		return true ;
 	}
 	else

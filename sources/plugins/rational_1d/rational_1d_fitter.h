@@ -7,6 +7,7 @@
 #include <tuple>
 
 // Interface
+#include <QObject>
 #include <core/function.h>
 #include <core/data.h>
 #include <core/fitter.h>
@@ -60,6 +61,12 @@ class rational_1d_data : public data
 		// Get min and max input parameters
 		virtual double min() const ;
 		virtual double max() const ; 
+	
+		// Get the dimension of the input and output space
+		// WARNING: this dimension is defined after loading
+		// the data!
+		virtual int input_dimension() const ;
+		virtual int output_dimension() const ;
 
 	private: // data
 
@@ -72,16 +79,16 @@ class rational_1d_data : public data
 		double _min, _max ;
 } ;
 
-class rational_1d_fitter //: public fitter
+class rational_1d_fitter : public fitter
 {
 	public: // methods
 
 		// Fitting a data object
-		virtual bool fit_data(const rational_1d_data& data, rational_1d& fit) ;
+		virtual bool fit_data(const rational_1d_data* data, rational_1d*& fit) ;
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const rational_1d_data& data, int np, int nq, rational_1d& fit) = 0 ;
+		virtual bool fit_data(const rational_1d_data* data, int np, int nq, rational_1d*& fit) = 0 ;
 
 		virtual void set_parameters(const arguments& args) ;
 
