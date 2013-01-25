@@ -13,10 +13,11 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <cstdlib>
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv);
+	QApplication app(argc, argv, false);
 
 
 	std::vector<function*> functions ;
@@ -41,14 +42,16 @@ int main(int argc, char** argv)
 #endif
 				functions.push_back(dynamic_cast<function*>(plugin)) ;
 			}
-			else if(dynamic_cast<data*>(plugin) != nullptr)
+			
+			if(dynamic_cast<data*>(plugin) != nullptr)
 			{
 #ifdef DEBUG
 				std::cout << "<<DEBUG>>  -> it is a data loader" << std::endl ;
 #endif
 				datas.push_back(dynamic_cast<data*>(plugin)) ;
 			}
-			else if(dynamic_cast<fitter*>(plugin) != nullptr)
+			
+			if(dynamic_cast<fitter*>(plugin) != nullptr)
 			{
 #ifdef DEBUG
 				std::cout << "<<DEBUG>>  -> it is a fitter" << std::endl ;
