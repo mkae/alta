@@ -22,7 +22,14 @@ typedef CGAL::Quadratic_program<ET> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
 typedef CGAL::Quadratic_program_options Options ;
 
-bool rational_1d_fitter_cgal::fit_data(const data* d, function*& fit)
+rational_fitter_cgal::rational_fitter_cgal() : QObject()
+{
+}
+rational_fitter_cgal::~rational_fitter_cgal() 
+{
+}
+
+bool rational_fitter_cgal::fit_data(const data* d, function*& fit)
 {
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 	int temp_np = _min_np, temp_nq = _min_nq ;
@@ -48,7 +55,7 @@ bool rational_1d_fitter_cgal::fit_data(const data* d, function*& fit)
 	return false ;
 }
 
-void rational_1d_fitter_cgal::set_parameters(const arguments& args)
+void rational_fitter_cgal::set_parameters(const arguments& args)
 {
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
@@ -57,7 +64,7 @@ void rational_1d_fitter_cgal::set_parameters(const arguments& args)
 }
 		
 
-bool rational_1d_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf) 
+bool rational_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf) 
 {
 	// by default, we have a nonnegative QP with Ax - b >= 0
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
@@ -254,4 +261,4 @@ bool rational_1d_fitter_cgal::fit_data(const data* d, int np, int nq, function*&
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_fitter_cgal,   rational_1d_fitter_cgal)
+Q_EXPORT_PLUGIN2(rational_fitter_cgal, rational_fitter_cgal)

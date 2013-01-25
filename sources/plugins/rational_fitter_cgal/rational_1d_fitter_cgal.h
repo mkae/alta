@@ -13,12 +13,15 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
-class rational_1d_fitter_cgal : public QObject, public fitter
+class rational_fitter_cgal : public QObject, public fitter
 {
 	Q_OBJECT
 	Q_INTERFACES(fitter)
 
 	public: // methods
+	
+		rational_fitter_cgal() ;
+		virtual ~rational_fitter_cgal() ;
 
 		// Fitting a data object
 		virtual bool fit_data(const data* d, function*& fit) ;

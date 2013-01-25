@@ -53,6 +53,7 @@ class rational_1d_data : public data
 
 		// Acces to data
 		virtual bool get(int i, double& x, double& yl, double& yu) const ;
+		virtual const std::vector<double>& get(int i) const ;
 		virtual const std::vector<double>& operator[](int i) const ;
 
 		// Get data size
@@ -84,11 +85,11 @@ class rational_1d_fitter : public fitter
 	public: // methods
 
 		// Fitting a data object
-		virtual bool fit_data(const rational_1d_data* data, rational_1d*& fit) ;
+		virtual bool fit_data(const data* d, function*& f) ;
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const rational_1d_data* data, int np, int nq, rational_1d*& fit) = 0 ;
+		virtual bool fit_data(const data* d, int np, int nq, function*& f) = 0 ;
 
 		virtual void set_parameters(const arguments& args) ;
 

@@ -9,7 +9,7 @@ class rational_1d_fitter_eigen : public rational_1d_fitter
 		// Fitting a data object using np elements
 		// in the numerator and nq elements in the
 		// denominator
-		virtual bool fit_data(const rational_1d_data* data, int np, int nq, rational_1d*& fit) ;
+		virtual bool fit_data(const data* d, int np, int nq, function*& f) ;
 
 	private:
 } ;

@@ -29,22 +29,30 @@ int main(int argc, char** argv)
 		QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
 
 		QObject *plugin = loader.instance();
-		if (plugin != nullptr) {
-
-			std::cout << "Loading plugin " << fileName.toStdString() << std::endl ;
+		if (plugin != nullptr) 
+		{
+#ifdef DEBUG
+			std::cout << "<<DEBUG>> loading plugin " << fileName.toStdString() << std::endl ;
+#endif
 			if(dynamic_cast<function*>(plugin) != nullptr)
 			{
-				std::cout << "  -> it is a function" << std::endl ;
+#ifdef DEBUG
+				std::cout << "<<DEBUG>>  -> it is a function" << std::endl ;
+#endif
 				functions.push_back(dynamic_cast<function*>(plugin)) ;
 			}
 			else if(dynamic_cast<data*>(plugin) != nullptr)
 			{
-				std::cout << "  -> it is a data loader" << std::endl ;
+#ifdef DEBUG
+				std::cout << "<<DEBUG>>  -> it is a data loader" << std::endl ;
+#endif
 				datas.push_back(dynamic_cast<data*>(plugin)) ;
 			}
 			else if(dynamic_cast<fitter*>(plugin) != nullptr)
 			{
-				std::cout << "  -> it is a fitter" << std::endl ;
+#ifdef DEBUG
+				std::cout << "<<DEBUG>>  -> it is a fitter" << std::endl ;
+#endif
 				fitters.push_back(dynamic_cast<fitter*>(plugin)) ;
 			}
 
@@ -52,6 +60,14 @@ int main(int argc, char** argv)
 	}
 
 	arguments args(argc, argv) ;
+	if(! args.is_defined("input")) {
+		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
+		return 1 ;
+	}
+	if(! args.is_defined("output")) {
+		std::cerr << "<<ERROR>> the output filename is not defined" << std::endl ;
+		return 1 ;
+	}
 
 	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
@@ -59,12 +75,29 @@ int main(int argc, char** argv)
 
 		function* f = functions[0] ;
 		data*     d = datas[0] ;
+		if(args.is_defined("min") && args.is_defined("max"))
+		{
+			d->load(args["input"], args.get_float("min", 0.0f), args.get_float("max", 1.0f));
+		}
+		else if(args.is_defined("min") && !args.is_defined("max"))
+		{
+			d->load(args["input"], args.get_float("min", 0.0f), std::numeric_limits<double>::max());
+		}
+		else if(args.is_defined("min") && !args.is_defined("max"))
+		{
+			d->load(args["input"], -std::numeric_limits<double>::max(), args.get_float("min", 0.0f));
+		}
+		else
+		{
+			d->load(args["input"]);
+		}
+
 		bool is_fitted = fitters[0]->fit_data(d, f) ;
 
 		// Display the result
 		if(is_fitted)
 		{
-			std::cout << f << std::endl ;
+//			std::cout << *f << std::endl ;
 
 			//*
 			std::ofstream file(args["output"], std::ios_base::trunc);

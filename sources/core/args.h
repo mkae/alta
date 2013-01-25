@@ -62,11 +62,10 @@ class arguments
 		} ;
 		float get_float(const std::string& key, float default_value = 0.0f) const
 		{
-			std::string value = _map.at(key) ;
-			if(value.empty())
-				return default_value ;
+			if(_map.count(key) > 0)
+				return atof(_map.at(key).c_str()) ;
 			else
-				return atof(value.c_str()) ;
+				return default_value ;
 		} ;
 		int get_int(const std::string& key, int default_value = 0) const
 		{

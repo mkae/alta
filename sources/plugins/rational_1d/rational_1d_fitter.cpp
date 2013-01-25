@@ -170,6 +170,11 @@ bool rational_1d_data::get(int i, double& x, double& yl, double& yu) const
 
 	return true ;
 }
+
+const std::vector<double>& rational_1d_data::get(int i) const
+{
+	return _data[i] ;
+}
 		
 int rational_1d_data::input_dimension() const 
 {
