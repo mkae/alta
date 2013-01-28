@@ -64,17 +64,24 @@ void rational_fitter_cgal::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf) 
+bool rational_fitter_cgal::fit_data(const data* dat, int np, int nq, function*& rf) 
 {
 	// by default, we have a nonnegative QP with Ax - b >= 0
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
 
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
-	if(r == nullptr)
+	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
+	if(r == nullptr || d == nullptr)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;
 	}
+
+	// I need to set the dimension of the resulting function to be equal
+	// to the dimension of my fitting problem
+	r->setDimX(d->dimX()) ;
+	r->setDimY(d->dimY()) ;
+
 
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
@@ -103,7 +110,7 @@ bool rational_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf
 			// Filling the p part
 			if(j<np)
 			{
-				const double pi = r->p((*d)[i][0], j) ;
+				const double pi = r->p(d->get(i), j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				qp.set_a(j, i,  ET(pi)) ;
@@ -114,14 +121,17 @@ bool rational_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf
 			// Filling the q part
 			else
 			{
-				const double qi = r->q((*d)[i][0], j-np) ;
-				a0_norm += qi*qi * ((*d)[i][1]*(*d)[i][1]) ;
-				qp.set_a(j, i, ET(-(*d)[i][1] * qi)) ;
-				CI(j, i) = -(*d)[i][1] * qi ;
+				vec yl, yu ; 
+				d->get(i, yl, yu) ;
+
+				const double qi = r->q(d->get(i), j-np) ;
+				a0_norm += qi*qi * (yl[0]*yl[0]) ;
+				qp.set_a(j, i, ET(-yl[0] * qi)) ;
+				CI(j, i) = -yl[0] * qi ;
 				
-				a1_norm += qi*qi * ((*d)[i][2]*(*d)[i][2]) ;
-				qp.set_a(j, i+d->size(),  ET((*d)[i][2] * qi)) ;
-				CI(j, i+d->size()) = (*d)[i][2] * qi ;
+				a1_norm += qi*qi * (yu[0]*yu[0]) ;
+				qp.set_a(j, i+d->size(),  ET(yu[0] * qi)) ;
+				CI(j, i+d->size()) = yu[0] * qi ;
 			}
 		}
 	
@@ -146,13 +156,17 @@ bool rational_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf
 	std::cout << " ]" << std::endl ;
 #endif
 	
-	const double delta = sigma_m / sigma_M ;
+	double delta = sigma_m / sigma_M ;
 	if(isnan(delta) || (abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 #ifdef DEBUG
 		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
 #endif
 		return false ;
+	}
+	else if(delta == 0.0)
+	{
+		delta = 1.0 ;
 	}
 
 #ifdef DEBUG
@@ -253,6 +267,8 @@ bool rational_fitter_cgal::fit_data(const data* d, int np, int nq, function*& rf
 			delete r ;
 		}
 		r = new rational_function(p, q);
+			
+		std::cout << "<<INFO>> got solution " << *r << std::endl ;
 		return true;
 	}
 	else

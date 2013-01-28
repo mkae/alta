@@ -17,16 +17,16 @@ void rational_data::load(const std::string& filename)
 void rational_data::load(const std::string& filename, double min, double max) 
 {
 	std::ifstream file(filename) ;
-	_min =  std::numeric_limits<double>::max() ;
-	_max = -std::numeric_limits<double>::max() ;
-
 	if(!file.is_open())
 	{
 		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
 	}
 
 	// N-Floats regexp
-	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)+");
+//	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)");
+
+	_nX = 0 ; _nY = 0 ;
+	std::vector<int> vs ;
 
 	double x, y, dy ;
 	while(file.good())
@@ -36,30 +36,78 @@ void rational_data::load(const std::string& filename, double min, double max)
 		std::stringstream linestream(line) ;
 		
 		// Discard incorrect lines
-		if(!boost::regex_match(line,e))
+		if(linestream.peek() == '#')
+		{
+			linestream.ignore(1) ;
+
+			std::string comment ;
+			linestream >> comment ;
+			std::cout << comment << std::endl ;
+
+			if(comment == std::string("DIM"))
+			{
+				linestream >> _nX >> _nY ;
+
+				vs.resize(dimY()) ;
+				for(int k=0; k<dimY(); ++k)
+				{
+					vs[k] = 0 ;
+				}
+
+				_min.resize(dimX()) ;
+				_max.resize(dimX()) ;
+				for(int k=0; k<dimY(); ++k)
+				{
+					_min[k] =  std::numeric_limits<double>::max() ;
+					_max[k] = -std::numeric_limits<double>::max() ;
+				}
+			}
+			continue ;
+		} 
+		else if(line.empty()/*!boost::regex_match(line,e)*/)
 		{
 			continue ;
 		}
 
-		linestream >> x >> y ;
-		if(linestream.good()) {
-			linestream >> dy ;
-		} else {
-			// TODO Specify the delta in case
-			dy = 0.01f ;
+		vec v ;
+		v.resize(dimX() + 3*dimY()) ;
+		for(int i=0; i<dimX(); ++i)
+			linestream >> v[i] ;
+
+		for(int i=0; i<dimY(); ++i)
+			linestream >> v[dimX() + i] ;
+
+		for(int i=0; i<dimY(); ++i)
+		{
+			// TODO, the firts case does not account for the
+			// dimension of the ouput vector
+			if(linestream.good()) 
+			{
+				linestream >> v[dimX() + dimY()+i] ;
+			} 
+			else 
+			{
+				// TODO Specify the delta in case
+				// Handle multiple dim
+				v[dimX() + dimY()+i] = v[dimX() + i] - 0.01f ;
+				v[dimX() + 2*dimY()+i] = v[dimX() + i] + 0.01f ;
+			}
+		}
+		
+		// If data is not in the interval of fit
+		// TODO: Update to more dims
+		if(v[0] < min || v[0] > max)
+		{
+			continue ;
 		}
 
-		if(x <= max && x >= min)
-		{
-			std::vector<double> v ;
-			v.push_back(x) ;
-			v.push_back(y-dy) ;
-			v.push_back(y+dy) ;
-			_data.push_back(v) ;
+		_data.push_back(v) ;
 
-			// Update min and max
-			_min = std::min(_min, x) ;
-			_max = std::max(_max, x) ;
+		// Update min and max
+		for(int k=0; k<dimX(); ++k)
+		{
+			_min[k] = std::min(_min[k], v[k]) ;
+			_max[k] = std::max(_max[k], v[k]) ;
 		}
 	}
 
@@ -75,10 +123,11 @@ void rational_data::load(const std::string& filename, double min, double max)
 	_data = temp ;
 */
 	// Sort the vector
-	std::sort(_data.begin(), _data.end(), [](const std::vector<double>& a, const std::vector<double>& b){return (a[0]<b[0]);});
+//	std::sort(_data.begin(), _data.end(), [](const std::vector<double>& a, const std::vector<double>& b){return (a[0]<b[0]);});
 
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
-	std::cout << "<<INFO>> data inside [" << _min << ", " << _max << "]" << std::endl ;
+	std::cout << "<<INFO>> data inside " << _min << " ... " << _max << std::endl ;
+	std::cout << "<<INFO>> loading data file of R^" << dimX() << " -> R^" << dimY() << std::endl ;
 	std::cout << "<<INFO>> " << _data.size() << " elements to fit" << std::endl ;
 }
 
@@ -96,20 +145,21 @@ bool rational_data::get(int i, double& x, double& yl, double& yu) const
 	return true ;
 }
 		
-int rational_data::input_dimension() const 
+void rational_data::get(int i, vec& yl, vec& yu) const
 {
-	return 1 ;
+	yl.resize(dimY()) ; yu.resize(dimY()) ;
+	for(int j=0; j<dimY(); ++j)	
+	{
+		yl[j] = _data[i][dimX() + dimY() + j] ;
+		yu[j] = _data[i][dimX() + 2*dimY() + j] ;
+	}
 }
-int rational_data::output_dimension() const
-{
-	return 1 ;
-}
-
-const std::vector<double>& rational_data::operator[](int i) const
+		
+const vec& rational_data::operator[](int i) const
 {
 	return _data[i] ;
 }
-const std::vector<double>& rational_data::get(int i) const 
+const vec& rational_data::get(int i) const 
 {
 	return _data[i] ;
 }
@@ -119,12 +169,12 @@ int rational_data::size() const
 	return _data.size() ;
 }
 
-double rational_data::min() const 
+vec rational_data::min() const 
 {
 	return _min ;
 }
 
-double rational_data::max() const 
+vec rational_data::max() const 
 {
 	return _max ;
 }

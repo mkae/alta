@@ -6,6 +6,6 @@ INCLUDEPATH += ../../ ../../libs/rational_1d /home/belcour/Sources/Eigen/include
 SOURCES += main.cpp
 
 QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC
-QMAKE_LFLAGS   +=  -Wl,-rpath="."
+QMAKE_LFLAGS   +=  -Wl,-rpath="/home/belcour/Projects/alta/sources/plugins/build"
 
 LIBS += -lCGAL -lboost_regex

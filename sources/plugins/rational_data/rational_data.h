@@ -26,30 +26,25 @@ class rational_data : public QObject, public data
 
 		// Acces to data
 		virtual bool get(int i, double& x, double& yl, double& yu) const ;
-		virtual const std::vector<double>& get(int i) const ;		
-		virtual const std::vector<double>& operator[](int i) const ;
+		virtual const vec& get(int i) const ;		
+		virtual void get(int i, vec& yl, vec& yu) const ;		
+		virtual const vec& operator[](int i) const ;
 
 		// Get data size
 		virtual int size() const ;
 
 		// Get min and max input parameters
-		virtual double min() const ;
-		virtual double max() const ; 
-	
-		// Get the dimension of the input and output space
-		// WARNING: this dimension is defined after loading
-		// the data!
-		virtual int input_dimension() const ;
-		virtual int output_dimension() const ;
+		virtual vec min() const ;
+		virtual vec max() const ; 
 
 	private: // data
 
 		// Store for each point of data, the upper
 		// and lower value
-		std::vector<std::vector<double> > _data ;
+		std::vector<vec> _data ;
 
 		// Store the min and max value on the input
 		// domain
-		double _min, _max ;
+		vec _min, _max ;
 } ;
 

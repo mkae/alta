@@ -23,32 +23,86 @@ rational_function::~rational_function()
 }
 
 // Overload the function operator
-double rational_function::operator()(double x) const 
+vec rational_function::operator()(const vec& x) const 
 {
-	double p = 0.0f ;
-	double q = 0.0f ;
+	vec res ;
+	res.resize(dimY()) ;
 
-	for(int i=a.size()-1; i>=0; --i)
+	for(int k=0; k<_nY; ++k)
 	{
-		p = x*p + a[i] ;
-	}
+		double p = 0.0f ;
+		double q = 0.0f ;
+		for(int l=0; l<_nX; ++l)
+		{
 
-	for(int i=b.size()-1; i>=0; --i)
-	{
-		q = x*q + b[i] ;
-	}
+			for(int i=a.size()-1; i>=0; --i)
+			{
+				p = x[l]*p + a[i] ;
+			}
 
-	return p/q ;
+			for(int i=b.size()-1; i>=0; --i)
+			{
+				q = x[l]*q + b[i] ;
+			}
+		}
+		res[k] = p/q ;
+	}
+	return res ;
 }
-		
+
+
 // Get the p_i and q_j function
-double rational_function::p(double x, int i) const
+double rational_function::p(const vec& x, int i) const
 {
-	return pow(x, i) ;
+	std::vector<int> deg ; deg.assign(dimY(), 0) ;
+	
+	double res = 1.0 ;
+
+	if(i == 0)
+		return res ;
+
+	int temp_i = i ;
+	int temp_c ;
+	while(temp_i != 0)
+	{
+		temp_c = (temp_i-1) % dimX() ;
+		temp_i = (temp_i - temp_c) / dimX() ;
+
+		deg[temp_c] += 1 ;
+	}
+
+	for(int k=0; k<dimX(); ++k)
+	{
+		res *= pow(x[k], deg[k]) ;
+	}
+
+	return res ;
 }
-double rational_function::q(double x, int j) const 
+double rational_function::q(const vec& x, int i) const 
 {
-	return pow(x, j) ;
+	std::vector<int> deg ; deg.assign(dimY(), 0) ;
+	
+	double res = 1.0 ;
+
+	if(i == 0)
+		return res ;
+
+	int temp_i = i ;
+	int temp_c ;
+	while(temp_i != 0)
+	{
+		temp_c = (temp_i-1) % dimX() ;
+		temp_i = (temp_i - temp_c) / dimX() ;
+
+		deg[temp_c] += 1 ;
+	}
+
+	for(int k=0; k<dimX(); ++k)
+	{
+		res *= pow(x[k], deg[k]) ;
+	}
+
+	return res ;
 }
 
 // IO function to text files

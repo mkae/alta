@@ -3,6 +3,7 @@
 #include "function.h"
 #include "data.h"
 #include "args.h"
+#include "common.h"
 
 #include <QtPlugin>
 

@@ -13,5 +13,5 @@ LIBS           += -lCGAL -lboost_regex                 \
                   -L../build                           \
 						-lrational_function -lrational_data
 
-QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC
+QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC -g
 

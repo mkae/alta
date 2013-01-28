@@ -10,4 +10,4 @@ SOURCES         = rational_data.cpp
 
 LIBS           += -lboost_regex
 
-QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC
+QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC -g

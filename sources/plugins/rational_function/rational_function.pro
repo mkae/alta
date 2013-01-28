@@ -10,5 +10,5 @@ SOURCES         = rational_function.cpp
 
 LIBS           += -lboost_regex
 
-QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC -rdynamic
+QMAKE_CXXFLAGS += -std=c++11 -frounding-math -fPIC -rdynamic -g
 

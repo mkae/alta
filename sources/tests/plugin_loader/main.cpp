@@ -17,14 +17,23 @@
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv, false);
+//	QCoreApplication::addLibraryPath() ;
+	QCoreApplication::addLibraryPath(QString("/home/belcour/Projects/alta/sources/tests/plugin_loader/")) ;
 
+	QApplication app(argc, argv, false);
+	arguments args(argc, argv) ;
 
 	std::vector<function*> functions ;
 	std::vector<data*>     datas ;
 	std::vector<fitter*>   fitters ;
 
 	QDir pluginsDir = QDir(app.applicationDirPath());
+	if(args.is_defined("plugins"))
+	{
+		pluginsDir = QDir(args["plugins"].c_str()) ;
+	}
+
+
 	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) 
 	{
 		QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -62,7 +71,6 @@ int main(int argc, char** argv)
 		}
 	}
 
-	arguments args(argc, argv) ;
 	if(! args.is_defined("input")) {
 		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
 		return 1 ;
@@ -100,16 +108,13 @@ int main(int argc, char** argv)
 		// Display the result
 		if(is_fitted)
 		{
-//			std::cout << *f << std::endl ;
-
-			//*
 			std::ofstream file(args["output"], std::ios_base::trunc);
-			const double dt = (d->max() - d->min()) / 100.0f ;
-			for(double x=d->min(); x<=d->max(); x+=dt)
+			const double dt = (d->max()[0] - d->min()[0]) / 100.0f ;
+			for(double x=d->min()[0]; x<=d->max()[0]; x+=dt)
 			{
-				file << x << "\t" << (*f)(x) << std::endl ;
+				vec vx ; vx.push_back(x) ;
+				file << x << "\t" << ((*f)(vx))[0] << std::endl ;
 			}
-			//*/
 		}
 		else
 		{

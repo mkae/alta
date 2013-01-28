@@ -12,6 +12,7 @@
 #include <core/data.h>
 #include <core/fitter.h>
 #include <core/args.h>
+#include <core/common.h>
 
 class rational_function : public QObject, public function
 {
@@ -25,11 +26,11 @@ class rational_function : public QObject, public function
 		virtual ~rational_function() ;
 
 		// Overload the function operator
-		virtual double operator()(double x) const ;
+		virtual vec operator()(const vec& x) const ;
 
 		// Get the p_i and q_j function
-		virtual double p(double x, int i) const ;
-		virtual double q(double x, int j) const ;
+		virtual double p(const vec& x, int i) const ;
+		virtual double q(const vec& x, int j) const ;
 
 		// IO function to text files
 		void load(const std::string& filename) ;
