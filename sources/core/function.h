@@ -21,8 +21,8 @@ class function //: public std::function<double(double)>
 		virtual int dimX() const { return _nX ; } ;
 		virtual int dimY() const { return _nY ; } ;
 
-		virtual int setDimX(int nX) { _nX = nX ; } ;
-		virtual int setDimY(int nY) { _nY = nY ; } ;
+		virtual void setDimX(int nX) { _nX = nX ; } ;
+		virtual void setDimY(int nY) { _nY = nY ; } ;
 
 	protected:
 		// Dimension of the function

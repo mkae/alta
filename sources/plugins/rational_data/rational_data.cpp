@@ -26,7 +26,7 @@ void rational_data::load(const std::string& filename, double min, double max)
 //	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)");
 
 	_nX = 0 ; _nY = 0 ;
-	std::vector<int> vs ;
+	std::vector<int> vs ; int current_vs = 0 ;
 
 	double x, y, dy ;
 	while(file.good())
@@ -42,13 +42,12 @@ void rational_data::load(const std::string& filename, double min, double max)
 
 			std::string comment ;
 			linestream >> comment ;
-			std::cout << comment << std::endl ;
 
 			if(comment == std::string("DIM"))
 			{
 				linestream >> _nX >> _nY ;
 
-				vs.resize(dimY()) ;
+				vs.assign(dimY(), 0) ;
 				for(int k=0; k<dimY(); ++k)
 				{
 					vs[k] = 0 ;
@@ -61,6 +60,12 @@ void rational_data::load(const std::string& filename, double min, double max)
 					_min[k] =  std::numeric_limits<double>::max() ;
 					_max[k] = -std::numeric_limits<double>::max() ;
 				}
+			}
+			else if(comment == std::string("VS"))
+			{
+				int t ;
+				linestream >> t ;
+				vs[current_vs] = t ; ++current_vs ;
 			}
 			continue ;
 		} 
@@ -81,25 +86,36 @@ void rational_data::load(const std::string& filename, double min, double max)
 		{
 			// TODO, the firts case does not account for the
 			// dimension of the ouput vector
-/*			if(linestream.good()) 
+			if(vs[i] == 2) 
 			{
 				linestream >> v[dimX() + dimY()+i] ;
+				linestream >> v[dimX() + 2*dimY()+i] ;
 			} 
+			else if(vs[i] == 1)
+			{
+				double dt ;
+				linestream >> dt ;
+				v[dimX() + dimY()+i] = v[dimX() + i] - dt ;
+				v[dimX() + 2*dimY()+i] = v[dimX() + i] + dt ;
+			}
 			else 
-*/			{
+			{
 				// TODO Specify the delta in case
 				// Handle multiple dim
-				v[dimX() + dimY()+i] = v[dimX() + i] - 0.01f ;
-				v[dimX() + 2*dimY()+i] = v[dimX() + i] + 0.01f ;
+				v[dimX() + dimY()+i] = v[dimX() + i] - 0.01 ;
+				v[dimX() + 2*dimY()+i] = v[dimX() + i] + 0.01 ;
 			}
 		}
 		
 		// If data is not in the interval of fit
 		// TODO: Update to more dims
 		bool is_in = true ;
-		if(v[0] < min || v[0] > max)
+		for(int i=0; i<dimX(); ++i)
 		{
-			is_in = false ;
+			if(v[i] < min || v[i] > max)
+			{
+				is_in = false ;
+			}
 		}
 		if(!is_in)
 		{

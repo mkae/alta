@@ -1,4 +1,4 @@
-#include "rational_1d_fitter_cgal.h"
+#include "rational_fitter_cgal.h"
 
 #include <CGAL/basic.h>
 #include <CGAL/QP_models.h>
@@ -41,12 +41,13 @@ bool rational_fitter_cgal::fit_data(const data* d, function*& fit)
 		}
 
 		std::cout << "<<INFO>> fitt using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
+		std::cout.flush() ;
 
-		if(temp_np <= _max_np)
+		if(temp_np < _max_np)
 		{
 			++temp_np ;
 		}
-		if(temp_nq <= _max_nq)
+		if(temp_nq < _max_nq)
 		{
 			++temp_nq ;
 		}

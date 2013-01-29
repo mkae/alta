@@ -1,8 +1,7 @@
 DESTDIR = ../../build
-CONFIG += debug plugin
+#CONFIG += debug
 QT += 
 INCLUDEPATH += ../../ ../../libs/rational_1d \
-#					/home/belcour/Sources/Eigen/include/eigen3
 
 SOURCES += main.cpp
 
