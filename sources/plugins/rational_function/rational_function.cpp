@@ -54,7 +54,12 @@ vec rational_function::operator()(const vec& x) const
 // Get the p_i and q_j function
 double rational_function::p(const vec& x, int i) const
 {
-	std::vector<int> deg ; deg.assign(dimY(), 0) ;
+	if(dimX() == 1)
+	{
+		return pow(x[0], i) ;
+	}
+	
+	std::vector<int> deg ; deg.assign(dimX(), 0) ;
 	
 	double res = 1.0 ;
 
@@ -63,13 +68,14 @@ double rational_function::p(const vec& x, int i) const
 
 	int temp_i = i ;
 	int temp_c ;
-	while(temp_i != 0)
+	while(temp_i > 1)
 	{
-		temp_c = (temp_i-1) % dimX() ;
+		temp_c = temp_i % dimX() ;
 		temp_i = (temp_i - temp_c) / dimX() ;
 
 		deg[temp_c] += 1 ;
 	}
+	deg[0] += temp_i ;
 
 	for(int k=0; k<dimX(); ++k)
 	{
@@ -80,7 +86,12 @@ double rational_function::p(const vec& x, int i) const
 }
 double rational_function::q(const vec& x, int i) const 
 {
-	std::vector<int> deg ; deg.assign(dimY(), 0) ;
+	if(dimX() == 1)
+	{
+		return pow(x[0], i) ;
+	}
+
+	std::vector<int> deg ; deg.assign(dimX(), 0) ;
 	
 	double res = 1.0 ;
 
@@ -89,13 +100,14 @@ double rational_function::q(const vec& x, int i) const
 
 	int temp_i = i ;
 	int temp_c ;
-	while(temp_i != 0)
+	while(temp_i > 1)
 	{
-		temp_c = (temp_i-1) % dimX() ;
+		temp_c = temp_i % dimX() ;
 		temp_i = (temp_i - temp_c) / dimX() ;
 
 		deg[temp_c] += 1 ;
 	}
+	deg[0] += temp_i ;
 
 	for(int k=0; k<dimX(); ++k)
 	{

@@ -1,10 +1,8 @@
 #pragma once
 
 // Include STL
-#include <functional>
 #include <vector>
 #include <string>
-#include <tuple>
 
 // Interface
 #include <QObject>

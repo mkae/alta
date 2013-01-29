@@ -71,7 +71,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, int np, int nq, function*& 
 
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
-	if(r == nullptr || d == nullptr)
+	if(r == NULL || d == NULL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;
@@ -140,7 +140,15 @@ bool rational_fitter_cgal::fit_data(const data* dat, int np, int nq, function*& 
 		ci(i) = sqrt(a0_norm) ;
 		ci(i+d->size()) = sqrt(a1_norm) ;
 	}
-
+#ifdef DEBUG
+	for(int j=0; j<d->size()*2; ++j)
+	{
+		for(int i=0; i<np+nq; ++i)
+			std::cout << CI(i,j) << "\t";
+		std::cout << std::endl; 
+	}
+	std::cout << std::endl ;
+#endif
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
 	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
@@ -262,7 +270,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, int np, int nq, function*& 
 			}
 		}
 
-		if(r != nullptr)
+		if(r != NULL)
 		{
 			delete r ;
 		}

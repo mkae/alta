@@ -1,7 +1,7 @@
 #include "rational_data.h"
 
-#include <boost/regex.hpp>
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <limits>
@@ -16,7 +16,7 @@ void rational_data::load(const std::string& filename)
 		
 void rational_data::load(const std::string& filename, double min, double max) 
 {
-	std::ifstream file(filename) ;
+	std::ifstream file(filename.c_str()) ;
 	if(!file.is_open())
 	{
 		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
@@ -81,12 +81,12 @@ void rational_data::load(const std::string& filename, double min, double max)
 		{
 			// TODO, the firts case does not account for the
 			// dimension of the ouput vector
-			if(linestream.good()) 
+/*			if(linestream.good()) 
 			{
 				linestream >> v[dimX() + dimY()+i] ;
 			} 
 			else 
-			{
+*/			{
 				// TODO Specify the delta in case
 				// Handle multiple dim
 				v[dimX() + dimY()+i] = v[dimX() + i] - 0.01f ;
@@ -96,7 +96,12 @@ void rational_data::load(const std::string& filename, double min, double max)
 		
 		// If data is not in the interval of fit
 		// TODO: Update to more dims
+		bool is_in = true ;
 		if(v[0] < min || v[0] > max)
+		{
+			is_in = false ;
+		}
+		if(!is_in)
 		{
 			continue ;
 		}

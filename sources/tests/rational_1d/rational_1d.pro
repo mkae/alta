@@ -1,5 +1,6 @@
 DEST_DIR = ../bin
-CONFIG += debug plugin
+CONFIG += plugin	\
+#         debug
 QT += 
 INCLUDEPATH += ../../ ../../plugins/rational_1d /home/belcour/Sources/Eigen/include/eigen3
 

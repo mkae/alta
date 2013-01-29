@@ -39,12 +39,12 @@ int main(int argc, char** argv)
 		QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
 
 		QObject *plugin = loader.instance();
-		if (plugin != nullptr) 
+		if (plugin != NULL) 
 		{
 #ifdef DEBUG
 			std::cout << "<<DEBUG>> loading plugin " << fileName.toStdString() << std::endl ;
 #endif
-			if(dynamic_cast<function*>(plugin) != nullptr)
+			if(dynamic_cast<function*>(plugin) != NULL)
 			{
 #ifdef DEBUG
 				std::cout << "<<DEBUG>>  -> it is a function" << std::endl ;
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 				functions.push_back(dynamic_cast<function*>(plugin)) ;
 			}
 			
-			if(dynamic_cast<data*>(plugin) != nullptr)
+			if(dynamic_cast<data*>(plugin) != NULL)
 			{
 #ifdef DEBUG
 				std::cout << "<<DEBUG>>  -> it is a data loader" << std::endl ;
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 				datas.push_back(dynamic_cast<data*>(plugin)) ;
 			}
 			
-			if(dynamic_cast<fitter*>(plugin) != nullptr)
+			if(dynamic_cast<fitter*>(plugin) != NULL)
 			{
 #ifdef DEBUG
 				std::cout << "<<DEBUG>>  -> it is a fitter" << std::endl ;
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 		// Display the result
 		if(is_fitted)
 		{
-			std::ofstream file(args["output"], std::ios_base::trunc);
+			std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 			const double dt = (d->max()[0] - d->min()[0]) / 100.0f ;
 			for(double x=d->min()[0]; x<=d->max()[0]; x+=dt)
 			{
