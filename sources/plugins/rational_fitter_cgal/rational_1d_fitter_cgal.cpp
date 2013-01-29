@@ -165,7 +165,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, int np, int nq, function*& 
 #endif
 	
 	double delta = sigma_m / sigma_M ;
-	if(isnan(delta) || (abs(delta) == std::numeric_limits<double>::infinity()))
+	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 #ifdef DEBUG
 		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
@@ -249,7 +249,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, int np, int nq, function*& 
 	for(int i=0; i<np+nq; ++i)
 	{
 		const double v = (double)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
-		solves_qp = solves_qp && !isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
+		solves_qp = solves_qp && !std::isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
 	}
 
 	if(solves_qp)
