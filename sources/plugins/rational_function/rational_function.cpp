@@ -48,6 +48,23 @@ vec rational_function::value(const vec& x) const
 	return res ;
 }
 
+std::vector<int> rational_function::index2degree(int i) const
+{
+	std::vector<int> deg ; deg.assign(dimX(), 0) ;
+	
+	int temp_i = i ;
+	int temp_c ;
+	while(temp_i > 1)
+	{
+		temp_c = temp_i % dimX() ;
+		temp_i = (temp_i - temp_c) / dimX() ;
+
+		deg[temp_c] += 1 ;
+	}
+	deg[0] += temp_i ;
+	return deg ;
+}
+
 
 // Get the p_i and q_j function
 double rational_function::p(const vec& x, int i) const
@@ -129,12 +146,31 @@ void rational_function::save(const std::string& filename, const arguments& args)
 	double dt = (max[0]-min[0]) / nb_samples ;
 
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
-	for(double x=min[0]; x<=max[0]; x+=dt)
+	file << "#DIM " << _nX << " " << _nY << std::endl ;
+	file << "#NP " << a.size() << std::endl ;
+	file << "#NQ " << b.size() << std::endl ;
+	file << "#BASIS poly" << std::endl ;
+
+	for(int i=0; i<a.size(); ++i)
 	{
-		vec vx ; for(int i=0;i<_nX; ++i) { vx.push_back(x) ; }
-		file << x << "\t" << value(vx)[0] << std::endl ;
-		std::cout << x << "\t" << value(vx)[0] << std::endl ;
+		std::vector<int> index = index2degree(i) ;
+		for(int j=0; j<index.size(); ++j)
+		{
+			file << index[j] << "\t" ;
+		}
+		file << a[i] << std::endl ;
 	}
+	
+	for(int i=0; i<b.size(); ++i)
+	{
+		std::vector<int> index = index2degree(i) ;
+		for(int j=0; j<index.size(); ++j)
+		{
+			file << index[j] << "\t" ;
+		}
+		file << b[i] << std::endl ;
+	}
+
 }
 
 std::ostream& operator<< (std::ostream& out, const rational_function& r) 

@@ -38,6 +38,10 @@ class rational_function : public QObject, public function
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;
 
+	private: // functions
+		
+		std::vector<int> index2degree(int i) const ;
+
 	private: // data
 
 		// Store the coefficients for the moment, I assume
