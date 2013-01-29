@@ -13,7 +13,7 @@ class data
 
 		// Load data from a file
 		virtual void load(const std::string& filename) = 0 ;
-		virtual void load(const std::string& filename, double min, double max) = 0 ;
+		virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
 		// Acces to data
 //		virtual bool get(int i, double& x, double& y, double& t) const = 0 ;

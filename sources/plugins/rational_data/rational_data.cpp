@@ -10,11 +10,11 @@
 
 void rational_data::load(const std::string& filename) 
 {
-	load(filename, -std::numeric_limits<double>::max(), std::numeric_limits<double>::max()) ;
-
+	arguments args ;
+	load(filename, args) ;
 }
 		
-void rational_data::load(const std::string& filename, double min, double max) 
+void rational_data::load(const std::string& filename, const arguments& args) 
 {
 	std::ifstream file(filename.c_str()) ;
 	if(!file.is_open())
@@ -22,8 +22,9 @@ void rational_data::load(const std::string& filename, double min, double max)
 		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
 	}
 
-	// N-Floats regexp
-//	boost::regex e ("^([0-9]*\.?[0-9]+[\\t ]?)");
+	double min, max ;
+	min = args.get_float("min", -std::numeric_limits<double>::max()) ;
+	max = args.get_float("max",  std::numeric_limits<double>::max()) ;
 
 	_nX = 0 ; _nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
@@ -102,8 +103,8 @@ void rational_data::load(const std::string& filename, double min, double max)
 			{
 				// TODO Specify the delta in case
 				// Handle multiple dim
-				v[dimX() + dimY()+i] = v[dimX() + i] - 0.01 ;
-				v[dimX() + 2*dimY()+i] = v[dimX() + i] + 0.01 ;
+				v[dimX() +   dimY()+i] = v[dimX() + i] - args.get_float("dt", 0.1) ;
+				v[dimX() + 2*dimY()+i] = v[dimX() + i] + args.get_float("dt", 0.1) ;
 			}
 		}
 		

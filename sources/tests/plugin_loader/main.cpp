@@ -86,29 +86,31 @@ int main(int argc, char** argv)
 
 		function* f = functions[0] ;
 		data*     d = datas[0] ;
-		if(args.is_defined("min") && args.is_defined("max"))
-		{
-			d->load(args["input"], args.get_float("min", 0.0f), args.get_float("max", 1.0f));
-		}
-		else if(args.is_defined("min") && !args.is_defined("max"))
-		{
-			d->load(args["input"], args.get_float("min", 0.0f), std::numeric_limits<double>::max());
-		}
-		else if(args.is_defined("min") && !args.is_defined("max"))
-		{
-			d->load(args["input"], -std::numeric_limits<double>::max(), args.get_float("min", 0.0f));
-		}
-		else
-		{
-			d->load(args["input"]);
-		}
+		d->load(args["input"], args);
 
 		bool is_fitted = fitters[0]->fit_data(d, f) ;
 
 		// Display the result
 		if(is_fitted)
 		{
-			functions[0]->save(args["output"], args) ;
+/*
+			vec min, max ;
+			min.assign(2, args.get_float("min", 0.0f)) ;
+			max.assign(2, args.get_float("max", 1.5f)) ;
+
+			int nb_samples = args.get_int("nb_samples", 100) ;
+			double dt = (max[0]-min[0]) / nb_samples ;
+
+			std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+			for(double x=min[0]; x<=max[0]; x+=dt)
+			{
+				vec vx ; for(int i=0;i<2; ++i) { vx.push_back(x) ; }
+				file << x << "\t" << f->value(vx)[0] << std::endl ;
+				std::cout << x << "\t" << f->value(vx)[0] << std::endl ;
+			}
+/*/
+			f->save(args["output"], args) ;
+//*/
 		}
 		else
 		{

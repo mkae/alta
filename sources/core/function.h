@@ -8,12 +8,13 @@
 #include "common.h"
 #include "args.h"
 
-class function //: public std::function<double(double)>
+class function 
 {
 	public: // methods
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const = 0 ;
+		virtual vec value(const vec& x) const = 0 ;
 		
 		// IO function to text files
 		virtual void load(const std::string& filename) = 0 ;

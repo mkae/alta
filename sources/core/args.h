@@ -10,6 +10,9 @@ class arguments
 	public: // functions
 
 		// Constructor and destructor
+		arguments()
+		{
+		} ;
 		arguments(int argc, char** const argv)
 		{
 			std::string key ;

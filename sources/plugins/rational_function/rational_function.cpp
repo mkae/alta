@@ -23,28 +23,26 @@ rational_function::~rational_function()
 }
 
 // Overload the function operator
-vec rational_function::operator()(const vec& x) const 
+vec rational_function::value(const vec& x) const 
 {
 	vec res ;
-	res.resize(dimY()) ;
+	res.reserve(_nY) ;
 
 	for(int k=0; k<_nY; ++k)
 	{
 		double p = 0.0f ;
 		double q = 0.0f ;
-		for(int l=0; l<_nX; ++l)
+		
+		for(int i=a.size()-1; i>=0; --i)
 		{
-
-			for(int i=a.size()-1; i>=0; --i)
-			{
-				p = x[l]*p + a[i] ;
-			}
-
-			for(int i=b.size()-1; i>=0; --i)
-			{
-				q = x[l]*q + b[i] ;
-			}
+			p += a[i]*this->p(x, i) ;
 		}
+
+		for(int i=b.size()-1; i>=0; --i)
+		{
+			q += b[i]*this->q(x, i) ;
+		}
+
 		res[k] = p/q ;
 	}
 	return res ;
@@ -133,16 +131,16 @@ void rational_function::save(const std::string& filename, const arguments& args)
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	for(double x=min[0]; x<=max[0]; x+=dt)
 	{
-		vec vx ; vx.push_back(x) ;
-		file << x << "\t" << ((*this)(vx))[0] << std::endl ;
-		std::cout << x << "\t" << ((*this)(vx))[0] << std::endl ;
+		vec vx ; for(int i=0;i<_nX; ++i) { vx.push_back(x) ; }
+		file << x << "\t" << value(vx)[0] << std::endl ;
+		std::cout << x << "\t" << value(vx)[0] << std::endl ;
 	}
 }
 
 std::ostream& operator<< (std::ostream& out, const rational_function& r) 
 {
 	std::cout << "p = [" ;
-	for(int i=0; i<r.a.size(); ++i)
+	for(unsigned int i=0; i<r.a.size(); ++i)
 	{
 		if(i != 0)
 		{
@@ -153,7 +151,7 @@ std::ostream& operator<< (std::ostream& out, const rational_function& r)
 	std::cout << "]" << std::endl ;
 
 	std::cout << "q = [" ;
-	for(int i=0; i<r.b.size(); ++i)
+	for(unsigned int i=0; i<r.b.size(); ++i)
 	{
 		if(i != 0)
 		{
@@ -163,6 +161,7 @@ std::ostream& operator<< (std::ostream& out, const rational_function& r)
 	}
 	std::cout << "]" << std::endl ;
 
+	return out ;
 }
 
 

@@ -20,7 +20,7 @@ class rational_data : public QObject, public data
 
 		// Load data from a file
 		virtual void load(const std::string& filename) ;
-		virtual void load(const std::string& filename, double min, double max) ;
+		virtual void load(const std::string& filename, const arguments& args) ;
 
 		// Acces to data
 		virtual bool get(int i, double& x, double& yl, double& yu) const ;
