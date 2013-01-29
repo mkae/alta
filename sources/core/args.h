@@ -69,11 +69,10 @@ class arguments
 		} ;
 		int get_int(const std::string& key, int default_value = 0) const
 		{
-			std::string value = _map.at(key) ;
-			if(value.empty())
-				return default_value ;
+			if(_map.count(key) > 0)
+				return atoi(_map.at(key).c_str()) ;
 			else
-				return atoi(value.c_str()) ;
+				return default_value ;
 		} ;
 
 	private: // data

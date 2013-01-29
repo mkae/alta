@@ -32,7 +32,7 @@ class rational_function : public QObject, public function
 
 		// IO function to text files
 		void load(const std::string& filename) ;
-		void save() const ;
+		void save(const std::string& filename, const arguments& args) const ;
 
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;

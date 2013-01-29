@@ -121,8 +121,22 @@ double rational_function::q(const vec& x, int i) const
 void rational_function::load(const std::string& filename)
 {
 }
-void rational_function::save() const
+void rational_function::save(const std::string& filename, const arguments& args) const
 {
+	vec min, max ;
+	min.assign(_nX, args.get_float("min", 0.0f)) ;
+	max.assign(_nX, args.get_float("max", 1.5f)) ;
+
+	int nb_samples = args.get_int("nb_samples", 100) ;
+	double dt = (max[0]-min[0]) / nb_samples ;
+
+	std::ofstream file(filename.c_str(), std::ios_base::trunc);
+	for(double x=min[0]; x<=max[0]; x+=dt)
+	{
+		vec vx ; vx.push_back(x) ;
+		file << x << "\t" << ((*this)(vx))[0] << std::endl ;
+		std::cout << x << "\t" << ((*this)(vx))[0] << std::endl ;
+	}
 }
 
 std::ostream& operator<< (std::ostream& out, const rational_function& r) 

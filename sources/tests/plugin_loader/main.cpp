@@ -108,13 +108,7 @@ int main(int argc, char** argv)
 		// Display the result
 		if(is_fitted)
 		{
-			std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
-			const double dt = (d->max()[0] - d->min()[0]) / 100.0f ;
-			for(double x=d->min()[0]; x<=d->max()[0]; x+=dt)
-			{
-				vec vx ; vx.push_back(x) ;
-				file << x << "\t" << ((*f)(vx))[0] << std::endl ;
-			}
+			functions[0]->save(args["output"], args) ;
 		}
 		else
 		{

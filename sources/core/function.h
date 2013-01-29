@@ -6,6 +6,7 @@
 #include <QtPlugin>
 
 #include "common.h"
+#include "args.h"
 
 class function //: public std::function<double(double)>
 {
@@ -16,7 +17,7 @@ class function //: public std::function<double(double)>
 		
 		// IO function to text files
 		virtual void load(const std::string& filename) = 0 ;
-		virtual void save() const = 0 ;
+		virtual void save(const std::string& filename, const arguments& args) const = 0 ;
 
 		virtual int dimX() const { return _nX ; } ;
 		virtual int dimY() const { return _nY ; } ;
