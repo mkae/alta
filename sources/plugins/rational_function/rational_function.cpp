@@ -62,13 +62,18 @@ vec rational_function::value(const vec& x) const
 std::vector<int> rational_function::index2degree(int i) const
 {
 	std::vector<int> deg ; deg.assign(dimX(), 0) ;
+	if(dimX() == 1)
+	{
+		deg[0] = i ;
+		return deg ;
+	}
 	
 	int temp_i = i-1 ;
 	int temp_c ;
-	while(temp_i >= 0)
+	while(temp_i > 0)
 	{
 		temp_c = temp_i % dimX() ;
-		temp_i = temp_i - dimX() ;
+		temp_i = temp_i / dimX() ;
 
 		deg[temp_c] += 1 ;
 	}

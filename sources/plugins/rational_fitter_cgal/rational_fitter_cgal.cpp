@@ -60,7 +60,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	{
 		if(fit_data(d, temp_np, temp_nq, r))
 		{
-			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << std::endl ;
+			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
 			return true ;
 		}
 

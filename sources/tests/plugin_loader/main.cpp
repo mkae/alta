@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 					efile << v[u] << "\t" ;
 					
 				for(int u=0; u<d->dimY(); ++u)
-					efile << abs(y2[u]-y1[u]) << "\t" ;
+					efile << y2[u]-y1[u] << "\t" ;
 					
 				efile << std::endl ;
 			}
