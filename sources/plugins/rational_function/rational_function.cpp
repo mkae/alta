@@ -26,7 +26,7 @@ rational_function::~rational_function()
 vec rational_function::value(const vec& x) const 
 {
 	vec res ;
-	res.reserve(_nY) ;
+	res.assign(_nY, 0.0) ;
 
 	for(int k=0; k<_nY; ++k)
 	{

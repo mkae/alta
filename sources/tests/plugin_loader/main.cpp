@@ -18,10 +18,14 @@
 int main(int argc, char** argv)
 {
 //	QCoreApplication::addLibraryPath() ;
-	QCoreApplication::addLibraryPath(QString("/home/belcour/Projects/alta/sources/tests/plugin_loader/")) ;
+//	QCoreApplication::addLibraryPath(QString("/home/belcour/Projects/alta/sources/tests/plugin_loader/")) ;
 
 	QApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
+#ifdef DEBUG
+	std::cout << "<<INFO>> loading in " << app.applicationDirPath().toStdString() << std::endl ;
+#endif
+	setenv("LD_PRELOAD", app.applicationDirPath().toStdString().c_str(), 1) ;
 
 	std::vector<function*> functions ;
 	std::vector<data*>     datas ;
@@ -33,10 +37,14 @@ int main(int argc, char** argv)
 		pluginsDir = QDir(args["plugins"].c_str()) ;
 	}
 
+	std::vector<QString> plugins ;
 
 	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) 
 	{
-		QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+		QPluginLoader loader ;
+		loader.setLoadHints(QLibrary::ExportExternalSymbolsHint) ;
+		loader.setFileName(pluginsDir.absoluteFilePath(fileName));
+
 
 		QObject *plugin = loader.instance();
 		if (plugin != NULL) 
@@ -69,7 +77,15 @@ int main(int argc, char** argv)
 			}
 
 		}
+		else
+		{
+#ifdef DEBUG
+			std::cout << "<<DEBUG>> " << loader.errorString().toStdString() << std::endl ;
+#endif
+			plugins.push_back(fileName) ;
+		}
 	}
+
 
 	if(! args.is_defined("input")) {
 		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
@@ -109,7 +125,20 @@ int main(int argc, char** argv)
 				std::cout << x << "\t" << f->value(vx)[0] << std::endl ;
 			}
 /*/
-			f->save(args["output"], args) ;
+		//	f->save(args["output"], args) ;
+
+			std::ofstream file("temp.gnuplot", std::ios_base::trunc);
+			double error = 0.0 ;
+			for(int i=0; i<d->size(); ++i)
+			{
+				vec v = d->get(i) ;
+				vec y1 ; y1.assign(d->dimY(), 0.0) ;
+				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+
+				vec y2 = f->value(v) ;
+				file << v[0] << "\t" << y2[0] << std::endl ;
+//				std::cout << y1 << " .. " << y2 << std::endl ;
+			}
 //*/
 		}
 		else
