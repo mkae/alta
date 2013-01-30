@@ -2,26 +2,31 @@
 
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 class vec : public std::vector<double>
 {
 	public:
-/*		// Constructor & Destructors
+//*		// Constructor & Destructors
 		//
-		vec(int dim)
+		vec() : std::vector<double>()
+		{
+		}
+		vec(int dim) : std::vector<double>(dim)
 		{
 			assign(dim, 0.0) ;
 		} ;
 		virtual ~vec() 
 		{
 		} ;
-
+//*/
+		
 		// Mathematical operators
 		//
 		friend vec operator-(const vec& a)
 		{
-			vec b(a.size) ;
-			for(int i=0; i<a.size(); ++i)
+			vec b(a.size()) ;
+			for(unsigned int i=0; i<a.size(); ++i)
 			{
 				b[i] = -a[i] ;
 			}
@@ -32,8 +37,8 @@ class vec : public std::vector<double>
 #ifdef DEBUG
 			assert(a.size() == b.size()) ;
 #endif
-			vec c(a.size) ;
-			for(int i=0; i<a.size(); ++i)
+			vec c(a.size()) ;
+			for(unsigned int i=0; i<a.size(); ++i)
 			{
 				c[i] = a[i] - b[i];
 			}
@@ -44,8 +49,8 @@ class vec : public std::vector<double>
 #ifdef DEBUG
 			assert(a.size() == b.size()) ;
 #endif
-			vec c(a.size) ;
-			for(int i=0; i<a.size(); ++i)
+			vec c(a.size()) ;
+			for(unsigned int i=0; i<a.size(); ++i)
 			{
 				c[i] = a[i] + b[i];
 			}
@@ -56,14 +61,14 @@ class vec : public std::vector<double>
 #ifdef DEBUG
 			assert(a.size() == b.size()) ;
 #endif
-			vec c(a.size) ;
-			for(int i=0; i<a.size(); ++i)
+			vec c(a.size()) ;
+			for(unsigned int i=0; i<a.size(); ++i)
 			{
 				c[i] = a[i] * b[i];
 			}
 			return c ;
 		}
-
+/*
 		friend double norm(const vec& a)
 		{
 

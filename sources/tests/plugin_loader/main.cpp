@@ -22,10 +22,6 @@ int main(int argc, char** argv)
 
 	QApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
-#ifdef DEBUG
-	std::cout << "<<INFO>> loading in " << app.applicationDirPath().toStdString() << std::endl ;
-#endif
-	setenv("LD_PRELOAD", app.applicationDirPath().toStdString().c_str(), 1) ;
 
 	std::vector<function*> functions ;
 	std::vector<data*>     datas ;
@@ -125,19 +121,40 @@ int main(int argc, char** argv)
 				std::cout << x << "\t" << f->value(vx)[0] << std::endl ;
 			}
 /*/
-		//	f->save(args["output"], args) ;
+			f->save(args["output"], args) ;
 
 			std::ofstream file("temp.gnuplot", std::ios_base::trunc);
-			double error = 0.0 ;
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
-				vec y1 ; y1.assign(d->dimY(), 0.0) ;
+				vec y1(d->dimY()) ;
 				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
 
 				vec y2 = f->value(v) ;
-				file << v[0] << "\t" << y2[0] << std::endl ;
-//				std::cout << y1 << " .. " << y2 << std::endl ;
+				for(int u=0; u<d->dimX(); ++u)
+					file << v[u] << "\t" ;
+					
+				for(int u=0; u<d->dimY(); ++u)
+					file << y2[u] << "\t" ;
+					
+				file << std::endl ;
+			}	
+
+			std::ofstream efile("error.gnuplot", std::ios_base::trunc);
+			for(int i=0; i<d->size(); ++i)
+			{
+				vec v = d->get(i) ;
+				vec y1(d->dimY()) ;
+				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+
+				vec y2 = f->value(v) ;
+				for(int u=0; u<d->dimX(); ++u)
+					efile << v[u] << "\t" ;
+					
+				for(int u=0; u<d->dimY(); ++u)
+					efile << abs(y2[u]-y1[u]) << "\t" ;
+					
+				efile << std::endl ;
 			}
 //*/
 		}

@@ -32,14 +32,29 @@ class rational_function : public QObject, public function
 		virtual double q(const vec& x, int j) const ;
 
 		// IO function to text files
-		void load(const std::string& filename) ;
-		void save(const std::string& filename, const arguments& args) const ;
+		virtual void load(const std::string& filename) ;
+		virtual void save(const std::string& filename, const arguments& args) const ;
+	
+		// Update the function
+		virtual void update(const std::vector<double>& in_a, 
+		                    const std::vector<double>& in_b) ;
+
+		// Get the coefficients
+		virtual double getP(int i) const { return a[i] ; } ;
+		virtual double getQ(int i) const { return b[i] ; } ;
 
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;
 
-	private: // functions
+		// Save the rational function to a given format
+		void save_rational_function(const std::string& filename) const ;
+		void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
+
+//	private: // functions
 		
+		// Convert an index in N to a vector of degree for a
+		// multinomial coeffcient. The resulting vector v should
+		// be used as prod_k x[k]^v[k]
 		std::vector<int> index2degree(int i) const ;
 
 	private: // data

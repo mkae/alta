@@ -9,7 +9,7 @@
 #include <cmath>
 
 
-rational_function::rational_function() 
+rational_function::rational_function() : a(), b()
 {
 }
 
@@ -21,26 +21,37 @@ rational_function::rational_function(const std::vector<double>& a,
 rational_function::~rational_function()
 {
 }
+		
+void rational_function::update(const std::vector<double>& in_a,
+                               const std::vector<double>& in_b)
+{
+	a.reserve(in_a.size()) ;
+	b.reserve(in_b.size()) ;
+	a = in_a ;
+	b = in_b ;
+}
 
 // Overload the function operator
 vec rational_function::value(const vec& x) const 
 {
-	vec res ;
-	res.assign(_nY, 0.0) ;
+	vec res(_nY) ;
+
+	const int np = a.size() / _nY ;
+	const int nq = b.size() / _nY ;
 
 	for(int k=0; k<_nY; ++k)
 	{
 		double p = 0.0f ;
 		double q = 0.0f ;
 		
-		for(int i=a.size()-1; i>=0; --i)
+		for(unsigned int i=0; i<np; ++i)
 		{
-			p += a[i]*this->p(x, i) ;
+			p += a[i*_nY + k]*this->p(x, i) ;
 		}
 
-		for(int i=b.size()-1; i>=0; --i)
+		for(unsigned int i=0; i<nq; ++i)
 		{
-			q += b[i]*this->q(x, i) ;
+			q += b[i*_nY + k]*this->q(x, i) ;
 		}
 
 		res[k] = p/q ;
@@ -52,16 +63,16 @@ std::vector<int> rational_function::index2degree(int i) const
 {
 	std::vector<int> deg ; deg.assign(dimX(), 0) ;
 	
-	int temp_i = i ;
+	int temp_i = i-1 ;
 	int temp_c ;
-	while(temp_i > 1)
+	while(temp_i >= 0)
 	{
 		temp_c = temp_i % dimX() ;
-		temp_i = (temp_i - temp_c) / dimX() ;
+		temp_i = temp_i - dimX() ;
 
 		deg[temp_c] += 1 ;
 	}
-	deg[0] += temp_i ;
+//	deg[0] += temp_i ;
 	return deg ;
 }
 
@@ -138,39 +149,56 @@ void rational_function::load(const std::string& filename)
 }
 void rational_function::save(const std::string& filename, const arguments& args) const
 {
-	vec min, max ;
-	min.assign(_nX, args.get_float("min", 0.0f)) ;
-	max.assign(_nX, args.get_float("max", 1.5f)) ;
+	save_rational_function(filename) ;
+}
 
-	int nb_samples = args.get_int("nb_samples", 100) ;
-	double dt = (max[0]-min[0]) / nb_samples ;
+void rational_function::save_gnuplot(const std::string& filename, const data* d, const arguments& args) const 
+{
+	std::ofstream file(filename.c_str(), std::ios_base::trunc);
+	for(int i=0; i<d->size(); ++i)
+	{
+		vec v = d->get(i) ;
+		vec y1 ; y1.assign(d->dimY(), 0.0) ;
+		for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
 
+		vec y2 = value(v) ;
+		for(int u=0; u<d->dimX(); ++u)
+			file << v[u] << "\t" ;
+
+		for(int u=0; u<d->dimY(); ++u)
+			file << y2[u] << "\t" ;
+
+		file << std::endl ;
+	}
+}
+
+void rational_function::save_rational_function(const std::string& filename) const 
+{
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NP " << a.size() << std::endl ;
 	file << "#NQ " << b.size() << std::endl ;
 	file << "#BASIS poly" << std::endl ;
 
-	for(int i=0; i<a.size(); ++i)
+	for(unsigned int i=0; i<a.size(); ++i)
 	{
 		std::vector<int> index = index2degree(i) ;
-		for(int j=0; j<index.size(); ++j)
+		for(unsigned int j=0; j<index.size(); ++j)
 		{
 			file << index[j] << "\t" ;
 		}
 		file << a[i] << std::endl ;
 	}
 	
-	for(int i=0; i<b.size(); ++i)
+	for(unsigned int i=0; i<b.size(); ++i)
 	{
 		std::vector<int> index = index2degree(i) ;
-		for(int j=0; j<index.size(); ++j)
+		for(unsigned int j=0; j<index.size(); ++j)
 		{
 			file << index[j] << "\t" ;
 		}
 		file << b[i] << std::endl ;
 	}
-
 }
 
 std::ostream& operator<< (std::ostream& out, const rational_function& r) 

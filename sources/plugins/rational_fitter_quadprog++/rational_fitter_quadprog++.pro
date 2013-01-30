@@ -1,8 +1,8 @@
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
-						eigen   \
-						cgal    
+CONFIG         *= qt         \
+                  plugin     \
+						eigen      \
+						quadprog++ 
 
 DESTDIR         = ../../build
  
@@ -10,12 +10,12 @@ INCLUDEPATH    += ../rational_function \
                   ../rational_data     \
                   ../.. 
 
-HEADERS         = rational_fitter_cgal.h
-SOURCES         = rational_fitter_cgal.cpp
+HEADERS         = rational_fitter.h
+SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../build           \
 						-lrational_function	\
 						-lrational_data
 
-QMAKE_CXXFLAGS += -frounding-math -fPIC
+QMAKE_CXXFLAGS += -fPIC
 

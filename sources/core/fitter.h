@@ -19,7 +19,7 @@ class fitter
 		// underling function class. Return the best
 		// fit (along with fitting information ?)
 		//
-		virtual bool fit_data(const data* d, function*& f) = 0 ;
+		virtual bool fit_data(const data* d, function* f) = 0 ;
 
 
 		virtual void set_parameters(const arguments& args) = 0 ;

@@ -1,10 +1,8 @@
-#include "rational_fitter_cgal.h"
+#include "rational_fitter.h"
 
-#include <CGAL/basic.h>
-#include <CGAL/QP_models.h>
-#include <CGAL/QP_functions.h>
-#include <CGAL/MP_Float.h>
 #include <Eigen/SVD>
+#include <Array.hh>
+#include <QuadProg++.hh>
 
 #include <string>
 #include <iostream>
@@ -13,58 +11,28 @@
 #include <algorithm>
 #include <cmath>
 
-typedef CGAL::MP_Float ET ;
-typedef CGAL::Quadratic_program<ET> Program ;
-typedef CGAL::Quadratic_program_solution<ET> Solution ;
-typedef CGAL::Quadratic_program_options Options ;
+#include <rational_function.h>
+#include <rational_data.h>
 
-rational_fitter_cgal::rational_fitter_cgal() : QObject()
+rational_fitter_quadprog++::rational_fitter_quadprog++() : QObject()
 {
 }
-rational_fitter_cgal::~rational_fitter_cgal() 
+rational_fitter_quadprog++::~rational_fitter_quadprog++() 
 {
 }
 
-bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
+bool rational_fitter_quadprog++::fit_data(const data* d, function*& fit)
 {
-	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
-	if(r == NULL || d == NULL)
-	{
-		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
-		return false ;
-	}
-
-	// I need to set the dimension of the resulting function to be equal
-	// to the dimension of my fitting problem
-	r->setDimX(d->dimX()) ;
-	r->setDimY(d->dimY()) ;
-
-#ifdef DEBUG_DEGREES
-	for(int i=0; i<100; ++i)
-	{
-		std::vector<int> v = r->index2degree(i) ;
-		std::cout << i << " = " ;
-		for(int j=0; j<v.size(); ++j)
-			std::cout << v[j] << "\t" ;
-		std::cout << std::endl ;
-	}
-	throw ;
-#endif
-
-	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
-	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
-
+	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 	int temp_np = _min_np, temp_nq = _min_nq ;
 	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
-		if(fit_data(d, temp_np, temp_nq, r))
+		if(fit_data(d, temp_np, temp_nq, fit))
 		{
-			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << std::endl ;
 			return true ;
 		}
 
-		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
+		std::cout << "<<INFO>> fitt using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
 		if(temp_np < _max_np)
@@ -80,7 +48,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	return false ;
 }
 
-void rational_fitter_cgal::set_parameters(const arguments& args)
+void rational_fitter_quadprog++::set_parameters(const arguments& args)
 {
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
@@ -88,48 +56,42 @@ void rational_fitter_cgal::set_parameters(const arguments& args)
 	_min_nq = args.get_float("min-nq", _max_nq) ;
 }
 		
-// TODO Finish
-bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
-{
 
-	// Multidimensional coefficients
-	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
-	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
-
-	for(int j=0; j<d->dimY(); ++j)
-	{
-		if(!fit_data(d, np, nq, j, r))
-			return false ;
-
-		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
-		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-	}
-
-	r->update(Pn, Qn) ;
-	return true ;
-}
-
-// dat is the data object, it contains all the points to fit
-// np and nq are the degree of the RP to fit to the data
-// y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
-// the function return a ration BRDF function and a boolean
-bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int ny, rational_function* r) 
+bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, function*& rf) 
 {
 	// by default, we have a nonnegative QP with Ax - b >= 0
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
+
+	rational_function* r = dynamic_cast<rational_function*>(rf) ;
+	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
+	if(r == NULL || d == NULL)
+	{
+		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
+		return false ;
+	}
+
+	// I need to set the dimension of the resulting function to be equal
+	// to the dimension of my fitting problem
+	r->setDimX(d->dimX()) ;
+	r->setDimY(d->dimY()) ;
+
+	// Matrices of the problem
+	QuadProgPP::Matrix<double> G (0.0, np+nq, np+nq) ;
+	QuadProgPP::Matrix<double> CI(0.0, np+nq, 2*d->size()) ;
+	QuadProgPP::Vector<double> ci(0.0, 2*d->size()) ;
+	QuadProgPP::Matrix<double> CE(0.0, np+nq, 2*d->size()) ;
+	QuadProgPP::Vector<double> ce(0.0, 2*d->size()) ;
 
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
 	for(int i=0; i<np+nq; ++i)
 	{
-		qp.set_d(i, i, 1.0) ; 
+		G.set(1.0, i, i) ; 
 	}
 	
 	// Each constraint (fitting interval or point
 	// add another dimension to the constraint
 	// matrix
-	Eigen::MatrixXd CI(np+nq, 2*d->size()) ;
-	Eigen::VectorXd ci(2*d->size()) ;
 	for(int i=0; i<d->size(); ++i)	
 	{		
 		// Norm of the row vector
@@ -160,13 +122,13 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 				d->get(i, yl, yu) ;
 
 				const double qi = r->q(d->get(i), j-np) ;
-				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
-				qp.set_a(j, i, ET(-yl[ny] * qi)) ;
-				CI(j, i) = -yl[ny] * qi ;
+				a0_norm += qi*qi * (yl[0]*yl[0]) ;
+				qp.set_a(j, i, ET(-yl[0] * qi)) ;
+				CI(j, i) = -yl[0] * qi ;
 				
-				a1_norm += qi*qi * (yu[ny]*yu[ny]) ;
-				qp.set_a(j, i+d->size(),  ET(yu[ny] * qi)) ;
-				CI(j, i+d->size()) = yu[ny] * qi ;
+				a1_norm += qi*qi * (yu[0]*yu[0]) ;
+				qp.set_a(j, i+d->size(),  ET(yu[0] * qi)) ;
+				CI(j, i+d->size()) = yu[0] * qi ;
 			}
 		}
 	
@@ -291,25 +253,26 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 	{
 		// Recopy the vector d
 		std::vector<double> p, q;
-		p.assign(np, 0.0) ; q.assign(nq, 0.0) ;
 		for(int i=0; i<np+nq; ++i)
 		{
 			const double v = CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
 
 			if(i < np)
 			{
-				p[i] = v ;
+				p.push_back(v) ;
 			}
 			else
 			{
-				q[i-np] = v ;
+				q.push_back(v) ;
 			}
 		}
-/*
+
+		if(r != NULL)
+		{
+			delete r ;
+		}
 		r = new rational_function(p, q);
-/*/
- 		r->update(p, q) ;
-//*/			
+			
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
 		return true;
 	}
@@ -319,4 +282,4 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_fitter_cgal, rational_fitter_cgal)
+Q_EXPORT_PLUGIN2(rational_fitter_quadprog++, rational_fitter_quadprog++)
