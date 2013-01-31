@@ -14,14 +14,14 @@
 #include <rational_function.h>
 #include <rational_data.h>
 
-rational_fitter_quadprog++::rational_fitter_quadprog++() : QObject()
+rational_fitter_quadprog::rational_fitter_quadprog() : QObject()
 {
 }
-rational_fitter_quadprog++::~rational_fitter_quadprog++() 
+rational_fitter_quadprog::~rational_fitter_quadprog() 
 {
 }
 
-bool rational_fitter_quadprog++::fit_data(const data* d, function*& fit)
+bool rational_fitter_quadprog::fit_data(const data* d, function* fit)
 {
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 	int temp_np = _min_np, temp_nq = _min_nq ;
@@ -48,7 +48,7 @@ bool rational_fitter_quadprog++::fit_data(const data* d, function*& fit)
 	return false ;
 }
 
-void rational_fitter_quadprog++::set_parameters(const arguments& args)
+void rational_fitter_quadprog::set_parameters(const arguments& args)
 {
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
@@ -57,10 +57,10 @@ void rational_fitter_quadprog++::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, function*& rf) 
+bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, function* rf) 
 {
 	// by default, we have a nonnegative QP with Ax - b >= 0
-	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
+//	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
 
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
@@ -77,6 +77,7 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 
 	// Matrices of the problem
 	QuadProgPP::Matrix<double> G (0.0, np+nq, np+nq) ;
+	QuadProgPP::Vector<double> g (0.0, np+nq) ;
 	QuadProgPP::Matrix<double> CI(0.0, np+nq, 2*d->size()) ;
 	QuadProgPP::Vector<double> ci(0.0, 2*d->size()) ;
 	QuadProgPP::Matrix<double> CE(0.0, np+nq, 2*d->size()) ;
@@ -86,7 +87,7 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 	// be equal to the dimension of p + q
 	for(int i=0; i<np+nq; ++i)
 	{
-		G.set(1.0, i, i) ; 
+		G[i][i] = 1.0 ; 
 	}
 	
 	// Each constraint (fitting interval or point
@@ -110,10 +111,8 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 				const double pi = r->p(d->get(i), j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
-				qp.set_a(j, i,  ET(pi)) ;
-				qp.set_a(j, i+d->size(), ET(-pi)) ;
-				CI(j, i) =  pi ;
-				CI(j, i+d->size()) = -pi ;
+				CI[j][i] =  pi ;
+				CI[j][i+d->size()] = -pi ;
 			}
 			// Filling the q part
 			else
@@ -123,44 +122,45 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 
 				const double qi = r->q(d->get(i), j-np) ;
 				a0_norm += qi*qi * (yl[0]*yl[0]) ;
-				qp.set_a(j, i, ET(-yl[0] * qi)) ;
-				CI(j, i) = -yl[0] * qi ;
+				CI[j][i] = -yl[0] * qi ;
 				
 				a1_norm += qi*qi * (yu[0]*yu[0]) ;
-				qp.set_a(j, i+d->size(),  ET(yu[0] * qi)) ;
-				CI(j, i+d->size()) = yu[0] * qi ;
+				CI[j][i+d->size()] = yu[0] * qi ;
 			}
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
-		ci(i) = sqrt(a0_norm) ;
-		ci(i+d->size()) = sqrt(a1_norm) ;
+		ci[i] = -sqrt(a0_norm) ;
+		ci[i+d->size()] = -sqrt(a1_norm) ;
 	}
 #ifdef DEBUG
 	for(int j=0; j<d->size()*2; ++j)
 	{
 		for(int i=0; i<np+nq; ++i)
-			std::cout << CI(i,j) << "\t";
+			std::cout << CI[i][j] << "\t";
 		std::cout << std::endl; 
 	}
 	std::cout << std::endl ;
 #endif
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
+/*
 	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
 	const double sigma_m = svd.singularValues()(std::min(2*d->size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
-
+*/
 #ifdef DEBUG
+/*
 	std::cout << "<<DEBUG>> SVD = [ " ;
 	for(int i=0; i<std::min(2*d->size(), np+nq); ++i)
 	{
 		std::cout << svd.singularValues()(i) << ", " ;
 	}
 	std::cout << " ]" << std::endl ;
+*/
 #endif
-	
+/*	
 	double delta = sigma_m / sigma_M ;
 	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
@@ -174,27 +174,30 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 		delta = 1.0 ;
 	}
 
+
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	for(int i=0; i<2*d->size(); ++i)	
 	{		
-		qp.set_b(i, ET(delta * ci(i))) ;
+//		qp.set_b(i, ET(delta * ci(i))) ;
 	}
-
+*/
 #ifdef DEBUG
 	// Export some informations on the problem to solve
-	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;
-	std::cout << "<<DEBUG>> " << qp.get_m() << " constraints" << std::endl ;
+//	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;
+//	std::cout << "<<DEBUG>> " << qp.get_m() << " constraints" << std::endl ;
 #endif
 
+/*
 	if(qp.is_linear() && !qp.is_nonnegative())
 	{
 		std::cerr << "<<ERROR>> the problem should not be linear or negative!" << std::endl ;
 		return false ;
 	}
-
+*/
 #ifdef EXTREM_DEBUG
+/*
 	// Iterate over the rows
 	std::cout << std::endl ;
 	std::cout << "A = [" ;
@@ -228,24 +231,18 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 		std::cout << ";" ;
 	}
 	std::cout << "]" << std::endl << std::endl ;
+*/
 #endif
 
-	// solve the program, using ET as the exact type
-	Options  o ;
-	o.set_auto_validation(true) ;
-	Solution s = CGAL::solve_quadratic_program(qp, ET(), o) ;
+	// Compute the solution
+	QuadProgPP::Vector<double> x;
+	double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
 
-#ifdef DEBUG
-	if(s.is_infeasible())
-	{
-		std::cout << "<<DEBUG>> the current program is infeasible" << std::endl ;
-	}
-#endif
 
-	bool solves_qp = !s.is_infeasible() && s.solves_quadratic_program(qp)  ;
+	bool solves_qp = !cost == std::numeric_limits<double>::infinity();
 	for(int i=0; i<np+nq; ++i)
 	{
-		const double v = (double)CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
+		const double v = x[i];
 		solves_qp = solves_qp && !std::isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
 	}
 
@@ -255,7 +252,7 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 		std::vector<double> p, q;
 		for(int i=0; i<np+nq; ++i)
 		{
-			const double v = CGAL::to_double(*(s.variable_numerators_begin()+i)) ;
+			const double v = x[i];
 
 			if(i < np)
 			{
@@ -277,9 +274,10 @@ bool rational_fitter_quadprog++::fit_data(const data* dat, int np, int nq, funct
 		return true;
 	}
 	else
+
 	{
 		return false; 
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_fitter_quadprog++, rational_fitter_quadprog++)
+Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)

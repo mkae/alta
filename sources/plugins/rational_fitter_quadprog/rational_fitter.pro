@@ -1,8 +1,9 @@
+TARGET          = rational_fitter_quadprog
 TEMPLATE        = lib
 CONFIG         *= qt         \
                   plugin     \
 						eigen      \
-						quadprog++ 
+						quadprog 
 
 DESTDIR         = ../../build
  
