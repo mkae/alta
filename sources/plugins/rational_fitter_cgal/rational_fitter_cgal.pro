@@ -13,7 +13,7 @@ INCLUDEPATH    += ../rational_function \
 HEADERS         = rational_fitter_cgal.h
 SOURCES         = rational_fitter_cgal.cpp
 
-LIBS           += -L../build           \
+LIBS           += -L../../build           \
 						-lrational_function	\
 						-lrational_data
 

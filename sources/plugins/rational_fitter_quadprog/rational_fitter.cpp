@@ -83,6 +83,8 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 	QuadProgPP::Matrix<double> CE(0.0, np+nq, 2*d->size()) ;
 	QuadProgPP::Vector<double> ce(0.0, 2*d->size()) ;
 
+	Eigen::MatrixXd eCI(np+nq, 2*d->size()) ;
+
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
 	for(int i=0; i<np+nq; ++i)
@@ -113,6 +115,10 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 				a1_norm += pi*pi ;
 				CI[j][i] =  pi ;
 				CI[j][i+d->size()] = -pi ;
+
+				// Updating Eigen matrix
+				eCI(j,i) = pi ;
+				eCI(j,i+d->size()) = -pi ;
 			}
 			// Filling the q part
 			else
@@ -126,6 +132,10 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 				
 				a1_norm += qi*qi * (yu[0]*yu[0]) ;
 				CI[j][i+d->size()] = yu[0] * qi ;
+				
+				// Updating Eigen matrix
+				eCI(j,i) = -yl[0] * qi ;
+				eCI(j,i+d->size()) = yu[0] * qi ;
 			}
 		}
 	
@@ -135,32 +145,36 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 		ci[i+d->size()] = -sqrt(a1_norm) ;
 	}
 #ifdef DEBUG
+	std::cout << "CI = [" ;
 	for(int j=0; j<d->size()*2; ++j)
 	{
 		for(int i=0; i<np+nq; ++i)
-			std::cout << CI[i][j] << "\t";
-		std::cout << std::endl; 
+		{
+			std::cout << CI[i][j] ;
+			if(i != np+nq-1) std::cout << ", ";
+		}
+		if(j != d->size()*2-1)
+			std::cout << ";" << std::endl; 
+		else
+			std::cout << "]" << std::endl ;
 	}
-	std::cout << std::endl ;
 #endif
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
-/*
-	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
+
+	Eigen::JacobiSVD<Eigen::MatrixXd> svd(eCI);
 	const double sigma_m = svd.singularValues()(std::min(2*d->size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
-*/
+
 #ifdef DEBUG
-/*
 	std::cout << "<<DEBUG>> SVD = [ " ;
 	for(int i=0; i<std::min(2*d->size(), np+nq); ++i)
 	{
 		std::cout << svd.singularValues()(i) << ", " ;
 	}
 	std::cout << " ]" << std::endl ;
-*/
 #endif
-/*	
+	
 	double delta = sigma_m / sigma_M ;
 	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
@@ -180,9 +194,9 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 #endif
 	for(int i=0; i<2*d->size(); ++i)	
 	{		
-//		qp.set_b(i, ET(delta * ci(i))) ;
+		ci[i] = ci[i] * delta ; 
 	}
-*/
+
 #ifdef DEBUG
 	// Export some informations on the problem to solve
 //	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;
