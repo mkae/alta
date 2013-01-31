@@ -69,6 +69,12 @@ int main(int argc, char** argv)
 #ifdef DEBUG
 				std::cout << "<<DEBUG>>  -> it is a fitter" << std::endl ;
 #endif
+				if(args.is_defined("fitter") && loader.fileName().toStdString().find(args["fitter"]) == std::string::npos)
+				{
+					std::cout << loader.fileName().toStdString() << std::endl ;
+					continue ;
+				}
+
 				fitters.push_back(dynamic_cast<fitter*>(plugin)) ;
 			}
 
