@@ -80,8 +80,8 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 	QuadProgPP::Vector<double> g (0.0, np+nq) ;
 	QuadProgPP::Matrix<double> CI(0.0, np+nq, 2*d->size()) ;
 	QuadProgPP::Vector<double> ci(0.0, 2*d->size()) ;
-	QuadProgPP::Matrix<double> CE(0.0, np+nq, 2*d->size()) ;
-	QuadProgPP::Vector<double> ce(0.0, 2*d->size()) ;
+	QuadProgPP::Matrix<double> CE(0.0, np+nq, 0) ;
+	QuadProgPP::Vector<double> ce(0.0, 0) ;
 
 	Eigen::MatrixXd eCI(np+nq, 2*d->size()) ;
 
@@ -253,7 +253,7 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 	double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
 
 
-	bool solves_qp = !cost == std::numeric_limits<double>::infinity();
+	bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
 	for(int i=0; i<np+nq; ++i)
 	{
 		const double v = x[i];

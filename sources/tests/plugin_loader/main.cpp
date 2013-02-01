@@ -71,10 +71,10 @@ int main(int argc, char** argv)
 #endif
 				if(args.is_defined("fitter") && loader.fileName().toStdString().find(args["fitter"]) == std::string::npos)
 				{
-					std::cout << loader.fileName().toStdString() << std::endl ;
 					continue ;
 				}
 
+				std::cout << "<<INFO>> using " << loader.fileName().toStdString() << std::endl ;
 				fitters.push_back(dynamic_cast<fitter*>(plugin)) ;
 			}
 
@@ -127,9 +127,13 @@ int main(int argc, char** argv)
 				std::cout << x << "\t" << f->value(vx)[0] << std::endl ;
 			}
 /*/
+
 			f->save(args["output"], args) ;
 
-			std::ofstream file("temp.gnuplot", std::ios_base::trunc);
+			size_t n = args["output"].find('.') ;
+			std::string gnuplot_filename = args["output"].substr(0,n); 
+			gnuplot_filename.append(".gnuplot") ;
+			std::ofstream file(gnuplot_filename.c_str(), std::ios_base::trunc);
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
@@ -146,7 +150,9 @@ int main(int argc, char** argv)
 				file << std::endl ;
 			}	
 
-			std::ofstream efile("error.gnuplot", std::ios_base::trunc);
+			std::string error_filename = args["output"].substr(0,n); 
+			error_filename.append(".errorplot") ;
+			std::ofstream efile(error_filename.c_str(), std::ios_base::trunc);
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
