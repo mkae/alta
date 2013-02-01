@@ -59,25 +59,50 @@ vec rational_function::value(const vec& x) const
 	return res ;
 }
 
+void populate(std::vector<int>& vec, int N, int k, int j)
+{
+	vec[0] = k ;
+	if(j == 0)
+		return ;
+
+	int tj = j ;
+	while(tj != 0)
+	{
+		// First non null index
+		int nn_index = 0; while(vec[nn_index] == 0) { nn_index = (nn_index+1) % N ; } 
+
+		// Index of the place where to append
+		int ap_index = (nn_index + 1) % N ; while(vec[ap_index] == k) { ap_index = (ap_index+1) % N ; } 
+
+		vec[nn_index] -= 1;
+		vec[ap_index] += 1;
+
+		--tj;
+	}
+}
+
 std::vector<int> rational_function::index2degree(int i) const
 {
 	std::vector<int> deg ; deg.assign(dimX(), 0) ;
-	if(dimX() == 1)
-	{
-		deg[0] = i ;
+	if(i == 0)
 		return deg ;
-	}
 	
-	int temp_i = i-1 ;
-	int temp_c ;
-	while(temp_i > 0)
+	// Calculate the power (number of elements to put in
+	// the vector) at which the index is definite.
+	int Nk = 1 ;
+	int nk = dimX() ;
+	int k  = 1 ;
+	while(!(i >= Nk & i < Nk+nk))
 	{
-		temp_c = temp_i % dimX() ;
-		temp_i = temp_i / dimX() ;
-
-		deg[temp_c] += 1 ;
+		Nk += nk ;
+		nk *= dimX() ;
+		++k ;
 	}
-//	deg[0] += temp_i ;
+
+	// Populate the vector from front to back
+	int j = i-Nk ;
+	populate(deg, dimX(), k, j) ;
+
 	return deg ;
 }
 

@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include <QTime>
+
 #include <rational_function.h>
 #include <rational_data.h>
 
@@ -21,18 +23,44 @@ rational_fitter_quadprog::~rational_fitter_quadprog()
 {
 }
 
-bool rational_fitter_quadprog::fit_data(const data* d, function* fit)
+bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 {
-	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
+	rational_function* r = dynamic_cast<rational_function*>(fit) ;
+	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
+	if(r == NULL || d == NULL)
+	{
+		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
+		return false ;
+	}
+
+	// I need to set the dimension of the resulting function to be equal
+	// to the dimension of my fitting problem
+	r->setDimX(d->dimX()) ;
+	r->setDimY(d->dimY()) ;
+
+	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
+	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
+
+
 	int temp_np = _min_np, temp_nq = _min_nq ;
 	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
-		if(fit_data(d, temp_np, temp_nq, fit))
+		QTime time ;
+		time.start() ;
+	
+		if(fit_data(d, temp_np, temp_nq, r))
 		{
+			int msec = time.elapsed() ;
+			int sec  = (msec / 1000) % 60 ;
+			int min  = (msec / 60000) % 60 ;
+			int hour = (msec / 3600000) ;
+			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
+			std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+
 			return true ;
 		}
 
-		std::cout << "<<INFO>> fitt using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
+		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
 		if(temp_np < _max_np)

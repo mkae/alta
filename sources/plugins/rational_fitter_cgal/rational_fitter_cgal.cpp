@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include <QTime>
+
 typedef CGAL::MP_Float ET ;
 typedef CGAL::Quadratic_program<ET> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
@@ -55,12 +57,22 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
+
 	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np <= _max_np || temp_nq <= _max_nq)
+	while(temp_np < _max_np || temp_nq < _max_nq)
 	{
+		QTime time ;
+		time.start() ;
+		
 		if(fit_data(d, temp_np, temp_nq, r))
 		{
+			int msec = time.elapsed() ;
+			int sec  = (msec / 1000) % 60 ;
+			int min  = (msec / 60000) % 60 ;
+			int hour = (msec / 3600000) ;
 			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
+			std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+
 			return true ;
 		}
 
