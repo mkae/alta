@@ -120,40 +120,25 @@ bool rational_fitter_eigen::fit_data(const rational_data* d, int np, int nq, int
 	}
 
 	// Perform the Eigen decomposition of CI CI'
-	Eigen::MatrixXd M(np+nq, np+nq) ;
-	M = CI * CI.transpose() ;
-	Eigen::EigenSolver<Eigen::MatrixXd> solver(M) ;
+	Eigen::MatrixXd M(np+nq, np+nq);
+	M.noalias() = CI * CI.transpose();
+  // Faster alternative for large np+nq (only the lower triangular half gets computed):
+  // M.setZero();
+  // M.selfadjointView<Lower>().rankUpdate(CI.transpose());
+	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(M) ;
 
 	if(solver.info() == Eigen::Success)
 	{
 		// Calculate the minimum eigen value and
 		// its position
-		double min_val = solver.eigenvalues()(0).real();
-		int    min_ind = 0;
-		for(int i=0; i<np+nq; ++i)
-		{
-			if(min_val > solver.eigenvalues()(i).real())
-			{
-				min_val = solver.eigenvalues()(i).real();
-				min_ind = i ;
-			}
-		}
+		int min_id = 0;
+		double min_val = solver.eigenvalues().minCoeff(&min_id);
 
-		// Recopy the vector d
+		// Get p and q coefficients from respective eigenvector
 		std::vector<double> p, q;
-		p.assign(np, 0.0) ; q.assign(nq, 0.0) ;
-		for(int i=0; i<np+nq; ++i)
-		{
-
-			if(i < np)
-			{
-				p[i] = solver.eigenvectors()(i, min_ind).real() ;
-			}
-			else
-			{
-				q[i-np] = solver.eigenvectors()(i, min_ind).real() ;
-			}
-		}
+		p.assign(np, 0.0) ; q.assign(nq, 0.0);
+    Eigen::VectorXd::Map(&p[0], np) = solver.eigenvectors().col(min_id).head(np);
+    Eigen::VectorXd::Map(&q[0], nq) = solver.eigenvectors().col(min_id).tail(nq);
 		
 		r->update(p, q) ;
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
