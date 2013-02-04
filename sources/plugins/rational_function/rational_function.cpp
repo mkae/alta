@@ -8,6 +8,13 @@
 #include <algorithm>
 #include <cmath>
 
+extern "C"
+{
+	void* provide_function()
+	{
+		return new rational_function() ;
+	}
+}
 
 rational_function::rational_function() : a(), b()
 {
@@ -259,4 +266,4 @@ std::ostream& operator<< (std::ostream& out, const rational_function& r)
 }
 
 
-Q_EXPORT_PLUGIN2(rational_function, rational_function)
+//Q_EXPORT_PLUGIN2(rational_function, rational_function)

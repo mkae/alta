@@ -48,6 +48,7 @@ int main(int argc, char** argv)
 #ifdef DEBUG
 			std::cout << "<<DEBUG>> loading plugin " << fileName.toStdString() << std::endl ;
 #endif
+			/*
 			if(dynamic_cast<function*>(plugin) != NULL)
 			{
 #ifdef DEBUG
@@ -63,7 +64,7 @@ int main(int argc, char** argv)
 #endif
 				datas.push_back(dynamic_cast<data*>(plugin)) ;
 			}
-			
+		*/	
 			if(dynamic_cast<fitter*>(plugin) != NULL)
 			{
 #ifdef DEBUG
@@ -75,7 +76,11 @@ int main(int argc, char** argv)
 				}
 
 				std::cout << "<<INFO>> using " << loader.fileName().toStdString() << std::endl ;
-				fitters.push_back(dynamic_cast<fitter*>(plugin)) ;
+				fitter *f = dynamic_cast<fitter*>(plugin) ;
+				fitters.push_back(f) ;
+				datas.push_back(f->provide_data()) ;
+				functions.push_back(f->provide_function()) ;
+
 			}
 
 		}

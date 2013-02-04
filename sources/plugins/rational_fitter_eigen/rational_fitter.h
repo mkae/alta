@@ -34,6 +34,14 @@ class rational_fitter_eigen : public QObject, public fitter
 
 		virtual void set_parameters(const arguments& args) ;
 
+		virtual data* provide_data() const
+		{
+			return new rational_data() ;
+		}	;
+		virtual function* provide_function() const 
+		{
+			return new rational_function() ;
+		}	;
 	protected: // data
 
 		// min and Max usable np and nq values for the fitting

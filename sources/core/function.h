@@ -31,4 +31,4 @@ class function
 		int _nX, _nY ;
 } ;
 
-Q_DECLARE_INTERFACE(function, "Fitter.Function") 
+//Q_DECLARE_INTERFACE(function, "Fitter.Function") 

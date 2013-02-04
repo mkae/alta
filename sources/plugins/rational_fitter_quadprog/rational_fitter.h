@@ -11,6 +11,10 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
+#include <rational_function.h>
+#include <rational_data.h>
+
+
 class rational_fitter_quadprog : public QObject, public fitter
 {
 	Q_OBJECT
@@ -30,6 +34,14 @@ class rational_fitter_quadprog : public QObject, public fitter
 
 		virtual void set_parameters(const arguments& args) ;
 
+		virtual data* provide_data() const
+		{
+			return new rational_data() ;
+		}	;
+		virtual function* provide_function() const 
+		{
+			return new rational_function() ;
+		}	;
 	protected: // data
 
 		// min and Max usable np and nq values for the fitting

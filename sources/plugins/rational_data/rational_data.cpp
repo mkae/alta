@@ -201,4 +201,4 @@ vec rational_data::max() const
 	return _max ;
 }
 
-Q_EXPORT_PLUGIN2(rational_data, rational_data)
+//Q_EXPORT_PLUGIN2(rational_data, rational_data)
