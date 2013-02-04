@@ -1,0 +1,2 @@
+TARGET  = lib
+CONFIG += staticlib 
