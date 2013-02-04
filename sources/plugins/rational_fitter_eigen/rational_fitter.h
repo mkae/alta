@@ -23,25 +23,27 @@ class rational_fitter_eigen : public QObject, public fitter
 	
 		rational_fitter_eigen() ;
 		virtual ~rational_fitter_eigen() ;
-
+			
 		// Fitting a data object
+		//
 		virtual bool fit_data(const data* d, function* fit) ;
+
+		// Provide user parameters to the fitter
+		//
+		virtual void set_parameters(const arguments& args) ;
+
+		// Obtain associated data and functions
+		//
+		virtual data*     provide_data() const ;
+		virtual function* provide_function() const ;
+
+	protected: // function
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
 		virtual bool fit_data(const rational_data* d, int np, int nq, rational_function* fit) ;
 		virtual bool fit_data(const rational_data* dat, int np, int nq, int ny, rational_function* fit) ;
 
-		virtual void set_parameters(const arguments& args) ;
-
-		virtual data* provide_data() const
-		{
-			return new rational_data() ;
-		}	;
-		virtual function* provide_function() const 
-		{
-			return new rational_function() ;
-		}	;
 	protected: // data
 
 		// min and Max usable np and nq values for the fitting

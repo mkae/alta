@@ -16,6 +16,16 @@
 #include <rational_function.h>
 #include <rational_data.h>
 
+data* rational_fitter_quadprog::provide_data() const
+{
+	return new rational_data() ;
+}
+
+function* rational_fitter_quadprog::provide_function() const 
+{
+	return new rational_function() ;
+}
+
 rational_fitter_quadprog::rational_fitter_quadprog() : QObject()
 {
 }
@@ -43,11 +53,11 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 
 
 	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np <= _max_np || temp_nq <= _max_nq)
+	while(temp_np < _max_np || temp_nq < _max_nq)
 	{
 		QTime time ;
 		time.start() ;
-	
+		
 		if(fit_data(d, temp_np, temp_nq, r))
 		{
 			int msec = time.elapsed() ;
@@ -85,7 +95,31 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, function* rf) 
+bool rational_fitter_quadprog::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
+{
+
+	// Multidimensional coefficients
+	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
+	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
+
+	for(int j=0; j<d->dimY(); ++j)
+	{
+		if(!fit_data(d, np, nq, j, r))
+			return false ;
+
+		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
+		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
+	}
+
+	r->update(Pn, Qn) ;
+	return true ;
+}
+
+// dat is the data object, it contains all the points to fit
+// np and nq are the degree of the RP to fit to the data
+// y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
+// the function return a ration BRDF function and a boolean
+bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq, int ny, rational_function* rf) 
 {
 	// by default, we have a nonnegative QP with Ax - b >= 0
 //	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
@@ -155,15 +189,15 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 				d->get(i, yl, yu) ;
 
 				const double qi = r->q(d->get(i), j-np) ;
-				a0_norm += qi*qi * (yl[0]*yl[0]) ;
-				CI[j][i] = -yl[0] * qi ;
+				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
+				CI[j][i] = -yl[ny] * qi ;
 				
-				a1_norm += qi*qi * (yu[0]*yu[0]) ;
-				CI[j][i+d->size()] = yu[0] * qi ;
+				a1_norm += qi*qi * (yu[ny]*yu[ny]) ;
+				CI[j][i+d->size()] = yu[ny] * qi ;
 				
 				// Updating Eigen matrix
-				eCI(j,i) = -yl[0] * qi ;
-				eCI(j,i+d->size()) = yu[0] * qi ;
+				eCI(j,i) = -yl[ny] * qi ;
+				eCI(j,i+d->size()) = yu[ny] * qi ;
 			}
 		}
 	
@@ -189,7 +223,6 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 #endif
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
-
 	Eigen::JacobiSVD<Eigen::MatrixXd> svd(eCI);
 	const double sigma_m = svd.singularValues()(std::min(2*d->size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
@@ -225,57 +258,6 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 		ci[i] = ci[i] * delta ; 
 	}
 
-#ifdef DEBUG
-	// Export some informations on the problem to solve
-//	std::cout << "<<DEBUG>> " << qp.get_n() << " variables" << std::endl ;
-//	std::cout << "<<DEBUG>> " << qp.get_m() << " constraints" << std::endl ;
-#endif
-
-/*
-	if(qp.is_linear() && !qp.is_nonnegative())
-	{
-		std::cerr << "<<ERROR>> the problem should not be linear or negative!" << std::endl ;
-		return false ;
-	}
-*/
-#ifdef EXTREM_DEBUG
-/*
-	// Iterate over the rows
-	std::cout << std::endl ;
-	std::cout << "A = [" ;
-	for(int j=0; j<qp.get_m(); ++j)
-	{
-		if(j == 0) std::cout << "   " ;
-
-		// Iterate over the columns
-		for(int i=0; i<qp.get_n(); ++i)
-		{
-			if(i > 0) std::cout << ",\t" ;
-			std::cout << *(*(qp.get_a()+i) +j) ;
-		}
-		std::cout << ";" ;
-		if(j < qp.get_n()-1) std::cout << std::endl ;
-	}
-	std::cout << "]" << std::endl << std::endl ;
-	
-	std::cout << std::endl ;
-	std::cout << "D = [" ;
-	for(int j=0; j<np+nq; ++j)
-	{
-		if(j == 0) std::cout << "   " ;
-
-		// Iterate over the columns
-		for(int i=0; i<np+nq; ++i)
-		{
-			if(i > 0) std::cout << ",\t" ;
-			std::cout << *(*(qp.get_d()+i) +j) ;
-		}
-		std::cout << ";" ;
-	}
-	std::cout << "]" << std::endl << std::endl ;
-*/
-#endif
-
 	// Compute the solution
 	QuadProgPP::Vector<double> x;
 	double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
@@ -306,13 +288,9 @@ bool rational_fitter_quadprog::fit_data(const data* dat, int np, int nq, functio
 			}
 		}
 
-		if(r != NULL)
-		{
-			delete r ;
-		}
-		r = new rational_function(p, q);
-			
+		r->update(p, q);
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
+		
 		return true;
 	}
 	else

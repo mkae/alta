@@ -12,6 +12,16 @@
 
 #include <QTime>
 
+data* rational_fitter_eigen::provide_data() const
+{
+	return new rational_data() ;
+}
+
+function* rational_fitter_eigen::provide_function() const 
+{
+	return new rational_function() ;
+}
+
 rational_fitter_eigen::rational_fitter_eigen() : QObject()
 {
 }
@@ -40,6 +50,7 @@ bool rational_fitter_eigen::fit_data(const data* dat, function* fit)
 	QTime time ;
 	time.start() ;
 
+
 	if(fit_data(d, _np, _nq, r))
 	{
 		int msec = time.elapsed() ;
@@ -64,7 +75,6 @@ void rational_fitter_eigen::set_parameters(const arguments& args)
 	_nq = args.get_float("nq", 10) ;
 }
 		
-// TODO Finish
 bool rational_fitter_eigen::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
 {
 
@@ -129,16 +139,33 @@ bool rational_fitter_eigen::fit_data(const rational_data* d, int np, int nq, int
   // M.setZero();
   // M.selfadjointView<Lower>().rankUpdate(CI.transpose());
 	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(M) ;
-	
-//	std::cout << M << std::endl << std::endl ;
-
+/*
+	std::cout << M.size() << std::endl << std::endl ;
+	std::cout << M << std::endl << std::endl ;
+*/
 	if(solver.info() == Eigen::Success)
 	{
+/*
+		std::cout << solver.eigenvalues() << std::endl ;
+*/
 		// Calculate the minimum eigen value and
 		// its position
+#ifdef NOT_WORKING
 		int    min_id = 0;
 		double min_val = solver.eigenvalues().minCoeff(&min_id);
-
+#else
+		int    min_id = 0 ;
+		double min_val = std::numeric_limits<double>::max() ;
+		for(int i=0; i<solver.eigenvalues().size(); ++i)
+		{
+			double value = solver.eigenvalues()[i] ;
+			if(value >= 0 && value < min_val)
+			{
+				min_id  = i ;
+				min_val = value ;
+			}
+		}
+#endif
 		// Recopy the vector d
 		std::vector<double> p, q;
 		p.assign(np, 0.0) ; q.assign(nq, 0.0) ;

@@ -5,17 +5,18 @@
 #include <string>
 
 // Interface
-#include <QObject>
+//#include <QObject>
 #include <core/function.h>
 #include <core/data.h>
 #include <core/fitter.h>
 #include <core/args.h>
 
-class rational_data : public QObject, public data
+class rational_data : /*public QObject,*/ public data
 {
+/*	
 	Q_OBJECT
 	Q_INTERFACES(data)
-
+*/
 	public: // methods
 
 		// Load data from a file

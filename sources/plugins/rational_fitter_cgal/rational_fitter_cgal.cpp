@@ -20,6 +20,17 @@ typedef CGAL::Quadratic_program<ET> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
 typedef CGAL::Quadratic_program_options Options ;
 
+
+data* rational_fitter_cgal::provide_data() const
+{
+	return new rational_data() ;
+}
+
+function* rational_fitter_cgal::provide_function() const 
+{
+	return new rational_function() ;
+}
+
 rational_fitter_cgal::rational_fitter_cgal() : QObject()
 {
 }
@@ -41,18 +52,6 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
-
-#ifdef DEBUG_DEGREES
-	for(int i=0; i<100; ++i)
-	{
-		std::vector<int> v = r->index2degree(i) ;
-		std::cout << i << " = " ;
-		for(int j=0; j<v.size(); ++j)
-			std::cout << v[j] << "\t" ;
-		std::cout << std::endl ;
-	}
-	throw ;
-#endif
 
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
@@ -100,7 +99,6 @@ void rational_fitter_cgal::set_parameters(const arguments& args)
 	_min_nq = args.get_float("min-nq", _max_nq) ;
 }
 		
-// TODO Finish
 bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
 {
 
@@ -317,12 +315,9 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 				q[i-np] = v ;
 			}
 		}
-/*
-		r = new rational_function(p, q);
-/*/
  		r->update(p, q) ;
-//*/			
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
+		
 		return true;
 	}
 	else

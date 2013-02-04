@@ -106,9 +106,12 @@ int main(int argc, char** argv)
 	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fitters[0]->set_parameters(args) ;
-
+/*
 		function* f = functions[0] ;
 		data*     d = datas[0] ;
+*/
+		function* f = fitters[0]->provide_function() ;
+		data*     d = fitters[0]->provide_data() ;
 		d->load(args["input"], args);
 
 		bool is_fitted = fitters[0]->fit_data(d, f) ;

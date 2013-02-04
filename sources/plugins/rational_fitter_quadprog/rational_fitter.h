@@ -26,23 +26,24 @@ class rational_fitter_quadprog : public QObject, public fitter
 		virtual ~rational_fitter_quadprog() ;
 
 		// Fitting a data object
+		//
 		virtual bool fit_data(const data* d, function* fit) ;
+
+		// Provide user parameters to the fitter
+		//
+		virtual void set_parameters(const arguments& args) ;
+
+		// Obtain associated data and functions
+		//
+		virtual data*     provide_data() const ;
+		virtual function* provide_function() const ;
+
+	protected: // data
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const data* d, int np, int nq, function* fit) ;
-
-		virtual void set_parameters(const arguments& args) ;
-
-		virtual data* provide_data() const
-		{
-			return new rational_data() ;
-		}	;
-		virtual function* provide_function() const 
-		{
-			return new rational_function() ;
-		}	;
-	protected: // data
+		virtual bool fit_data(const rational_data* d, int np, int nq, rational_function* fit) ;
+		virtual bool fit_data(const rational_data* dat, int np, int nq, int ny, rational_function* fit) ;
 
 		// min and Max usable np and nq values for the fitting
 		int _max_np, _max_nq ;
