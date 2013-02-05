@@ -1,6 +1,6 @@
 #include "rational_function.h"
 
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 #include <string>
 #include <iostream>
 #include <fstream>
