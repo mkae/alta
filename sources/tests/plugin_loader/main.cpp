@@ -41,6 +41,13 @@ int main(int argc, char** argv)
 		loader.setLoadHints(QLibrary::ExportExternalSymbolsHint) ;
 		loader.setFileName(pluginsDir.absoluteFilePath(fileName));
 
+		if(!loader.load())
+		{
+#ifdef DEBUG
+			std::cout << "<<DEBUG>> " << loader.errorString().toStdString() << std::endl ;
+#endif
+			continue ;
+		}
 
 		QObject *plugin = loader.instance();
 		if (plugin != NULL) 
