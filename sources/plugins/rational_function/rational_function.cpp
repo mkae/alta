@@ -53,12 +53,12 @@ vec rational_function::value(const vec& x) const
 		
 		for(unsigned int i=0; i<np; ++i)
 		{
-			p += a[i*_nY + k]*this->p(x, i) ;
+			p += a[k*_nY + i]*this->p(x, i) ;
 		}
 
 		for(unsigned int i=0; i<nq; ++i)
 		{
-			q += b[i*_nY + k]*this->q(x, i) ;
+			q += b[k*_nY + i]*this->q(x, i) ;
 		}
 
 		res[k] = p/q ;
@@ -99,7 +99,7 @@ std::vector<int> rational_function::index2degree(int i) const
 	int Nk = 1 ;
 	int nk = dimX() ;
 	int k  = 1 ;
-	while(!(i >= Nk & i < Nk+nk))
+	while(!(i >= Nk && i < Nk+nk))
 	{
 		Nk += nk ;
 		nk *= dimX() ;
@@ -217,7 +217,7 @@ void rational_function::save_rational_function(const std::string& filename) cons
 	file << "#NQ " << b.size() / _nY << std::endl ;
 	file << "#BASIS poly" << std::endl ;
 
-	for(unsigned int i=0; i<a.size(); ++i)
+	for(unsigned int i=0; i<a.size() / _nY; ++i)
 	{
 		std::vector<int> index = index2degree(i) ;
 		for(unsigned int j=0; j<index.size(); ++j)
@@ -230,7 +230,7 @@ void rational_function::save_rational_function(const std::string& filename) cons
 	for(unsigned int i=0; i<b.size(); ++i)
 	{
 		std::vector<int> index = index2degree(i) ;
-		for(unsigned int j=0; j<index.size(); ++j)
+		for(unsigned int j=0; j<index.size() / _nY; ++j)
 		{
 			file << index[j] << "\t" ;
 		}

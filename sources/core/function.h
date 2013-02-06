@@ -7,7 +7,8 @@
 
 #include "common.h"
 #include "args.h"
-#include "data.h"
+
+class data ;
 
 class function 
 {
@@ -26,8 +27,6 @@ class function
 
 		virtual void setDimX(int nX) { _nX = nX ; } ;
 		virtual void setDimY(int nY) { _nY = nY ; } ;
-	
-		virtual void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
 
 	protected:
 		// Dimension of the function

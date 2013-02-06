@@ -148,13 +148,15 @@ int main(int argc, char** argv)
 			size_t n = args["output"].find('.') ;
 			std::string gnuplot_filename = args["output"].substr(0,n); 
 			gnuplot_filename.append(".gnuplot") ;
+/*	
 			f->save_gnuplot(gnuplot_filename, d, args);				
-/*			std::ofstream file(gnuplot_filename.c_str(), std::ios_base::trunc);
+/*/
+			std::ofstream file(gnuplot_filename.c_str(), std::ios_base::trunc);
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
-				vec y1(d->dimY()) ;
-				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+//				vec y1(d->dimY()) ;
+//				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
 
 				vec y2 = f->value(v) ;
 				for(int u=0; u<d->dimX(); ++u)
@@ -165,7 +167,7 @@ int main(int argc, char** argv)
 					
 				file << std::endl ;
 			}	
-*/
+//*/
 			std::string error_filename = args["output"].substr(0,n); 
 			error_filename.append(".errorplot") ;
 			std::ofstream efile(error_filename.c_str(), std::ios_base::trunc);
