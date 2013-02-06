@@ -53,7 +53,7 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 
 
 	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np < _max_np || temp_nq < _max_nq)
+	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
 		QTime time ;
 		time.start() ;
@@ -73,11 +73,11 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
-		if(temp_np < _max_np)
+		if(temp_np <= _max_np)
 		{
 			++temp_np ;
 		}
-		if(temp_nq < _max_nq)
+		if(temp_nq <= _max_nq)
 		{
 			++temp_nq ;
 		}
@@ -121,9 +121,6 @@ bool rational_fitter_quadprog::fit_data(const rational_data* d, int np, int nq, 
 // the function return a ration BRDF function and a boolean
 bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq, int ny, rational_function* rf) 
 {
-	// by default, we have a nonnegative QP with Ax - b >= 0
-//	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
-
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
 	if(r == NULL || d == NULL)
@@ -136,6 +133,10 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
+
+	// Get the maximum value in data to scale the input parameter space
+	// so that it reduces the values of the polynomial
+	vec dmax = d->max() ;
 
 	// Matrices of the problem
 	QuadProgPP::Matrix<double> G (0.0, np+nq, np+nq) ;
@@ -163,6 +164,12 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 		double a0_norm = 0.0 ;
 		double a1_norm = 0.0 ;
 
+		vec xi = d->get(i) ;
+		for(int k=0; k<d->dimX(); ++k)
+		{
+			xi[k] /= dmax[k] ;
+		}
+
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -172,7 +179,7 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 			// Filling the p part
 			if(j<np)
 			{
-				const double pi = r->p(d->get(i), j) ;
+				const double pi = r->p(xi, j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				CI[j][i] =  pi ;
@@ -188,7 +195,7 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 				vec yl, yu ; 
 				d->get(i, yl, yu) ;
 
-				const double qi = r->q(d->get(i), j-np) ;
+				const double qi = r->q(xi, j-np) ;
 				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
 				CI[j][i] = -yl[ny] * qi ;
 				
@@ -274,24 +281,25 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 	{
 		// Recopy the vector d
 		std::vector<double> p, q;
+		double norm = 0.0 ;
 		for(int i=0; i<np+nq; ++i)
 		{
 			const double v = x[i];
-
+			norm += v*v ;
 			if(i < np)
 			{
-				p.push_back(v) ;
+				p.push_back(v / r->p(dmax, i)) ;
 			}
 			else
 			{
-				q.push_back(v) ;
+				q.push_back(v / r->q(dmax, i-np)) ;
 			}
 		}
 
 		r->update(p, q);
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
 		
-		return true;
+		return norm > 0.0;
 	}
 	else
 
