@@ -1,2 +1,2 @@
 TARGET  = lib
-CONFIG += staticlib 
+CONFIG += static

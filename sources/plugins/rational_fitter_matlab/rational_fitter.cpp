@@ -26,15 +26,9 @@ function* rational_fitter_matlab::provide_function() const
 
 rational_fitter_matlab::rational_fitter_matlab() : QObject()
 {
-	// Create matlab engine
-	if (!(ep = engOpen(""))) 
-	{
-		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
-	}
 }
 rational_fitter_matlab::~rational_fitter_matlab() 
 {
-	engClose(ep); 
 }
 
 bool rational_fitter_matlab::fit_data(const data* dat, function* fit)
@@ -47,41 +41,63 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit)
 		return false ;
 	}
 	
+	// Create matlab engine
+	if (!(ep = engOpen(""))) 
+	{
+		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
+		return false ;
+	}
+	
 
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
 
-	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
+	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
+	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
-
-	QTime time ;
-	time.start() ;
-
-
-	if(fit_data(d, _np, _nq, r))
+	int temp_np = _min_np, temp_nq = _min_nq ;
+	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
-		int msec = time.elapsed() ;
-		int sec  = (msec / 1000) % 60 ;
-		int min  = (msec / 60000) % 60 ;
-		int hour = (msec / 3600000) ;
-		std::cout << "<<INFO>> got a fit" << std::endl ;
-		std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+		QTime time ;
+		time.start() ;
+		
+		if(fit_data(d, temp_np, temp_nq, r))
+		{
+			int msec = time.elapsed() ;
+			int sec  = (msec / 1000) % 60 ;
+			int min  = (msec / 60000) % 60 ;
+			int hour = (msec / 3600000) ;
+			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
+			std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
 
-		return true ;
+			return true ;
+		}
+
+		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
+		std::cout.flush() ;
+
+		if(temp_np <= _max_np)
+		{
+			++temp_np ;
+		}
+		if(temp_nq <= _max_nq)
+		{
+			++temp_nq ;
+		}
 	}
 
-	std::cout << "<<INFO>> fit failed\r"  ;
-	std::cout.flush() ;
-
+	engClose(ep); 
 	return false ;
 }
 
 void rational_fitter_matlab::set_parameters(const arguments& args)
 {
-	_np = args.get_float("np", 10) ;
-	_nq = args.get_float("nq", 10) ;
+	_max_np = args.get_float("np", 10) ;
+	_max_nq = args.get_float("nq", 10) ;
+	_min_np = args.get_float("min-np", _max_np) ;
+	_min_nq = args.get_float("min-nq", _max_nq) ;	
 }
 		
 bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
@@ -117,7 +133,7 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 	// Matrices of the problem
 	Eigen::MatrixXd G (N, N) ;
 	Eigen::VectorXd g (N) ;
-	Eigen::MatrixXd CI(N, 2*M) ;
+	Eigen::MatrixXd CI(2*M, N) ;
 	Eigen::VectorXd ci(2*M) ;
 
 	// Select the size of the result vector to
@@ -157,8 +173,8 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				// Updating Eigen matrix
-				CI(j,i)   =  pi ;
-				CI(j,i+M) = -pi ;
+				CI(2*i+0, j) =  pi ;
+				CI(2*i+1, j) = -pi ;
 			}
 			// Filling the q part
 			else
@@ -167,19 +183,19 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 				d->get(i, yl, yu) ;
 
 				const double qi = r->q(d->get(i), j-np) ;
-				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
-				a1_norm += qi*qi * (yu[ny]*yu[ny]) ;
+				a0_norm += qi*qi * (yu[ny]*yu[ny]) ;
+				a1_norm += qi*qi * (yl[ny]*yl[ny]) ;
 				
 				// Updating Eigen matrix
-				CI(j,i)   = -yl[ny] * qi ;
-				CI(j,i+M) =  yu[ny] * qi ;
+				CI(2*i+0, j) = -yu[ny] * qi ;
+				CI(2*i+1, j) =  yl[ny] * qi ;
 			}
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
-		ci(i)   = -sqrt(a0_norm) ;
-		ci(i+M) = -sqrt(a1_norm) ;
+		ci(2*i+0) = -sqrt(a0_norm) ;
+		ci(2*i+1) = -sqrt(a1_norm) ;
 	}
 	
 	// Update the ci column with the delta parameter
@@ -208,6 +224,9 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 	{		
 		ci(i) = ci(i) * delta ; 
 	}
+#ifdef DEBUG
+	std::cout << "CI = " << CI << std::endl << std::endl ;
+#endif
 
 	// Create the MATLAB defintion of objects
 	// MATLAB defines a quad prog as
@@ -265,14 +284,18 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 				mxDestroyArray(x);
 				mxDestroyArray(flag);
 			
+#ifdef DEBUG
 				std::cerr << "<<ERROR>> flag is not equal to 1" << std::endl ;
+#endif
 				return false ;
 			}
 
+			double  total = 0.0;
 			double* val = (double*)mxGetData(x) ;
 			std::vector<double> a, b;
 			for(int i=0; i<N; ++i)
 			{
+				total += val[i]*val[i] ;
 				if(i < np)
 				{
 					a.push_back(val[i]) ;
@@ -286,16 +309,21 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 
 			mxDestroyArray(x);
 			mxDestroyArray(flag);
-			return true ;
+			return total > 0.0 ;
 		}
 		else
 		{
+#ifdef DEBUG
 			std::cerr << "<<ERROR>> unable to gather result flag" << std::endl ;
+#endif
+			return false ;
 		}
 	}
 	else 
 	{
+#ifdef DEBUG
 		std::cerr << "<<ERROR>> unable to gather result x" << std::endl ;
+#endif
 		return false ;
 	}
 }

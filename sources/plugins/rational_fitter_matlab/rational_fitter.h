@@ -48,7 +48,9 @@ class rational_fitter_matlab : public QObject, public fitter
 	protected: // data
 
 		// min and Max usable np and nq values for the fitting
-		int _np, _nq ;
+		// 
+		int _max_np, _max_nq ;
+		int _min_np, _min_nq ;
 		Engine *ep;
 } ;
 

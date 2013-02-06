@@ -58,7 +58,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 
 
 	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np < _max_np || temp_nq < _max_nq)
+	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
 		QTime time ;
 		time.start() ;
@@ -78,11 +78,11 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
-		if(temp_np < _max_np)
+		if(temp_np <= _max_np)
 		{
 			++temp_np ;
 		}
-		if(temp_nq < _max_nq)
+		if(temp_nq <= _max_nq)
 		{
 			++temp_nq ;
 		}

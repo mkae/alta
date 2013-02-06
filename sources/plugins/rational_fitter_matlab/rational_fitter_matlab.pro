@@ -18,4 +18,4 @@ LIBS           += -L../../build           \
 						-lrational_function	\
 						-lrational_data
 
-QMAKE_CXXFLAGS += -fPIC
+#QMAKE_CXXFLAGS += -fPIC

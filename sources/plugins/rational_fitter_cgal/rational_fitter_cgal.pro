@@ -18,5 +18,8 @@ LIBS           += -L../../build           \
 						-lrational_function	\
 						-lrational_data
 
-QMAKE_CXXFLAGS += -frounding-math -fPIC
+unix {
+QMAKE_CXXFLAGS += -frounding-math 
+}
+#-fPIC
 
