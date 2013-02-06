@@ -195,8 +195,8 @@ void rational_function::save_gnuplot(const std::string& filename, const data* d,
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec v = d->get(i) ;
-		vec y1 ; y1.assign(d->dimY(), 0.0) ;
-		for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+//		vec y1 ; y1.assign(d->dimY(), 0.0) ;
+//		for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
 
 		vec y2 = value(v) ;
 		for(int u=0; u<d->dimX(); ++u)
@@ -213,8 +213,8 @@ void rational_function::save_rational_function(const std::string& filename) cons
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
-	file << "#NP " << a.size() << std::endl ;
-	file << "#NQ " << b.size() << std::endl ;
+	file << "#NP " << a.size() / _nY << std::endl ;
+	file << "#NQ " << b.size() / _nY << std::endl ;
 	file << "#BASIS poly" << std::endl ;
 
 	for(unsigned int i=0; i<a.size(); ++i)

@@ -56,7 +56,7 @@ void rational_data::load(const std::string& filename, const arguments& args)
 
 				_min.resize(dimX()) ;
 				_max.resize(dimX()) ;
-				for(int k=0; k<dimY(); ++k)
+				for(int k=0; k<dimX(); ++k)
 				{
 					_min[k] =  std::numeric_limits<double>::max() ;
 					_max[k] = -std::numeric_limits<double>::max() ;
