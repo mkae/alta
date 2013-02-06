@@ -130,6 +130,10 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 	int N = np+nq ;
 	int M = d->size() ;
 	
+	// Get the maximum value in data to scale the input parameter space
+	// so that it reduces the values of the polynomial
+	vec dmax = d->max() ;
+	
 	// Matrices of the problem
 	Eigen::MatrixXd G (N, N) ;
 	Eigen::VectorXd g (N) ;
@@ -160,6 +164,12 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 		double a0_norm = 0.0 ;
 		double a1_norm = 0.0 ;
 
+		vec xi = d->get(i) ;
+		for(int k=0; k<d->dimX(); ++k)
+		{
+			xi[k] /= dmax[k] ;
+		}
+
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -169,7 +179,7 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 			// Filling the p part
 			if(j<np)
 			{
-				const double pi = r->p(d->get(i), j) ;
+				const double pi = r->p(xi, j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				// Updating Eigen matrix
@@ -182,7 +192,7 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 				vec yl, yu ; 
 				d->get(i, yl, yu) ;
 
-				const double qi = r->q(d->get(i), j-np) ;
+				const double qi = r->q(xi, j-np) ;
 				a0_norm += qi*qi * (yu[ny]*yu[ny]) ;
 				a1_norm += qi*qi * (yl[ny]*yl[ny]) ;
 				
@@ -298,11 +308,11 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 				total += val[i]*val[i] ;
 				if(i < np)
 				{
-					a.push_back(val[i]) ;
+					a.push_back(val[i] / r->p(dmax, i)) ;
 				}
 				else
 				{
-					b.push_back(val[i]) ;
+					b.push_back(val[i] / r->q(dmax, i-np)) ;
 				}
 			}
 			r->update(a, b) ;

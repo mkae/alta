@@ -128,6 +128,10 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 	// by default, we have a nonnegative QP with Ax - b >= 0
 	Program qp (CGAL::LARGER, false, 0, false, 0) ; 
 
+	// Get the maximum value in data to scale the input parameter space
+	// so that it reduces the values of the polynomial
+	vec dmax = d->max() ;
+
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
 	for(int i=0; i<np+nq; ++i)
@@ -146,6 +150,12 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 		double a0_norm = 0.0 ;
 		double a1_norm = 0.0 ;
 
+		vec xi = d->get(i) ;
+		for(int k=0; k<d->dimX(); ++k)
+		{
+			xi[k] /= dmax[k] ;
+		}
+
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -155,7 +165,7 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 			// Filling the p part
 			if(j<np)
 			{
-				const double pi = r->p(d->get(i), j) ;
+				const double pi = r->p(xi, j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
 				qp.set_a(j, i,  ET(pi)) ;
@@ -169,7 +179,7 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 				vec yl, yu ; 
 				d->get(i, yl, yu) ;
 
-				const double qi = r->q(d->get(i), j-np) ;
+				const double qi = r->q(xi, j-np) ;
 				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
 				qp.set_a(j, i, ET(-yl[ny] * qi)) ;
 				CI(j, i) = -yl[ny] * qi ;
@@ -308,11 +318,11 @@ bool rational_fitter_cgal::fit_data(const rational_data* d, int np, int nq, int 
 
 			if(i < np)
 			{
-				p[i] = v ;
+				p[i] = v / r->p(dmax, i) ;
 			}
 			else
 			{
-				q[i-np] = v ;
+				q[i-np] = v / r->q(dmax, i-np) ;
 			}
 		}
  		r->update(p, q) ;
