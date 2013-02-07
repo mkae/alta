@@ -271,13 +271,22 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 	engEvalString(ep, "display(b)");
 	std::cout << output << std::endl ;
 #endif
+
+#ifdef USE_MATLAB
 	engEvalString(ep, "[x, fval, flag] = quadprog(H,f,A,b);");
+#else
+    engEvalString(ep, "cd matlab;");
+    engEvalString(ep, "[x, err] = qpas(H,f,A,b);");
+    engEvalString(ep, "flag = err == 0.0;");
+    engEvalString(ep, "cd ..;");
+#endif
 #ifdef DEBUG
-	std::cout << output << std::endl ;
 	engEvalString(ep, "display(x)");
 	std::cout << output << std::endl ;
 	engEvalString(ep, "display(flag)");
+    std::cout << output << std::endl ;
 #endif
+
 	mxDestroyArray(H);
 	mxDestroyArray(f);
 	mxDestroyArray(A);
