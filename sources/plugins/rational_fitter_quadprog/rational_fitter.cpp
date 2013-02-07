@@ -257,7 +257,7 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 	}
 
 
-#ifdef DEBUG
+#ifndef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	for(int i=0; i<2*d->size(); ++i)	

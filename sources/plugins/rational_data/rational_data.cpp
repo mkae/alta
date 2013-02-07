@@ -96,15 +96,16 @@ void rational_data::load(const std::string& filename, const arguments& args)
 			{
 				double dt ;
 				linestream >> dt ;
-				v[dimX() + dimY()+i] = v[dimX() + i] - dt ;
-				v[dimX() + 2*dimY()+i] = v[dimX() + i] + dt ;
+                v[dimX() + dimY()+i] = v[dimX() + i] * (1.0f - dt) ;
+                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0f + dt) ;
 			}
 			else 
 			{
 				// TODO Specify the delta in case
 				// Handle multiple dim
-				v[dimX() +   dimY()+i] = v[dimX() + i] - args.get_float("dt", 0.1) ;
-				v[dimX() + 2*dimY()+i] = v[dimX() + i] + args.get_float("dt", 0.1) ;
+                float dt = args.get_float("dt", 0.1);
+                v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0f - dt) ;
+                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0f + dt) ;
 			}
 		}
 		

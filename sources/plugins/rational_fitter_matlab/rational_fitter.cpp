@@ -214,7 +214,12 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 	const double sigma_m = svd.singularValues()(std::min(2*M, N)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
 	double delta = sigma_m / sigma_M ;
-	
+
+#ifdef NOT_WORKING
+	static double cond_number = std::numeric_limits<double>::max() ;
+	cond_number = std::min(delta, cond_number) ;
+#endif 
+
 	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 #ifdef DEBUG
@@ -227,13 +232,15 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 		delta = 1.0 ;
 	}
 
-#ifdef DEBUG
+#ifndef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
+	
 	for(int i=0; i<2*M; ++i)	
 	{		
 		ci(i) = ci(i) * delta ; 
 	}
+	
 #ifdef DEBUG
 	std::cout << "CI = " << CI << std::endl << std::endl ;
 #endif
@@ -274,9 +281,15 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 
 #ifdef USE_MATLAB
 	engEvalString(ep, "[x, fval, flag] = quadprog(H,f,A,b);");
+#ifdef DEBUG
+	std::cout << output << std::endl ;
+#endif
 #else
     engEvalString(ep, "cd matlab;");
     engEvalString(ep, "[x, err] = qpas(H,f,A,b);");
+#ifdef DEBUG
+	std::cout << output << std::endl ;
+#endif
     engEvalString(ep, "flag = err == 0.0;");
     engEvalString(ep, "cd ..;");
 #endif
