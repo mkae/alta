@@ -146,13 +146,22 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 	Eigen::MatrixXd CE(np+nq, 2*d->size()) ;
 	Eigen::VectorXd ce(2*d->size()) ;
 
-	Eigen::MatrixXd eCI(np+nq, 2*d->size()) ;
-
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
 	for(int i=0; i<np+nq; ++i)
 	{
-		G(i,i) = 1.0 ; 
+		for(int j=0; j<np+nq; ++j)
+		{
+			if(i == j)
+			{
+				G(i,j) = 1.0 ; 
+			}
+			else
+			{
+				G(i,j) = 0.0 ;
+			}
+		}
+		g(i) = 0.0 ;
 	}
 	
 	// Each constraint (fitting interval or point
@@ -176,14 +185,17 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 		// the upper constraint
 		for(int j=0; j<np+nq; ++j)
 		{
+			CE(j, i) = 0.0 ;
+			CE(j, i+d->size()) = 0.0 ;
+
 			// Filling the p part
 			if(j<np)
 			{
 				const double pi = r->p(xi, j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
-				CI(j,i) =  pi ;
-				CI(j,i+d->size()) = -pi ;
+				CI(i,j) =  pi ;
+				CI(i+d->size(),j) = -pi ;
 			}
 			// Filling the q part
 			else
@@ -193,10 +205,10 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 
 				const double qi = r->q(xi, j-np) ;
 				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
-				CI(j,i) = -yl[ny] * qi ;
+				CI(j, i) = -yl[ny] * qi ;
 				
 				a1_norm += qi*qi * (yu[ny]*yu[ny]) ;
-				CI(j,i+d->size()) = yu[ny] * qi ;
+				CI(j, i+d->size()) = yu[ny] * qi ;
 			}
 		}
 	
@@ -204,6 +216,8 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 		// delta parameter.
 		ci(i) = -sqrt(a0_norm) ;
 		ci(i+d->size()) = -sqrt(a1_norm) ;
+		ce(i) = 0.0 ;
+		ce(i+d->size()) = 0.0 ;
 	}
 #ifdef DEBUG
 	std::cout << "CI = [" ;
@@ -258,7 +272,7 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 	}
 
 	// Compute the solution
-	Eigen::VectorXd x;
+	Eigen::VectorXd x(np+nq);
 	double cost = solve_quadprog(G, g, CE, ce, CI, ci, x);
 
 
