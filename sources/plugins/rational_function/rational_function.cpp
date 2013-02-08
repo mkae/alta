@@ -43,8 +43,8 @@ vec rational_function::value(const vec& x) const
 {
 	vec res(_nY) ;
 
-	const int np = a.size() / _nY ;
-	const int nq = b.size() / _nY ;
+    unsigned int const np = a.size() / _nY ;
+    unsigned int const nq = b.size() / _nY ;
 
 	for(int k=0; k<_nY; ++k)
 	{

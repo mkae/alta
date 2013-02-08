@@ -2,7 +2,7 @@ TARGET          = rational_fitter_quadproge
 TEMPLATE        = lib
 CONFIG         *= qt         \
                   plugin     \
-						eigen      
+                  eigen
 
 DESTDIR         = ../../build
  
