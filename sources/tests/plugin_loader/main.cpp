@@ -105,7 +105,11 @@ int main(int argc, char** argv)
 
 #else
 	plugins_manager manager(args) ;
-	fitter* fit = manager.get_fitter() ;
+	fitter* fit = manager.get_fitter(args["fitter"]) ;
+	if(fit == NULL)
+	{
+		fit = manager.get_fitter() ;
+	}
 #endif
 
 	if(! args.is_defined("input")) {

@@ -1,4 +1,4 @@
-#include "plugin_manager.h"
+#include "plugins_manager.h"
 
 #include <QCoreApplication>
 #include <QPluginLoader>
@@ -119,34 +119,34 @@ fitter* plugins_manager::get_fitter()   const
 //
 function* plugins_manager::get_function(const std::string& n) const 
 {
-	if(_functions.empty())
+	if(_functions.count(n) == 0)
 	{
 		return NULL ;
 	}
 	else
 	{
-		return _functions.at(n)->second ;
+		return _functions.at(n) ;
 	}
 }
 data* plugins_manager::get_data(const std::string& n)     const 
 {
-	if(_datas.empty())
+	if(_datas.count(n) == 0)
 	{
 		return NULL ;
 	}
 	else
 	{
-		return _datas.at(n)->second ;
+		return _datas.at(n) ;
 	}
 }
 fitter* plugins_manager::get_fitter(const std::string& n)   const 
 {
-	if(_fitters.empty())
+	if(_fitters.count(n) == 0)
 	{
 		return NULL ;
 	}
 	else
 	{
-		return _fitters.at(n)->second ;
+		return _fitters.at(n) ;
 	}
 }

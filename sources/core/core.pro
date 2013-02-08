@@ -9,6 +9,6 @@ HEADERS  = args.h              \
 		 	  data.h              \
 	 		  fitter.h            \
 	 		  function.h          \
- 			  plugin_manager.h
+ 			  plugins_manager.h
 
-SOURCES  = plugin_manager.cpp
+SOURCES  = plugins_manager.cpp
