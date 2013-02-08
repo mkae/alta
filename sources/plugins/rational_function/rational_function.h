@@ -26,7 +26,7 @@ class rational_function : /*public QObject,*/ public function
 
 		// Overload the function operator
 		virtual vec value(const vec& x) const ;
-		virtual vec operator()(const vec& x) const { return value(x) ; } ;
+        virtual vec operator()(const vec& x) const { return value(x) ; }
 
 		// Get the p_i and q_j function
 		virtual double p(const vec& x, int i) const ;
@@ -41,8 +41,8 @@ class rational_function : /*public QObject,*/ public function
 		                    const std::vector<double>& in_b) ;
 
 		// Get the coefficients
-		virtual double getP(int i) const { return a[i] ; } ;
-		virtual double getQ(int i) const { return b[i] ; } ;
+        virtual double getP(int i) const { return a[i] ; }
+        virtual double getQ(int i) const { return b[i] ; }
 
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;
