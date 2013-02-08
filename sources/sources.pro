@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
-SUBDIRS  = \#core    \
+SUBDIRS  = core    \
            plugins \
            tests
 
-#plugins.depends = core
+plugins.depends = core
 tests.depends   = plugins

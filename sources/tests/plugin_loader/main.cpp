@@ -2,6 +2,7 @@
 #include <core/data.h>
 #include <core/function.h>
 #include <core/fitter.h>
+#include <core/plugins_manager.h>
 
 #include <QPluginLoader>
 #include <QtPlugin>
@@ -23,6 +24,7 @@ int main(int argc, char** argv)
 	QApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
+#ifdef OLD
 	std::vector<function*> functions ;
 	std::vector<data*>     datas ;
 	std::vector<fitter*>   fitters ;
@@ -99,7 +101,12 @@ int main(int argc, char** argv)
 			plugins.push_back(fileName) ;
 		}
 	}
+	fitter* fit = fitters[0] ;
 
+#else
+	plugins_manager manager(args) ;
+	fitter* fit = manager.get_fitter() ;
+#endif
 
 	if(! args.is_defined("input")) {
 		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
@@ -110,18 +117,18 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
+//	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
-		fitters[0]->set_parameters(args) ;
+		fit->set_parameters(args) ;
 /*
 		function* f = functions[0] ;
 		data*     d = datas[0] ;
 */
-		function* f = fitters[0]->provide_function() ;
-		data*     d = fitters[0]->provide_data() ;
+		function* f = fit->provide_function() ;
+		data*     d = fit->provide_data() ;
 		d->load(args["input"], args);
 
-		bool is_fitted = fitters[0]->fit_data(d, f) ;
+		bool is_fitted = fit->fit_data(d, f) ;
 
 		// Display the result
 		if(is_fitted)
@@ -194,11 +201,11 @@ int main(int argc, char** argv)
 		}
 
 	}	
-	else
+/*	else
 	{
 		std::cout << "<<ERROR>> not enough plugin defined" << std::endl ;
 	}
-
+*/
 
 	return 0 ;
 }

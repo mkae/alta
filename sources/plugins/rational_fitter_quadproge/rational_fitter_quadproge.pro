@@ -10,7 +10,8 @@ INCLUDEPATH    += ../rational_function \
                   ../rational_data     \
                   ../.. 
 
-HEADERS         = rational_fitter.h
+HEADERS         = rational_fitter.h   \
+                  eiquadprog.hpp
 SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build        \
