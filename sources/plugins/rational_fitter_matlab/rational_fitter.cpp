@@ -16,7 +16,7 @@
 
 data* rational_fitter_matlab::provide_data() const
 {
-	return new rational_data() ;
+	return new vertical_segment() ;
 }
 
 function* rational_fitter_matlab::provide_function() const 
@@ -34,7 +34,7 @@ rational_fitter_matlab::~rational_fitter_matlab()
 bool rational_fitter_matlab::fit_data(const data* dat, function* fit)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
+	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
 	if(r == NULL || d == NULL || ep == NULL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
@@ -102,7 +102,7 @@ void rational_fitter_matlab::set_parameters(const arguments& args)
 	_min_nq = args.get_float("min-nq", _max_nq) ;	
 }
 		
-bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
+bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
 {
 
 	// Multidimensional coefficients
@@ -126,7 +126,7 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, ra
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, int ny, rational_function* r) 
+bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq, int ny, rational_function* r) 
 {
 	// Size of the problem
 	int N = np+nq ;
