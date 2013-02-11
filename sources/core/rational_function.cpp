@@ -120,6 +120,8 @@ double legendre(double x, int i)
 	}
 }
 
+#define POLYNOMIALS
+
 // Get the p_i and q_j function
 double rational_function::p(const vec& x, int i) const
 {
