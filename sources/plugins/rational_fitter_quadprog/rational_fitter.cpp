@@ -13,12 +13,10 @@
 
 #include <QTime>
 
-#include <rational_function.h>
-#include <rational_data.h>
 
 data* rational_fitter_quadprog::provide_data() const
 {
-	return new rational_data() ;
+	return new vertical_segment() ;
 }
 
 function* rational_fitter_quadprog::provide_function() const 
@@ -36,7 +34,7 @@ rational_fitter_quadprog::~rational_fitter_quadprog()
 bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
+	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
 	if(r == NULL || d == NULL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
@@ -97,7 +95,7 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const rational_data* d, int np, int nq, rational_function* r) 
+bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
 {
 
 	// Multidimensional coefficients
@@ -121,10 +119,10 @@ bool rational_fitter_quadprog::fit_data(const rational_data* d, int np, int nq, 
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq, int ny, rational_function* rf) 
+bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf) 
 {
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
-	const rational_data* d = dynamic_cast<const rational_data*>(dat) ;
+	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
 	if(r == NULL || d == NULL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;

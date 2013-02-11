@@ -5,7 +5,7 @@
 #include <string>
 
 // Interface
-//#include <QObject>
+#include <QObject>
 #include "function.h"
 #include "data.h"
 #include "fitter.h"
@@ -47,14 +47,14 @@ class rational_function : public function
 		void save_rational_function(const std::string& filename) const ;
 		void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
 
-	private: // functions
+	protected: // functions
 		
 		// Convert an index in N to a vector of degree for a
 		// multinomial coeffcient. The resulting vector v should
 		// be used as prod_k x[k]^v[k]
 		std::vector<int> index2degree(int i) const ;
 
-	private: // data
+	protected: // data
 
 		// Store the coefficients for the moment, I assume
 		// the functions to be polynomials.
