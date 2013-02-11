@@ -47,6 +47,8 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
+	r->setMin(d->min()) ;
+	r->setMax(d->max()) ;
 
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
@@ -174,11 +176,11 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 		double a1_norm = 0.0 ;
 
 		vec xi = d->get(i) ;
-		for(int k=0; k<d->dimX(); ++k)
+/*		for(int k=0; k<d->dimX(); ++k)
 		{
 			xi[k] /= dmax[k] ;
 		}
-
+*/
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -294,11 +296,11 @@ bool rational_fitter_quadprog::fit_data(const rational_data* dat, int np, int nq
 			norm += v*v ;
 			if(i < np)
 			{
-				p.push_back(v / r->p(dmax, i)) ;
+				p.push_back(v) ;
 			}
 			else
 			{
-				q.push_back(v / r->q(dmax, i-np)) ;
+				q.push_back(v) ;
 			}
 		}
 

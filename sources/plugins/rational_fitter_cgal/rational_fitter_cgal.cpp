@@ -52,6 +52,8 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
+	r->setMin(d->min()) ;
+	r->setMax(d->max()) ;
 
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
@@ -151,11 +153,12 @@ bool rational_fitter_cgal::fit_data(const vertical_segment* d, int np, int nq, i
 		double a1_norm = 0.0 ;
 
 		vec xi = d->get(i) ;
+/*
 		for(int k=0; k<d->dimX(); ++k)
 		{
 			xi[k] /= dmax[k] ;
 		}
-
+*/
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -318,11 +321,11 @@ bool rational_fitter_cgal::fit_data(const vertical_segment* d, int np, int nq, i
 
 			if(i < np)
 			{
-				p[i] = v / r->p(dmax, i) ;
+				p[i] = v ;
 			}
 			else
 			{
-				q[i-np] = v / r->q(dmax, i-np) ;
+				q[i-np] = v ;
 			}
 		}
  		r->update(p, q) ;

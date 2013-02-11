@@ -43,6 +43,8 @@ bool rational_fitter_eigen::fit_data(const data* dat, function* fit)
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
+	r->setMin(d->min()) ;
+	r->setMax(d->max()) ;
 
 	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
 

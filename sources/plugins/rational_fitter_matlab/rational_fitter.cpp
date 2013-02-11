@@ -53,6 +53,8 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit)
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
 	r->setDimY(d->dimY()) ;
+	r->setMin(d->min()) ;
+	r->setMax(d->max()) ;
 
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
@@ -165,11 +167,11 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 		double a1_norm = 0.0 ;
 
 		vec xi = d->get(i) ;
-		for(int k=0; k<d->dimX(); ++k)
+/*		for(int k=0; k<d->dimX(); ++k)
 		{
 			xi[k] /= dmax[k] ;
 		}
-
+*/
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -330,11 +332,11 @@ bool rational_fitter_matlab::fit_data(const rational_data* d, int np, int nq, in
 				total += val[i]*val[i] ;
 				if(i < np)
 				{
-					a.push_back(val[i] / r->p(dmax, i)) ;
+					a.push_back(val[i]) ;
 				}
 				else
 				{
-					b.push_back(val[i] / r->q(dmax, i-np)) ;
+					b.push_back(val[i]) ;
 				}
 			}
 			r->update(a, b) ;
