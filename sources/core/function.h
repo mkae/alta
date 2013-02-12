@@ -51,4 +51,4 @@ class function
 		vec _min, _max ;
 } ;
 
-//Q_DECLARE_INTERFACE(function, "Fitter.Function") 
+Q_DECLARE_INTERFACE(function, "Fitter.Function") 

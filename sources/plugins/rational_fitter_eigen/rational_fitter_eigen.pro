@@ -16,8 +16,8 @@ HEADERS         = rational_fitter.h
 SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build           \
-						-lrational_function	\
-						-lrational_data
+                  -lcore
+
 
 #QMAKE_CXXFLAGS += -fPIC
 

@@ -12,8 +12,11 @@
 #include "args.h"
 #include "common.h"
 
-class rational_function : public function
+class rational_function : public QObject, public function
 {
+	Q_OBJECT
+	Q_INTERFACES(function)
+
 	public: // methods
 
 		rational_function() ;

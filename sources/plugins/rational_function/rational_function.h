@@ -13,11 +13,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
-class rational_function_chebychev : public QObject, public rational_function
+class rational_function_chebychev : public rational_function
 {
-	Q_OBJECT
-	Q_INTERFACES(function rational_function)
-
 	public: // methods
 
 		rational_function_chebychev() ;
