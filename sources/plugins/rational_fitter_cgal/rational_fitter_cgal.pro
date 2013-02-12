@@ -7,19 +7,14 @@ CONFIG         *= shared  \
 
 DESTDIR         = ../../build
  
-INCLUDEPATH    += ../rational_function \
-                  ../rational_data     \
-                  ../.. 
+INCLUDEPATH    += ../.. 
 
 HEADERS         = rational_fitter_cgal.h
 SOURCES         = rational_fitter_cgal.cpp
 
-LIBS           += -L../../build           \
-						-lrational_function	\
-						-lrational_data
+LIBS           += -L../../build        \
+						-lcore
 
 unix {
 QMAKE_CXXFLAGS += -frounding-math 
 }
-#-fPIC
-

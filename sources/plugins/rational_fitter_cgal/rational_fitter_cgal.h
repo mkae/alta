@@ -7,12 +7,12 @@
 // Interface
 #include <QObject>
 #include <core/function.h>
+#include <core/rational_function.h>
 #include <core/data.h>
+#include <core/vertical_segment.h>
 #include <core/fitter.h>
 #include <core/args.h>
 
-#include <rational_function.h>
-#include <rational_data.h>
 
 class rational_fitter_cgal : public QObject, public fitter
 {
@@ -41,8 +41,8 @@ class rational_fitter_cgal : public QObject, public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const rational_data* d, int np, int nq, rational_function* fit) ;
-		virtual bool fit_data(const rational_data* dat, int np, int nq, int ny, rational_function* fit) ;
+		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit) ;
+		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit) ;
 
 		// min and Max usable np and nq values for the fitting
 		int _max_np, _max_nq ;
