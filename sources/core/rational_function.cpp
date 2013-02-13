@@ -132,7 +132,7 @@ double rational_function::p(const vec& x, int i) const
 #ifdef POLYNOMIALS
 		res *= pow(x[k], deg[k]) ;
 #else // LEGENDRE
-		res *= legendre(2.0*((x[k] - _min[k]) / _max[k] - 0.5), deg[k]);
+		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
 #endif
 	}
 
@@ -147,7 +147,7 @@ double rational_function::q(const vec& x, int i) const
 #ifdef POLYNOMIALS
 		res *= pow(x[k], deg[k]) ;
 #else // LEGENDRE
-		res *= legendre(2.0*((x[k] - _min[k]) / _max[k] - 0.5), deg[k]);
+		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
 #endif
 	}
 
