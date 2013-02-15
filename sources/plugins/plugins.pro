@@ -7,5 +7,5 @@ SUBDIRS  = \
 			  rational_fitter_eigen     \
 			  rational_fitter_leastsquare \
         rational_function       \
-#         rational_fitter_matlab   
+        rational_fitter_matlab   
 
