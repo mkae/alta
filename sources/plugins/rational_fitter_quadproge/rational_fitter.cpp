@@ -214,10 +214,13 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
-		ci(i)           = sqrt(a0_norm) ;
-		ci(i+d->size()) = sqrt(a1_norm) ;
+		ci(i)           = 0.0 ; // sqrt(a0_norm) ;
+		ci(i+d->size()) = 0.0 ; // sqrt(a1_norm) ;
 		ce(i)           = 0.0 ;
 		ce(i+d->size()) = 0.0 ;
+	
+		CI.row(i)           /= sqrt(a0_norm) ;
+		CI.row(i+d->size()) /= sqrt(a1_norm) ;
 	}
 #ifdef DEBUG
 	std::cout << "CI = [" ;
@@ -268,7 +271,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 	for(int i=0; i<2*d->size(); ++i)	
 	{
-		CI.row(i) /= ci(i) ;
+//		CI.row(i) /= ci(i) ;
 		ci(i) = -delta ; 
 	}
 

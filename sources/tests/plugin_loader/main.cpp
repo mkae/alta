@@ -128,7 +128,16 @@ int main(int argc, char** argv)
 		function* f = functions[0] ;
 		data*     d = datas[0] ;
 */
-		function* f = fit->provide_function() ;
+		function* f = NULL;
+		if(args.is_defined("func"))
+		{
+			std::cout << "<<INFO>> Using plugin function \"" << args["func"] << "\"" << std::endl ;
+			f = manager.get_function(args["func"]) ;
+		}
+		else
+		{
+			f = fit->provide_function() ;
+		}
 		data*     d = fit->provide_data() ;
 		d->load(args["input"], args);
 

@@ -43,7 +43,8 @@ double rational_function_chebychev::p(const vec& x, int i) const
 	double res = 1.0;
 	for(int k=0; k<dimX(); ++k)
 	{
-		res *= chebychev(x[k], deg[k]);
+		double xk = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
+		res *= chebychev(xk, deg[k]);
 	}
 
 	return res ;
@@ -54,7 +55,8 @@ double rational_function_chebychev::q(const vec& x, int i) const
 	double res = 1.0; 
 	for(int k=0; k<dimX(); ++k)
 	{
-		res *= chebychev(x[k], deg[k]);
+		double xk = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
+		res *= chebychev(xk, deg[k]);
 	}
 
 	return res ;

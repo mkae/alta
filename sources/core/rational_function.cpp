@@ -80,9 +80,6 @@ bool compare(std::vector<std::vector<int> > a, std::vector<int> b)
 
 void populate(std::vector<int>& vec, int N, int k, int j)
 {
-	// Already used vectors
-	std::vector<std::vector<int> > already_used ;
-
 	vec[0] = k ;
 	if(j == 0)
 		return ;
@@ -90,8 +87,6 @@ void populate(std::vector<int>& vec, int N, int k, int j)
 	int tj = j ;
 	while(tj != 0)
 	{
-		already_used.push_back(vec) ;
-
 		// First non null index
 		int nn_index = 0; while(vec[nn_index] == 0) { nn_index = (nn_index+1) % N ; } 
 
@@ -112,22 +107,40 @@ std::vector<int> rational_function::index2degree(int i) const
 	if(i == 0)
 		return deg ;
 	
-	// Calculate the power (number of elements to put in
-	// the vector) at which the index is definite.
-	int Nk = 1 ;
-	int nk = dimX() ;
-	int k  = 1 ;
-	while(!(i >= Nk && i < Nk+nk))
+	if(dimX() == 2)
 	{
-		Nk += nk ;
-		nk *= dimX() ;
-		++k ;
-	}
+		int Nk = 1 ;
+		int k  = 1 ;
+		while(!(i >= Nk && i < Nk+k+1))
+		{
+			Nk += k+1 ;
+			++k ;
+		}
 
-	// Populate the vector from front to back
-	int j = i-Nk ;
-	populate(deg, dimX(), k, j) ;
+		int r = i-Nk ;
+		deg[0] = k-r;
+		deg[1] = r;
+	}
+	else
+	{
+		// Calculate the power (number of elements to put in
+		// the vector) at which the index is definite.
+		int Nk = 1 ;
+		int nk = dimX() ;
+		int k  = 1 ;
+		while(!(i >= Nk && i < Nk+nk))
+		{
+			Nk += nk ;
+			nk *= dimX() ;
+			++k ;
+		}
+
+		// Populate the vector from front to back
+		int j = i-Nk ;
+		populate(deg, dimX(), k, j) ;
+	}
 	return deg ;
+
 }
 
 double legendre(double x, int i)

@@ -54,8 +54,14 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	r->setDimY(d->dimY()) ;
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
-
-
+/*
+	for(int i=0; i<20; ++i)
+	{
+		std::vector<int> deg = r->index2degree(i) ;
+		std::cout << deg[0] << ", " << deg[1] << std::endl ;
+	}
+	throw ;
+*/
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
