@@ -55,6 +55,7 @@ bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
 
+
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 

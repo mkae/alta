@@ -50,7 +50,7 @@ class rational_function : public QObject, public function
 		void save_rational_function(const std::string& filename) const ;
 		void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
 
-	protected: // functions
+//	protected: // functions
 		
 		// Convert an index in N to a vector of degree for a
 		// multinomial coeffcient. The resulting vector v should

@@ -57,8 +57,32 @@ vec rational_function::value(const vec& x) const
 	return res ;
 }
 
+bool compare(std::vector<std::vector<int> > a, std::vector<int> b)
+{
+	bool current = false;
+	for(int i=0; i<a.size(); ++i)
+	{
+		int nb_equals =  0;
+		for(int j=0; j<b.size(); ++j)
+		{
+			if(a[i][j] == b[j])
+			{
+				++nb_equals ;
+			}
+		}
+
+		if(nb_equals == b.size())
+			current = true;
+	}
+
+	return current ;
+}
+
 void populate(std::vector<int>& vec, int N, int k, int j)
 {
+	// Already used vectors
+	std::vector<std::vector<int> > already_used ;
+
 	vec[0] = k ;
 	if(j == 0)
 		return ;
@@ -66,6 +90,8 @@ void populate(std::vector<int>& vec, int N, int k, int j)
 	int tj = j ;
 	while(tj != 0)
 	{
+		already_used.push_back(vec) ;
+
 		// First non null index
 		int nn_index = 0; while(vec[nn_index] == 0) { nn_index = (nn_index+1) % N ; } 
 
@@ -78,6 +104,7 @@ void populate(std::vector<int>& vec, int N, int k, int j)
 		--tj;
 	}
 }
+
 
 std::vector<int> rational_function::index2degree(int i) const
 {
@@ -100,7 +127,6 @@ std::vector<int> rational_function::index2degree(int i) const
 	// Populate the vector from front to back
 	int j = i-Nk ;
 	populate(deg, dimX(), k, j) ;
-
 	return deg ;
 }
 
