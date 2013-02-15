@@ -4,4 +4,5 @@ SUBDIRS  = core    \
            tests
 
 plugins.depends = core
+tests.depends   = core
 tests.depends   = plugins

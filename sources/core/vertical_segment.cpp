@@ -1,4 +1,4 @@
-#include "rational_data.h"
+#include "vertical_segment.h"
 
 #include <string>
 #include <sstream>
@@ -8,13 +8,13 @@
 #include <algorithm>
 #include <cmath>
 
-void rational_data::load(const std::string& filename) 
+void vertical_segment::load(const std::string& filename) 
 {
 	arguments args ;
 	load(filename, args) ;
 }
 		
-void rational_data::load(const std::string& filename, const arguments& args) 
+void vertical_segment::load(const std::string& filename, const arguments& args) 
 {
 	std::ifstream file(filename.c_str()) ;
 	if(!file.is_open())
@@ -70,7 +70,7 @@ void rational_data::load(const std::string& filename, const arguments& args)
 			}
 			continue ;
 		} 
-		else if(line.empty()/*!boost::regex_match(line,e)*/)
+		else if(line.empty())
 		{
 			continue ;
 		}
@@ -134,27 +134,13 @@ void rational_data::load(const std::string& filename, const arguments& args)
 		}
 	}
 
-	//TODO Test for small data
-/*	std::vector<std::vector<double> > temp ;
-	std::ofstream temp_out("temp.gnuplot", std::ios_base::trunc) ;
-	for(int i=0; i<20; ++i)
-	{
-		int k = (i * _data.size()) / 20 ;
-		temp_out << _data[k][0] << "\t" << _data[k][1] << "\t" << 0.5*(_data[k][2] - _data[k][1]) << std::endl ;
-		temp.push_back(_data[k]) ;
-	}
-	_data = temp ;
-*/
-	// Sort the vector
-//	std::sort(_data.begin(), _data.end(), [](const std::vector<double>& a, const std::vector<double>& b){return (a[0]<b[0]);});
-
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
 	std::cout << "<<INFO>> data inside " << _min << " ... " << _max << std::endl ;
 	std::cout << "<<INFO>> loading data file of R^" << dimX() << " -> R^" << dimY() << std::endl ;
 	std::cout << "<<INFO>> " << _data.size() << " elements to fit" << std::endl ;
 }
 
-bool rational_data::get(int i, double& x, double& yl, double& yu) const
+bool vertical_segment::get(int i, double& x, double& yl, double& yu) const
 {
 	if(i >= (int)_data.size())
 	{
@@ -168,7 +154,7 @@ bool rational_data::get(int i, double& x, double& yl, double& yu) const
 	return true ;
 }
 		
-void rational_data::get(int i, vec& yl, vec& yu) const
+void vertical_segment::get(int i, vec& yl, vec& yu) const
 {
 	yl.resize(dimY()) ; yu.resize(dimY()) ;
 	for(int j=0; j<dimY(); ++j)	
@@ -178,28 +164,26 @@ void rational_data::get(int i, vec& yl, vec& yu) const
 	}
 }
 		
-const vec& rational_data::operator[](int i) const
+const vec& vertical_segment::operator[](int i) const
 {
 	return _data[i] ;
 }
-const vec& rational_data::get(int i) const 
+const vec& vertical_segment::get(int i) const 
 {
 	return _data[i] ;
 }
 
-int rational_data::size() const
+int vertical_segment::size() const
 {
 	return _data.size() ;
 }
 
-vec rational_data::min() const 
+vec vertical_segment::min() const 
 {
 	return _min ;
 }
 
-vec rational_data::max() const 
+vec vertical_segment::max() const 
 {
 	return _max ;
 }
-
-//Q_EXPORT_PLUGIN2(rational_data, rational_data)
