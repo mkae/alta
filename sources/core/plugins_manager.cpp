@@ -1,4 +1,6 @@
 #include "plugins_manager.h"
+#include "rational_function.h"
+#include "vertical_segment.h"
 
 #include <QCoreApplication>
 #include <QPluginLoader>
@@ -83,7 +85,7 @@ function* plugins_manager::get_function() const
 {
 	if(_functions.empty())
 	{
-		return NULL ;
+		return new rational_function() ;
 	}
 	else
 	{
@@ -94,7 +96,7 @@ data* plugins_manager::get_data()     const
 {
 	if(_datas.empty())
 	{
-		return NULL ;
+		return new vertical_segment() ;
 	}
 	else
 	{
@@ -121,7 +123,7 @@ function* plugins_manager::get_function(const std::string& n) const
 {
 	if(_functions.count(n) == 0)
 	{
-		return NULL ;
+		return new rational_function() ;
 	}
 	else
 	{
@@ -132,7 +134,7 @@ data* plugins_manager::get_data(const std::string& n)     const
 {
 	if(_datas.count(n) == 0)
 	{
-		return NULL ;
+		return new vertical_segment() ;
 	}
 	else
 	{
