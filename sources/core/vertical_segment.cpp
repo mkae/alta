@@ -20,6 +20,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	if(!file.is_open())
 	{
 		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+		throw ;
 	}
 
 	double min, max ;

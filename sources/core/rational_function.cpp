@@ -1,6 +1,7 @@
 #include "rational_function.h"
 
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <limits>
@@ -196,6 +197,97 @@ double rational_function::q(const vec& x, int i) const
 // IO function to text files
 void rational_function::load(const std::string& filename)
 {
+	std::ifstream file(filename.c_str()) ;
+	if(!file.is_open())
+	{
+		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+		throw ;
+	}
+
+	int np, nq ;
+	int nX, nY ;
+	vec xmin, xmax ;
+	int i = 0, j = 0;
+	while(file.good())
+	{
+		std::string line ;
+		std::getline(file, line) ;
+		std::stringstream linestream(line) ;
+		
+		// Discard incorrect lines
+		if(linestream.peek() == '#')
+		{
+			linestream.ignore(1) ;
+
+			std::string comment ;
+			linestream >> comment ;
+
+			if(comment == std::string("DIM"))
+			{
+				linestream >> nX >> nY ;
+				setDimX(nX) ;
+				setDimY(nY) ;
+
+				xmin.resize(nX) ;
+				xmax.resize(nX) ;
+				for(int k=0; k<nX; ++k)
+					xmax[k] = 1.0;
+
+				setMin(xmin) ;
+				setMax(xmax) ;
+			}
+			else if(comment == std::string("NP"))
+			{
+				linestream >> np ;
+				a.resize(np*nY);
+			}
+			else if(comment == std::string("NQ"))
+			{
+				linestream >> nq ;
+				b.resize(nq*nY);
+			}
+			continue ;
+		} 
+		else if(line.empty())
+		{
+			continue ;
+		}
+		else
+		{
+			int index ; double val ;
+			
+			// Accessing the index
+			for(int k=0; k<nX; ++k) {
+				linestream >> index ;
+			}
+
+			// Accessing the value
+			linestream >> val ;
+			
+			if(i < np)
+			{
+				a[i + np*j] = val ;
+			}
+			else
+			{
+				b[i-np + nq*j] = val ;
+			}
+
+			if(i < np+nq) {
+				++i ;
+			} else {
+				i = 0 ;
+				++j ;
+			}
+		}
+	}	
+
+	for(int i=0; i<a.size(); ++i) {
+		std::cout << a[i] << "\t" ;
+	}
+	for(int i=0; i<b.size(); ++i) {
+		std::cout << b[i] << "\t" ;
+	}
 }
 void rational_function::save(const std::string& filename, const arguments& args) const
 {
@@ -230,25 +322,31 @@ void rational_function::save_rational_function(const std::string& filename) cons
 	file << "#NQ " << b.size() / _nY << std::endl ;
 	file << "#BASIS poly" << std::endl ;
 
-	for(unsigned int i=0; i<a.size() / _nY; ++i)
+	int np = a.size() / _nY ;
+	int nq = b.size() / _nX ;
+	for(int k=0; k<_nY; ++k)
 	{
-		std::vector<int> index = index2degree(i) ;
-		for(unsigned int j=0; j<index.size(); ++j)
+		for(unsigned int i=0; i<np; ++i)
 		{
-			file << index[j] << "\t" ;
+			std::vector<int> index = index2degree(i) ;
+			for(unsigned int j=0; j<index.size(); ++j)
+			{
+				file << index[j] << "\t" ;
+			}
+			file << a[i+np*k] << std::endl ;
 		}
-		file << a[i] << std::endl ;
-	}
-	
-	for(unsigned int i=0; i<b.size(); ++i)
-	{
-		std::vector<int> index = index2degree(i) ;
-		for(unsigned int j=0; j<index.size() / _nY; ++j)
+
+		for(unsigned int i=0; i<nq; ++i)
 		{
-			file << index[j] << "\t" ;
+			std::vector<int> index = index2degree(i) ;
+			for(unsigned int j=0; j<index.size(); ++j)
+			{
+				file << index[j] << "\t" ;
+			}
+			file << b[i+nq*k] << std::endl ;
 		}
-		file << b[i] << std::endl ;
 	}
+
 }
 
 std::ostream& operator<< (std::ostream& out, const rational_function& r) 
