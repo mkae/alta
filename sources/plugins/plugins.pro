@@ -7,5 +7,6 @@ SUBDIRS  = \
 			  rational_fitter_eigen         \
 			  rational_fitter_leastsquare   \
            rational_function_chebychev   \
-           rational_fitter_matlab   
+           rational_fitter_matlab        \
+			  data_merl
 

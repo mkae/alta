@@ -6,6 +6,7 @@
 #include <QtPlugin>
 
 #include "common.h"
+#include "args.h"
 
 class data
 {
