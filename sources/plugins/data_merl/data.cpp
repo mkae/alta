@@ -259,12 +259,13 @@ void data_merl::load(const std::string& filename, const arguments& args)
 }
 
 // Acces to data
-const vec& data_merl::get(int i) const 
+vec data_merl::get(int i) const 
 {
-	int phid_ind = i % BRDF_SAMPLING_RES_PHI_D*BRDF_SAMPLING_RES_THETA_D / 2;
+	int phid_ind = i % (BRDF_SAMPLING_RES_PHI_D / 2);
 	int thed_ind = (i / (BRDF_SAMPLING_RES_PHI_D / 2)) % BRDF_SAMPLING_RES_THETA_D ;
 	int theh_ind = (i / (BRDF_SAMPLING_RES_PHI_D / 2 * BRDF_SAMPLING_RES_THETA_D)) 
 		            % BRDF_SAMPLING_RES_THETA_H ;
+
 
 	vec res(6) ;
 	res[0] = phid_ind * M_PI / (BRDF_SAMPLING_RES_PHI_D / 2);
@@ -273,8 +274,9 @@ const vec& data_merl::get(int i) const
 	res[3] = brdf[i] * RED_SCALE;
 	res[4] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 	res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
+	return res ;
 }
-const vec& data_merl::operator[](int i) const 
+vec data_merl::operator[](int i) const 
 {
 	return get(i) ;
 }

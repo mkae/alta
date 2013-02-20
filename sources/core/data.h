@@ -18,8 +18,8 @@ class data
 
 		// Acces to data
 //		virtual bool get(int i, double& x, double& y, double& t) const = 0 ;
-		virtual const vec& get(int i) const = 0 ;
-		virtual const vec& operator[](int i) const = 0 ;
+		virtual vec get(int i) const = 0 ;
+		virtual vec operator[](int i) const = 0 ;
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;

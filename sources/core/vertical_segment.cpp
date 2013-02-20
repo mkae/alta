@@ -165,11 +165,11 @@ void vertical_segment::get(int i, vec& yl, vec& yu) const
 	}
 }
 		
-const vec& vertical_segment::operator[](int i) const
+vec vertical_segment::operator[](int i) const
 {
 	return _data[i] ;
 }
-const vec& vertical_segment::get(int i) const 
+vec vertical_segment::get(int i) const 
 {
 	return _data[i] ;
 }

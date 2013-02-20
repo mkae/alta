@@ -18,8 +18,8 @@ class data_merl : public QObject, public data
 		virtual void load(const std::string& filename, const arguments& args) ;
 
 		// Acces to data
-		virtual const vec& get(int i) const ;
-		virtual const vec& operator[](int i) const ;
+		virtual vec get(int i) const ;
+		virtual vec operator[](int i) const ;
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const ;

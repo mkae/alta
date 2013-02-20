@@ -96,10 +96,12 @@ data* plugins_manager::get_data()     const
 {
 	if(_datas.empty())
 	{
+		std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
 		return new vertical_segment() ;
 	}
 	else
 	{
+		std::cout << "<<DEBUG>>  using \"" << _datas.begin()->first << "\" data loader" << std::endl ;
 		return _datas.begin()->second ;
 	}
 }
@@ -134,10 +136,12 @@ data* plugins_manager::get_data(const std::string& n)     const
 {
 	if(_datas.count(n) == 0)
 	{
+		std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
 		return new vertical_segment() ;
 	}
 	else
 	{
+		std::cout << "<<DEBUG>>  using \"" << n << "\" data loader" << std::endl ;
 		return _datas.at(n) ;
 	}
 }

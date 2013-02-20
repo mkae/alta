@@ -20,9 +20,9 @@ class vertical_segment : public data
 
 		// Acces to data
 		virtual bool get(int i, double& x, double& yl, double& yu) const ;
-		virtual const vec& get(int i) const ;		
+		virtual vec get(int i) const ;		
 		virtual void get(int i, vec& yl, vec& yu) const ;		
-		virtual const vec& operator[](int i) const ;
+		virtual vec operator[](int i) const ;
 
 		// Get data size
 		virtual int size() const ;

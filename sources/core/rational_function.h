@@ -25,7 +25,7 @@ class rational_function : public QObject, public function
 
 		// Overload the function operator
 		virtual vec value(const vec& x) const ;
-        virtual vec operator()(const vec& x) const { return value(x) ; }
+		virtual vec operator()(const vec& x) const { return value(x) ; }
 
 		// Get the p_i and q_j function
 		virtual double p(const vec& x, int i) const ;

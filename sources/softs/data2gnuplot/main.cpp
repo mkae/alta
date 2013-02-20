@@ -35,19 +35,8 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-	function* f = NULL;
-	if(args.is_defined("func"))
-	{
-		std::cout << "<<INFO>> Using plugin function \"" << args["func"] << "\"" << std::endl ;
-		f = manager.get_function(args["func"]) ;
-	}
-	else
-	{
-		f = manager.get_function() ;
-	}
-
 	data* d = NULL ;
-	d = manager.get_data() ;
+	d = manager.get_data(args["loader"]) ;
 	d->load(args["input"]);
 
 	// Create output file
@@ -55,6 +44,7 @@ int main(int argc, char** argv)
 
 	if(d != NULL)
 	{
+		std::cout << "<<INFO>> will export " << d->size() << " elements" << std::endl ;
 		for(int i=0; i<d->size(); ++i)
 		{
 			vec v = d->get(i) ;
