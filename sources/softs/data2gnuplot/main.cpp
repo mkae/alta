@@ -53,11 +53,13 @@ int main(int argc, char** argv)
 		in[0] = cos(phi_in)*sin(theta_in);
 		in[1] = sin(phi_in)*sin(theta_in);
 		in[2] = cos(theta_in);
-		for(int i=0; i<90; ++i)
-			for(int j=0; j<90; ++j)
+
+		const int N = 1000;
+		for(int i=0; i<N; ++i)
+			for(int j=0; j<N; ++j)
 			{
-				double phi   = i * M_PI / 89 ;
-				double theta = j * M_PI / 89 * 0.5 ;
+				double phi   = (i-N/2) * M_PI / (N-1) * 2;
+				double theta = (j-N/2) * M_PI / (N-1) ;
 				out[0] = cos(phi)*sin(theta);
 				out[1] = sin(phi)*sin(theta);
 				out[2] = cos(theta);
