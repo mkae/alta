@@ -280,6 +280,23 @@ vec data_merl::operator[](int i) const
 {
 	return get(i) ;
 }
+vec data_merl::value(vec in, vec out) const
+{
+	// compute  thetain fi_in, theta_out fi_out
+	double th_in  = acos(in[2]);
+	double fi_in  = atan2(in[1], in[0]);
+	double th_out = acos(out[2]);
+	double fi_out = atan2(out[1], out[0]);
+
+	double r, g, b;
+	lookup_brdf_val(brdf, th_in, fi_in, th_out, fi_out, r, g, b) ;
+
+	vec res(3);
+	res[0] = r;
+	res[1] = g;
+	res[2] = b;
+	return res;
+}
 
 // Get data size, e.g. the number of samples to fit
 int data_merl::size() const 

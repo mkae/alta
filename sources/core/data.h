@@ -17,9 +17,12 @@ class data
 		virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
 		// Acces to data
-//		virtual bool get(int i, double& x, double& y, double& t) const = 0 ;
 		virtual vec get(int i) const = 0 ;
 		virtual vec operator[](int i) const = 0 ;
+		virtual vec value(vec in, vec out) const 
+		{
+			return vec(_nY) ;
+		}
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;

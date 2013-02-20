@@ -12,6 +12,7 @@
 #include <fstream>
 #include <limits>
 #include <cstdlib>
+#include <cmath>
 
 int main(int argc, char** argv)
 {
@@ -45,15 +46,27 @@ int main(int argc, char** argv)
 	if(d != NULL)
 	{
 		std::cout << "<<INFO>> will export " << d->size() << " elements" << std::endl ;
-		for(int i=0; i<d->size(); ++i)
-		{
-			vec v = d->get(i) ;
+	
+		vec in(3), out(3) ;
+		in[0] = 0.0;
+		in[1] = 0.0;
+		in[2] = 1.0;
+		for(int i=0; i<90; ++i)
+			for(int j=0; j<90; ++j)
+			{
+				double phi   = i * M_PI / 89 ;
+				double theta = j * M_PI / 89 * 0.5 ;
+				out[0] = cos(phi)*sin(theta);
+				out[1] = sin(phi)*sin(theta);
+				out[2] = cos(theta);
+				vec v = d->value(in, out) ;
 
-			for(int u=0; u<d->dimX()+d->dimY(); ++u)
-				file << v[u] << "\t" ;
+				file << phi << "\t" << theta << "\t" ;
+				for(int u=0; u<d->dimY(); ++u)
+					file << v[u] << "\t" ;
 			
-			file << std::endl ;
-		}
+				file << std::endl ;
+			}
 	}	
 	else
 	{
