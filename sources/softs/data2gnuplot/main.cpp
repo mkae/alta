@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 	plugins_manager manager(args) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file" << std::endl ;
+		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --loader loader.so" << std::endl ;
 		std::cout << " - input and output are mandatory parameters" << std::endl ;
 		return 0 ;
 	}
@@ -47,10 +47,12 @@ int main(int argc, char** argv)
 	{
 		std::cout << "<<INFO>> will export " << d->size() << " elements" << std::endl ;
 	
+		double theta_in = (double)args.get_float("theta", 0.0f);
+		double phi_in   = (double)args.get_float("phi", 0.0f);
 		vec in(3), out(3) ;
-		in[0] = 0.0;
-		in[1] = 0.0;
-		in[2] = 1.0;
+		in[0] = cos(phi_in)*sin(theta_in);
+		in[1] = sin(phi_in)*sin(theta_in);
+		in[2] = cos(theta_in);
 		for(int i=0; i<90; ++i)
 			for(int j=0; j<90; ++j)
 			{
