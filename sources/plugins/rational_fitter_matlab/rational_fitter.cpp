@@ -212,7 +212,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 	
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
-	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
+	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(CI);
 	const double sigma_m = svd.singularValues()(std::min(2*M, N)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
 	double delta = sigma_m / sigma_M ;

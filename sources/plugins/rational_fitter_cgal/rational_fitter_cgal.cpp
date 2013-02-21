@@ -211,7 +211,7 @@ bool rational_fitter_cgal::fit_data(const vertical_segment* d, int np, int nq, i
 #endif
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
-	Eigen::JacobiSVD<Eigen::MatrixXd> svd(CI);
+	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(CI);
 	const double sigma_m = svd.singularValues()(std::min(2*d->size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
 
