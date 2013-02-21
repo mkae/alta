@@ -24,93 +24,12 @@ int main(int argc, char** argv)
 	QApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
-#ifdef OLD
-	std::vector<function*> functions ;
-	std::vector<data*>     datas ;
-	std::vector<fitter*>   fitters ;
-
-	QDir pluginsDir = QDir(app.applicationDirPath());
-	if(args.is_defined("plugins"))
-	{
-		pluginsDir = QDir(args["plugins"].c_str()) ;
-	}
-
-	std::vector<QString> plugins ;
-
-	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) 
-	{
-		QPluginLoader loader ;
-		loader.setLoadHints(QLibrary::ExportExternalSymbolsHint) ;
-		loader.setFileName(pluginsDir.absoluteFilePath(fileName));
-
-		if(!loader.load())
-		{
-#ifdef DEBUG
-			std::cout << "<<DEBUG>> " << loader.errorString().toStdString() << std::endl ;
-#endif
-			continue ;
-		}
-
-		QObject *plugin = loader.instance();
-		if (plugin != NULL) 
-		{
-#ifdef DEBUG
-			std::cout << "<<DEBUG>> loading plugin " << fileName.toStdString() << std::endl ;
-#endif
-			/*
-			if(dynamic_cast<function*>(plugin) != NULL)
-			{
-#ifdef DEBUG
-				std::cout << "<<DEBUG>>  -> it is a function" << std::endl ;
-#endif
-				functions.push_back(dynamic_cast<function*>(plugin)) ;
-			}
-			
-			if(dynamic_cast<data*>(plugin) != NULL)
-			{
-#ifdef DEBUG
-				std::cout << "<<DEBUG>>  -> it is a data loader" << std::endl ;
-#endif
-				datas.push_back(dynamic_cast<data*>(plugin)) ;
-			}
-		*/	
-			if(dynamic_cast<fitter*>(plugin) != NULL)
-			{
-#ifdef DEBUG
-				std::cout << "<<DEBUG>>  -> it is a fitter" << std::endl ;
-#endif
-				if(args.is_defined("fitter") && loader.fileName().toStdString().find(args["fitter"]) == std::string::npos)
-				{
-					continue ;
-				}
-
-				std::cout << "<<INFO>> using " << loader.fileName().toStdString() << std::endl ;
-				fitter *f = dynamic_cast<fitter*>(plugin) ;
-				fitters.push_back(f) ;
-				datas.push_back(f->provide_data()) ;
-				functions.push_back(f->provide_function()) ;
-
-			}
-
-		}
-		else
-		{
-#ifdef DEBUG
-			std::cout << "<<DEBUG>> " << loader.errorString().toStdString() << std::endl ;
-#endif
-			plugins.push_back(fileName) ;
-		}
-	}
-	fitter* fit = fitters[0] ;
-
-#else
 	plugins_manager manager(args) ;
 	fitter* fit = manager.get_fitter(args["fitter"]) ;
 	if(fit == NULL)
 	{
 		fit = manager.get_fitter() ;
 	}
-#endif
 
 	if(! args.is_defined("input")) {
 		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
@@ -124,10 +43,6 @@ int main(int argc, char** argv)
 //	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fit->set_parameters(args) ;
-/*
-		function* f = functions[0] ;
-		data*     d = datas[0] ;
-*/
 		function* f = NULL;
 		if(args.is_defined("func"))
 		{
@@ -164,7 +79,7 @@ int main(int argc, char** argv)
 /*/
 
 			f->save(args["output"], args) ;
-
+#ifdef OLD // use brdf2gnuplot
 			size_t n = args["output"].find('.') ;
 			std::string gnuplot_filename = args["output"].substr(0,n); 
 			gnuplot_filename.append(".gnuplot") ;
@@ -207,6 +122,7 @@ int main(int argc, char** argv)
 				efile << std::endl ;
 			}
 //*/
+#endif
 		}
 		else
 		{

@@ -113,6 +113,7 @@ fitter* plugins_manager::get_fitter()   const
 	}
 	else
 	{
+		std::cout << "<<DEBUG>>  using \"" <<  _fitters.begin()->first << "\"" << std::endl ;
 		return _fitters.begin()->second ;
 	}
 }
@@ -153,6 +154,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
 	}
 	else
 	{
+		std::cout << "<<DEBUG>>  using \"" <<  n << "\"" << std::endl ;
 		return _fitters.at(n) ;
 	}
 }

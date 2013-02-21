@@ -14,24 +14,24 @@
 #include <QTime>
 
 
-data* rational_fitter_quadprog::provide_data() const
+data* rational_fitter_quadproge::provide_data() const
 {
 	return new vertical_segment() ;
 }
 
-function* rational_fitter_quadprog::provide_function() const 
+function* rational_fitter_quadproge::provide_function() const 
 {
 	return new rational_function() ;
 }
 
-rational_fitter_quadprog::rational_fitter_quadprog() : QObject()
+rational_fitter_quadproge::rational_fitter_quadproge() : QObject()
 {
 }
-rational_fitter_quadprog::~rational_fitter_quadprog() 
+rational_fitter_quadproge::~rational_fitter_quadproge() 
 {
 }
 
-bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
+bool rational_fitter_quadproge::fit_data(const data* dat, function* fit)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
@@ -86,7 +86,7 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 	return false ;
 }
 
-void rational_fitter_quadprog::set_parameters(const arguments& args)
+void rational_fitter_quadproge::set_parameters(const arguments& args)
 {
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
@@ -95,7 +95,7 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
+bool rational_fitter_quadproge::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
 {
 
 	// Multidimensional coefficients
@@ -119,7 +119,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf) 
+bool rational_fitter_quadproge::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf) 
 {
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
@@ -194,8 +194,8 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 				const double pi = r->p(xi, j) ;
 				a0_norm += pi*pi ;
 				a1_norm += pi*pi ;
-				CI(i,j) =  pi ;
-				CI(i+d->size(),j) = -pi ;
+				CI(j,i) =  pi ;
+				CI(j,i+d->size()) = -pi ;
 			}
 			// Filling the q part
 			else
@@ -205,22 +205,22 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 
 				const double qi = r->q(xi, j-np) ;
 				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
-				CI(j, i) = -yl[ny] * qi ;
-				
 				a1_norm += qi*qi * (yu[ny]*yu[ny]) ;
+				CI(j, i) = -yl[ny] * qi ;
 				CI(j, i+d->size()) = yu[ny] * qi ;
 			}
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
-		ci(i)           = 0.0 ; // sqrt(a0_norm) ;
-		ci(i+d->size()) = 0.0 ; // sqrt(a1_norm) ;
+		ci(i)           = -sqrt(a0_norm) ;
+		ci(i+d->size()) = -sqrt(a1_norm) ;
 		ce(i)           = 0.0 ;
 		ce(i+d->size()) = 0.0 ;
-	
-		CI.row(i)           /= sqrt(a0_norm) ;
-		CI.row(i+d->size()) /= sqrt(a1_norm) ;
+/*	
+		CI.col(i)           /= sqrt(a0_norm) ;
+		CI.col(i+d->size()) /= sqrt(a1_norm) ;
+*/
 	}
 #ifdef DEBUG
 	std::cout << "CI = [" ;
@@ -271,9 +271,16 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 	for(int i=0; i<2*d->size(); ++i)	
 	{
-//		CI.row(i) /= ci(i) ;
-		ci(i) = -delta ; 
+		ci(i) = ci(i) * delta;
+//		ci(i) = delta ; 
 	}
+
+#ifdef DEBUG
+	std::cout  << G << std::endl << std::endl ;
+	std::cout  << g << std::endl << std::endl ;
+	std::cout  << CI << std::endl << std::endl ;
+	std::cout  << ci << std::endl << std::endl ;
+#endif
 
 	// Compute the solution
 	Eigen::VectorXd x(np+nq);
@@ -318,4 +325,4 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)
+Q_EXPORT_PLUGIN2(rational_fitter_quadproge, rational_fitter_quadproge)

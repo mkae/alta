@@ -14,15 +14,15 @@
 #include <core/vertical_segment.h>
 
 
-class rational_fitter_quadprog : public QObject, public fitter
+class rational_fitter_quadproge : public QObject, public fitter
 {
 	Q_OBJECT
 	Q_INTERFACES(fitter)
 
 	public: // methods
 	
-		rational_fitter_quadprog() ;
-		virtual ~rational_fitter_quadprog() ;
+		rational_fitter_quadproge() ;
+		virtual ~rational_fitter_quadproge() ;
 
 		// Fitting a data object
 		//

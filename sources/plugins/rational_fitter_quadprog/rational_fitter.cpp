@@ -258,8 +258,15 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	for(int i=0; i<2*d->size(); ++i)	
 	{		
 		ci[i] = ci[i] * delta ; 
+#ifdef DEBUG
+		std::cout << ci[i] << "\t" ;
+#endif
 	}
+#ifdef DEBUG
+	std::cout << std::endl << std::endl ;
 
+	std::cout << eCI << std::endl << std::endl ;
+#endif
 	// Compute the solution
 	QuadProgPP::Vector<double> x;
 	double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
