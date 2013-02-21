@@ -94,16 +94,16 @@ function* plugins_manager::get_function() const
 }
 data* plugins_manager::get_data()     const 
 {
-	if(_datas.empty())
+	//if(_datas.empty())
 	{
 		std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
 		return new vertical_segment() ;
-	}
+	}/*
 	else
 	{
 		std::cout << "<<DEBUG>>  using \"" << _datas.begin()->first << "\" data loader" << std::endl ;
 		return _datas.begin()->second ;
-	}
+	}*/
 }
 fitter* plugins_manager::get_fitter()   const 
 {

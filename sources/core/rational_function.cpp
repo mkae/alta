@@ -252,7 +252,7 @@ void rational_function::load(const std::string& filename)
 		{
 			continue ;
 		}
-		else
+		else if(j < nY)
 		{
 			int index ; double val ;
 			
@@ -281,13 +281,14 @@ void rational_function::load(const std::string& filename)
 			}
 		}
 	}	
-
+/*
 	for(int i=0; i<a.size(); ++i) {
 		std::cout << a[i] << "\t" ;
 	}
 	for(int i=0; i<b.size(); ++i) {
 		std::cout << b[i] << "\t" ;
 	}
+*/
 }
 void rational_function::save(const std::string& filename, const arguments& args) const
 {
