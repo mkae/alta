@@ -79,9 +79,33 @@ bool compare(std::vector<std::vector<int> > a, std::vector<int> b)
 	return current ;
 }
 
-void populate(std::vector<int>& vec, int N, int k, int j)
+// Estimate the number of configuration for an indice
+// vector of dimension d with maximum element value
+// being k.
+int estimate_dk(int k, int d)
 {
-	vec[0] = k ;
+	if(d == 1)
+	{
+		return 1;
+	}
+	else
+	{
+		int res = 0;
+		for(int i=0; i<=k; ++i)
+		{
+			res += estimate_dk(k-i, d-1);
+		}
+		return res;
+	}
+}
+
+// Populate a vector of degrees of dimension N using a
+// maximum degree of M. The index at the current level
+// is j
+void populate(std::vector<int>& vec, int N, int M, int j)
+{
+#ifdef OLD
+	vec[0] = M ;
 	if(j == 0)
 		return ;
 
@@ -92,19 +116,43 @@ void populate(std::vector<int>& vec, int N, int k, int j)
 		int nn_index = 0; while(vec[nn_index] == 0) { nn_index = (nn_index+1) % N ; } 
 
 		// Index of the place where to append
-		int ap_index = (nn_index + 1) % N ; while(vec[ap_index] == k) { ap_index = (ap_index+1) % N ; } 
+		int ap_index = (nn_index + 1) % N ; while(vec[ap_index] == M) { ap_index = (ap_index+1) % N ; } 
 
 		vec[nn_index] -= 1;
 		vec[ap_index] += 1;
 
 		--tj;
 	}
+#else
+	// For each dimension, estimate the current level
+	// based on the number of configurations in the
+	// other dimensions
+	int current_M = M ;
+	int nb_conf = 0;
+	for(int d=0; d<N-1; ++d)
+	{
+		int k;
+		for(k=0; k<=current_M; ++k)
+		{
+			int oracle = estimate_dk(current_M-k, N-(d+1));
+			if(nb_conf <= j && j < nb_conf+oracle)
+			{
+				break;
+			}
+			nb_conf += oracle;
+		}
+		
+		vec[N-1 - d] = k ;	
+		current_M -= k ;
+	}
+	vec[0] = current_M;
+#endif
 }
-
 
 std::vector<int> rational_function::index2degree(int i) const
 {
 	std::vector<int> deg ; deg.assign(dimX(), 0) ;
+
 	if(i == 0)
 		return deg ;
 	
@@ -124,22 +172,21 @@ std::vector<int> rational_function::index2degree(int i) const
 	}
 	else
 	{
-		// Calculate the power (number of elements to put in
-		// the vector) at which the index is definite.
 		int Nk = 1 ;
-		int nk = dimX() ;
 		int k  = 1 ;
-		while(!(i >= Nk && i < Nk+nk))
+		int dk = estimate_dk(k, dimX()) ;
+		while(!(i >= Nk && i < Nk+dk))
 		{
-			Nk += nk ;
-			nk *= dimX() ;
+			Nk += dk ;
 			++k ;
+			dk = estimate_dk(k, dimX()) ;
 		}
 
 		// Populate the vector from front to back
 		int j = i-Nk ;
 		populate(deg, dimX(), k, j) ;
 	}
+
 	return deg ;
 
 }

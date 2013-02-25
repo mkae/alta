@@ -52,6 +52,17 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
 
+	
+/*
+	for(int i=0; i<20; ++i)
+	{
+		std::vector<int> deg = r->index2degree(i) ;
+		std::cout << deg[0] << ", " << deg[1] << ", " << deg[2] << std::endl ;
+	}
+	throw ;
+//*/
+
+
 	int temp_np = _min_np, temp_nq = _min_nq ;
 	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
