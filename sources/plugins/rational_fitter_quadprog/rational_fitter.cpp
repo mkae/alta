@@ -51,18 +51,6 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
-
-	
-/*
-	for(int i=0; i<20; ++i)
-	{
-		std::vector<int> deg = r->index2degree(i) ;
-		std::cout << deg[0] << ", " << deg[1] << ", " << deg[2] << std::endl ;
-	}
-	throw ;
-//*/
-
-
 	int temp_np = _min_np, temp_nq = _min_nq ;
 	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
@@ -171,11 +159,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 		double a1_norm = 0.0 ;
 
 		vec xi = d->get(i) ;
-/*		for(int k=0; k<d->dimX(); ++k)
-		{
-			xi[k] /= dmax[k] ;
-		}
-*/
+
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -263,7 +247,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	}
 
 
-#ifndef DEBUG
+#ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	for(int i=0; i<2*d->size(); ++i)	
@@ -310,8 +294,9 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 		}
 
 		r->update(p, q);
+#ifdef DEBUG
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
-		
+#endif
 		return norm > 0.0;
 	}
 	else

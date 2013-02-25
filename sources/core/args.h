@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "common.h"
+
 class arguments
 {
 	public: // functions
@@ -69,14 +71,44 @@ class arguments
 				return atof(_map.at(key).c_str()) ;
 			else
 				return default_value ;
-		} ;
+		}
 		int get_int(const std::string& key, int default_value = 0) const
 		{
 			if(_map.count(key) > 0)
 				return atoi(_map.at(key).c_str()) ;
 			else
 				return default_value ;
-		} ;
+		} 
+		vec get_vec(const std::string& key, float default_value) const
+		{
+			vec res;
+			if(_map.count(key) > 0)
+			{
+				std::string s = _map.at(key);
+				if(s[0] == '\[') // Is an array of type [a, b, c]
+				{
+					int i = 0;
+					size_t pos = 0;
+					while(pos != std::string::npos)
+					{
+						size_t ppos = s.find(",", pos);
+
+						if(ppos != std::string::npos)
+						{
+							std::cout << s.substr(pos, ppos) << std::endl ;
+							res[i] = atof(s.substr(pos, ppos).c_str());
+							pos = ppos+1;
+							++i;
+						}
+					}
+					return res;
+				}
+			}
+
+			float val = get_float(key, default_value);
+			res.push_back(default_value);
+			return res;
+		}
 
 	private: // data
 

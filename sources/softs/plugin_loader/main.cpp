@@ -8,6 +8,7 @@
 #include <QtPlugin>
 #include <QApplication>
 #include <QDir>
+#include <QTime>
 
 #include <iostream>
 #include <vector>
@@ -56,11 +57,19 @@ int main(int argc, char** argv)
 		data*     d = fit->provide_data() ;
 		d->load(args["input"], args);
 
+		QTime time ;
+		time.start() ;
 		bool is_fitted = fit->fit_data(d, f) ;
+		int msec = time.elapsed() ;
+		int sec  = (msec / 1000) % 60 ;
+		int min  = (msec / 60000) % 60 ;
+		int hour = (msec / 3600000) ;
+		
 
 		// Display the result
 		if(is_fitted)
 		{
+			std::cout << "<<INFO>> total time: " << hour << "h " << min << "m " << sec << "s" << std::endl ;
 /*
 			vec min, max ;
 			min.assign(2, args.get_float("min", 0.0f)) ;

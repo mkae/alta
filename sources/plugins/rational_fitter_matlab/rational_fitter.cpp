@@ -167,11 +167,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		double a1_norm = 0.0 ;
 
 		vec xi = d->get(i) ;
-/*		for(int k=0; k<d->dimX(); ++k)
-		{
-			xi[k] /= dmax[k] ;
-		}
-*/
+
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
 		// For the lower constraint and negated for 
@@ -234,7 +230,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		delta = 1.0 ;
 	}
 
-#ifndef DEBUG
+#ifdef DEBUG
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	
