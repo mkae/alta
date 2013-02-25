@@ -23,9 +23,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 		throw ;
 	}
 
-	double min, max ;
-	min = args.get_float("min", -std::numeric_limits<double>::max()) ;
-	max = args.get_float("max",  std::numeric_limits<double>::max()) ;
+	vec min, max ;
 
 	_nX = 0 ; _nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
@@ -57,6 +55,10 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				_min.resize(dimX()) ;
 				_max.resize(dimX()) ;
+	
+				min = args.get_vec("min", _nX, -std::numeric_limits<double>::max()) ;
+				max = args.get_vec("max", _nX,  std::numeric_limits<double>::max()) ;
+
 				for(int k=0; k<dimX(); ++k)
 				{
 					_min[k] =  std::numeric_limits<double>::max() ;
@@ -115,7 +117,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 		bool is_in = true ;
 		for(int i=0; i<dimX(); ++i)
 		{
-			if(v[i] < min || v[i] > max)
+			if(v[i] < min[i] || v[i] > max[i])
 			{
 				is_in = false ;
 			}

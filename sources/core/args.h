@@ -27,13 +27,19 @@ class arguments
 				if(temp.compare(0, 2, "--") == 0)
 				{
 					key = temp.substr(2, temp.size()-2) ;
-					if(i+1 < argc) 
+					int j = i+1;
+					while(j < argc) 
 					{
-						std::string next(argv[i+1]) ;
+						std::string next(argv[j]) ;
 						if(next.compare(0, 2, "--") != 0)
 						{
-							data = next ;
+							data.append(next) ;
 						}
+						else
+						{
+							break ;
+						}
+						++j;
 					}
 				}
 				_map.insert(std::pair<std::string, std::string>(key, data)) ;
@@ -79,34 +85,43 @@ class arguments
 			else
 				return default_value ;
 		} 
-		vec get_vec(const std::string& key, float default_value) const
+		vec get_vec(const std::string& key, int size, float default_value = 0.0f) const
 		{
-			vec res;
+			vec res(size);
 			if(_map.count(key) > 0)
 			{
 				std::string s = _map.at(key);
 				if(s[0] == '\[') // Is an array of type [a, b, c]
 				{
 					int i = 0;
-					size_t pos = 0;
+					size_t pos = 1;
 					while(pos != std::string::npos)
 					{
-						size_t ppos = s.find(",", pos);
+						size_t ppos = s.find(',', pos);
 
 						if(ppos != std::string::npos)
 						{
-							std::cout << s.substr(pos, ppos) << std::endl ;
 							res[i] = atof(s.substr(pos, ppos).c_str());
 							pos = ppos+1;
 							++i;
 						}
+						else
+						{
+							res[i] = atof(s.substr(pos, ppos-1).c_str());
+							pos = ppos;
+							++i;
+						}
 					}
+					std::cout << std::endl ;
 					return res;
 				}
 			}
 
 			float val = get_float(key, default_value);
-			res.push_back(default_value);
+			for(int i=0; i<size; ++i)
+			{
+				res[i] = val;
+			}
 			return res;
 		}
 

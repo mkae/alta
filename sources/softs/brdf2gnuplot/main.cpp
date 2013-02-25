@@ -53,6 +53,13 @@ int main(int argc, char** argv)
 		d->load(args["data"]) ;
 	}
 
+	bool plot_error = false ;
+	if(args.is_defined("error"))
+	{
+		std::cout << "<<INFO>> Exporting an error plot" << std::endl;
+		plot_error = true ;
+	}
+
 	// Load the BRDF
 	f->load(args["input"]);
 
@@ -70,7 +77,13 @@ int main(int argc, char** argv)
 				file << v[u] << "\t" ;
 
 			for(int u=0; u<d->dimY(); ++u)
-				file << y2[u] << "\t" ;
+			{
+				if(plot_error) {
+					file << y2[u] << "\t" ;
+				} else {
+					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+				}
+			}
 
 			file << std::endl ;
 		}
