@@ -58,27 +58,6 @@ vec rational_function::value(const vec& x) const
 	return res ;
 }
 
-bool compare(std::vector<std::vector<int> > a, std::vector<int> b)
-{
-	bool current = false;
-	for(int i=0; i<a.size(); ++i)
-	{
-		int nb_equals =  0;
-		for(int j=0; j<b.size(); ++j)
-		{
-			if(a[i][j] == b[j])
-			{
-				++nb_equals ;
-			}
-		}
-
-		if(nb_equals == b.size())
-			current = true;
-	}
-
-	return current ;
-}
-
 // Estimate the number of configuration for an indice
 // vector of dimension d with maximum element value
 // being k.
@@ -87,6 +66,10 @@ int estimate_dk(int k, int d)
 	if(d == 1)
 	{
 		return 1;
+	}
+	else if(d ==2)
+	{
+		return k+1;
 	}
 	else
 	{
@@ -104,26 +87,6 @@ int estimate_dk(int k, int d)
 // is j
 void populate(std::vector<int>& vec, int N, int M, int j)
 {
-#ifdef OLD
-	vec[0] = M ;
-	if(j == 0)
-		return ;
-
-	int tj = j ;
-	while(tj != 0)
-	{
-		// First non null index
-		int nn_index = 0; while(vec[nn_index] == 0) { nn_index = (nn_index+1) % N ; } 
-
-		// Index of the place where to append
-		int ap_index = (nn_index + 1) % N ; while(vec[ap_index] == M) { ap_index = (ap_index+1) % N ; } 
-
-		vec[nn_index] -= 1;
-		vec[ap_index] += 1;
-
-		--tj;
-	}
-#else
 	// For each dimension, estimate the current level
 	// based on the number of configurations in the
 	// other dimensions
@@ -146,7 +109,6 @@ void populate(std::vector<int>& vec, int N, int M, int j)
 		current_M -= k ;
 	}
 	vec[0] = current_M;
-#endif
 }
 
 std::vector<int> rational_function::index2degree(int i) const
@@ -207,7 +169,7 @@ double legendre(double x, int i)
 	}
 }
 
-//#define POLYNOMIALS
+#define POLYNOMIALS
 
 // Get the p_i and q_j function
 double rational_function::p(const vec& x, int i) const
