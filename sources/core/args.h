@@ -95,7 +95,7 @@ class arguments
 				{
 					int i = 0;
 					size_t pos = 1;
-					while(pos != std::string::npos)
+					while(pos != std::string::npos && i<size)
 					{
 						size_t ppos = s.find(',', pos);
 
@@ -112,7 +112,6 @@ class arguments
 							++i;
 						}
 					}
-					std::cout << std::endl ;
 					return res;
 				}
 			}

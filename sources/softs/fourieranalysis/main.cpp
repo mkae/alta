@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	plugins_manager manager(args) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --loader loader.so" << std::endl ;
+		std::cout << "<<HELP>> fouriertransform --input data.file --output gnuplot.file --loader loader.so --in [input vector] --raw gnuplot.file" << std::endl ;
 		std::cout << " - input and output are mandatory parameters" << std::endl ;
 		return 0 ;
 	}
@@ -58,10 +58,11 @@ int main(int argc, char** argv)
 
 
 		std::cout << "<<INFO>> will export " << d->size() << " elements" << std::endl ;
-	
-		double theta_in = (double)args.get_float("theta", 0.0f);
-		double phi_in   = (double)args.get_float("phi", 0.0f);
+		
 		vec in(3), out(3) ;
+		vec arg_in = args.get_vec("in", 2);
+		double theta_in = (double)arg_in[0];
+		double phi_in   = (double)arg_in[1];
 		in[0] = cos(phi_in)*sin(theta_in);
 		in[1] = sin(phi_in)*sin(theta_in);
 		in[2] = cos(theta_in);
@@ -79,7 +80,8 @@ int main(int argc, char** argv)
 				out[1] = sin(phi)*sin(theta);
 				out[2] = cos(theta);
 				vec v = d->value(in, out) ;
-				xdata[j] = j-N/2;
+				xdata[j] = theta;
+
 				data[j]  = v[0] ;
 
 				/*
@@ -92,10 +94,7 @@ int main(int argc, char** argv)
 			}
 
 		// Create the MATLAB defintion of objects
-		// MATLAB defines a quad prog as
-		//   1/2 x' H x + f' x with A x <= b 
-		//
-		mxArray *d, *x;
+		mxArray *d, *x, *f;
 		d = mxCreateDoubleMatrix(  N, 1, mxREAL);
 		x = mxCreateDoubleMatrix(  N, 1, mxREAL);
 		memcpy((void *)mxGetPr(d), (void *) data,  N*sizeof(double));
@@ -108,21 +107,35 @@ int main(int argc, char** argv)
 		output[BUFFER_SIZE] = '\0';
 		engOutputBuffer(ep, output, BUFFER_SIZE) ;
 		engEvalString(ep, "normd = sum(d) / max(size(d));");
-		std::cout << output << std::endl ;
 		engEvalString(ep, "d = d ./ normd;");
-		std::cout << output << std::endl ;
-		engEvalString(ep, "f = real(fftshift(fft(d)));");
-		std::cout << output << std::endl ;
+		engEvalString(ep, "ff = fftshift(fft(d));");
+		engEvalString(ep, "f = sqrt(real(ff).^2 + imag(ff).^2);");
 		engEvalString(ep, "normf = sum(f) / max(size(f));");
-		std::cout << output << std::endl ;
 		engEvalString(ep, "f = f ./ normf;");
-		std::cout << output << std::endl ;
-		engEvalString(ep, "plot(x, f, x, d)");
-		std::cout << output << std::endl ;
+//		engEvalString(ep, "plot(x, f, x, d)");
+//		std::cout << output << std::endl ;
 
-		char c;
-		std::cin >> c ;
+		f = engGetVariable(ep, "f");
+		std::ofstream out_fourier(args["output"].c_str(), std::ios_base::trunc);
+		double* val = (double*)mxGetData(f) ;
+		for(int i=0; i<N; ++i)
+		{
+			out_fourier << i - N/2 << "\t" << val[i] << std::endl ;
+		}
+		out_fourier.close();
 
+		if(args.is_defined("raw"))
+		{
+			std::ofstream out_raw(args["raw"].c_str(), std::ios_base::trunc);
+			for(int i=0; i<N; ++i)
+			{
+				out_raw << xdata[i] << "\t" << data[i] << std::endl ;
+			}
+			out_raw.close();
+		}
+
+		mxDestroyArray(x);
+		mxDestroyArray(d);
 		engClose(ep);
 	}	
 	else
