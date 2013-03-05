@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 /*/
 
 			f->save(args["output"], args) ;
-#ifdef OLD // use brdf2gnuplot
+#ifndef OLD // use brdf2gnuplot
 			size_t n = args["output"].find('.') ;
 			std::string gnuplot_filename = args["output"].substr(0,n); 
 			gnuplot_filename.append(".gnuplot") ;

@@ -14,24 +14,24 @@
 #include <QTime>
 
 
-data* rational_fitter_quadprog::provide_data() const
+data* rational_fitter_parallel::provide_data() const
 {
 	return new vertical_segment() ;
 }
 
-function* rational_fitter_quadprog::provide_function() const 
+function* rational_fitter_parallel::provide_function() const 
 {
 	return new rational_function() ;
 }
 
-rational_fitter_quadprog::rational_fitter_quadprog() : QObject()
+rational_fitter_parallel::rational_fitter_parallel() : QObject()
 {
 }
-rational_fitter_quadprog::~rational_fitter_quadprog() 
+rational_fitter_parallel::~rational_fitter_parallel() 
 {
 }
 
-bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
+bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
@@ -57,8 +57,9 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 		QTime time ;
 		time.start() ;
 
-		bool got_solution = false ;
-	
+		double min_delta = std::numeric_limits<double>::max();
+		int nb_sol_found = 0;
+		int np, nq ;
 		#pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
@@ -67,27 +68,38 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 
 			vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
 
-			bool is_fitted = fit_data(d, temp_np, temp_nq, r, p, q);
+			double delta;
+			bool is_fitted = fit_data(d, temp_np, temp_nq, r, p, q, delta);
 			if(is_fitted)
 			{
 				#pragma omp critical
 				{
-					got_solution = true ;
-					std::cout << p << std::endl ;
-					std::cout << q << std::endl ;
-					r->update(p, q);
+					++nb_sol_found ;
+					if(delta < min_delta)
+					{
+						min_delta = delta ;
+#ifdef DEBUG
+						std::cout << p << std::endl ;
+						std::cout << q << std::endl ;
+#endif
+						r->update(p, q);
+						np = p.size() / d->dimY();
+						nq = q.size() / d->dimY();
+					}
 				}
 			}
 		}
 				
-		if(got_solution)
+		if(min_delta < std::numeric_limits<double>::max())
 		{
 			int msec = time.elapsed() ;
 			int sec  = (msec / 1000) % 60 ;
 			int min  = (msec / 60000) % 60 ;
 			int hour = (msec / 3600000) ;
 			std::cout << "<<INFO>> got a fit using N = " << i << std::endl ;
+			std::cout << "<<INFO>> got a fit using {np, nq} = " << np << ", " << nq << std::endl ;
 			std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+			std::cout << "<<INFO>> I got " << nb_sol_found << " solutions to the QP" << std::endl ;
 			return true ;
 		}
 	}
@@ -95,7 +107,7 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit)
 	return false ;
 }
 
-void rational_fitter_quadprog::set_parameters(const arguments& args)
+void rational_fitter_parallel::set_parameters(const arguments& args)
 {
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
@@ -104,16 +116,16 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r, vec& P, vec& Q) 
+bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, rational_function* r, vec& P, vec& Q, double& delta) 
 {
 	for(int j=0; j<d->dimY(); ++j)
 	{
 		vec p(np), q(nq);
-		if(!fit_data(d, np, nq, j, r, p, q))
+		if(!fit_data(d, np, nq, j, r, p, q, delta))
 			return false ;
 
-		for(int i=0; i<np; ++i) { P[i*r->dimY() + j] = p[i] ; }
-		for(int i=0; i<nq; ++i) { Q[i*r->dimY() + j] = q[i] ; }
+		for(int i=0; i<np; ++i) { P[j*np + i] = p[i] ; }
+		for(int i=0; i<nq; ++i) { Q[j*nq + i] = q[i] ; }
 	}
 
 	return true ;
@@ -123,7 +135,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf, vec& p, vec& q) 
+bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf, vec& p, vec& q, double& delta) 
 {
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
@@ -238,7 +250,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	std::cout << " ]" << std::endl ;
 #endif
 	
-	double delta = sigma_m / sigma_M ;
+	delta = sigma_M / sigma_m ;
 	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 #ifdef DEBUG
@@ -257,7 +269,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 	for(int i=0; i<2*d->size(); ++i)	
 	{		
-		ci[i] = ci[i] * delta ; 
+		ci[i] = ci[i] / delta ; 
 #ifdef DEBUG
 		std::cout << ci[i] << "\t" ;
 #endif
@@ -309,4 +321,4 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)
+Q_EXPORT_PLUGIN2(rational_fitter_parallel, rational_fitter_parallel)

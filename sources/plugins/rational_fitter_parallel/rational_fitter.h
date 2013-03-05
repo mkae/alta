@@ -14,15 +14,15 @@
 #include <core/args.h>
 
 
-class rational_fitter_quadprog : public QObject, public fitter
+class rational_fitter_parallel : public QObject, public fitter
 {
 	Q_OBJECT
 	Q_INTERFACES(fitter)
 
 	public: // methods
 	
-		rational_fitter_quadprog() ;
-		virtual ~rational_fitter_quadprog() ;
+		rational_fitter_parallel() ;
+		virtual ~rational_fitter_parallel() ;
 
 		// Fitting a data object
 		//
@@ -41,8 +41,8 @@ class rational_fitter_quadprog : public QObject, public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit, vec& p, vec& q) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit, vec& p, vec& q) ;
+		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit, vec& p, vec& q, double& delta) ;
+		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit, vec& p, vec& q, double& delta) ;
 
 		// min and Max usable np and nq values for the fitting
 		int _max_np, _max_nq ;

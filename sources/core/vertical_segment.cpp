@@ -99,16 +99,16 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			{
 				double dt ;
 				linestream >> dt ;
-                v[dimX() + dimY()+i] = v[dimX() + i] * (1.0f - dt) ;
-                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0f + dt) ;
+				v[dimX() + dimY()+i] = v[dimX() + i] * (1.0 - dt) ;
+				v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + dt) ;
 			}
 			else 
 			{
 				// TODO Specify the delta in case
 				// Handle multiple dim
-                float dt = args.get_float("dt", 0.1);
-                v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0f - dt) ;
-                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0f + dt) ;
+				double dt = args.get_float("dt", 0.1);
+				v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 - dt) ;
+				v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + dt) ;
 			}
 		}
 		

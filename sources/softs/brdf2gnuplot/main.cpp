@@ -93,5 +93,6 @@ int main(int argc, char** argv)
 		std::cerr << "<<ERROR>> --data is not defined" << std::endl ;
 	}
 
+	file.close();
 	return 0 ;
 }
