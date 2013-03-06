@@ -49,6 +49,7 @@ class rational_function : public QObject, public function
 		// Save the rational function to a given format
 		void save_rational_function(const std::string& filename) const ;
 		void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
+		void save_cpp(const std::string& filename, const arguments& args) const ;
 
 	protected: // functions
 		

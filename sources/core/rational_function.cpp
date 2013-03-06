@@ -301,7 +301,57 @@ void rational_function::load(const std::string& filename)
 }
 void rational_function::save(const std::string& filename, const arguments& args) const
 {
-	save_rational_function(filename) ;
+	if(args.is_defined("export-format"))
+	{
+		if(args["export-format"].compare("c++") == 0)
+		{
+			std::cout << "<<INFO>> will export in C++ format" << std::endl;
+			save_cpp(filename, args);
+		}
+		else
+		{
+			std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
+		}
+	}
+	else
+	{
+		std::cout << "<<INFO>> will export the rational coefficients" << std::endl;
+		save_rational_function(filename) ;
+	}
+}
+
+// Will save a header only function file
+// TODO it should handle parametrization
+void rational_function::save_cpp(const std::string& filename, const arguments& args) const
+{
+	std::ofstream file(filename.c_str(), std::ios_base::trunc);
+	file << "double* brdf(double* x)" << std::endl;
+	file << "{" << std::endl;
+
+	file << "\tdouble p = ";
+	for(int i=0; i<a.size(); ++i)
+	{
+		if(i > 0 && a[i] >= 0.0)
+		{
+			file << " + ";
+		}
+		file << a[i] << "*x\[" << i << "\]" ;
+	}
+	file << 	";" << std::endl;
+
+	file << "\tdouble q = ";
+	for(int i=0; i<b.size(); ++i)
+	{
+		if(i > 0)
+			file << " + ";
+		file << b[i] << "*x\[" << i << "\]" ;
+	}
+	file << 	";" << std::endl;
+
+	file << "\treturn p/q;";
+	file << 	"}" << std::endl;
+
+	file.close() ;
 }
 
 void rational_function::save_gnuplot(const std::string& filename, const data* d, const arguments& args) const 
@@ -322,6 +372,7 @@ void rational_function::save_gnuplot(const std::string& filename, const data* d,
 
 		file << std::endl ;
 	}
+	file.close();
 }
 
 void rational_function::save_rational_function(const std::string& filename) const 
