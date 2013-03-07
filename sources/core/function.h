@@ -91,9 +91,9 @@ class nonlinear_function: public function
 		//! parameters. 
 		//
 		// The x input of this function is the position in the input space and 
-		// has size dimX(), the resulting vector has the size of the parameters:
-		// [df/dp1, ..., df/dpn]
-		virtual vec parameters_derivatives(const vec& x) const = 0;
+		// has size dimX(), the resulting vector has the size of the parameters
+		// times the size of the output domain.
+		virtual vec parametersJacobian(const vec& x) const = 0;
 };
 
 Q_DECLARE_INTERFACE(function, "Fitter.Function") 
