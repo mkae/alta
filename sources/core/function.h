@@ -12,6 +12,12 @@ class data ;
 
 /*! \brief A representation of an analytical function.
  *
+ *  function are functors with a domain of definition specified by a vector 
+ *  interval \f$[\vec{min} .. \vec{max}]\f$ where \f$\vec{min}\f$ and 
+ *  \f$\vec{max}\f$ have the size of the input domain.
+ *
+ *  Any function used by the fitting algorithm should overload publicly this
+ *  interface.
  */
 class function 
 {
@@ -21,15 +27,18 @@ class function
 		virtual vec operator()(const vec& x) const = 0 ;
 		virtual vec value(const vec& x) const = 0 ;
 
-		// IO function to text files
+		//! Load function specific files
 		virtual void load(const std::string& filename) = 0 ;
+
+		//! \brief Save the current function to a specific file type, args can 
+		//! be used to differenciate the type of export.
+		//!
+		//! \see rational_function.cpp for an example
 		virtual void save(const std::string& filename, const arguments& args) const = 0 ;
 
-		/*! \brief Provide the dimension of the input space of the function
-		 */
+		//! Provide the dimension of the input space of the function
 		virtual int dimX() const { return _nX ; }
-		/*! \brief Provide the dimension of the output space of the function
-		 */
+		//! Provide the dimension of the output space of the function
 		virtual int dimY() const { return _nY ; }
 
 		virtual void setDimX(int nX) { _nX = nX ; }
@@ -52,24 +61,37 @@ class function
 
 	protected: //data
 
-		// Dimension of the function & domain of
-		// definition.
+		// Dimension of the function & domain of definition.
 		int _nX, _nY ;
 		vec _min, _max ;
 };
 
+/*! \brief Non-linear function interface
+ *
+ * Provide a way to obtain the dérivative of the function with respect to its
+ * parameters. If the function \f$f(\vec{x})\f$ is defined for a vector of
+ * parameters \f$\vec{a}\f$, the resulting vector is \f$df_i = {df \over 
+ * da_i}\f$. 
+ *
+ * \note that it is not necessary to have an analytical formulation
+ * of the derivative and a numerical evaluation of it can be provided.
+ *
+ */
 class nonlinear_function: public function
 {
 	public: // methods
 
-		// Set the vector of parameters for the function
+		//! Get the vector of parameters for the function
 		virtual vec parameters() const = 0;
+
+		//! Update the vector of parameters for the function
 		virtual void setParameters(const vec& p) = 0;
 
-		// Obtain the derivatives of the function with respect
-		// to the parameters. The x input of this function is 
-		// the position in the input space and has size dimX(),
-		// the resulting vector has the size of the parameters:
+		//! \brief Obtain the derivatives of the function with respect to the 
+		//! parameters. 
+		//
+		// The x input of this function is the position in the input space and 
+		// has size dimX(), the resulting vector has the size of the parameters:
 		// [df/dp1, ..., df/dpn]
 		virtual vec parameters_derivatives(const vec& x) const = 0;
 };
