@@ -10,6 +10,9 @@
 
 class data ;
 
+/*! \brief A representation of an analytical function.
+ *
+ */
 class function 
 {
 	public: // methods
@@ -22,7 +25,11 @@ class function
 		virtual void load(const std::string& filename) = 0 ;
 		virtual void save(const std::string& filename, const arguments& args) const = 0 ;
 
+		/*! \brief Provide the dimension of the input space of the function
+		 */
 		virtual int dimX() const { return _nX ; }
+		/*! \brief Provide the dimension of the output space of the function
+		 */
 		virtual int dimY() const { return _nY ; }
 
 		virtual void setDimX(int nX) { _nX = nX ; }
