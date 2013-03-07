@@ -73,9 +73,10 @@ class function
  * parameters \f$\vec{a}\f$, the resulting vector is \f$df_i = {df \over 
  * da_i}\f$. 
  *
- * \note that it is not necessary to have an analytical formulation
+ * \note It is not necessary to have an analytical formulation
  * of the derivative and a numerical evaluation of it can be provided.
  *
+ * \todo Add a Levenberg-Marquardt fitter for this generic kind of function
  */
 class nonlinear_function: public function
 {

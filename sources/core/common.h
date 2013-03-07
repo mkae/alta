@@ -4,6 +4,10 @@
 #include <iostream>
 #include <cassert>
 
+/*! \brief A core implementation of a vector of double. This type is used for
+ *! any transmission of vector data with unfixed dimension. It allows to have
+ *! a generic fitter working for n-Dimensional data.
+ */
 class vec : public std::vector<double>
 {
 	public:
