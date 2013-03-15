@@ -82,6 +82,9 @@ class nonlinear_function: public function
 {
 	public: // methods
 
+		//! Number of parameters to this non-linear function
+		virtual int nbParameters() const = 0;
+
 		//! Get the vector of parameters for the function
 		virtual vec parameters() const = 0;
 
@@ -94,6 +97,9 @@ class nonlinear_function: public function
 		// The x input of this function is the position in the input space and 
 		// has size dimX(), the resulting vector has the size of the parameters
 		// times the size of the output domain.
+		//
+		// The result vector should be orderer as res[i + dimY()*j], output
+		// dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const = 0;
 };
 

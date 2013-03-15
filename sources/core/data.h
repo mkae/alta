@@ -31,8 +31,8 @@ class data
 		virtual vec min() const = 0 ;
 		virtual vec max() const = 0 ;
 
-		virtual int dimX() const { return _nX ; } ;
-		virtual int dimY() const { return _nY ; } ;
+        virtual int dimX() const { return _nX ; }
+        virtual int dimY() const { return _nY ; }
 	
 	protected:
 		// Dimension of the function

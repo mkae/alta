@@ -9,5 +9,6 @@ SUBDIRS  = \
 			  rational_fitter_leastsquare   \
            rational_function_chebychev   \
            rational_fitter_matlab        \
+			  nonlinear_levenberg_eigen     \
 			  data_merl
 
