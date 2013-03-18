@@ -26,6 +26,10 @@ class rational_function : public QObject, public function
 		// Overload the function operator
 		virtual vec value(const vec& x) const ;
 		virtual vec operator()(const vec& x) const { return value(x) ; }
+		
+		// Get the numerator (p) and denominator (q) functions
+		virtual vec p(const vec& x) const ;
+		virtual vec q(const vec& x) const ;
 
 		// Get the p_i and q_j function
 		virtual double p(const vec& x, int i) const ;

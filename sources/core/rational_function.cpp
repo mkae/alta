@@ -58,6 +58,46 @@ vec rational_function::value(const vec& x) const
 	return res ;
 }
 
+// Get the p_i and q_j function
+vec rational_function::p(const vec& x) const
+{
+	vec res(_nY) ;
+
+    unsigned int const np = a.size() / _nY ;
+
+	for(int k=0; k<_nY; ++k)
+	{
+		double p = 0.0f ;
+		
+		for(unsigned int i=0; i<np; ++i)
+		{
+			p += a[k*_nY + i]*this->p(x, i) ;
+		}
+
+		res[k] = p ;
+	}
+	return res ;
+}
+vec rational_function::q(const vec& x) const 
+{
+	vec res(_nY) ;
+
+    unsigned int const nq = b.size() / _nY ;
+
+	for(int k=0; k<_nY; ++k)
+	{
+		double q = 0.0f ;
+
+		for(unsigned int i=0; i<nq; ++i)
+		{
+			q += b[k*_nY + i]*this->q(x, i) ;
+		}
+
+		res[k] = q ;
+	}
+	return res ;
+}
+
 // Estimate the number of configuration for an indice
 // vector of dimension d with maximum element value
 // being k.
