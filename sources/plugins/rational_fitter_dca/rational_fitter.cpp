@@ -83,27 +83,6 @@ void rational_fitter_dca::set_parameters(const arguments& args)
 	_min_np = args.get_float("min-np", _max_np) ;
 	_min_nq = args.get_float("min-nq", _max_nq) ;	
 }
-		
-bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_function* r)
-{
-
-	// Multidimensional coefficients
-	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
-	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
-
-	for(int j=0; j<d->dimY(); ++j)
-	{
-		if(!fit_data(d, np, nq, j, r))
-			return false ;
-
-		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
-		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-	}
-
-	r->update(Pn, Qn) ;
-	return true ;
-}
-
 
 // Bootstrap the DCA algorithm with the Papamarkos fitting
 // algorithm [Papamarkos 1988]
@@ -117,7 +96,7 @@ void bootstrap(const data* d, int np, int nq, rational_function* fit, double& de
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, rational_function* r)
+bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_function* r)
 {
 	// Size of the problem
 	int N  = np+nq+1 ;
