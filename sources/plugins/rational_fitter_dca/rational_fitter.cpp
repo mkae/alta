@@ -102,7 +102,7 @@ void rational_fitter_dca::set_parameters(const arguments& args)
 	_min_nq = args.get_float("min-nq", _max_nq) ;	
 }
 		
-bool rational_fitter_dca::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
+bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_function* r)
 {
 
 	// Multidimensional coefficients
@@ -122,16 +122,30 @@ bool rational_fitter_dca::fit_data(const vertical_segment* d, int np, int nq, ra
 	return true ;
 }
 
+
+// Bootstrap the DCA algorithm with the Papamarkos fitting
+// algorithm [Papamarkos 1988]
+// \todo Finish the Papamarkos implementation
+void bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta)
+{
+}
+
 // dat is the data object, it contains all the points to fit
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_dca::fit_data(const vertical_segment* d, int np, int nq, int ny, rational_function* r) 
+bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, rational_function* r)
 {
 	// Size of the problem
 	int N  = np+nq+1 ;
 	int M  = d->size() ;
 	int nY = d->dimY();	
+
+    // Bootstrap the delta and rational function using the Papamarkos
+    // algorithm.
+    double delta = 0.0;
+    bootstrap(d, np, nq, r, delta);
+
 	// Create the MATLAB defintion of objects
 	// MATLAB defines a linear prog as
 	//   min f' x with A x <= b 
@@ -144,17 +158,13 @@ bool rational_fitter_dca::fit_data(const vertical_segment* d, int np, int nq, in
 	engPutVariable(ep, "f", f);
 	engPutVariable(ep, "A", A);
 	engPutVariable(ep, "b", b);
-	
-	// Get the maximum value in data to scale the input parameter space
-	// so that it reduces the values of the polynomial
-	vec dmax = d->max() ;
-	
+
 	// Matrices of the problem in Eigen format
 	Eigen::VectorXd g (nY*N) ;
 	Eigen::MatrixXd CI(2*M, nY*N) ;
 	Eigen::VectorXd ci(2*M) ;
 
-	double delta_k = 0.0;
+    double delta_k = delta;
 
 	// Loop until you get a converge solution \delta > \delta_k
 	// \todo add the correct looping condition
@@ -209,22 +219,21 @@ bool rational_fitter_dca::fit_data(const vertical_segment* d, int np, int nq, in
 				// Filling the q part
 				else if(j<np+nq)
 				{
-					vec yl, yu ; 
-					d->get(i, yl, yu) ;
+                    vec value = d->get(i) ;
 
 					const double qi = r->q(xi, j-np) ;
 
 					// Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
-						CI(2*(nY*i + y)+0, j) = (delta_k+yu[y]) * qi ;
-						CI(2*(nY*i + y)+1, j) = (delta_k-yl[y]) * qi ;
+                        CI(2*(nY*i + y)+0, j) = (delta_k+value[y]) * qi ;
+                        CI(2*(nY*i + y)+1, j) = (delta_k-value[y]) * qi ;
 					}
 				}
 				else
 				{
 					// Last column of the constraint matrix
-					vec qk = r->q(x_i) ;
+                    vec qk = r->q(xi) ;
 					for(int y=0; y<nY; ++y)
 					{
 						CI(2*(nY*i + y)+0, j) = qk[y] ;

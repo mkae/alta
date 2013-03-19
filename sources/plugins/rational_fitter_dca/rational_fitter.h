@@ -41,8 +41,12 @@ class rational_fitter_dca : public QObject, public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit) ;
+        virtual bool fit_data(const data* d, int np, int nq, rational_function* fit) ;
+        virtual bool fit_data(const data* dat, int np, int nq, int ny, rational_function* fit) ;
+
+        // Bootstrap the DCA algorithm with the Papamarkos fitting
+        // algorithm [Papamarkos 1988]
+        void bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta) ;
 
 	protected: // data
 
