@@ -56,39 +56,21 @@ bool rational_fitter_dca::fit_data(const data* dat, function* fit)
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
 
-	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
-	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
-	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np <= _max_np || temp_nq <= _max_nq)
-	{
-		QTime time ;
-		time.start() ;
+    QTime time ;
+    time.start() ;
 		
-		if(fit_data(d, temp_np, temp_nq, r))
-		{
-			int msec = time.elapsed() ;
-			int sec  = (msec / 1000) % 60 ;
-			int min  = (msec / 60000) % 60 ;
-			int hour = (msec / 3600000) ;
-			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
-			std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+    if(fit_data(d, _max_np, _max_nq, r))
+    {
+        int msec = time.elapsed() ;
+        int sec  = (msec / 1000) % 60 ;
+        int min  = (msec / 60000) % 60 ;
+        int hour = (msec / 3600000) ;
+        std::cout << "<<INFO>> got a fit using np = " << _max_np << " & nq =  " << _max_nq << "      " << std::endl ;
+        std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
 
-			return true ;
-		}
-
-		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
-		std::cout.flush() ;
-
-		if(temp_np <= _max_np)
-		{
-			++temp_np ;
-		}
-		if(temp_nq <= _max_nq)
-		{
-			++temp_nq ;
-		}
-	}
+        return true ;
+    }
 
 	engClose(ep); 
 	return false ;
@@ -128,6 +110,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 // \todo Finish the Papamarkos implementation
 void bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta)
 {
+
 }
 
 // dat is the data object, it contains all the points to fit
@@ -144,25 +127,21 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, ration
     // Bootstrap the delta and rational function using the Papamarkos
     // algorithm.
     double delta = 0.0;
-    bootstrap(d, np, nq, r, delta);
+   // bootstrap(d, np, nq, r, delta);
 
 	// Create the MATLAB defintion of objects
 	// MATLAB defines a linear prog as
 	//   min f' x with A x <= b 
 	//
 	mxArray *f, *A, *b, *x, *flag;
-	f = mxCreateDoubleMatrix(N*nY,    1, mxREAL);
-	A = mxCreateDoubleMatrix( 2*M, nY*N, mxREAL);
-	b = mxCreateDoubleMatrix( 2*M,    1, mxREAL);
+    f = mxCreateDoubleMatrix(N*nY,    1, mxREAL);
+    A = mxCreateDoubleMatrix( 2*M*nY, N*nY, mxREAL);
+    b = mxCreateDoubleMatrix( 2*M*nY, 1, mxREAL);
 
-	engPutVariable(ep, "f", f);
-	engPutVariable(ep, "A", A);
-	engPutVariable(ep, "b", b);
-
-	// Matrices of the problem in Eigen format
+    // Matrices of the problem in Eigen format
 	Eigen::VectorXd g (nY*N) ;
-	Eigen::MatrixXd CI(2*M, nY*N) ;
-	Eigen::VectorXd ci(2*M) ;
+    Eigen::MatrixXd CI(2*M*nY, N*nY) ;
+    Eigen::VectorXd ci(2*M*nY) ;
 
     double delta_k = delta;
 
@@ -185,10 +164,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, ration
 		// matrix
 		for(int i=0; i<M; ++i)	
 		{		
-			// Norm of the row vector
-			double a0_norm = 0.0 ;
-			double a1_norm = 0.0 ;
-
+            //
 			vec xi = d->get(i) ;
 
 			// For each input data i \in M, the following constraints have to
@@ -212,22 +188,20 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, ration
 					// Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
-						CI(2*(nY*i + y)+0, j) = -pi ;
-						CI(2*(nY*i + y)+1, j) =  pi ;
+                        CI(2*(nY*i + y)+0, nY*j + y) = -pi ;
+                        CI(2*(nY*i + y)+1, nY*j + y) =  pi ;
 					}
 				}
 				// Filling the q part
 				else if(j<np+nq)
 				{
-                    vec value = d->get(i) ;
-
 					const double qi = r->q(xi, j-np) ;
 
 					// Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
-                        CI(2*(nY*i + y)+0, j) = (delta_k+value[y]) * qi ;
-                        CI(2*(nY*i + y)+1, j) = (delta_k-value[y]) * qi ;
+                        CI(2*(nY*i + y)+0, nY*j + y) = (delta_k+xi[d->dimX()+y]) * qi ;
+                        CI(2*(nY*i + y)+1, nY*j + y) = (delta_k-xi[d->dimX()+y]) * qi ;
 					}
 				}
 				else
@@ -236,8 +210,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, ration
                     vec qk = r->q(xi) ;
 					for(int y=0; y<nY; ++y)
 					{
-						CI(2*(nY*i + y)+0, j) = qk[y] ;
-						CI(2*(nY*i + y)+1, j) = qk[y] ;
+                        CI(2*(nY*i + y)+0, nY*j + y) = qk[y] ;
+                        CI(2*(nY*i + y)+1, nY*j + y) = qk[y] ;
 					}
 				}
 			}
@@ -251,17 +225,22 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, ration
 			}
 		}
 
+        std::cout << CI << std::endl << std::endl;
 
 		// Copy the data to matlab and execute the linear program
 		//
-		memcpy((void *)mxGetPr(f), (void *) g.data(),  N*sizeof(double));
-		memcpy((void *)mxGetPr(A), (void *)CI.data(), (2*M)*N*sizeof(double));
-		memcpy((void *)mxGetPr(b), (void *)ci.data(), (2*M)*sizeof(double));
+        memcpy((void *)mxGetPr(f), (void *) g.data(),  N*nY*sizeof(double));
+        memcpy((void *)mxGetPr(A), (void *)CI.data(), (2*M*nY)*N*nY*sizeof(double));
+        memcpy((void *)mxGetPr(b), (void *)ci.data(), (2*M*nY)*sizeof(double));
+
+        engPutVariable(ep, "f", f);
+        engPutVariable(ep, "A", A);
+        engPutVariable(ep, "b", b);
 
 		char* output = new char[BUFFER_SIZE+1];
 		output[BUFFER_SIZE] = '\0';
 		engOutputBuffer(ep, output, BUFFER_SIZE) ;
-#ifdef DEBUG
+#ifndef DEBUG
 		engEvalString(ep, "display(f)");
 		std::cout << output << std::endl ;
 		engEvalString(ep, "display(A)");
@@ -271,7 +250,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, int ny, ration
 #endif
 
 		engEvalString(ep, "[x, fval, flag] = linprog(f,A,b);");
-#ifdef DEBUG
+#ifndef DEBUG
 		std::cout << output << std::endl ;
 #endif
 
