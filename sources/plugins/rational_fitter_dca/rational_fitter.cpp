@@ -84,12 +84,39 @@ void rational_fitter_dca::set_parameters(const arguments& args)
 	_min_nq = args.get_float("min-nq", _max_nq) ;	
 }
 
+double distance(const rational_function* f, const data* d)
+{
+    double distance = 0.0;
+    for(int i=0; i<d->size(); ++i)
+    {
+        vec xi = d->get(i) ;
+        vec y  = f->value(xi);
+        double current_d = 0.0;
+
+        for(int j=0; j<d->dimY(); ++j)
+        {
+            double diff = y[j] - xi[d->dimX()+j];
+            current_d += diff;
+        }
+
+        current_d = std::abs(current_d);
+        if(current_d > distance)
+            distance = current_d;
+    }
+    return distance;
+}
+
 // Bootstrap the DCA algorithm with the Papamarkos fitting
 // algorithm [Papamarkos 1988]
 // \todo Finish the Papamarkos implementation
-void bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta)
+void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta)
 {
+    vec p(np*d->dimY());
+    vec q(nq*d->dimY());
+    q[0] = 1.0;
 
+    fit->update(p, q);
+    delta = distance(fit, d);
 }
 
 // dat is the data object, it contains all the points to fit
@@ -106,7 +133,10 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
     // Bootstrap the delta and rational function using the Papamarkos
     // algorithm.
     double delta = 0.0;
-   // bootstrap(d, np, nq, r, delta);
+    bootstrap(d, np, nq, r, delta);
+#ifndef DEBUG
+    std::cout << "<<DEBUG>> delta value after boostrap: " << delta << std::endl;
+#endif
 
 	// Create the MATLAB defintion of objects
 	// MATLAB defines a linear prog as
@@ -157,7 +187,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 			// [-p_j(x_i) ..-p_j(x_i), [ f_i+\delta_k]*q_j(x_i) ..[ fi+\delta_k]*q_j(x_i), qk(x_i)]
 			// [ p_j(x_i) .. p_j(x_i), [-f_i+\delta_k]*q_j(x_i) ..[-fi+\delta_k]*q_j(x_i), qk(x_i)]
 			//
-			for(int j=0; j<N-1; ++j)
+            for(int j=0; j<N; ++j)
 			{
 				// Filling the p part
 				if(j<np)
@@ -167,8 +197,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 					// Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
-                        CI(2*(nY*i + y)+0, nY*j + y) = -pi ;
-                        CI(2*(nY*i + y)+1, nY*j + y) =  pi ;
+                        CI(2*(nY*i + y)+0, nY*j + y) =  pi ;
+                        CI(2*(nY*i + y)+1, nY*j + y) = -pi ;
 					}
 				}
 				// Filling the q part
@@ -179,8 +209,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 					// Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
-                        CI(2*(nY*i + y)+0, nY*j + y) = (delta_k+xi[d->dimX()+y]) * qi ;
-                        CI(2*(nY*i + y)+1, nY*j + y) = (delta_k-xi[d->dimX()+y]) * qi ;
+                        CI(2*(nY*i + y)+0, nY*j + y) = -(delta_k+xi[d->dimX()+y]) * qi ;
+                        CI(2*(nY*i + y)+1, nY*j + y) = -(delta_k-xi[d->dimX()+y]) * qi ;
 					}
 				}
 				else
@@ -189,8 +219,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
                     vec qk = r->q(xi) ;
 					for(int y=0; y<nY; ++y)
 					{
-                        CI(2*(nY*i + y)+0, nY*j + y) = qk[y] ;
-                        CI(2*(nY*i + y)+1, nY*j + y) = qk[y] ;
+                        CI(2*(nY*i + y)+0, nY*j + y) = -qk[y] ;
+                        CI(2*(nY*i + y)+1, nY*j + y) = -qk[y] ;
 					}
 				}
 			}
