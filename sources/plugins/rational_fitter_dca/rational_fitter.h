@@ -52,7 +52,6 @@ class rational_fitter_dca : public QObject, public fitter
 		// min and Max usable np and nq values for the fitting
 		// 
 		int _max_np, _max_nq ;
-		int _min_np, _min_nq ;
 		Engine *ep;
 } ;
 
