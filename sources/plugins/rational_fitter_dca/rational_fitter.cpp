@@ -132,7 +132,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	// algorithm.
 	double delta = 0.0;
 	bootstrap(d, np, nq, r, delta);
-#ifndef DEBUG
+#ifdef DEBUG
 	std::cout << "<<DEBUG>> delta value after boostrap: " << delta << std::endl;
 	std::cout << "<<DEBUG>> r: " << *r << std::endl;
 #endif
@@ -179,13 +179,15 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	engPutVariable(ep, "u", u);
 	engPutVariable(ep, "l", l);
 
-
-	double delta_k = delta;
+	double delta_k;
 
 	// Loop until you get a converge solution \delta > \delta_k
 	// \todo add the correct looping condition
-	while(true)
+	do
 	{
+		// delta_{k+1} = delta_{k}
+		delta_k = delta;
+
 		// The function to minimize is \delta which is the last element of
 		// the result vector
 		for(int j=0; j<nY*(N-1); ++j)
@@ -283,85 +285,46 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 		char* output = new char[BUFFER_SIZE+1];
 		output[BUFFER_SIZE] = '\0';
 		engOutputBuffer(ep, output, BUFFER_SIZE) ;
-#ifndef DEBUG
-		engEvalString(ep, "display(f)");
-		std::cout << output << std::endl ;
-		engEvalString(ep, "display(A)");
-		std::cout << output << std::endl ;
-		engEvalString(ep, "display(b)");
-		std::cout << output << std::endl ;
-		engEvalString(ep, "display(u)");
-		std::cout << output << std::endl ;
-		engEvalString(ep, "display(l)");
-		std::cout << output << std::endl ;
-#endif
 
 		engEvalString(ep, "[x, fval, flag] = linprog(f,A,b,[],[], l, u);");
-#ifndef DEBUG
+#ifdef DEBUG
 		std::cout << output << std::endl ;
 #endif
 
 		x    = engGetVariable(ep, "x") ;
 		flag = engGetVariable(ep, "flag") ;
 
-		// \todo remove when correct looping condition ready
-		break;
-	}
+		// Update the rational function
+		double* val = (double*)mxGetData(x) ;
+		std::vector<double> a, b;
+		for(int i=0; i<(np+nq)*nY; ++i)
+		{
+			if(i < np*nY)
+			{
+				a.push_back(val[i]) ;
+			}
+			else
+			{
+				b.push_back(val[i]) ;
+			}
+		}
+		r->update(a, b) ;
+#ifdef DEBUG
+		std::cout << "<<DEBUG>> current rational function: " <<  *r << std::endl ;
+#endif
+
+		// Compute the new delta_k, the distance to the data points
+		delta = distance(r, d);
+	
+	}while(delta <= delta_k);
 
 	mxDestroyArray(f);
 	mxDestroyArray(A);
 	mxDestroyArray(b);
-	if(x != NULL)
-	{
-		if(flag != NULL)
-		{
-			if(mxGetScalar(flag) != 1)
-			{
-				mxDestroyArray(x);
-				mxDestroyArray(flag);
+	mxDestroyArray(u);
+	mxDestroyArray(l);
 
-#ifdef DEBUG
-				std::cerr << "<<ERROR>> flag is not equal to 1" << std::endl ;
-#endif
-				return false ;
-			}
-
-			double  total = 0.0;
-			double* val = (double*)mxGetData(x) ;
-			std::vector<double> a, b;
-			for(int i=0; i<N; ++i)
-			{
-				total += val[i]*val[i] ;
-				if(i < np)
-				{
-					a.push_back(val[i]) ;
-				}
-				else
-				{
-					b.push_back(val[i]) ;
-				}
-			}
-			r->update(a, b) ;
-
-			mxDestroyArray(x);
-			mxDestroyArray(flag);
-			return total > 0.0 ;
-		}
-		else
-		{
-#ifdef DEBUG
-			std::cerr << "<<ERROR>> unable to gather result flag" << std::endl ;
-#endif
-			return false ;
-		}
-	}
-	else 
-	{
-#ifdef DEBUG
-		std::cerr << "<<ERROR>> unable to gather result x" << std::endl ;
-#endif
-		return false ;
-	}
+	return true ;
 }
 
 Q_EXPORT_PLUGIN2(rational_fitter_dca, rational_fitter_dca)
