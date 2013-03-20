@@ -369,7 +369,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 	file << "{" << std::endl;
 
 	file << "\tdouble p = ";
-	for(int i=0; i<a.size(); ++i)
+	for(unsigned int i=0; i<a.size(); ++i)
 	{
 		if(i > 0 && a[i] >= 0.0)
 		{
@@ -380,7 +380,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 	file << 	";" << std::endl;
 
 	file << "\tdouble q = ";
-	for(int i=0; i<b.size(); ++i)
+	for(unsigned int i=0; i<b.size(); ++i)
 	{
 		if(i > 0)
 			file << " + ";
@@ -423,8 +423,8 @@ void rational_function::save_rational_function(const std::string& filename) cons
 	file << "#NQ " << b.size() / _nY << std::endl ;
 	file << "#BASIS poly" << std::endl ;
 
-	int np = a.size() / _nY ;
-	int nq = b.size() / _nX ;
+	unsigned int np = a.size() / _nY ;
+	unsigned int nq = b.size() / _nX ;
 	for(int k=0; k<_nY; ++k)
 	{
 		for(unsigned int i=0; i<np; ++i)

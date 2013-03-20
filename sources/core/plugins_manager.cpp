@@ -130,7 +130,7 @@ function* plugins_manager::get_function(const std::string& n) const
 	}
 	else
 	{
-		return _functions.at(n) ;
+		return _functions.find(n)->second ;
 	}
 }
 data* plugins_manager::get_data(const std::string& n)     const 
@@ -143,7 +143,7 @@ data* plugins_manager::get_data(const std::string& n)     const
 	else
 	{
 		std::cout << "<<DEBUG>>  using \"" << n << "\" data loader" << std::endl ;
-		return _datas.at(n) ;
+		return _datas.find(n)->second ;
 	}
 }
 fitter* plugins_manager::get_fitter(const std::string& n)   const 
@@ -155,6 +155,6 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
 	else
 	{
 		std::cout << "<<DEBUG>>  using \"" <<  n << "\"" << std::endl ;
-		return _fitters.at(n) ;
+		return _fitters.find(n)->second ;
 	}
 }

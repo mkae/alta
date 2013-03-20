@@ -74,14 +74,14 @@ class arguments
 		float get_float(const std::string& key, float default_value = 0.0f) const
 		{
 			if(_map.count(key) > 0)
-				return atof(_map.at(key).c_str()) ;
+				return atof(_map.find(key)->second.c_str()) ;
 			else
 				return default_value ;
 		}
 		int get_int(const std::string& key, int default_value = 0) const
 		{
 			if(_map.count(key) > 0)
-				return atoi(_map.at(key).c_str()) ;
+				return atoi(_map.find(key)->second.c_str()) ;
 			else
 				return default_value ;
 		} 
@@ -90,7 +90,7 @@ class arguments
 			vec res(size);
 			if(_map.count(key) > 0)
 			{
-				std::string s = _map.at(key);
+				std::string s = _map.find(key)->second;
 				if(s[0] == '\[') // Is an array of type [a, b, c]
 				{
 					int i = 0;
