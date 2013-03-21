@@ -13,6 +13,7 @@ class data ;
 /*! \brief A representation of an analytical function.
  *  \ingroup core
  *
+ *  \details
  *  function are functors with a domain of definition specified by a vector 
  *  interval \f$[\vec{min} .. \vec{max}]\f$ where \f$\vec{min}\f$ and 
  *  \f$\vec{max}\f$ have the size of the input domain.
@@ -70,7 +71,9 @@ class function
 };
 
 /*! \brief Non-linear function interface
+ *  \ingroup core
  *
+ * \details
  * Provide a way to obtain the dérivative of the function with respect to its
  * parameters. If the function \f$f(\vec{x})\f$ is defined for a vector of
  * parameters \f$\vec{a}\f$, the resulting vector is \f$df_i = {df \over 
@@ -78,8 +81,6 @@ class function
  *
  * \note It is not necessary to have an analytical formulation
  * of the derivative and a numerical evaluation of it can be provided.
- *
- * \todo Add a Levenberg-Marquardt fitter for this generic kind of function
  */
 class nonlinear_function: public function
 {

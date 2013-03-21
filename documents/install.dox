@@ -1,0 +1,26 @@
+/**
+\defgroup install
+
+How to install the various components
+
+<h2>Requirement</h2>
+<ul>
+	<li>Qt library with qmake</li>
+	<li>Eigen library (for some plugins)</li>
+	<li>Matlab with the Engine library (for some plugins)</li>
+	<li>CGAL library (for some plugins)</li>
+</ul>
+
+<h2>Installation</h2>
+
+Once you have the required libraries, the installation of the fitting
+tools is straightforward:
+
+\verbatim
+$ cd $ALTA/sources
+$ qmake && make
+\endverbatim
+
+All the resulting elements (binaries, dynamic and static libraries)
+are outputed in: <em>$ALTA/sources/build</em> directory.
+*/

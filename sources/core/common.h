@@ -4,26 +4,28 @@
 #include <iostream>
 #include <cassert>
 
-/*! \brief A core implementation of a vector of double. This type is used for
- * any transmission of vector data with unfixed dimension. It allows to have
- * a generic fitter working for n-Dimensional data.
+/*! \brief A core implementation of a vector of double. 
+ *
+ * \details
+ * This type is used for any transmission of vector data with unfixed 
+ * dimension. It allows to have a generic fitter working for 
+ * n-Dimensional data.
  */
 class vec : public std::vector<double>
 {
 	public:
-//*		// Constructor & Destructors
+		// Constructor & Destructors
 		//
 		vec() : std::vector<double>()
 		{
 		}
 		vec(int dim) : std::vector<double>(dim)
 		{
-			assign(dim, 0.0) ;
+		assign(dim, 0.0) ;
 		} ;
 		virtual ~vec() 
 		{
 		} ;
-//*/
 		
 		// Mathematical operators
 		//
@@ -78,7 +80,7 @@ class vec : public std::vector<double>
 
 		}
 */
-		// IO Functions
+		//! \brief IO Functions
 		//
 		friend std::ostream& operator<< (std::ostream& out, const vec& v)
 		{
