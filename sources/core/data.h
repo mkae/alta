@@ -7,7 +7,9 @@
 
 #include "common.h"
 #include "args.h"
-
+/*! 
+ *  \ingroup core
+ */
 class data
 {
 		public: // methods

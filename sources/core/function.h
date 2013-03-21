@@ -11,6 +11,7 @@
 class data ;
 
 /*! \brief A representation of an analytical function.
+ *  \ingroup core
  *
  *  function are functors with a domain of definition specified by a vector 
  *  interval \f$[\vec{min} .. \vec{max}]\f$ where \f$\vec{min}\f$ and 
@@ -18,6 +19,8 @@ class data ;
  *
  *  Any function used by the fitting algorithm should overload publicly this
  *  interface.
+ *
+ *  \todo how-to write a plugin here ?
  */
 class function 
 {

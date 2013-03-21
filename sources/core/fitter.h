@@ -7,8 +7,8 @@
 
 #include <QtPlugin>
 
-/*
- * Fitting interface for generic fitting algorithms
+/*! \brief Fitting interface for generic fitting algorithms
+ *  \ingroup core
  *
  */
 class fitter

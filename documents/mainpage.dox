@@ -4,12 +4,12 @@
 This package provide C++ code to analyze BRDF, fit measured data to analytical
 formulation, etc. It is decomposed in three components:
 <ul>
-	<li><em>core</em>: a set of classes providing interfaces to BRDFs, data type 
+	<li><em>\ref core</em>: a set of classes providing interfaces to BRDFs, data type 
 	and fitting algorithms. All the code using this library should rely on this
 	part.</li>
-	<li><em>plugins</em>: a set of Qt plugins providing fitting algorithms
+	<li><em>\ref plugins</em>: a set of Qt plugins providing fitting algorithms
 	for rational BRDFs, non-linear BRDFs, etc.</li>
-	<li><em>softs</em>: a set of tools to fit data, convert data, export fitting to 
+	<li><em>\ref softs</em>: a set of tools to fit data, convert data, export fitting to 
 	plots, etc.</li>
 </ul>
 
@@ -17,11 +17,18 @@ This library rely on Qt's lower level
 <a href="http://qt-project.org/doc/qt-4.8/plugins-howto.html">plugins mechanism</a>.
 Three types of plugins are availables:
 <ul>
-	<li><em>data</em> plugins allow to load BRDF measurements files.</li>
-	<li><em>function</em> plugins provide BRDF representations.</li>
-	<li><em>fitter</em> plugins provide fitting algorithms.</li>
+	<li><em>\ref data</em> plugins allow to load BRDF measurements files.</li>
+	<li><em>\ref function</em> plugins provide BRDF representations.</li>
+	<li><em>\ref fitter</em> plugins provide fitting algorithms.</li>
 </ul>
 
 The plugin_manager class will load all the Qt plugins and will provide access to
 the requested elements. See the documentation of this class.
+
+\todo Write how-to-compile documentation
+\todo Write how-to-extend documentation (for plugin generation)
+
+\defgroup core
+\defgroup plugins
+\defgroup softs
 */

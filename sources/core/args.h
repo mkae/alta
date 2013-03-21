@@ -7,6 +7,13 @@
 
 #include "common.h"
 
+/*! \brief A useful class for storing the high-level arguments of a program
+ *  or a function.
+ *
+ *  The set of parameters are parsed from the command line using the 
+ *  constructor. They are stored as std::string in a std::map.
+ *  \todo add functionalities to provide new parameters values.
+ */
 class arguments
 {
 	public: // functions
@@ -47,7 +54,7 @@ class arguments
 		} ;
 		~arguments() { } ;
 
-		// Access elements
+		//! \brief is the elements in the command line ?
 		bool is_defined(const std::string& key) const
 		{
 			if(_map.count(key) > 0)
@@ -59,6 +66,7 @@ class arguments
 				return false ;
 			}
 		} ;
+		//! \brief access the element stored value
 		std::string operator[](const std::string& key) const
 		{
 			if(_map.count(key) > 0)
@@ -71,6 +79,11 @@ class arguments
 				return std::string() ;
 			}
 		} ;
+		//! \brief acces to the float value associated with the parameter
+		//! \a key.
+		//!
+		//! The \a default_value argument will be returned if the \a key
+		//! has no associated value.
 		float get_float(const std::string& key, float default_value = 0.0f) const
 		{
 			if(_map.count(key) > 0)
@@ -78,6 +91,11 @@ class arguments
 			else
 				return default_value ;
 		}
+		//! \brief acces to the integer value associated with the parameter
+		//! \a key.
+		//!
+		//! The \a default_value argument will be returned if the \a key
+		//! has no associated value.
 		int get_int(const std::string& key, int default_value = 0) const
 		{
 			if(_map.count(key) > 0)
@@ -85,6 +103,11 @@ class arguments
 			else
 				return default_value ;
 		} 
+		//! \brief acces to a vector of float of size \a size associated with
+		//! the parameter \a key.
+		//!
+		//! The \a default_value argument will be returned if the \a key
+		//! has no associated value.
 		vec get_vec(const std::string& key, int size, float default_value = 0.0f) const
 		{
 			vec res(size);
