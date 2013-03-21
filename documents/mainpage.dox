@@ -26,11 +26,8 @@ Documentation to \ref install
 
 Documentation to \ref contribute
 
-The plugin_manager class will load all the Qt plugins and will provide access to
+The \ref plugins_manager class will load all the Qt plugins and will provide access to
 the requested elements. See the documentation of this class.
-
-\todo Write how-to-compile documentation
-\todo Write how-to-extend documentation (for plugin generation)
 
 \defgroup core
 \defgroup plugins

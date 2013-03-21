@@ -1,5 +1,5 @@
-/**
-\defgroup contribute
+/*!
+\page contribute Contribute
 
 You can contribute and expand ALTA by providing new plugins. The three kind
 of plugins (function, data and fitter) can be provided. Examples of such
@@ -19,7 +19,7 @@ Q_OBJECT and Q_INTERFACES(fitter) macros is manatory.
 #include <core/args.h>
 #include <core/function.h>
 
-class rational_fitter_eigen : public QObject, public fitter
+class my_fitter : public QObject, public fitter
 {
 	Q_OBJECT
 	Q_INTERFACES(fitter)
@@ -44,3 +44,6 @@ class rational_fitter_eigen : public QObject, public fitter
 
 } ;
 \endcode
+
+\todo Add other example on data and function
+*/
