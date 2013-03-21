@@ -1,0 +1,46 @@
+/**
+\defgroup contribute
+
+You can contribute and expand ALTA by providing new plugins. The three kind
+of plugins (function, data and fitter) can be provided. Examples of such
+plugins can be found in the $ALTA/sources/plugins directory.
+
+<h2>Fitter: an example</h2>
+
+You have to inherit from the fitter and the QObject interfaces. It will
+be required that you implement the pure virtual functions. The call to
+Q_OBJECT and Q_INTERFACES(fitter) macros is manatory.
+
+\code
+#pragma once 
+
+// Interface
+#include <QObject>
+#include <core/args.h>
+#include <core/function.h>
+
+class rational_fitter_eigen : public QObject, public fitter
+{
+	Q_OBJECT
+	Q_INTERFACES(fitter)
+
+	public: // methods
+	
+		rational_fitter_eigen() ;
+		virtual ~rational_fitter_eigen() ;
+			
+		// Fitting a data object
+		//
+		virtual bool fit_data(const data* d, function* fit) ;
+
+		// Provide user parameters to the fitter
+		//
+		virtual void set_parameters(const arguments& args) ;
+
+		// Obtain associated data and functions
+		//
+		virtual data*     provide_data() const ;
+		virtual function* provide_function() const ;
+
+} ;
+\endcode
