@@ -16,5 +16,5 @@ LIBS           += -L../../build        \
 						-lcore
 
 unix {
-QMAKE_CXXFLAGS += -frounding-math 
+	QMAKE_CXXFLAGS += -frounding-math 
 }

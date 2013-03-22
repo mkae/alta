@@ -1,5 +1,3 @@
-
-
 TARGET          = rational_fitter_eigen
 TEMPLATE        = lib
 CONFIG         *= qt      \
@@ -17,7 +15,3 @@ SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build           \
                   -lcore
-
-
-#QMAKE_CXXFLAGS += -fPIC
-

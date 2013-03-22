@@ -17,4 +17,3 @@ SOURCES         = rational_fitter.cpp
 LIBS           += -L../../build           \
                   -lcore
 
-#QMAKE_CXXFLAGS += -fPIC
