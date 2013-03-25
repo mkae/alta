@@ -50,9 +50,12 @@ class rational_function : public QObject, public function
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;
 
-		// Save the rational function to a given format
+        //! \brief Save the rational function to the rational format (see \ref formating).
 		void save_rational_function(const std::string& filename) const ;
+        //! \brief Output the rational function as a gnuplot file. It requires
+        //! the data object to output the function at the input location only.
 		void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
+        //! \brief Output the rational function using a C++ function formating.
 		void save_cpp(const std::string& filename, const arguments& args) const ;
 
 	protected: // functions

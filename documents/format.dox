@@ -1,0 +1,33 @@
+/*!
+\page format Format
+
+\todo Describe here the file format
+
+<h2>Rational function file format (.rational)</h2>
+
+We advise to output all rational function into .rational file for consistency.
+ALTA library assumes that all rational polynomials are exported using the
+following convention:
+
+<ul>
+	<li>The .rational file is outputed in plain text and not in binary.</li>
+	<li>The .rational file starts with a header. Each line of the header 
+	starts with the character '#'.</li>
+	<li>If there are multiple color channels to the rational function, they
+	are enumerated in the file, one color channel by one.</li>
+</ul>
+
+Example of a .rational file:
+\verbatim
+   #DIM N P 
+   #NP  (nombre de coeffs ou degré max au numerateur  )
+   #NQ  (nombre de coeffs ou degré min au denominateur )
+   #BASIS  "chaine_caract_decrivant_le_type_de_fonction_de_base"
+   Coeff_numerateur deg_1_fct_base deg_2_fct_base ... coeff_associe 
+   Coeff denominateur
+   #NP
+   #NQ
+\endverbatim
+
+\todo Right now the different color channels have the same length !
+*/

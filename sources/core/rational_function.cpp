@@ -364,8 +364,7 @@ void rational_function::save(const std::string& filename, const arguments& args)
 	}
 }
 
-// Will save a header only function file
-// TODO it should handle parametrization
+//! \todo it should handle parametrization
 void rational_function::save_cpp(const std::string& filename, const arguments& args) const
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
