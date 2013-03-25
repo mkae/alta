@@ -12,6 +12,10 @@
 #include <core/args.h>
 #include <core/vertical_segment.h>
 
+/*! \brief A fitter for non-linear BRDF models that uses Eigen's
+ *  Levenberg-Marquardt solver.
+ *  \ingroup plugins
+ */
 class nonlinear_fitter_eigen: public QObject, public fitter
 {
 	Q_OBJECT

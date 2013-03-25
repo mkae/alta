@@ -16,3 +16,7 @@ We use heavily the Qt profile functionality. To build some of the plugins you wi
 be required to create your own system dependant .prf for any used library. For example
 all the rational BRDF fitters use the Eigen library. Therefore it is mandatory that you
 provide a eigen.prf file and that this file is in your QMAKEFEATURES directory.
+
+Generate the documentation using Doxygen
+  cd ${ALTA}/documents/
+  doxygen doxygen.conf

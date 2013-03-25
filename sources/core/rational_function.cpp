@@ -392,8 +392,9 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
         }
     }
     file << "};" << std::endl;
+    file << std::endl ;
 
-
+    file << "// l(double x, int i) is the Legendre polynomial of order i evaluated in x" << std::endl;
     file << "void brdf(double* x, double* y)" << std::endl;
     file << "{" << std::endl;
     file << "\tdouble p, q;" << std::endl;

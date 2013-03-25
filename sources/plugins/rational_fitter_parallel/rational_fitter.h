@@ -13,7 +13,13 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
-
+/*! \brief A fitter for rational functions that can run in parallel
+ *  using QuadProg++ quadratic solver.
+ *  \ingroup plugins
+ *
+ *  \details
+ *  You can find QuadProg++ here: http://quadprog.sourceforge.net/
+ */
 class rational_fitter_parallel : public QObject, public fitter
 {
 	Q_OBJECT

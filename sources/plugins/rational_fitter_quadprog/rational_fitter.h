@@ -13,12 +13,8 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
-/*! \todo This plugin is not working with 1D example. This is weird. Use the following command
- *  to generate the bug:
-     \verbatim 
-     ./build/plugin_loader --input ../data/1d/transmi_lame_50_50_avg45.txt --output output.rational --fitter librational_fitter_quadprog.so --min 400 --max 500 --min-np 1 --min-nq 1 --np 20 --nq 20 --dt 0.01
-     \endverbatim
-     It should freeze after np = 6 and nq = 6
+/*! \brief A rational fitter using the library QuadProg++
+ *  You can find the library here: http://quadprog.sourceforge.net/
  */
 class rational_fitter_quadprog : public QObject, public fitter
 {

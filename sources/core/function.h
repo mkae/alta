@@ -20,8 +20,6 @@ class data ;
  *
  *  Any function used by the fitting algorithm should overload publicly this
  *  interface.
- *
- *  \todo how-to write a plugin here ?
  */
 class function 
 {
