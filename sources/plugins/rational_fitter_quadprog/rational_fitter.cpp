@@ -13,7 +13,6 @@
 
 #include <QTime>
 
-
 data* rational_fitter_quadprog::provide_data() const
 {
 	return new vertical_segment() ;

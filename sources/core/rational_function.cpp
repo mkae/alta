@@ -157,8 +157,12 @@ std::vector<int> rational_function::index2degree(int i) const
 
 	if(i == 0)
 		return deg ;
-	
-	if(dimX() == 2)
+		
+	if(dimX() == 1)
+	{
+	    deg[0] = i;
+	}
+    else if(dimX() == 2)
 	{
 		int Nk = 1 ;
 		int k  = 1 ;
@@ -209,7 +213,7 @@ double legendre(double x, int i)
 	}
 }
 
-#define POLYNOMIALS
+//#define POLYNOMIALS
 
 // Get the p_i and q_j function
 double rational_function::p(const vec& x, int i) const
@@ -341,9 +345,9 @@ void rational_function::load(const std::string& filename)
 }
 void rational_function::save(const std::string& filename, const arguments& args) const
 {
-	if(args.is_defined("export-format"))
+    if(args.is_defined("export"))
 	{
-		if(args["export-format"].compare("c++") == 0)
+        if(args["export"].compare("c++") == 0)
 		{
 			std::cout << "<<INFO>> will export in C++ format" << std::endl;
 			save_cpp(filename, args);
@@ -365,7 +369,7 @@ void rational_function::save(const std::string& filename, const arguments& args)
 void rational_function::save_cpp(const std::string& filename, const arguments& args) const
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
-	file << "double* brdf(double* x)" << std::endl;
+    file << "double brdf(double* x)" << std::endl;
 	file << "{" << std::endl;
 
 	file << "\tdouble p = ";
@@ -388,7 +392,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 	}
 	file << 	";" << std::endl;
 
-	file << "\treturn p/q;";
+    file << "\treturn p/q;" << std::endl;
 	file << 	"}" << std::endl;
 
 	file.close() ;

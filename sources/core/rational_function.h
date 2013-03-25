@@ -57,9 +57,9 @@ class rational_function : public QObject, public function
 
 	protected: // functions
 		
-		// Convert an index in N to a vector of degree for a
-		// multinomial coeffcient. The resulting vector v should
-		// be used as prod_k x[k]^v[k]
+        //! Convert a 1D index into a vector of degree for a
+        //! multinomial coeffcient. The resulting vector v should
+        //! be used as prod_k x[k]^v[k] for the monomial basis
 		std::vector<int> index2degree(int i) const ;
 
 	protected: // data

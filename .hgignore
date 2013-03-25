@@ -1,2 +1,12 @@
+syntax: glob
 documents/doxygen
 .*.swp
+moc_*
+Makefile
+*.o
+*.rational
+*.errorplot
+*.gnuplot
+oprofile_data
+*.so.*
+*.so

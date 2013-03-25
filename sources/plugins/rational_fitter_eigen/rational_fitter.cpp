@@ -167,10 +167,14 @@ bool rational_fitter_eigen::fit_data(const vertical_segment* d, int np, int nq, 
 				min_val = value ;
 			}
 		}
+		
+		if(min_val == std::numeric_limits<double>::max())
+		{
+    		return false;
+		}
 #endif
 		// Recopy the vector d
-		std::vector<double> p, q;
-		p.assign(np, 0.0) ; q.assign(nq, 0.0) ;
+		vec p(np), q(nq);
 		Eigen::VectorXd::Map(&p[0], np) = solver.eigenvectors().col(min_id).head(np);
 		Eigen::VectorXd::Map(&q[0], nq) = solver.eigenvectors().col(min_id).tail(nq);
 		

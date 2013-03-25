@@ -160,8 +160,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	{
 		if(i<np*nY)
 		{
-			ui(i) =  100.0; // std::numeric_limits<double>::max();
-			li(i) = -100.0; //-std::numeric_limits<double>::max();
+			ui(i) =  1.0E30; // std::numeric_limits<double>::max();
+			li(i) = -1.0E30; //-std::numeric_limits<double>::max();
 		}
 		else if(i<(np+nq)*nY)
 		{
@@ -170,8 +170,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 		}
 		else
 		{
-			ui(i) =  100.0; // std::numeric_limits<double>::max();
-			li(i) = -100.0; //-std::numeric_limits<double>::max();
+			ui(i) =  1.0E30; // std::numeric_limits<double>::max();
+			li(i) = -1.0E30; //-std::numeric_limits<double>::max();
 		}
 	}
 	memcpy((void *)mxGetPr(u), (void *)ui.data(), N*nY*sizeof(double));
@@ -314,7 +314,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 #endif
 
 		// Compute the new delta_k, the distance to the data points
-		delta = distance(r, d);
+//		delta = distance(r, d);
 	
 	}while(delta <= delta_k);
 

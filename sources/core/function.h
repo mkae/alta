@@ -15,7 +15,7 @@ class data ;
  *
  *  \details
  *  function are functors with a domain of definition specified by a vector 
- *  interval \f$[\vec{min} .. \vec{max}]\f$ where \f$\vec{min}\f$ and 
+ *  interval \f$[\vec{min} .. \vec{max}]\f$ where \f$\vec{min}\f$ and 
  *  \f$\vec{max}\f$ have the size of the input domain.
  *
  *  Any function used by the fitting algorithm should overload publicly this

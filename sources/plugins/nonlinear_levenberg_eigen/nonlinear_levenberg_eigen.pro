@@ -8,7 +8,7 @@ DESTDIR         = ../../build
  
 INCLUDEPATH    += ../.. 
 
-HEADERS         = _fitter.h
+HEADERS         = fitter.h
 SOURCES         = fitter.cpp
 
 LIBS           += -L../../build \
