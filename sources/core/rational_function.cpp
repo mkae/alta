@@ -367,34 +367,85 @@ void rational_function::save(const std::string& filename, const arguments& args)
 //! \todo it should handle parametrization
 void rational_function::save_cpp(const std::string& filename, const arguments& args) const
 {
-	std::ofstream file(filename.c_str(), std::ios_base::trunc);
-    file << "double brdf(double* x)" << std::endl;
-	file << "{" << std::endl;
+    unsigned int np = a.size() / _nY ;
+    unsigned int nq = b.size() / _nY ;
 
-	file << "\tdouble p = ";
-	for(unsigned int i=0; i<a.size(); ++i)
-	{
-		if(i > 0 && a[i] >= 0.0)
-		{
-			file << " + ";
-		}
-		file << a[i] << "*x\[" << i << "\]" ;
-	}
-	file << 	";" << std::endl;
+    std::ofstream file(filename.c_str(), std::ios_base::trunc);
 
-	file << "\tdouble q = ";
-	for(unsigned int i=0; i<b.size(); ++i)
-	{
-		if(i > 0)
-			file << " + ";
-		file << b[i] << "*x\[" << i << "\]" ;
-	}
-	file << 	";" << std::endl;
+    file << "double s[" << dimX() << "] = {";
+    for(int i=0; i<dimX(); ++i)
+    {
+        file << 1.0 / (_max[i]-_min[i]);
+        if(i < dimX()-1)
+        {
+            file << ", ";
+        }
+    }
+    file << "};" << std::endl;
+    file << "double c[" << dimX() << "] = {";
+    for(int i=0; i<dimX(); ++i)
+    {
+        file << _min[i];
+        if(i < dimX()-1)
+        {
+            file << ", ";
+        }
+    }
+    file << "};" << std::endl;
 
-    file << "\treturn p/q;" << std::endl;
-	file << 	"}" << std::endl;
 
-	file.close() ;
+    file << "void brdf(double* x, double* y)" << std::endl;
+    file << "{" << std::endl;
+    file << "\tdouble p, q;" << std::endl;
+
+    // Export each color channel independantly
+    for(int j=0; j<dimY(); ++j)
+    {
+        // Export the numerator of the jth color channel
+        file << "\tp = ";
+        for(unsigned int i=0; i<np; ++i)
+        {
+            if(i > 0 && a[np*j + i] >= 0.0)
+            {
+                file << " + ";
+            }
+            file << a[np*j + i];
+
+            std::vector<int> degree = index2degree(i);
+            for(unsigned int k=0; k<degree.size(); ++k)
+            {
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+            }
+        }
+        file << ";" << std::endl;
+
+        // Export the denominator of the jth color channel
+        file << "\tq = ";
+        for(unsigned int i=0; i<nq; ++i)
+        {
+            if(i > 0 && b[np*j + i] >= 0.0)
+                file << " + ";
+            file << b[np*j + i] ;
+
+            std::vector<int> degree = index2degree(i);
+            for(unsigned int k=0; k<degree.size(); ++k)
+            {
+                file << "*l(x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+            }
+        }
+        file << ";" << std::endl;
+
+        file << "\t y[" << j << "] = p/q;" << std::endl;
+        if(j < dimY()-1)
+        {
+            file << std::endl;
+        }
+    }
+
+
+    file << "}" << std::endl;
+
+    file.close() ;
 }
 
 void rational_function::save_gnuplot(const std::string& filename, const data* d, const arguments& args) const 
@@ -427,7 +478,7 @@ void rational_function::save_rational_function(const std::string& filename) cons
 	file << "#BASIS poly" << std::endl ;
 
 	unsigned int np = a.size() / _nY ;
-	unsigned int nq = b.size() / _nX ;
+    unsigned int nq = b.size() / _nY ;
 	for(int k=0; k<_nY; ++k)
 	{
 		for(unsigned int i=0; i<np; ++i)
