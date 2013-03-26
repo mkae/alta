@@ -61,21 +61,21 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 
 		// Allocate enough processor to run fully in parallel, but account for
 		// the fact that each thread will require its own memory.
-		size_t need_memory = (i+1) * d->size() * 2 * sizeof(double); 
-		size_t avai_memory = plugins_manager::get_available_memory();
-		int nb_cores = avai_memory / need_memory ;
+		size_t need_memory = ((3*i+1)*d->size()*2 + 2*i + 2*d->dimY()*d->size()) * sizeof(double); 
+		size_t avai_memory = plugins_manager::get_system_memory();
+		int nb_cores = (60 * avai_memory) / (100 * need_memory) ;
 		nb_cores = std::min<int>(nb_cores, omp_get_num_procs());
 
 		if(nb_cores == 0)
 		{
 			std::cerr << "<<ERROR>> not enough memory to perform the fit" << std::endl ;
-#ifndef DEBUG
-			std::cout << "<<DEBUG>> " << need_memory / 1024 << "MB required / " 
-			          << avai_memory / 1024 << "MB available" << std::endl;
+#ifdef DEBUG
+			std::cout << "<<DEBUG>> " << need_memory / (1024*1024) << "MB required / " 
+			          << avai_memory / (1024*1024) << "MB available" << std::endl;
 #endif
 			return false;
 		}
-#ifndef DEBUG
+#ifdef DEBUG
 		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
 #endif
 		omp_set_num_threads(nb_cores) ;
