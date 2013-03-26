@@ -8,26 +8,29 @@
 #include "fitter.h"
 #include "args.h"
 
+/*! \brief This class handles the loading of plugins and insure that they can
+ *  talk to each others through coordinates transforms.
+ *
+ *  \details
+ *
+ *  \todo Should we put this class as a singleton ? I am tempted by it so that
+ *  each plugin can access some informations.
+ */
 class plugins_manager
 {
 	public: //functions
 
-		// Create the object, parse the argument and load
-		// all the plugins
-		//
+		//! \brief Create the object, parse the argument and load all the plugins
 		plugins_manager(const arguments& args) ;
 
-		// Get instances of the function, the data and the
-		// fitter. Select the first in the map,
-		//
+		//! Get instances of the function, the data and the fitter. Select the first 
+		//! in the map,
 		function* get_function() const ;
 		data*     get_data()     const ;
 		fitter*   get_fitter()   const ;
 		
-		// Get instances of the function, the data and the
-		// fitter, select one based on the name. Return null
-		// if no one exist.
-		//
+		//! \brief Get instances of the function, the data and the fitter, select one 
+		//! based on the name. Return null if no one exist.
 		function* get_function(const std::string& n) const ;
 		data*     get_data(const std::string& n)     const ;
 		fitter*   get_fitter(const std::string& n)   const ;
