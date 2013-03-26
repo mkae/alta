@@ -1,5 +1,7 @@
 #include "rational_fitter.h"
 
+#include <core/plugins_manager.h>
+
 #include <Eigen/SVD>
 #include <Array.hh>
 #include <QuadProg++.hh>
@@ -56,6 +58,27 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 		std::cout.flush() ;
 		QTime time ;
 		time.start() ;
+
+		// Allocate enough processor to run fully in parallel, but account for
+		// the fact that each thread will require its own memory.
+		size_t need_memory = (i+1) * d->size() * 2 * sizeof(double); 
+		size_t avai_memory = plugins_manager::get_available_memory();
+		int nb_cores = avai_memory / need_memory ;
+		nb_cores = std::min<int>(nb_cores, omp_get_num_procs());
+
+		if(nb_cores == 0)
+		{
+			std::cerr << "<<ERROR>> not enough memory to perform the fit" << std::endl ;
+#ifndef DEBUG
+			std::cout << "<<DEBUG>> " << need_memory / 1024 << "MB required / " 
+			          << avai_memory / 1024 << "MB available" << std::endl;
+#endif
+			return false;
+		}
+#ifndef DEBUG
+		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
+#endif
+		omp_set_num_threads(nb_cores) ;
 
 		double min_delta = std::numeric_limits<double>::max();
 		int nb_sol_found = 0;

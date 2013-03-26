@@ -158,3 +158,23 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
 		return _fitters.find(n)->second ;
 	}
 }
+		
+// \todo implement the Darwin (MACOS) version.
+#ifdef WIN32
+#include <windows.h>
+size_t plugins_manager::get_available_memory()
+{
+	MEMORYSTATUSEX status;
+	status.dwLength = sizeof(status);
+	GlobalMemoryStatusEx(&status);
+	return status.ullTotalPhys;
+}
+#else
+#include <unistd.h>
+size_t plugins_manager::get_available_memory()
+{
+	long pages = sysconf(_SC_PHYS_PAGES);
+	long page_size = sysconf(_SC_PAGE_SIZE);
+	return pages * page_size;
+}
+#endif

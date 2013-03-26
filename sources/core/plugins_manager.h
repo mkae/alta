@@ -32,6 +32,11 @@ class plugins_manager
 		data*     get_data(const std::string& n)     const ;
 		fitter*   get_fitter(const std::string& n)   const ;
 
+		//! \brief Provide a measure of how much free memory is left on the system.
+		//! \details It permits to know is one can allocate more memory for a fitting
+		//! procedure for example.
+		static size_t get_available_memory() ;
+
 	private: //data
 
 		std::map<std::string, function*> _functions ;
