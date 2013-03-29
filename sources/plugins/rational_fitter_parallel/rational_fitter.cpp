@@ -12,9 +12,11 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 #include <QTime>
 
+#include "quadratic_program.h"
 
 data* rational_fitter_parallel::provide_data() const
 {
@@ -83,7 +85,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 		double min_delta = std::numeric_limits<double>::max();
 		int nb_sol_found = 0;
 		int np, nq ;
-		#pragma omp parallel for
+//		#pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
 			int temp_np = i - j;
@@ -168,6 +170,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 		return false ;
 	}
 
+#ifdef OLD
 	// Get the maximum value in data to scale the input parameter space
 	// so that it reduces the values of the polynomial
 	vec dmax = d->max() ;
@@ -243,6 +246,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 		ci[i] = -sqrt(a0_norm) ;
 		ci[i+d->size()] = -sqrt(a1_norm) ;
 	}
+
 #ifdef DEBUG
 	std::cout << "CI = [" ;
 	for(int j=0; j<d->size()*2; ++j)
@@ -313,7 +317,43 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 		const double v = x[i];
 		solves_qp = solves_qp && !std::isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
 	}
+#else
+    quadratic_program qp(np, nq);
+    for(int i=0; i<d->size(); ++i)
+    {
+        vec xi = d->get(i) ;
 
+        // Create two vector of constraints
+        QuadProgPP::Vector<double> c1(np+nq), c2(np+nq);
+        for(int j=0; j<np+nq; ++j)
+        {
+            // Filling the p part
+            if(j<np)
+            {
+                const double pi = r->p(xi, j) ;
+                c1[j] =  pi ;
+                c2[j] = -pi ;
+
+            }
+            // Filling the q part
+            else
+            {
+                vec yl, yu ;
+                d->get(i, yl, yu) ;
+                const double qi = r->q(xi, j-np) ;
+
+                c1[j] = -yl[ny] * qi ;
+                c2[j] = yu[ny] * qi ;
+            }
+        }
+
+        qp.add_constraints(c1);
+        qp.add_constraints(c2);
+    }
+
+    QuadProgPP::Vector<double> x(np+nq);
+    bool solves_qp = qp.solve_program(x);
+#endif
 	if(solves_qp)
 	{
 		// Recopy the vector d

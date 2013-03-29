@@ -23,8 +23,8 @@ class plugins_manager
 		//! \brief Create the object, parse the argument and load all the plugins
 		plugins_manager(const arguments& args) ;
 
-		//! Get instances of the function, the data and the fitter. Select the first 
-		//! in the map,
+		//! \brief Get instances of the function, the data and the fitter. Select 
+		//! the first in the map,
 		function* get_function() const ;
 		data*     get_data()     const ;
 		fitter*   get_fitter()   const ;

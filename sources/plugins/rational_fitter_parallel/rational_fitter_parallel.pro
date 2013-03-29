@@ -12,7 +12,8 @@ INCLUDEPATH    += ../rational_function \
                   ../rational_data     \
                   ../.. 
 
-HEADERS         = rational_fitter.h
+HEADERS         = rational_fitter.h \
+    quadratic_program.h
 SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build        \
