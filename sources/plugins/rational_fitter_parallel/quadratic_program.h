@@ -17,22 +17,59 @@ public:
     }
 
     //! \brief Add a constraint by specifying the vector
-    void add_constraints(const QuadProgPP::Vector<double> v)
+    void add_constraints(const QuadProgPP::Vector<double> vec)
     {
         const int m = CI.nrows();
         const int n = CI.ncols();
-        CI.resize(m, n+1);
-        for(int i=0; i<m; ++i)
+
+        if(n > 0)
         {
-            CI[i][n] = v[i];
+            // Construct temp buffer
+            double* temp = new double[n*m];
+            for(int u=0; u<n; ++u)
+            {
+                for(int v=0; v<m; ++v)
+                {
+                    temp[u*m + v] = CI[v][u];
+                }
+            }
+
+            // Resize matrix CI
+            CI.resize(m, n+1);
+
+            // Recopy data
+            for(int u=0; u<n+1; ++u)
+            {
+                if(u==n)
+                {
+                    for(int v=0; v<m; ++v)
+                        CI[v][u] = vec[v];
+                }
+                else
+                {
+                    for(int v=0; v<m; ++v)
+                        CI[v][u] = temp[u*m + v];
+                }
+            }
+            delete[] temp;
+        }
+        else
+        {
+            // Resize matrix CI
+            CI.resize(m, 1);
+
+            // Recopy data
+            for(int u=0; u<m; ++u)
+                CI[n][u] = vec[u];
         }
     }
 
     //! \brief Solves the quadratic program
-    bool solve_program(QuadProgPP::Vector<double>& v)
-    {
+    bool solve_program(QuadProgPP::Vector<double>& v, double& delta)
+    {        
         const int m = CI.nrows();
         const int n = CI.ncols();
+
         QuadProgPP::Matrix<double> G (0.0, m, m) ;
         QuadProgPP::Vector<double> g (0.0, m) ;
         QuadProgPP::Vector<double> ci(0.0, n) ;
@@ -44,7 +81,7 @@ public:
         Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(Eigen::MatrixXd::Map(&CI[0][0], m, n));
         const double sigma_m = svd.singularValues()(std::min(m, n)-1) ;
         const double sigma_M = svd.singularValues()(0) ;
-        const double delta = sigma_M / sigma_m ;
+        delta = sigma_M / sigma_m ;
 
         // Select the size of the result vector to
         // be equal to the dimension of p + q

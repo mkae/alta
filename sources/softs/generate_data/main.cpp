@@ -24,12 +24,23 @@ int main(int argc, char** argv)
 		for(int i=0; i<nbx; ++i)
 		{
 			const float x = i / (float)nbx ;
-			const float y = 100.0f * exp(-10.0 * x*x) * x*x - 0.01 *x*x*x ;
+            const float y = 100.0f * exp(-10.0 * x*x) * x*x - 0.01 *x*x*x + 0.1 ;
 
 			f << x << "\t" << y << "\t" << 0.1f << std::endl ;
 		}
 	}
-	else if(k == 2)
+    else if(k == 2)
+    {
+        f << "#DIM 1 1" << std::endl ;
+        for(int i=0; i<nbx; ++i)
+        {
+            const float x = i / (float)nbx ;
+            const float y = (1.0 + 7.0*x - 10.5*x*x) / (1.0 + 7.0 * x) ;
+
+            f << x << "\t" << y << "\t" << 0.1f << std::endl ;
+        }
+    }
+    else if(k == 3)
 	{
 		f << "#DIM 2 1" << std::endl ;
 		for(int i=0; i<nbx; ++i)
@@ -42,7 +53,7 @@ int main(int argc, char** argv)
 				f << x << "\t" << y << "\t" << z << "\t" << 0.1f << std::endl ;
 			}
 	}
-	else if(k == 3)
+    else if(k == 4)
 	{
 		f << "#DIM 2 1" << std::endl ;
 		for(int i=0; i<nbx; ++i)

@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 			size_t n = args["output"].find('.') ;
 			std::string gnuplot_filename = args["output"].substr(0,n); 
 			gnuplot_filename.append(".gnuplot") ;
-/*	
+/*
 			f->save_gnuplot(gnuplot_filename, d, args);				
 /*/
 			std::ofstream file(gnuplot_filename.c_str(), std::ios_base::trunc);
@@ -110,7 +110,8 @@ int main(int argc, char** argv)
 					file << y2[u] << "\t" ;
 					
 				file << std::endl ;
-			}	
+            }
+            file.close();
 //*/
 			std::string error_filename = args["output"].substr(0,n); 
 			error_filename.append(".errorplot") ;

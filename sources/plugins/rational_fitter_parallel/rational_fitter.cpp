@@ -56,7 +56,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 
 	for(int i=_min_np; i<=_max_np; ++i)
 	{
-		std::cout << "<<INFO>> fit using np+nq = " << i << "\r"  ;
+        std::cout << "<<INFO>> fit using np+nq = " << i << "\r" ;
 		std::cout.flush() ;
 		QTime time ;
 		time.start() ;
@@ -171,11 +171,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 	}
 
 #ifdef OLD
-	// Get the maximum value in data to scale the input parameter space
-	// so that it reduces the values of the polynomial
-	vec dmax = d->max() ;
-
-	// Matrices of the problem
+    // Matrices of the problem
 	QuadProgPP::Matrix<double> G (0.0, np+nq, np+nq) ;
 	QuadProgPP::Vector<double> g (0.0, np+nq) ;
 	QuadProgPP::Matrix<double> CI(0.0, np+nq, 2*d->size()) ;
@@ -247,20 +243,10 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 		ci[i+d->size()] = -sqrt(a1_norm) ;
 	}
 
-#ifdef DEBUG
-	std::cout << "CI = [" ;
-	for(int j=0; j<d->size()*2; ++j)
-	{
-		for(int i=0; i<np+nq; ++i)
-		{
-			std::cout << CI[i][j] ;
-			if(i != np+nq-1) std::cout << ", ";
-		}
-		if(j != d->size()*2-1)
-			std::cout << ";" << std::endl; 
-		else
-			std::cout << "]" << std::endl ;
-	}
+
+
+#ifndef DEBUG
+    std::cout << CI << std::endl ;
 #endif
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
@@ -352,7 +338,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
     }
 
     QuadProgPP::Vector<double> x(np+nq);
-    bool solves_qp = qp.solve_program(x);
+    bool solves_qp = qp.solve_program(x, delta);
 #endif
 	if(solves_qp)
 	{
@@ -372,7 +358,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 			}
 		}
 
-#ifdef DEBUG
+#ifndef DEBUG
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
 #endif
 		return norm > 0.0;
