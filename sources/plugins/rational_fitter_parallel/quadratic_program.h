@@ -20,7 +20,7 @@ public:
     }
 
     //! \brief Add a constraint by specifying the vector
-    void add_constraints(const QuadProgPP::Vector<double> vec)
+    void add_constraints(const vec& c)
     {
         const int m = CI.nrows();
         const int n = CI.ncols();
@@ -46,7 +46,7 @@ public:
                 if(u==n)
                 {
                     for(int v=0; v<m; ++v)
-                        CI[v][u] = vec[v];
+                        CI[v][u] = c[v];
                 }
                 else
                 {
@@ -63,12 +63,48 @@ public:
 
             // Recopy data
             for(int u=0; u<m; ++u)
-                CI[n][u] = vec[u];
+                CI[n][u] = c[u];
         }
     }
 
+	 //! \brief Provide the number of constraints
+	 int nb_constraints() const
+	 {
+        return CI.ncols();
+	 }
+    
+	 //! \brief Solves the quadratic program and update the p and 
+	 //! q vector if necessary.
+    inline bool solve_program(QuadProgPP::Vector<double>& x, double& delta, vec& p, vec& q)
+	 {
+		 bool solves_qp = solve_program(x, delta) ;
+
+		 if(solves_qp)
+		 {
+			 double norm = 0.0;
+			 for(int i=0; i<_np+_nq; ++i)
+			 {
+				 const double v = x[i];
+				 norm += v*v ;
+				 if(i < _np)
+				 {
+					 p[i] = v ;
+				 }
+				 else
+				 {
+					 q[i-_np] = v ;
+				 }
+			 }
+			 return norm > 0.0;
+		 }
+		 else
+		 {
+			 return false ;
+		 }
+	 }
+
     //! \brief Solves the quadratic program
-    bool solve_program(QuadProgPP::Vector<double>& v, double& delta)
+    inline bool solve_program(QuadProgPP::Vector<double>& v, double& delta)
     {        
         const int m = CI.nrows();
         const int n = CI.ncols();
@@ -118,27 +154,46 @@ public:
         return solves_qp;
     }
 
-    //! \brief Test all the constraints of the data
-    bool test_constraints(const rational_function* r, const vertical_segment* data)
-    {
-        int nb_failed = 0;
-        for(int n=0; n<data->size(); ++n)
-        {
-            vec x, yl, yu;
-            data->get(n, x, yl, yu);
+	 //! \brief Test all the constraints of the data
+	 bool test_constraints(const rational_function* r, const vertical_segment* data)
+	 {
+		 int nb_failed = 0;
+		 for(int n=0; n<data->size(); ++n)
+		 {
+			 vec x, yl, yu;
+			 data->get(n, x, yl, yu);
 
-            vec y = r->value(x);
-            if(y < yl || y > yu)
-            {
-                nb_failed++;
-            }
-        }
+			 vec y = r->value(x);
+			 if(y < yl || y > yu)
+			 {
+				 nb_failed++;
+			 }
+		 }
 
 #ifdef DEBUG
         std::cout << "<<TRACE>> " << nb_failed << " constraints where not satified." << std::endl;
 #endif
 
         return nb_failed == 0;
+    }
+    
+	 //! \brief Give the next position in the data that is not satisfied.
+	 //! This method works only for a single color channel ny !
+    static int next_unmatching_constraint(int i, int ny, const rational_function* r, 
+	                                       const vertical_segment* data)
+    {
+        for(int n=i; n<data->size(); ++n)
+        {
+            vec x, yl, yu;
+            data->get(n, x, yl, yu);
+
+            vec y = r->value(x);
+            if(y[ny] < yl[ny] || y[ny] > yu[ny])
+            {
+					return n;
+            }
+        }
+		  return data->size();
     }
 
 protected:

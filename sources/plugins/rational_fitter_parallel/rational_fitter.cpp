@@ -56,7 +56,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 
 	for(int i=_min_np; i<=_max_np; ++i)
 	{
-        std::cout << "<<INFO>> fit using np+nq = " << i << "\r" ;
+		std::cout << "<<INFO>> fit using np+nq = " << i << "\r" ;
 		std::cout.flush() ;
 		QTime time ;
 		time.start() ;
@@ -73,7 +73,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 			std::cerr << "<<ERROR>> not enough memory to perform the fit" << std::endl ;
 #ifdef DEBUG
 			std::cout << "<<DEBUG>> " << need_memory / (1024*1024) << "MB required / " 
-			          << avai_memory / (1024*1024) << "MB available" << std::endl;
+				<< avai_memory / (1024*1024) << "MB available" << std::endl;
 #endif
 			return false;
 		}
@@ -85,7 +85,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 		double min_delta = std::numeric_limits<double>::max();
 		int nb_sol_found = 0;
 		int np, nq ;
-        #pragma omp parallel for
+#pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
 			int temp_np = i - j;
@@ -97,7 +97,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 			bool is_fitted = fit_data(d, temp_np, temp_nq, r, p, q, delta);
 			if(is_fitted)
 			{
-				#pragma omp critical
+#pragma omp critical
 				{
 					++nb_sol_found ;
 					if(delta < min_delta)
@@ -114,7 +114,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 				}
 			}
 		}
-				
+
 		if(min_delta < std::numeric_limits<double>::max())
 		{
 			int msec = time.elapsed() ;
@@ -139,9 +139,11 @@ void rational_fitter_parallel::set_parameters(const arguments& args)
 	_min_np = args.get_float("min-np", _max_np) ;
 	_min_nq = args.get_float("min-nq", _max_nq) ;
 }
-		
 
-bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, rational_function* r, vec& P, vec& Q, double& delta) 
+
+bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, 
+                                        rational_function* r, 
+													 vec& P, vec& Q, double& delta) 
 {
 	for(int j=0; j<d->dimY(); ++j)
 	{
@@ -160,7 +162,9 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf, vec& p, vec& q, double& delta) 
+bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int nq, int ny, 
+                                        rational_function* rf, 
+													 vec& p, vec& q, double& delta) 
 {
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
@@ -170,101 +174,78 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 		return false ;
 	}
 
-    quadratic_program qp(np, nq);
-    for(int i=0; i<d->size(); ++i)
-    {
-        vec xi = d->get(i) ;
+	const int m = d->size(); // 2*m = number of constraints
+	const int n = np+nq;       // n = np+nq
 
-        // Create two vector of constraints
-        QuadProgPP::Vector<double> c1(np+nq), c2(np+nq);
-        for(int j=0; j<np+nq; ++j)
-        {
-            // Filling the p part
-            if(j<np)
-            {
-                const double pi = r->p(xi, j) ;
-                c1[j] =  pi ;
-                c2[j] = -pi ;
 
-            }
-            // Filling the q part
-            else
-            {
-                vec yl, yu ;
-                d->get(i, yl, yu) ;
-                const double qi = r->q(xi, j-np) ;
+	quadratic_program qp(np, nq);
 
-                c1[j] = -yl[ny] * qi ;
-                c2[j] = yu[ny] * qi ;
-            }
-        }
-
-        qp.add_constraints(c1);
-        qp.add_constraints(c2);
-    }
-
-    QuadProgPP::Vector<double> x(np+nq);
-    bool solves_qp = qp.solve_program(x, delta);
-
-	if(solves_qp)
+#ifndef TODO_PUT_IN_METHOD
+	for(int i=0; i<d->size()/2; ++i)
 	{
-		// Recopy the vector d
-		double norm = 0.0 ;
-		for(int i=0; i<np+nq; ++i)
+
+		// Create two vector of constraints
+		vec c1(n), c2(n);
+		get_constraint(2*i, np, nq, ny, d, r, c1, c2);
+
+		qp.add_constraints(c1);
+		qp.add_constraints(c2);
+	}
+#endif
+
+//	do
+	{
+
+		QuadProgPP::Vector<double> x(n);
+		bool solves_qp = qp.solve_program(x, delta, p, q);
+
+		if(solves_qp)
 		{
-			const double v = x[i];
-			norm += v*v ;
-			if(i < np)
-			{
-				p[i] = v ;
-			}
-			else
-			{
-				q[i-np] = v ;
-			}
+#ifdef DEBUG
+			std::cout << "<<INFO>> got solution " << *r << std::endl ;
+#endif
+			return true;
 		}
 
-#ifdef DEBUG
-		std::cout << "<<INFO>> got solution " << *r << std::endl ;
-#endif
-		return norm > 0.0;
-	}
-	else
+//		int current = 0;
+//		int next = quadratic_program::next_unmatching_constraint(current, ny, );
+	} 
+//	while(qp.nb_constraints() < 2*m);
 
-	{
-		return false; 
-	}
+	return false; 
 }
 
-void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, const vertical_segment* data, const rational_function* func, vec& cu, vec& cl)
+void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, 
+		                                        const vertical_segment* data, 
+															 const rational_function* func, 
+															 vec& cu, vec& cl)
 {
-    const vec xi = data->get(i) ;
-    cu.resize(np+nq);
-    cl.resize(np+nq);
+	const vec xi = data->get(i) ;
+	cu.resize(np+nq);
+	cl.resize(np+nq);
 
-    // Create two vector of constraints
-    for(int j=0; j<np+nq; ++j)
-    {
-        // Filling the p part
-        if(j<np)
-        {
-            const double pi = func->p(xi, j) ;
-            cu[j] =  pi ;
-            cl[j] = -pi ;
+	// Create two vector of constraints
+	for(int j=0; j<np+nq; ++j)
+	{
+		// Filling the p part
+		if(j<np)
+		{
+			const double pi = func->p(xi, j) ;
+			cu[j] =  pi ;
+			cl[j] = -pi ;
 
-        }
-        // Filling the q part
-        else
-        {
-            vec yl, yu ;
-            data->get(i, yl, yu) ;
-            const double qi = func->q(xi, j-np) ;
+		}
+		// Filling the q part
+		else
+		{
+			vec yl, yu ;
+			data->get(i, yl, yu) ;
+			const double qi = func->q(xi, j-np) ;
 
-            cl[j] = -yl[ny] * qi ;
-            cu[j] = yu[ny] * qi ;
-        }
-    }
-
+			cu[j] = -yu[ny] * qi ;
+			cl[j] =  yl[ny] * qi ;
+		}
+	}
 }
 
 Q_EXPORT_PLUGIN2(rational_fitter_parallel, rational_fitter_parallel)
