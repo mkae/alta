@@ -152,6 +152,21 @@ class vec : public std::vector<double>
 
 			return res;
 		}
+        friend bool operator<(const vec& a, const vec& b)
+        {
+            bool lessthan = true ;
+            for(int i=0; i<a.size(); ++i)
+                lessthan &= a[i] < b[i];
+            return lessthan;
+        }
+        friend bool operator>(const vec& a, const vec& b)
+        {
+            bool greatthan = true ;
+            for(int i=0; i<a.size(); ++i)
+                greatthan &= a[i] > b[i];
+            return greatthan;
+        }
+
 /*
 		friend double norm(const vec& a)
 		{

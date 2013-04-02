@@ -19,7 +19,7 @@ class vertical_segment : public data
 		virtual void load(const std::string& filename, const arguments& args) ;
 
 		// Acces to data
-		virtual bool get(int i, double& x, double& yl, double& yu) const ;
+        virtual void get(int i, vec &x, vec &yl, vec &yu) const ;
 		virtual vec get(int i) const ;		
 		virtual void get(int i, vec& yl, vec& yu) const ;		
 		virtual vec operator[](int i) const ;

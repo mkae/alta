@@ -7,6 +7,7 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 
 void vertical_segment::load(const std::string& filename) 
 {
@@ -143,18 +144,22 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	std::cout << "<<INFO>> " << _data.size() << " elements to fit" << std::endl ;
 }
 
-bool vertical_segment::get(int i, double& x, double& yl, double& yu) const
+void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
 {
-	if(i >= (int)_data.size())
-	{
-		return false ;
-	}
+#ifdef DEBUG
+    assert(i >= 0 && i < _data.size());
+#endif
+    x.resize(dimX()); yl.resize(dimY()) ; yu.resize(dimY()) ;
+    for(int j=0; j<dimX(); ++j)
+    {
+        x[j] = _data[i][j] ;
+    }
+    for(int j=0; j<dimY(); ++j)
+    {
+        yl[j] = _data[i][dimX() + dimY() + j] ;
+        yu[j] = _data[i][dimX() + 2*dimY() + j] ;
+    }
 
-	x  = _data[i][0] ;
-	yl = _data[i][1] ;
-	yu = _data[i][2] ;
-
-	return true ;
 }
 		
 void vertical_segment::get(int i, vec& yl, vec& yu) const

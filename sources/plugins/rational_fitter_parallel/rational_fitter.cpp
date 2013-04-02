@@ -85,7 +85,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 		double min_delta = std::numeric_limits<double>::max();
 		int nb_sol_found = 0;
 		int np, nq ;
-//		#pragma omp parallel for
+        #pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
 			int temp_np = i - j;
@@ -170,140 +170,6 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 		return false ;
 	}
 
-#ifdef OLD
-    // Matrices of the problem
-	QuadProgPP::Matrix<double> G (0.0, np+nq, np+nq) ;
-	QuadProgPP::Vector<double> g (0.0, np+nq) ;
-	QuadProgPP::Matrix<double> CI(0.0, np+nq, 2*d->size()) ;
-	QuadProgPP::Vector<double> ci(0.0, 2*d->size()) ;
-	QuadProgPP::Matrix<double> CE(0.0, np+nq, 0) ;
-	QuadProgPP::Vector<double> ce(0.0, 0) ;
-
-	Eigen::MatrixXd eCI(np+nq, 2*d->size()) ;
-
-	// Select the size of the result vector to
-	// be equal to the dimension of p + q
-	for(int i=0; i<np+nq; ++i)
-	{
-		G[i][i] = 1.0 ; 
-	}
-	
-	// Each constraint (fitting interval or point
-	// add another dimension to the constraint
-	// matrix
-	for(int i=0; i<d->size(); ++i)	
-	{		
-		// Norm of the row vector
-		double a0_norm = 0.0 ;
-		double a1_norm = 0.0 ;
-
-		vec xi = d->get(i) ;
-
-		// A row of the constraint matrix has this 
-		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
-		// For the lower constraint and negated for 
-		// the upper constraint
-		for(int j=0; j<np+nq; ++j)
-		{
-			// Filling the p part
-			if(j<np)
-			{
-				const double pi = r->p(xi, j) ;
-				a0_norm += pi*pi ;
-				a1_norm += pi*pi ;
-				CI[j][i] =  pi ;
-				CI[j][i+d->size()] = -pi ;
-
-				// Updating Eigen matrix
-				eCI(j,i) = pi ;
-				eCI(j,i+d->size()) = -pi ;
-			}
-			// Filling the q part
-			else
-			{
-				vec yl, yu ; 
-				d->get(i, yl, yu) ;
-
-				const double qi = r->q(xi, j-np) ;
-				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
-				CI[j][i] = -yl[ny] * qi ;
-				
-				a1_norm += qi*qi * (yu[ny]*yu[ny]) ;
-				CI[j][i+d->size()] = yu[ny] * qi ;
-				
-				// Updating Eigen matrix
-				eCI(j,i) = -yl[ny] * qi ;
-				eCI(j,i+d->size()) = yu[ny] * qi ;
-			}
-		}
-	
-		// Set the c vector, will later be updated using the
-		// delta parameter.
-		ci[i] = -sqrt(a0_norm) ;
-		ci[i+d->size()] = -sqrt(a1_norm) ;
-	}
-
-
-
-#ifndef DEBUG
-    std::cout << CI << std::endl ;
-#endif
-	// Update the ci column with the delta parameter
-	// (See Celis et al. 2007 p.12)
-	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(eCI);
-	const double sigma_m = svd.singularValues()(std::min(2*d->size(), np+nq)-1) ;
-	const double sigma_M = svd.singularValues()(0) ;
-
-#ifdef DEBUG
-	std::cout << "<<DEBUG>> SVD = [ " ;
-	for(int i=0; i<std::min(2*d->size(), np+nq); ++i)
-	{
-		std::cout << svd.singularValues()(i) << ", " ;
-	}
-	std::cout << " ]" << std::endl ;
-#endif
-	
-	delta = sigma_M / sigma_m ;
-	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
-	{
-#ifdef DEBUG
-		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
-#endif
-		return false ;
-	}
-	else if(delta == 0.0)
-	{
-		delta = 1.0 ;
-	}
-
-
-#ifdef DEBUG
-	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
-#endif
-	for(int i=0; i<2*d->size(); ++i)	
-	{		
-		ci[i] = ci[i] / delta ; 
-#ifdef DEBUG
-		std::cout << ci[i] << "\t" ;
-#endif
-	}
-#ifdef DEBUG
-	std::cout << std::endl << std::endl ;
-
-	std::cout << eCI << std::endl << std::endl ;
-#endif
-	// Compute the solution
-	QuadProgPP::Vector<double> x;
-	double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
-
-
-	bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
-	for(int i=0; i<np+nq; ++i)
-	{
-		const double v = x[i];
-		solves_qp = solves_qp && !std::isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
-	}
-#else
     quadratic_program qp(np, nq);
     for(int i=0; i<d->size(); ++i)
     {
@@ -339,7 +205,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 
     QuadProgPP::Vector<double> x(np+nq);
     bool solves_qp = qp.solve_program(x, delta);
-#endif
+
 	if(solves_qp)
 	{
 		// Recopy the vector d
@@ -358,7 +224,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 			}
 		}
 
-#ifndef DEBUG
+#ifdef DEBUG
 		std::cout << "<<INFO>> got solution " << *r << std::endl ;
 #endif
 		return norm > 0.0;
@@ -368,6 +234,37 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 	{
 		return false; 
 	}
+}
+
+void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, const vertical_segment* data, const rational_function* func, vec& cu, vec& cl)
+{
+    const vec xi = data->get(i) ;
+    cu.resize(np+nq);
+    cl.resize(np+nq);
+
+    // Create two vector of constraints
+    for(int j=0; j<np+nq; ++j)
+    {
+        // Filling the p part
+        if(j<np)
+        {
+            const double pi = func->p(xi, j) ;
+            cu[j] =  pi ;
+            cl[j] = -pi ;
+
+        }
+        // Filling the q part
+        else
+        {
+            vec yl, yu ;
+            data->get(i, yl, yu) ;
+            const double qi = func->q(xi, j-np) ;
+
+            cl[j] = -yl[ny] * qi ;
+            cu[j] = yu[ny] * qi ;
+        }
+    }
+
 }
 
 Q_EXPORT_PLUGIN2(rational_fitter_parallel, rational_fitter_parallel)

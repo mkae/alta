@@ -4,6 +4,9 @@
 #include <Array.hh>
 #include <QuadProg++.hh>
 
+#include <core/rational_function.h>
+#include <core/vertical_segment.h>
+
 class quadratic_program
 {
 public:
@@ -113,6 +116,29 @@ public:
 
         bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
         return solves_qp;
+    }
+
+    //! \brief Test all the constraints of the data
+    bool test_constraints(const rational_function* r, const vertical_segment* data)
+    {
+        int nb_failed = 0;
+        for(int n=0; n<data->size(); ++n)
+        {
+            vec x, yl, yu;
+            data->get(n, x, yl, yu);
+
+            vec y = r->value(x);
+            if(y < yl || y > yu)
+            {
+                nb_failed++;
+            }
+        }
+
+#ifdef DEBUG
+        std::cout << "<<TRACE>> " << nb_failed << " constraints where not satified." << std::endl;
+#endif
+
+        return nb_failed == 0;
     }
 
 protected:
