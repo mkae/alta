@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 
+
 rational_function::rational_function() : a(), b()
 {
 }

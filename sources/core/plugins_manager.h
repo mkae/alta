@@ -25,13 +25,13 @@ class plugins_manager
 
 		//! \brief Get instances of the function, the data and the fitter. Select 
 		//! the first in the map,
-		function* get_function() const ;
+        static function* get_function() ;
 		data*     get_data()     const ;
 		fitter*   get_fitter()   const ;
 		
 		//! \brief Get instances of the function, the data and the fitter, select one 
 		//! based on the name. Return null if no one exist.
-		function* get_function(const std::string& n) const ;
+        static function* get_function(const std::string& n) ;
 		data*     get_data(const std::string& n)     const ;
 		fitter*   get_fitter(const std::string& n)   const ;
 

@@ -85,7 +85,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 		double min_delta = std::numeric_limits<double>::max();
 		int nb_sol_found = 0;
 		int np, nq ;
-#pragma omp parallel for
+
+        #pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
 			int temp_np = i - j;
@@ -97,7 +98,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
 			bool is_fitted = fit_data(d, temp_np, temp_nq, r, p, q, delta);
 			if(is_fitted)
 			{
-#pragma omp critical
+                #pragma omp critical
 				{
 					++nb_sol_found ;
 					if(delta < min_delta)
@@ -164,7 +165,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // the function return a ration BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int nq, int ny, 
                                         rational_function* rf, 
-													 vec& p, vec& q, double& delta) 
+                                        vec& p, vec& q, double& delta)
 {
 	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
@@ -175,25 +176,25 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 	}
 
 	const int m = d->size(); // 2*m = number of constraints
-	const int n = np+nq;       // n = np+nq
+    const int n = np+nq;     // n = np+nq
 
 
 	quadratic_program qp(np, nq);
 
 #ifndef TODO_PUT_IN_METHOD
-	for(int i=0; i<d->size()/2; ++i)
+    for(int i=0; i<d->size()/10; ++i)
 	{
 
 		// Create two vector of constraints
 		vec c1(n), c2(n);
-		get_constraint(2*i, np, nq, ny, d, r, c1, c2);
+        get_constraint(10*i, np, nq, ny, d, r, c1, c2);
 
 		qp.add_constraints(c1);
 		qp.add_constraints(c2);
 	}
 #endif
 
-//	do
+    do
 	{
 
 		QuadProgPP::Vector<double> x(n);
@@ -206,11 +207,26 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
 #endif
 			return true;
 		}
+/*
+        int current = 0, i=0;
+        while(i < 100 && current < m)
+        {
 
-//		int current = 0;
-//		int next = quadratic_program::next_unmatching_constraint(current, ny, );
+            int next = quadratic_program::next_unmatching_constraint(current, ny, );
+
+            // Create two vector of constraints
+            vec c1(n), c2(n);
+            get_constraint(next, np, nq, ny, d, r, c1, c2);
+
+            qp.add_constraints(c1);
+            qp.add_constraints(c2);
+
+            ++i;
+            current = next;
+        }
+*/
 	} 
-//	while(qp.nb_constraints() < 2*m);
+    while(qp.nb_constraints() < 2*m);
 
 	return false; 
 }
