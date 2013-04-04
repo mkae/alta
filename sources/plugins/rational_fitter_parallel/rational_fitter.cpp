@@ -35,7 +35,7 @@ rational_fitter_parallel::~rational_fitter_parallel()
 {
 }
 
-bool rational_fitter_parallel::fit_data(const data* dat, function* fit)
+bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;

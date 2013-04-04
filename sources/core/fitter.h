@@ -15,19 +15,19 @@ class fitter
 {
 	public:
 		
-		// Static function to fit a data set d with the
-		// underling function class. Return the best
-		// fit (along with fitting information ?)
-		//
-		virtual bool fit_data(const data* d, function* f) = 0 ;
+        //! \brief static function to fit a data set d with the underling
+        //! function class. Return the best fit (along with fitting
+        //! information ?)
+        virtual bool fit_data(const data* d, function* f, const arguments& args) = 0 ;
 
 
 		virtual void set_parameters(const arguments& args) = 0 ;
-
+/*
 		// Provide a function class and a data class
 		//
 		virtual data*     provide_data()     const = 0 ;
 		virtual function* provide_function() const = 0 ;
+*/
 } ;
 
 Q_DECLARE_INTERFACE(fitter, "Fitter.Fitter") 
