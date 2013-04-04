@@ -185,31 +185,22 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int nq, int ny, 
-                                        rational_function* rf, 
+bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
+                                        rational_function* r,
                                         vec& p, vec& q, double& delta)
 {
-	rational_function* r = dynamic_cast<rational_function*>(rf) ;
-	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
-	if(r == NULL || d == NULL)
-	{
-		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
-		return false ;
-	}
-
 	const int m = d->size(); // 2*m = number of constraints
     const int n = np+nq;     // n = np+nq
 
-
-	quadratic_program qp(np, nq);
+    quadratic_program qp(np, nq);
 
 #ifndef TODO_PUT_IN_METHOD
-    for(int i=0; i<d->size(); ++i)
+    for(int i=0; i<d->size()/10; ++i)
 	{
 
 		// Create two vector of constraints
 		vec c1(n), c2(n);
-        get_constraint(i, np, nq, ny, d, r, c1, c2);
+        get_constraint(10*i, np, nq, ny, d, r, c1, c2);
 
 		qp.add_constraints(c1);
 		qp.add_constraints(c2);
@@ -244,7 +235,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* dat, int np, int
                 current = next;
             }
 */
-			return true;
+            return qp.test_constraints(r, d);
 		}
         else
         {
