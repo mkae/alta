@@ -5,12 +5,14 @@
 #include <cassert>
 #include <cmath>
 
-/*! \brief A core implementation of a vector of double. 
+/*! \brief A core implementation of a vector of double.
+ *  \ingroup core
+ *  \internal
  *
- * \details
- * This type is used for any transmission of vector data with unfixed 
- * dimension. It allows to have a generic fitter working for 
- * n-Dimensional data.
+ *  \details
+ *  This type is used for any transmission of vector data with unfixed
+ *  dimension. It allows to have a generic fitter working for
+ *  n-Dimensional data.
  */
 class vec : public std::vector<double>
 {
@@ -23,13 +25,21 @@ class vec : public std::vector<double>
 		vec(int dim) : std::vector<double>(dim)
 		{
 		assign(dim, 0.0) ;
-		} ;
+        }
 		virtual ~vec() 
 		{
-		} ;
+        }
 		
 		// Mathematical operators
 		//
+        vec operator=(const vec& a)
+        {
+            for(unsigned int i=0; i<this->size(); ++i)
+            {
+                this->at(i) = a[i];
+            }
+            return *this ;
+        }
 		friend vec operator-(const vec& a)
 		{
 			vec b(a.size()) ;

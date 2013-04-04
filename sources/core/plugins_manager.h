@@ -32,7 +32,7 @@ class plugins_manager
 		//! \brief Get instances of the function, the data and the fitter, select one 
 		//! based on the name. Return null if no one exist.
         static function* get_function(const std::string& n) ;
-		data*     get_data(const std::string& n)     const ;
+        static data*     get_data(const std::string& n) ;
 		fitter*   get_fitter(const std::string& n)   const ;
 
 		//! \brief Provide a measure of how much memory there is on the system.

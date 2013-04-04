@@ -72,7 +72,7 @@ public:
 	 {
         return CI.ncols();
 	 }
-    
+
 	 //! \brief Solves the quadratic program and update the p and 
 	 //! q vector if necessary.
     inline bool solve_program(QuadProgPP::Vector<double>& x, double& delta, vec& p, vec& q)

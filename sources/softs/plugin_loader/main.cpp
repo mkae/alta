@@ -44,22 +44,13 @@ int main(int argc, char** argv)
 //	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fit->set_parameters(args) ;
-		function* f = NULL;
-		if(args.is_defined("func"))
-		{
-			std::cout << "<<INFO>> Using plugin function \"" << args["func"] << "\"" << std::endl ;
-			f = manager.get_function(args["func"]) ;
-		}
-		else
-		{
-			f = fit->provide_function() ;
-		}
-		data*     d = fit->provide_data() ;
+        function* f = plugins_manager::get_function(args["func"]);
+        data*     d = plugins_manager::get_data(args["data"]);
 		d->load(args["input"], args);
 
 		QTime time ;
 		time.start() ;
-		bool is_fitted = fit->fit_data(d, f) ;
+        bool is_fitted = fit->fit_data(d, f, args) ;
 		int msec = time.elapsed() ;
 		int sec  = (msec / 1000) % 60 ;
 		int min  = (msec / 60000) % 60 ;

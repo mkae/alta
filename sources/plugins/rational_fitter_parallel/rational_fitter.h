@@ -53,9 +53,5 @@ class rational_fitter_parallel : public QObject, public fitter
         //! \brief Create a constraint vector given its index i in the data
         // object and the rational function object to fit.
         virtual void get_constraint(int i, int np, int nq, int ny, const vertical_segment* data, const rational_function* func, vec& cu, vec& cl);
-
-		// min and Max usable np and nq values for the fitting
-		int _max_np, _max_nq ;
-		int _min_np, _min_nq ;
 } ;
 

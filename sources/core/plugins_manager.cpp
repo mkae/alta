@@ -144,6 +144,14 @@ fitter* plugins_manager::get_fitter()   const
 //
 function* plugins_manager::get_function(const std::string& n)
 {
+    if(n.empty())
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
+#endif
+        return new rational_function();
+    }
+
 #ifdef USING_STATIC
     FunctionPrototype myFunction = (FunctionPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_functionv");
 
@@ -171,22 +179,42 @@ function* plugins_manager::get_function(const std::string& n)
 	}
 #endif
 }
-data* plugins_manager::get_data(const std::string& n)     const 
+data* plugins_manager::get_data(const std::string& n)
 {
-	if(_datas.count(n) == 0)
-	{
+    if(n.empty())
+    {
 #ifdef DEBUG
-		std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
+        std::cout << "<<DEBUG>> no data plugin specified, returning a vertial_segment loader" << std::endl;
 #endif
-		return new vertical_segment() ;
-	}
-	else
-	{
+        return new vertical_segment();
+    }
+
+#ifdef USING_STATIC
+    DataPrototype myData = (DataPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_datav");
+
+    if(myData != NULL)
+    {
 #ifdef DEBUG
-		std::cout << "<<DEBUG>>  using \"" << n << "\" data loader" << std::endl ;
+        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
 #endif
-		return _datas.find(n)->second ;
-	}
+        return myData();
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
+        return new vertical_segment() ;
+    }
+#else
+
+    if(_functions.count(n) == 0)
+    {
+        return new vertical_segment() ;
+    }
+    else
+    {
+        return _datas.find(n)->second ;
+    }
+#endif
 }
 fitter* plugins_manager::get_fitter(const std::string& n)   const 
 {

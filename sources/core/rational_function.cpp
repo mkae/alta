@@ -13,6 +13,10 @@ rational_function::rational_function() : a(), b()
 {
 }
 
+rational_function::rational_function(int np, int nq) : a(np), b(nq)
+{
+}
+
 rational_function::rational_function(const std::vector<double>& a,
                          const std::vector<double>& b) :
 	a(a), b(b)
