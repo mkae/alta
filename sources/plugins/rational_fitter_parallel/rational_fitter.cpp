@@ -52,13 +52,14 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
 
-    const int _min_np = args.get_int("min-np", 10);
-    const int _max_np = args.get_int("np", _min_np);
+	const int _min_np = args.get_int("min-np", 10);
+	const int _max_np = args.get_int("np", _min_np);
 	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
+
 
 	for(int i=_min_np; i<=_max_np; ++i)
 	{
-		std::cout << "<<INFO>> fit using np+nq = " << i << "\r" ;
+		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
 		std::cout.flush() ;
 		QTime time ;
 		time.start() ;
@@ -82,31 +83,32 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
 #endif
+
 		omp_set_num_threads(nb_cores) ;
-        std::vector<rational_function*> rs;
-        for(int j=0; j<nb_cores; ++j)
-        {
-            rational_function* rj = dynamic_cast<rational_function*>(plugins_manager::get_function(args["func"]));
+		std::vector<rational_function*> rs;
+		for(int j=0; j<nb_cores; ++j)
+		{
+			rational_function* rj = dynamic_cast<rational_function*>(plugins_manager::get_function(args["func"]));
 
-            rj->setDimX(d->dimX()) ;
-            rj->setDimY(d->dimY()) ;
-            rj->setMin(d->min()) ;
-            rj->setMax(d->max()) ;
+			rj->setDimX(d->dimX()) ;
+			rj->setDimY(1) ;
+			rj->setMin(d->min()) ;
+			rj->setMax(d->max()) ;
 
-            if(rj == NULL)
-            {
-                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
-                return false;
-            }
-            rs.push_back(rj);
-        }
+			if(rj == NULL)
+			{
+				std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
+				return false;
+			}
+			rs.push_back(rj);
+		}
 
 
 		double min_delta = std::numeric_limits<double>::max();
 		int nb_sol_found = 0;
 		int np, nq ;
 
-        #pragma omp parallel for
+		//        #pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
 			int temp_np = i - j;
@@ -115,10 +117,10 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
 
 			double delta;
-            bool is_fitted = fit_data(d, temp_np, temp_nq, rs[omp_get_thread_num()], p, q, delta);
+			bool is_fitted = fit_data(d, temp_np, temp_nq, rs[omp_get_thread_num()], p, q, delta);
 			if(is_fitted)
 			{
-                #pragma omp critical
+#pragma omp critical
 				{
 					++nb_sol_found ;
 					if(delta < min_delta)
@@ -136,11 +138,11 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			}
 		}
 
-        // Clean memory
-        for(int j=0; j<nb_cores; ++j)
-        {
-            delete rs[j];
-        }
+		// Clean memory
+		for(int j=0; j<nb_cores; ++j)
+		{
+			delete rs[j];
+		}
 
 		if(min_delta < std::numeric_limits<double>::max())
 		{
@@ -165,8 +167,8 @@ void rational_fitter_parallel::set_parameters(const arguments& args)
 
 
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, 
-                                        rational_function* r, 
-													 vec& P, vec& Q, double& delta) 
+		rational_function* r, 
+		vec& P, vec& Q, double& delta)
 {
 	for(int j=0; j<d->dimY(); ++j)
 	{
@@ -186,71 +188,81 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
-                                        rational_function* r,
-                                        vec& p, vec& q, double& delta)
+		rational_function* r,
+		vec& p, vec& q, double& delta)
 {
 	const int m = d->size(); // 2*m = number of constraints
-    const int n = np+nq;     // n = np+nq
+	const int n = np+nq;     // n = np+nq
 
-    quadratic_program qp(np, nq);
+	quadratic_program qp(np, nq);
 
 #ifndef TODO_PUT_IN_METHOD
-    for(int i=0; i<d->size()/10; ++i)
+	for(int i=0; i<d->size()/100; ++i)
 	{
 
 		// Create two vector of constraints
 		vec c1(n), c2(n);
-        get_constraint(10*i, np, nq, ny, d, r, c1, c2);
+		get_constraint(100*i, np, nq, ny, d, r, c1, c2);
 
 		qp.add_constraints(c1);
 		qp.add_constraints(c2);
 	}
 #endif
 
-    while(true)
+	while(qp.nb_constraints() < 2*m)
 	{
+#ifdef DEBUG
+		std::cout << "<<DEBUG>> number of constraints = " << qp.nb_constraints() << std::endl ;
+#endif
 		QuadProgPP::Vector<double> x(n);
 		bool solves_qp = qp.solve_program(x, delta, p, q);
+		r->update(p, q);
 
 		if(solves_qp)
 		{
+			if(qp.test_constraints(ny, r, d))
+			{
 #ifdef DEBUG
-			std::cout << "<<INFO>> got solution " << *r << std::endl ;
+				std::cout << "<<INFO>> got solution " << *r << std::endl ;
 #endif
-/*
-            int current = 0, i=0;
-            while(i < 100 && current < m)
-            {
+				/*
+					int current = 0, i=0;
+					while(i < 100 && current < m)
+					{
 
-                int next = quadratic_program::next_unmatching_constraint(current, ny, );
+					int next = quadratic_program::next_unmatching_constraint(current, ny, );
 
-                // Create two vector of constraints
-                vec c1(n), c2(n);
-                get_constraint(next, np, nq, ny, d, r, c1, c2);
+				// Create two vector of constraints
+				vec c1(n), c2(n);
+				get_constraint(next, np, nq, ny, d, r, c1, c2);
 
-                qp.add_constraints(c1);
-                qp.add_constraints(c2);
+				qp.add_constraints(c1);
+				qp.add_constraints(c2);
 
-                ++i;
-                current = next;
-            }
-*/
-            return qp.test_constraints(r, d);
+				++i;
+				current = next;
+				}
+				*/
+				return true;
+			}
 		}
-        else
-        {
-            return false;
-        }
-	} 
+		else if(!solves_qp)
+		{
+#ifdef DEBUG
+			std::cout << "<<DEBUG>> not enough coefficients" << std::endl;
+#endif
+			return false;
+		}
+	}
 
-    std::cerr << "<<ERROR>> should not atteign this part of the code" << __FILE__ << ":" << __LINE__ << std::endl;
-    return false;
+
+	return false;
 }
 
 void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, 
-		                                        const vertical_segment* data, 
-															 const rational_function* func, 
-															 vec& cu, vec& cl)
+		const vertical_segment* data,
+		const rational_function* func,
+		vec& cu, vec& cl)
 {
 	const vec xi = data->get(i) ;
 	cu.resize(np+nq);
