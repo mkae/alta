@@ -72,4 +72,3 @@ class rational_function : public QObject, public function
 		std::vector<double> a ;
 		std::vector<double> b ;
 } ;
-
