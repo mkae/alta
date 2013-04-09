@@ -333,6 +333,11 @@ int data_merl::dimY() const
 	return 3 ; 
 }
 
+data* provide_data()
+{
+    return new data_merl();
+}
+
 
 Q_EXPORT_PLUGIN2(data_merl, data_merl)
 

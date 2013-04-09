@@ -218,6 +218,30 @@ data* plugins_manager::get_data(const std::string& n)
 }
 fitter* plugins_manager::get_fitter(const std::string& n)   const 
 {
+    if(n.empty())
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> no fitter plugin specified, returning null" << std::endl;
+#endif
+        return NULL;
+    }
+
+#ifndef USING_STATIC
+    FitterPrototype myFitter = (FitterPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_fitter");
+
+    if(myFitter != NULL)
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
+#endif
+        return myFitter();
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
+        return new NULL() ;
+    }
+#else
 	if(_fitters.count(n) == 0)
 	{
 		return NULL ;
@@ -229,6 +253,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
 #endif
 		return _fitters.find(n)->second ;
 	}
+#endif
 }
 		
 // \todo implement the Darwin (MACOS) version.

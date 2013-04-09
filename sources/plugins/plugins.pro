@@ -11,5 +11,6 @@ SUBDIRS  = \
            rational_fitter_matlab        \
            rational_fitter_dca           \
 			  nonlinear_levenberg_eigen     \
+			  nonlinear_function_phong      \
 			  data_merl
 
