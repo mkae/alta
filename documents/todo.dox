@@ -3,4 +3,6 @@
 
 \todo Change the automatic compilation soft to Cmake of scons
 
+\todo Load data file in binary format.
+
 */

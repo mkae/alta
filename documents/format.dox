@@ -3,6 +3,27 @@
 
 \todo Describe here the file format
 
+
+<h2>Input file format</h2>
+
+<h3>Parametrization</h3>
+
+Param toujours de la forme NOMDUTYPE_PARAM1_PARAM2_..._PARAMN ou N est le nombre
+de dimensions d'entree.
+
+\verbatim
+enum{
+	ROMEIRO_TH_TD,
+	RUSIN_TH_PH_TD,
+	RUSIN_TH_TD_PD,
+	RUSIN_TH_PH_TD_PD,
+	COS_TH_TD, // cosine theta_h, cosine theta_d
+	ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
+	CARTESIAN, // 6D (directions: 3d + 3d)
+	SPHERICAL_TL_PL_TV_PV
+}
+\endverbatim
+
 <h2>Rational function file format (.rational)</h2>
 
 We advise to output all rational function into .rational file for consistency.
@@ -30,4 +51,5 @@ Example of a .rational file:
 \endverbatim
 
 \todo Right now the different color channels have the same length !
+
 */
