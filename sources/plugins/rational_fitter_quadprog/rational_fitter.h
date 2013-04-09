@@ -28,7 +28,7 @@ class rational_fitter_quadprog : public QObject, public fitter
 
 		// Fitting a data object
 		//
-		virtual bool fit_data(const data* d, function* fit) ;
+        virtual bool fit_data(const data* d, function* fit, const arguments& args) ;
 
 		// Provide user parameters to the fitter
 		//

@@ -11,7 +11,8 @@ HEADERS  = args.h               \
 	 		  function.h           \
  			  plugins_manager.h    \
 			  vertical_segment.h   \
-			  rational_function.h
+			  rational_function.h  \
+			  params.h
 
 SOURCES  = plugins_manager.cpp  \
            vertical_segment.cpp \

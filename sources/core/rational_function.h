@@ -20,6 +20,7 @@ class rational_function : public QObject, public function
 	public: // methods
 
 		rational_function() ;
+        rational_function(int np, int nq) ;
 		rational_function(const std::vector<double>& a, const std::vector<double>& b) ;
 		virtual ~rational_function() ;
 
@@ -72,4 +73,3 @@ class rational_function : public QObject, public function
 		std::vector<double> a ;
 		std::vector<double> b ;
 } ;
-

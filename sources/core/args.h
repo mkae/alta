@@ -9,6 +9,8 @@
 
 /*! \brief A useful class for storing the high-level arguments of a program
  *  or a function.
+ *  \ingroup core
+ *  \internal
  *
  *  The set of parameters are parsed from the command line using the 
  *  constructor. They are stored as std::string in a std::map.
@@ -75,7 +77,7 @@ class arguments
 			}
 			else
 			{
-				std::cerr << "Underfined request to key : \"" << key << "\"" << std::endl ;
+                //std::cerr << "Underfined request to key : \"" << key << "\"" << std::endl ;
 				return std::string() ;
 			}
 		} ;
