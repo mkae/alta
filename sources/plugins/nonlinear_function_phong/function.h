@@ -19,6 +19,7 @@
  *
  *  \details
  *  A phong lobe is defined as \f$k_d + k_s |R.H|^N\f$
+ *  \todo Finish implementation
  */
 class phong_function : public nonlinear_function, public QObject
 {

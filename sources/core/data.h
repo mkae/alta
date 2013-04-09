@@ -37,6 +37,11 @@ class data
 
         virtual int dimX() const { return _nX ; }
         virtual int dimY() const { return _nY ; }
+
+        virtual params::type parametrization() const
+        {
+            return params::UNKNOWN;
+        }
 	
 	protected:
 		// Dimension of the function
@@ -50,6 +55,7 @@ Q_DECLARE_INTERFACE(data, "Fitter.Data")
  *
  *  \ingroup core
  *  \internal
+ *  \todo Finish this class
  */
 class data_params : public data
 {

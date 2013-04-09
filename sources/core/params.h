@@ -1,7 +1,5 @@
 #pragma once
 
-#include "data.h"
-
 /*! \brief a static class allowing to change from one parametrization
  *  to another.
  *  \ingroup core
