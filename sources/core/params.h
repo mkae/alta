@@ -31,6 +31,9 @@ class params
     public: // methods
 
         //! \brief static function for input type convertion.
+        //! \todo implement the convertion method using a case on the
+        //! out type. It should work if the input vector is converted
+        //! to a 6D vector (in, out).
         static vec convert(const vec& invec, params::type intype, params::type outtype)
         {
             return invec;
