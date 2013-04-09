@@ -56,7 +56,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				_min.resize(dimX()) ;
 				_max.resize(dimX()) ;
-	
+				
 				min = args.get_vec("min", _nX, -std::numeric_limits<double>::max()) ;
 				max = args.get_vec("max", _nX,  std::numeric_limits<double>::max()) ;
 
@@ -79,8 +79,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			continue ;
 		}
 
-		vec v ;
-		v.resize(dimX() + 3*dimY()) ;
+		vec v(dimX() + 3*dimY()) ;
 		for(int i=0; i<dimX(); ++i)
 			linestream >> v[i] ;
 

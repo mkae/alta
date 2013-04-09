@@ -59,7 +59,7 @@ nonlinear_fitter_eigen::~nonlinear_fitter_eigen()
 {
 }
 
-bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit)
+bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const arguments &args)
 {
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem

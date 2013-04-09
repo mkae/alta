@@ -8,7 +8,12 @@
 #include <algorithm>
 #include <cmath>
 
+
 rational_function::rational_function() : a(), b()
+{
+}
+
+rational_function::rational_function(int np, int nq) : a(np), b(nq)
 {
 }
 

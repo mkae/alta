@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QPluginLoader>
 #include <QtPlugin>
+#include <QLibrary>
 #include <QDir>
 
 // Create the object, parse the argument and load
@@ -78,12 +79,22 @@ plugins_manager::plugins_manager(const arguments& args)
 	}
 }
 
+#define USING_STATIC
+#ifdef USING_STATIC
+typedef function* (*FunctionPrototype)();
+typedef fitter*   (*FitterPrototype)();
+typedef data*     (*DataPrototype)();
+#endif
+
 // Get instances of the function, the data and the
 // fitter
 //
-function* plugins_manager::get_function() const 
+function* plugins_manager::get_function()
 {
-	if(_functions.empty())
+#ifdef USING_STATIC
+    return new rational_function() ;
+#else
+    if(_functions.empty())
 	{
 		return new rational_function() ;
 	}
@@ -91,17 +102,23 @@ function* plugins_manager::get_function() const
 	{
 		return _functions.begin()->second ;
 	}
+#endif
+
 }
 data* plugins_manager::get_data()     const 
 {
 	//if(_datas.empty())
 	{
-		std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
+#ifdef DEBUG
+        std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
+#endif
 		return new vertical_segment() ;
 	}/*
 	else
 	{
+#ifdef DEBUG
 		std::cout << "<<DEBUG>>  using \"" << _datas.begin()->first << "\" data loader" << std::endl ;
+#endif
 		return _datas.begin()->second ;
 	}*/
 }
@@ -113,17 +130,45 @@ fitter* plugins_manager::get_fitter()   const
 	}
 	else
 	{
+#ifdef DEBUG
 		std::cout << "<<DEBUG>>  using \"" <<  _fitters.begin()->first << "\"" << std::endl ;
+#endif
 		return _fitters.begin()->second ;
 	}
 }
+
 
 // Get instances of the function, the data and the
 // fitter, select one based on the name. Return null
 // if no one exist.
 //
-function* plugins_manager::get_function(const std::string& n) const 
+function* plugins_manager::get_function(const std::string& n)
 {
+    if(n.empty())
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
+#endif
+        return new rational_function();
+    }
+
+#ifdef USING_STATIC
+    FunctionPrototype myFunction = (FunctionPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_functionv");
+
+    if(myFunction != NULL)
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
+#endif
+        return myFunction();
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> no function provider found in file \"" << n << "\"" << std::endl;
+        return new rational_function() ;
+    }
+#else
+
 	if(_functions.count(n) == 0)
 	{
 		return new rational_function() ;
@@ -132,19 +177,44 @@ function* plugins_manager::get_function(const std::string& n) const
 	{
 		return _functions.find(n)->second ;
 	}
+#endif
 }
-data* plugins_manager::get_data(const std::string& n)     const 
+data* plugins_manager::get_data(const std::string& n)
 {
-	if(_datas.count(n) == 0)
-	{
-		std::cout << "<<DEBUG>>  using vertical segment data loader" << std::endl ;
-		return new vertical_segment() ;
-	}
-	else
-	{
-		std::cout << "<<DEBUG>>  using \"" << n << "\" data loader" << std::endl ;
-		return _datas.find(n)->second ;
-	}
+    if(n.empty())
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> no data plugin specified, returning a vertial_segment loader" << std::endl;
+#endif
+        return new vertical_segment();
+    }
+
+#ifdef USING_STATIC
+    DataPrototype myData = (DataPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_datav");
+
+    if(myData != NULL)
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
+#endif
+        return myData();
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
+        return new vertical_segment() ;
+    }
+#else
+
+    if(_functions.count(n) == 0)
+    {
+        return new vertical_segment() ;
+    }
+    else
+    {
+        return _datas.find(n)->second ;
+    }
+#endif
 }
 fitter* plugins_manager::get_fitter(const std::string& n)   const 
 {
@@ -154,7 +224,9 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
 	}
 	else
 	{
+#ifdef DEBUG
 		std::cout << "<<DEBUG>>  using \"" <<  n << "\"" << std::endl ;
+#endif
 		return _fitters.find(n)->second ;
 	}
 }

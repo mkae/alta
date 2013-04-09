@@ -7,6 +7,11 @@
 #include <algorithm>
 #include <cmath>
 
+function* provide_function()
+{
+    return new rational_function_chebychev();
+}
+
 rational_function_chebychev::rational_function_chebychev() : rational_function() 
 {
 }

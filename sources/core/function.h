@@ -49,12 +49,16 @@ class function
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min) 
 		{
+#ifdef DEBUG
 			assert(min.size() == _nX) ;
+#endif
 		  	_min = min ; 
 		}
 		virtual void setMax(const vec& max) 
 		{
+#ifdef DEBUG
 			assert(max.size() == _nX) ;
+#endif
 			_max = max ; 
 		}
 		virtual vec getMin() const { return _min ; }

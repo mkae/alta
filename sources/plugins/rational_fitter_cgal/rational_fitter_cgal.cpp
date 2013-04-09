@@ -38,7 +38,7 @@ rational_fitter_cgal::~rational_fitter_cgal()
 {
 }
 
-bool rational_fitter_cgal::fit_data(const data* dat, function* fit)
+bool rational_fitter_cgal::fit_data(const data* dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;

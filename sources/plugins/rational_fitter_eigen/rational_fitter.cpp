@@ -29,7 +29,7 @@ rational_fitter_eigen::~rational_fitter_eigen()
 {
 }
 
-bool rational_fitter_eigen::fit_data(const data* dat, function* fit)
+bool rational_fitter_eigen::fit_data(const data* dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
