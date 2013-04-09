@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "args.h"
+#include "params.h"
 
 class data ;
 
@@ -64,6 +65,7 @@ class function
 		virtual vec getMin() const { return _min ; }
 		virtual vec getMax() const { return _max ; }
 
+        virtual params::type parametrization() const { return params::UNKNOWN; }
 
 	protected: //data
 
