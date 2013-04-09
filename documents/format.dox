@@ -6,7 +6,18 @@
 
 <h2>Input file format</h2>
 
-<h3>Parametrization</h3>
+
+<h3> Parametrization format </h3>
+
+ New Tokens
+
+<ul>
+ <li> \verbatim #PARAM_IN   input_parametrization_name  \endverbatim </li>
+ <li> \verbatim #PARAM_OUT  output_parametrization_name \endverbatim </li>
+</ul>
+ 
+ 
+<h3>Input Parametrization</h3>
 
 Param toujours de la forme NOMDUTYPE_PARAM1_PARAM2_..._PARAMN ou N est le nombre
 de dimensions d'entree.
@@ -21,8 +32,20 @@ enum{
 	ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
 	CARTESIAN, // 6D (directions: 3d + 3d)
 	SPHERICAL_TL_PL_TV_PV
+	 INCIDENT_PLANT,  // Cf. CEA definition
 }
 \endverbatim
+
+<h3> Output Parametrization </h3>
+
+ Romain's Proposition  
+ RGB_COLOR
+ XYZ_COLOR
+ INV_STERADIAN
+ ENERGY   ( as specified by the International Unit System i.e., Joule)
+ LUMINANCE
+
+
 
 <h2>Rational function file format (.rational)</h2>
 
