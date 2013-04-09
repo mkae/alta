@@ -3,6 +3,13 @@
 
 \todo Change the automatic compilation soft to Cmake of scons
 
-\todo Load data file in binary format.
+\todo Load data file in binary format. 
+
+\todo Specify filename extensions (.txt for text file and .bin for binary ? ) for alta input data file.
+
+\todo Code/Develop brdf2alta:  a simple command line tool that reads BRDF files and exports them in ALTA format. 
+      Possible options are the file format, the parametrizations, the precision (double, float , long double),
+      specifications of the angles (in radiance or degrees)
+
 
 */
