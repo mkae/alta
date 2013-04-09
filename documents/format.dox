@@ -32,6 +32,7 @@ enum{
 	ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
 	CARTESIAN, // 6D (directions: 3d + 3d)
 	SPHERICAL_TL_PL_TV_PV
+	 INCIDENT_PLANT,  // Cf. CEA definition
 }
 \endverbatim
 
