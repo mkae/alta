@@ -12,6 +12,8 @@
  Quadratic Programming problem by means of an active-set dual method.
  Copyright (C) 2007-2009 Luca Di Gaspero.
  Copyright (C) 2009 Eric Moyer.  
+ Modification to use Eigen library for matricial operations by Gael
+ Guennebaud.
  
  QuadProg++ is free software: you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
