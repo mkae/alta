@@ -64,8 +64,7 @@ public:
     //! has a parametrization, and a new parametrization.
     data_params(const data* d, params::type param) : _d(d), _param(param)
     {
-        _nX = d->dimX(); //! \todo the parametrization can change the size
-                         //! of the input domain.
+        _nX = params::dimension(param);
         _nY = d->dimY();
     }
 
@@ -86,8 +85,10 @@ public:
     virtual vec get(int i) const
     {
         vec res(_nX + _nY);
+        vec in = _d->get(i);
 
-        params::convert(&_d->get(i)[0], _d->parametrization(), _param, &res[0]);
+        params::convert(&in[0], _d->parametrization(), _param, &res[0]);
+        memcpy(&res[_nX], &in[_d->dimX()], _nY*sizeof(double));
 
         return res;
     }
