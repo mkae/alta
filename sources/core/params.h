@@ -79,11 +79,36 @@ class params
                     half[1] = sin(invec[0])*sin(invec[1]);
                     half[2] = cos(invec[0]);
 
+                    outvec[0] = sin(invec[2]);
+                    outvec[1] = 0;
+                    outvec[2] = cos(invec[2]);
+                    rotate_binormal(outvec, invec[0]);
+                    rotate_normal(outvec, invec[1]);
+
+                    // \todo what is the out vector ?
+                    //outvec[3] = ;
+                    //outvec[4] = ;
+                    //outvec[5] = ;
 
                     break;
 
                 // 4D Parametrization
                 case params::RUSIN_TH_PH_TD_PD:
+                    half[0] = sin(invec[0])*cos(invec[1]);
+                    half[1] = sin(invec[0])*sin(invec[1]);
+                    half[2] = cos(invec[0]);
+
+                    outvec[0] = sin(invec[2])*cos(invec[3]);
+                    outvec[1] = sin(invec[2])*sin(invec[3]);
+                    outvec[2] = cos(invec[2]);
+                    rotate_binormal(outvec, invec[0]);
+                    rotate_normal(outvec, invec[1]);
+
+                    // \todo what is the out vector ?
+                    //outvec[3] = ;
+                    //outvec[4] = ;
+                    //outvec[5] = ;
+
                     break;
 
 
@@ -176,27 +201,25 @@ class params
             }
         }
 
-        //! \brief rotate a cartesian vector with respec to another of
-        //! \param theta degrees.
-        static void rotate(double* vec, double* ref, double theta)
-        {
-            const double cost = cos(theta);
-            const double sint = sin(theta);
-/*
-            vec[0] = ;
-            vec[1] = ;
-            vec[2] = ;
-*/
-        }
-
         //! \brief rotate a cartesian vector with respect to the normal of
         //! \param theta degrees.
-        static void rotate(double* vec, double theta)
+        static void rotate_normal(double* vec, double theta)
         {
             const double cost = cos(theta);
             const double sint = sin(theta);
 
             vec[0] = cost * vec[0] - sint * vec[1];
             vec[1] = sint * vec[0] + cost * vec[1];
+        }
+
+        //! \brief rotate a cartesian vector with respect to the bi-normal of
+        //! \param theta degrees.
+        static void rotate_binormal(double* vec, double theta)
+        {
+            const double cost = cos(theta);
+            const double sint = sin(theta);
+
+            vec[0] = cost * vec[0] - sint * vec[2];
+            vec[2] = sint * vec[0] + cost * vec[2];
         }
 };
