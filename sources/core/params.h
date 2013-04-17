@@ -17,6 +17,7 @@ class params
         enum type
         {
             ROMEIRO_TH_TD,
+            RUSIN_TH_TD,
             RUSIN_TH_PH_TD,
             RUSIN_TH_TD_PD,
             RUSIN_TH_PH_TD_PD,
@@ -52,8 +53,8 @@ class params
             }
         }
 
-        //! \brief static function for input type convertion. The \param
-        //! outvec resulting vector should be allocated with the correct
+        //! \brief static function for input type convertion. The outvec
+        //! resulting vector should be allocated with the correct
         //! output size.
         static void convert(const double* invec, params::type intype,
                             params::type outtype, double* outvec)
@@ -73,51 +74,23 @@ class params
 
             switch(intype)
             {
+                // 2D Parametrizations
+                case params::COS_TH_TD:
+                    half_to_cartesian(acos(invec[0]), 0.0, acos(invec[1]), 0.0, outvec);
+                    break;
+
+                case params::RUSIN_TH_TD:
+                    half_to_cartesian(invec[0], 0.0, invec[1], 0.0, outvec);
+                    break;
+
                 // 3D Parametrization
                 case params::RUSIN_TH_PH_TD:
-                    // Calculate the half vector
-                    half[0] = sin(invec[0])*cos(invec[1]);
-                    half[1] = sin(invec[0])*sin(invec[1]);
-                    half[2] = cos(invec[0]);
-
-                    outvec[0] = sin(invec[2]);
-                    outvec[1] = 0;
-                    outvec[2] = cos(invec[2]);
-                    rotate_binormal(outvec, invec[0]);
-                    rotate_normal(outvec, invec[1]);
-
-                    // Compute the out vector from the in vector and the half
-                    // vector.
-                    {
-                    const double dot = outvec[0]*half[0] + outvec[1]*half[1] + outvec[2]*half[2];
-                    outvec[3] = -outvec[0] + 2.0*dot * half[0];
-                    outvec[4] = -outvec[1] + 2.0*dot * half[1];
-                    outvec[5] = -outvec[2] + 2.0*dot * half[2];
-                    }
+                    half_to_cartesian(invec[0], invec[1], invec[2], 0.0, outvec);
                     break;
 
                 // 4D Parametrization
                 case params::RUSIN_TH_PH_TD_PD:
-                    // Calculate the half vector
-                    half[0] = sin(invec[0])*cos(invec[1]);
-                    half[1] = sin(invec[0])*sin(invec[1]);
-                    half[2] = cos(invec[0]);
-
-                    // Compute the light vector using the rotation formula.
-                    outvec[0] = sin(invec[2])*cos(invec[3]);
-                    outvec[1] = sin(invec[2])*sin(invec[3]);
-                    outvec[2] = cos(invec[2]);
-                    rotate_binormal(outvec, invec[0]);
-                    rotate_normal(outvec, invec[1]);
-
-                    // Compute the out vector from the in vector and the half
-                    // vector.
-                    {
-                    const double dot = outvec[0]*half[0] + outvec[1]*half[1] + outvec[2]*half[2];
-                    outvec[3] = -outvec[0] + 2.0*dot * half[0];
-                    outvec[4] = -outvec[1] + 2.0*dot * half[1];
-                    outvec[5] = -outvec[2] + 2.0*dot * half[2];
-                    }
+                    half_to_cartesian(invec[0], invec[1], invec[2], invec[3], outvec);
                     break;
 
 
@@ -210,8 +183,34 @@ class params
             }
         }
 
+        //! \brief from the 4D definition of a half vector parametrization,
+        //! export the cartesian coordinates.
+        static void half_to_cartesian(double theta_h, double phi_h,
+                                      double theta_d, double phi_d, double* out)
+        {
+            // Calculate the half vector
+            double half[3];
+            half[0] = sin(theta_h)*cos(phi_h);
+            half[1] = sin(theta_h)*sin(phi_h);
+            half[2] = cos(theta_h);
+
+            // Compute the light vector using the rotation formula.
+            out[0] = sin(theta_d)*cos(phi_d);
+            out[1] = sin(theta_d)*sin(phi_d);
+            out[2] = cos(theta_d);
+            rotate_binormal(out, theta_h);
+            rotate_normal(out, phi_h);
+
+            // Compute the out vector from the in vector and the half
+            // vector.
+            const double dot = out[0]*half[0] + out[1]*half[1] + out[2]*half[2];
+            out[3] = -out[0] + 2.0*dot * half[0];
+            out[4] = -out[1] + 2.0*dot * half[1];
+            out[5] = -out[2] + 2.0*dot * half[2];
+        }
+
         //! \brief rotate a cartesian vector with respect to the normal of
-        //! \param theta degrees.
+        //! theta degrees.
         static void rotate_normal(double* vec, double theta)
         {
             const double cost = cos(theta);
@@ -222,7 +221,7 @@ class params
         }
 
         //! \brief rotate a cartesian vector with respect to the bi-normal of
-        //! \param theta degrees.
+        //! theta degrees.
         static void rotate_binormal(double* vec, double theta)
         {
             const double cost = cos(theta);
