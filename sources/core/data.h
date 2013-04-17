@@ -93,7 +93,7 @@ public:
     }
     virtual vec operator[](int i) const
     {
-        return (*_d)[i];
+        return this->get(i);
     }
 
     // Get data size, e.g. the number of samples to fit
