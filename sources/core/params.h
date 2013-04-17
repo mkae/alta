@@ -45,6 +45,36 @@ class params
 
     public: // methods
 
+        //! \brief parse a string to provide a parametrization type.
+        static params::input parse_input(const std::string& txt)
+        {
+            if(txt == std::string("COS_TH"))
+            {
+                return params::COS_TH;
+            }
+            else if(txt == std::string("RUSIN_TH_TD"))
+            {
+                return params::RUSIN_TH_TD;
+            }
+            else
+            {
+                return params::UNKNOWN_INPUT;
+            }
+        }
+
+        //! \brief parse a string to provide a parametrization type.
+        static params::output parse_output(const std::string& txt)
+        {
+            if(txt == std::string("ENERGY"))
+            {
+                return params::ENERGY;
+            }
+            else
+            {
+                return params::UNKNOWN_OUTPUT;
+            }
+        }
+
         //! \brief static function for input type convertion. This
         //! function allocate the resulting vector.
         static double* convert(const double* invec, params::input intype,

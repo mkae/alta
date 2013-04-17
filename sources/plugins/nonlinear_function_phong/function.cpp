@@ -20,7 +20,10 @@ vec phong_function::operator()(const vec& x) const
 vec phong_function::value(const vec& x) const 
 {
     vec res(dimY());
-    res = _kd + _ks * pow(x[0], _N);
+    for(int i=0; i<dimY(); ++i)
+    {
+        res[i] = _kd[i] + _ks[i] * std::pow(x[0], _N[i]);
+    }
 
     return res;
 }
