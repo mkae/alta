@@ -75,6 +75,7 @@ class params
             {
                 // 3D Parametrization
                 case params::RUSIN_TH_PH_TD:
+                    // Calculate the half vector
                     half[0] = sin(invec[0])*cos(invec[1]);
                     half[1] = sin(invec[0])*sin(invec[1]);
                     half[2] = cos(invec[0]);
@@ -85,30 +86,38 @@ class params
                     rotate_binormal(outvec, invec[0]);
                     rotate_normal(outvec, invec[1]);
 
-                    // \todo what is the out vector ?
-                    //outvec[3] = ;
-                    //outvec[4] = ;
-                    //outvec[5] = ;
-
+                    // Compute the out vector from the in vector and the half
+                    // vector.
+                    {
+                    const double dot = outvec[0]*half[0] + outvec[1]*half[1] + outvec[2]*half[2];
+                    outvec[3] = -outvec[0] + 2.0*dot * half[0];
+                    outvec[4] = -outvec[1] + 2.0*dot * half[1];
+                    outvec[5] = -outvec[2] + 2.0*dot * half[2];
+                    }
                     break;
 
                 // 4D Parametrization
                 case params::RUSIN_TH_PH_TD_PD:
+                    // Calculate the half vector
                     half[0] = sin(invec[0])*cos(invec[1]);
                     half[1] = sin(invec[0])*sin(invec[1]);
                     half[2] = cos(invec[0]);
 
+                    // Compute the light vector using the rotation formula.
                     outvec[0] = sin(invec[2])*cos(invec[3]);
                     outvec[1] = sin(invec[2])*sin(invec[3]);
                     outvec[2] = cos(invec[2]);
                     rotate_binormal(outvec, invec[0]);
                     rotate_normal(outvec, invec[1]);
 
-                    // \todo what is the out vector ?
-                    //outvec[3] = ;
-                    //outvec[4] = ;
-                    //outvec[5] = ;
-
+                    // Compute the out vector from the in vector and the half
+                    // vector.
+                    {
+                    const double dot = outvec[0]*half[0] + outvec[1]*half[1] + outvec[2]*half[2];
+                    outvec[3] = -outvec[0] + 2.0*dot * half[0];
+                    outvec[4] = -outvec[1] + 2.0*dot * half[1];
+                    outvec[5] = -outvec[2] + 2.0*dot * half[2];
+                    }
                     break;
 
 
