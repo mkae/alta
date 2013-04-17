@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core

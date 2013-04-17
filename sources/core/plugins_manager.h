@@ -33,7 +33,31 @@ class plugins_manager
 		//! based on the name. Return null if no one exist.
         static function* get_function(const std::string& n) ;
         static data*     get_data(const std::string& n) ;
-		fitter*   get_fitter(const std::string& n)   const ;
+        fitter*   get_fitter(const std::string& n)   const ;
+
+        //! \brief check if a data object and a function object are compatibles.
+        //! this has to be done before fitting to ensure that the
+        //! parametrizations spaces are the same.
+        //! \todo specify an output parametrization for the function ?
+        static void check_compatibility(data*& d, function*& f,
+                                        const arguments& args)
+        {
+            if(f->parametrization() == params::UNKNOWN_INPUT)
+            {
+                std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
+                f->setParametrization(d->parametrization());
+            }
+            else if(d->parametrization() != f->parametrization())
+            {
+                std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+                data_params* dd = new data_params(d, f->parametrization());
+                d = dd ;
+            }
+            else
+            {
+                std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+            }
+        }
 
 		//! \brief Provide a measure of how much memory there is on the system.
 		//! \details It permits to know is one can allocate more memory for a fitting

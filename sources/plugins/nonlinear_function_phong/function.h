@@ -18,7 +18,7 @@
  *  fitting algorithms.
  *
  *  \details
- *  A phong lobe is defined as \f$k_d + k_s |R.H|^N\f$
+ *  A phong lobe is defined as \f$k_d + k_s |N.H|^a\f$
  *  \todo Finish implementation
  */
 class phong_function : public nonlinear_function, public QObject
@@ -55,14 +55,14 @@ class phong_function : public nonlinear_function, public QObject
         //! \brief Provide the dimension of the input space of the function
         virtual int dimX() const
         {
-            return 2 ;
+            return 1 ;
         }
 
         //! \brief Provide the parametrization of the input space of the function.
         //! For this one, we fix that the parametrization is in THETAD_PHID
-        virtual params::type parametrization() const
+        virtual params::input parametrization() const
         {
-            return params::ISOTROPIC_TD_PD ;
+            return params::COS_TH ;
         }
 
 

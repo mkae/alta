@@ -43,12 +43,13 @@ class data
             return params::UNKNOWN_INPUT;
         }
 	
-	protected:
-		// Dimension of the function
+    protected: // data
+
+        // Dimensions of the data
 		int _nX, _nY ;
 } ;
 	 
-Q_DECLARE_INTERFACE(data, "Fitter.Data") 
+Q_DECLARE_INTERFACE(data, "Fitter.Data")
 
 /*! \brief Change the parametrization of data to fit the parametrization of the
  *  function to be fitted.
@@ -68,9 +69,9 @@ public: // structures
     //! dimension is reduced, the program will halt.
     enum clustrering
     {
-        mean,
-        median,
-        none
+        MEAN,
+        MEDIAN,
+        NONE
     };
 
 public: // methods
@@ -78,13 +79,13 @@ public: // methods
     //! \brief contructor requires the definition of a base class that
     //! has a parametrization, and a new parametrization.
     data_params(const data* d, params::input param,
-                data_params::clustrering method = data_params::none) :
+                data_params::clustrering method = data_params::NONE) :
         _d(d), _param_in(param), _clustering_method(method)
     {
         _nX = params::dimension(param);
         _nY = d->dimY();
 
-        if(_nX < _d->dimX() && method == data_params::none)
+        if(_nX < _d->dimX() && method == data_params::NONE)
         {
             throw("No cluster method provided");
         }
@@ -135,9 +136,11 @@ public: // methods
         return _d->max();
     }
 
-protected:
-    // data object to interface
+protected: // data
+
     const data* _d;
     params::input _param_in;
     data_params::clustrering _clustering_method;
+
+    //! \todo Add a cluster object that will duplicate data or store indices.
 };

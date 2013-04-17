@@ -48,6 +48,9 @@ int main(int argc, char** argv)
         data*     d = plugins_manager::get_data(args["data"]);
 		d->load(args["input"], args);
 
+        // Check the compatibility between the data and the function
+        plugins_manager::check_compatibility(d, f, args);
+
 		QTime time ;
 		time.start() ;
         bool is_fitted = fit->fit_data(d, f, args) ;

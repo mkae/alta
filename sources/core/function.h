@@ -26,6 +26,10 @@ class function
 {
 	public: // methods
 
+        // Constructor
+        function() : _in_param(params::UNKNOWN_INPUT),
+                     _out_param(params::UNKNOWN_OUTPUT) { }
+
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const = 0 ;
 		virtual vec value(const vec& x) const = 0 ;
@@ -70,7 +74,18 @@ class function
         //! to the data.
         virtual params::input parametrization() const
         {
-            return params::UNKNOWN_INPUT;
+            return _in_param;
+        }
+
+        //! \brief can set the input parametrization of a non-parametrized
+        //! function. Throw an exception if it tries to erase a previously
+        //! defined one.
+        virtual void setParametrization(params::input new_param)
+        {
+            if(_in_param != params::UNKNOWN_INPUT)
+                throw("A parametrization is already defined");
+
+            _in_param = new_param;
         }
 
 	protected: //data
@@ -78,6 +93,10 @@ class function
 		// Dimension of the function & domain of definition.
 		int _nX, _nY ;
 		vec _min, _max ;
+
+        // Input and output parametrization
+        params::input  _in_param ;
+        params::output _out_param ;
 };
 
 /*! \brief Non-linear function interface
