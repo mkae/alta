@@ -21,6 +21,7 @@ class params
             RUSIN_TH_PH_TD,
             RUSIN_TH_TD_PD,
             RUSIN_TH_PH_TD_PD,
+            COS_TH,
             COS_TH_TD,
             ISOTROPIC_TV_TL_DPHI,
             ISOTROPIC_TD_PD, // Difference between two directions such as R and H
@@ -70,10 +71,13 @@ class params
         static void to_cartesian(const double* invec, params::type intype,
                                  double* outvec)
         {
-            double half[3];
-
             switch(intype)
             {
+                // 1D Parametrizations
+                case params::COS_TH:
+                    half_to_cartesian(acos(invec[0]), 0.0, 0.0, 0.0, outvec);
+                    break;
+
                 // 2D Parametrizations
                 case params::COS_TH_TD:
                     half_to_cartesian(acos(invec[0]), 0.0, acos(invec[1]), 0.0, outvec);
@@ -123,6 +127,11 @@ class params
 
             switch(outtype)
             {
+                // 1D Parametrizations
+                case params::COS_TH:
+                    outvec[0] = half[2];
+                    break;
+
                 // 2D Parametrizations
                 case params::COS_TH_TD:
                     outvec[0] = half[2];
@@ -152,6 +161,11 @@ class params
         {
             switch(t)
             {
+                // 1D Parametrizations
+                case params::COS_TH:
+                    return 1;
+                    break;
+
                 // 2D Parametrizations
                 case params::ISOTROPIC_TD_PD:
                 case params::ROMEIRO_TH_TD:
