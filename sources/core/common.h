@@ -28,7 +28,15 @@ class vec : public std::vector<double>
 		}
 		virtual ~vec() 
 		{
-		}
+        }
+
+        //! \brief get a subpart of the vector
+        vec subvector(int start, int n) const
+        {
+            vec res(n);
+            memcpy(&res[0], &this->at(start), n*sizeof(double));
+            return res;
+        }
 
 		//! \brief copy operator. It resize the left operand to the size of the 
 		//! right operand.

@@ -60,21 +60,36 @@ Q_DECLARE_INTERFACE(data, "Fitter.Data")
 class data_params : public data
 {
 public:
+    //! \brief contructor requires the definition of a base class that
+    //! has a parametrization, and a new parametrization.
+    data_params(const data* d, params::type param) : _d(d), _param(param)
+    {
+        _nX = d->dimX(); //! \todo the parametrization can change the size
+                         //! of the input domain.
+        _nY = d->dimY();
+    }
+
     // Load data from a file
     virtual void load(const std::string& filename)
     {
-        _d->load(filename);
+        std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
+        throw;
     }
 
     virtual void load(const std::string& filename, const arguments& args)
     {
-        _d->load(filename, args);
+        std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
+        throw;
     }
 
     // Acces to data
     virtual vec get(int i) const
     {
-        return _d->get(i);
+        vec res(_nX + _nY);
+
+        params::convert(&_d->get(i)[0], _d->parametrization(), _param, &res[0]);
+
+        return res;
     }
     virtual vec operator[](int i) const
     {
@@ -99,5 +114,6 @@ public:
 
 protected:
     // data object to interface
-    data* _d;
+    const data* _d;
+    params::type _param;
 };
