@@ -72,12 +72,18 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				linestream >> t ;
 				vs[current_vs] = t ; ++current_vs ;
 			}
-            else if(comment == std::string("PARAM_IN"))
-            {
-            }
-            else if(comment == std::string("PARAM_OUT"))
-            {
-            }
+         else if(comment == std::string("PARAM_IN"))
+         {
+				std::string param;
+				linestream >> param;
+				_in_param = params::parse_input(param);
+         }
+         else if(comment == std::string("PARAM_OUT"))
+         {
+				std::string param;
+				linestream >> param;
+				_out_param = params::parse_output(param);
+         }
 			continue ;
 		} 
 		else if(line.empty())
