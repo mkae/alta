@@ -12,9 +12,10 @@ class params
 {
     public: // data
 
-        //! \brief list of all supported parametrization. An unsupported
-        //! parametrization will go under the name <em>unknown</em>.
-        enum type
+        //! \brief list of all supported parametrization for the input space.
+        //! An unsupported parametrization will go under the name
+        //! <em>unknown</em>.
+        enum input
         {
             ROMEIRO_TH_TD,
             RUSIN_TH_TD,
@@ -27,15 +28,27 @@ class params
             ISOTROPIC_TD_PD, // Difference between two directions such as R and H
             CARTESIAN,
             SPHERICAL_TL_PL_TV_PV,
-            UNKNOWN
+            UNKNOWN_INPUT
+        };
+
+        //! \brief list of all supported parametrization for the output space.
+        //! An unsupported parametrization will go under the name
+        //! <em>unknown</em>.
+        enum output
+        {
+            INV_STERADIAN,
+            ENERGY,
+            RGB_COLOR,
+            XYZ_COLOR,
+            UNKNOWN_OUTPUT
         };
 
     public: // methods
 
         //! \brief static function for input type convertion. This
         //! function allocate the resulting vector.
-        static double* convert(const double* invec, params::type intype,
-                               params::type outtype)
+        static double* convert(const double* invec, params::input intype,
+                               params::input outtype)
         {
             int dim = dimension(outtype); // Get the size of the output vector
 
@@ -57,8 +70,8 @@ class params
         //! \brief static function for input type convertion. The outvec
         //! resulting vector should be allocated with the correct
         //! output size.
-        static void convert(const double* invec, params::type intype,
-                            params::type outtype, double* outvec)
+        static void convert(const double* invec, params::input intype,
+                            params::input outtype, double* outvec)
         {
             double  temvec[6]; // Temp CARTESIAN vectors
             to_cartesian(invec, intype, temvec);
@@ -68,7 +81,7 @@ class params
         //! \brief convert a input vector in a given parametrization to an
         //! output vector in a cartesian parametrization, that is two 3d
         //! vectors concatenated.
-        static void to_cartesian(const double* invec, params::type intype,
+        static void to_cartesian(const double* invec, params::input intype,
                                  double* outvec)
         {
             switch(intype)
@@ -112,7 +125,7 @@ class params
 
         //! \brief convert a input CARTESIAN vector, that is two 3d vectors
         //! concatenated  to an output vector in a given parametrization.
-        static void from_cartesian(const double* invec, params::type outtype,
+        static void from_cartesian(const double* invec, params::input outtype,
                                    double* outvec)
         {
             // Compute the half vector
@@ -157,7 +170,7 @@ class params
         }
 
         //! \brief provide a dimension associated with a parametrization
-        static int  dimension(params::type t)
+        static int  dimension(params::input t)
         {
             switch(t)
             {
@@ -189,6 +202,29 @@ class params
                 // 6D Parametrization
                 case params::CARTESIAN:
                     return 6;
+                    break;
+
+                default:
+                    return -1;
+                    break;
+            }
+        }
+
+        //! \brief provide a dimension associated with a parametrization
+        static int  dimension(params::output t)
+        {
+            switch(t)
+            {
+                // 1D Parametrizations
+                case params::INV_STERADIAN:
+                case params::ENERGY:
+                    return 1;
+                    break;
+
+                // 3D Parametrization
+                case params::RGB_COLOR:
+                case params::XYZ_COLOR:
+                    return 3;
                     break;
 
                 default:

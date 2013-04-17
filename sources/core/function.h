@@ -65,7 +65,13 @@ class function
 		virtual vec getMin() const { return _min ; }
 		virtual vec getMax() const { return _max ; }
 
-        virtual params::type parametrization() const { return params::UNKNOWN; }
+        //! \brief provide the parametrization of the function.
+        //! \note some function type can modify the parametrization to adapt
+        //! to the data.
+        virtual params::input parametrization() const
+        {
+            return params::UNKNOWN_INPUT;
+        }
 
 	protected: //data
 

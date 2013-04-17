@@ -38,9 +38,9 @@ class data
         virtual int dimX() const { return _nX ; }
         virtual int dimY() const { return _nY ; }
 
-        virtual params::type parametrization() const
+        virtual params::input parametrization() const
         {
-            return params::UNKNOWN;
+            return params::UNKNOWN_INPUT;
         }
 	
 	protected:
@@ -77,9 +77,9 @@ public: // methods
 
     //! \brief contructor requires the definition of a base class that
     //! has a parametrization, and a new parametrization.
-    data_params(const data* d, params::type param,
+    data_params(const data* d, params::input param,
                 data_params::clustrering method = data_params::none) :
-        _d(d), _param(param), _clustering_method(method)
+        _d(d), _param_in(param), _clustering_method(method)
     {
         _nX = params::dimension(param);
         _nY = d->dimY();
@@ -109,7 +109,7 @@ public: // methods
         vec res(_nX + _nY);
         vec in = _d->get(i);
 
-        params::convert(&in[0], _d->parametrization(), _param, &res[0]);
+        params::convert(&in[0], _d->parametrization(), _param_in, &res[0]);
         memcpy(&res[_nX], &in[_d->dimX()], _nY*sizeof(double));
 
         return res;
@@ -138,6 +138,6 @@ public: // methods
 protected:
     // data object to interface
     const data* _d;
-    params::type _param;
+    params::input _param_in;
     data_params::clustrering _clustering_method;
 };
