@@ -59,13 +59,35 @@ Q_DECLARE_INTERFACE(data, "Fitter.Data")
  */
 class data_params : public data
 {
-public:
+public: // structures
+
+    //! \brief when changing from a parametrization to another, you might
+    //! lose some dimensions. This list enumerate the different operators
+    //! that can be applied on the raw data to be clusterized.
+    //! \note by default we use <em>none</em>, but if the input space
+    //! dimension is reduced, the program will halt.
+    enum clustrering
+    {
+        mean,
+        median,
+        none
+    };
+
+public: // methods
+
     //! \brief contructor requires the definition of a base class that
     //! has a parametrization, and a new parametrization.
-    data_params(const data* d, params::type param) : _d(d), _param(param)
+    data_params(const data* d, params::type param,
+                data_params::clustrering method = data_params::none) :
+        _d(d), _param(param), _clustering_method(method)
     {
         _nX = params::dimension(param);
         _nY = d->dimY();
+
+        if(_nX < _d->dimX() && method == data_params::none)
+        {
+            throw("No cluster method provided");
+        }
     }
 
     // Load data from a file
@@ -117,4 +139,5 @@ protected:
     // data object to interface
     const data* _d;
     params::type _param;
+    data_params::clustrering _clustering_method;
 };
