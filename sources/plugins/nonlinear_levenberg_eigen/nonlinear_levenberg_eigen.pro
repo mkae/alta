@@ -1,4 +1,4 @@
-TARGET          = nonlinear_levenberf_eigen
+TARGET          = nonlinear_levenberg_eigen
 TEMPLATE        = lib
 CONFIG         *= qt      \
                   plugin  \

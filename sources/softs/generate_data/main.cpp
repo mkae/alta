@@ -66,6 +66,18 @@ int main(int argc, char** argv)
 				f << x << "\t" << y << "\t" << z << "\t" << 0.1f << std::endl ;
 			}
 	}
+   else if(k == 5)
+	{
+		f << "#DIM 1 1" << std::endl ;
+		f << "#PARAM_IN COS_TH" << std::endl;
+		for(int i=0; i<nbx; ++i)
+		{
+				const float x = i / (float)nbx ;
+				const float z = exp(-10.0 * x*x) + 0.1 ;
+			
+				f << x << "\t" << z << std::endl ;
+		}
+	}
 
 	return 0 ;
 }

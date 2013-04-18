@@ -13,6 +13,11 @@
 
 #include <QTime>
 
+fitter* provide_fitter()
+{
+    return new nonlinear_fitter_eigen();
+}
+
 struct EigenFunctor
 {
 	EigenFunctor(nonlinear_function* f) : _f(f)
@@ -70,7 +75,7 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 
 	if(dynamic_cast<nonlinear_function*>(fit) == NULL)
 	{
-		std::cerr << "<<ERROR>> the function is non a non-linear function" << std::endl;
+        std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
 		return false;
 	}
 	nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
