@@ -399,7 +399,24 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
     file << "};" << std::endl;
     file << std::endl ;
 
-    file << "// l(double x, int i) is the Legendre polynomial of order i evaluated in x" << std::endl;
+    file << "// The Legendre polynomial of order i evaluated in x" << std::endl;
+    file << "double l(double x, int i)" << std::endl;
+    file << "{" << std::endl;
+    file << "    if(i == 0)" << std::endl;
+    file << "    {" << std::endl;
+    file << "        return 1;" << std::endl;
+    file << "    }" << std::endl;
+    file << "    else if(i == 1)" << std::endl;
+    file << "    {" << std::endl;
+    file << "        return x;" << std::endl;
+    file << "    }" << std::endl;
+    file << "    else" << std::endl;
+    file << "    {" << std::endl;
+    file << "        return ((2*i-1)*x*legendre(x, i-1) - (i-1)*legendre(x, i-2)) / (double)i ;" << std::endl;
+    file << "    }" << std::endl;
+    file << "}" << std::endl;
+    file << std::endl;
+
     file << "void brdf(double* x, double* y)" << std::endl;
     file << "{" << std::endl;
     file << "\tdouble p, q;" << std::endl;
@@ -420,7 +437,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/(s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -436,7 +453,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(x\[" << k << "\]-c[" << k << "])/(s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -481,7 +498,7 @@ void rational_function::save_rational_function(const std::string& filename) cons
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NP " << a.size() / _nY << std::endl ;
 	file << "#NQ " << b.size() / _nY << std::endl ;
-	file << "#BASIS poly" << std::endl ;
+    file << "#BASIS LEGENDRE" << std::endl ;
 
 	unsigned int np = a.size() / _nY ;
     unsigned int nq = b.size() / _nY ;
