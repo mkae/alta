@@ -64,7 +64,21 @@ class phong_function : public nonlinear_function, public QObject
         {
             return params::COS_TH ;
         }
+        virtual void setParametrization(params::input new_param)
+        {
+            std::cerr << "Cannot change the ouput parametrization " << __FILE__ << ":" << __LINE__ << std::endl;
+            throw;
+        }
 
+        void setDimY(int nY)
+        {
+            _nY = nY ;
+
+            // Update the length of the vectors
+            _kd.resize(_nY) ;
+            _ks.resize(_nY) ;
+            _N.resize(_nY) ;
+        }
 
 	private: // data
 
