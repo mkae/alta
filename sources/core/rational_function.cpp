@@ -357,7 +357,12 @@ void rational_function::save(const std::string& filename, const arguments& args)
 			std::cout << "<<INFO>> will export in C++ format" << std::endl;
 			save_cpp(filename, args);
 		}
-		else
+        else if(args["export"].compare("matlab") == 0)
+        {
+            std::cout << "<<INFO>> will export in matlab format" << std::endl;
+            save_matlab(filename, args);
+        }
+        else
 		{
 			std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
 		}
@@ -367,6 +372,93 @@ void rational_function::save(const std::string& filename, const arguments& args)
 		std::cout << "<<INFO>> will export the rational coefficients" << std::endl;
 		save_rational_function(filename) ;
 	}
+}
+
+//! \todo it should handle parametrization
+void rational_function::save_matlab(const std::string& filename, const arguments& args) const
+{
+    unsigned int np = a.size() / _nY ;
+    unsigned int nq = b.size() / _nY ;
+
+    std::ofstream file(filename.c_str(), std::ios_base::trunc);
+
+    file << "global s = [";
+    for(int i=0; i<dimX(); ++i)
+    {
+        file << 1.0 / (_max[i]-_min[i]);
+        if(i < dimX()-1)
+        {
+            file << ", ";
+        }
+    }
+    file << "];" << std::endl;
+    file << "global c = [";
+    for(int i=0; i<dimX(); ++i)
+    {
+        file << _min[i];
+        if(i < dimX()-1)
+        {
+            file << ", ";
+        }
+    }
+    file << "];" << std::endl;
+    file << std::endl ;
+
+    file << "function y = brdf(x)" << std::endl;
+    file << std::endl;
+    file << "\tp, q;" << std::endl;
+
+    // Export each color channel independantly
+    for(int j=0; j<dimY(); ++j)
+    {
+        // Export the numerator of the jth color channel
+        file << "\tp = ";
+        for(unsigned int i=0; i<np; ++i)
+        {
+            if(i > 0 && a[np*j + i] >= 0.0)
+            {
+                file << " + ";
+            }
+            file << a[np*j + i];
+
+            std::vector<int> degree = index2degree(i);
+            for(unsigned int k=0; k<degree.size(); ++k)
+            {
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+            }
+        }
+        file << ";" << std::endl;
+
+        // Export the denominator of the jth color channel
+        file << "\tq = ";
+        for(unsigned int i=0; i<nq; ++i)
+        {
+            if(i > 0 && b[np*j + i] >= 0.0)
+                file << " + ";
+            else if(b[np*j + i] < 0.0)
+                file << " " ;
+
+            file << b[np*j + i] ;
+
+            std::vector<int> degree = index2degree(i);
+            for(unsigned int k=0; k<degree.size(); ++k)
+            {
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+            }
+        }
+        file << ";" << std::endl;
+
+        file << "\ty[" << j << "] = p/q;" << std::endl;
+        if(j < dimY()-1)
+        {
+            file << std::endl;
+        }
+    }
+
+
+    file << "endfunction" << std::endl;
+
+    file.close() ;
 }
 
 //! \todo it should handle parametrization
@@ -437,7 +529,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/(s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -448,17 +540,20 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
         {
             if(i > 0 && b[np*j + i] >= 0.0)
                 file << " + ";
+            else if(b[np*j + i] < 0.0)
+                file << " " ;
+
             file << b[np*j + i] ;
 
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(x\[" << k << "\]-c[" << k << "])/(s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
 
-        file << "\t y[" << j << "] = p/q;" << std::endl;
+        file << "\ty[" << j << "] = p/q;" << std::endl;
         if(j < dimY()-1)
         {
             file << std::endl;
