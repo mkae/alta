@@ -13,6 +13,12 @@
 
 #include <QTime>
 
+#ifdef WIN32
+#define isnan(X) ((X != X))
+#endif
+
+using namespace std;
+
 data* rational_fitter_quadprog::provide_data() const
 {
 	return new vertical_segment() ;
@@ -233,7 +239,8 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 	
 	double delta = sigma_m / sigma_M ;
-	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
+
+	if(isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 #ifdef DEBUG
 		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
@@ -270,7 +277,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	for(int i=0; i<np+nq; ++i)
 	{
 		const double v = x[i];
-		solves_qp = solves_qp && !std::isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
+		solves_qp = solves_qp && !isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
 	}
 
 	if(solves_qp)

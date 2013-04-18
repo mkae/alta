@@ -1,6 +1,7 @@
 TARGET          = quadprog++
 TEMPLATE        = lib
-CONFIG         *= qt      \
+CONFIG         *= static  \
+				  qt      \
                   plugin  \
                   eigen
 
