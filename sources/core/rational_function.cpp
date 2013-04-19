@@ -348,31 +348,6 @@ void rational_function::load(const std::string& filename)
 	}
 */
 }
-void rational_function::save(const std::string& filename, const arguments& args) const
-{
-    if(args.is_defined("export"))
-	{
-        if(args["export"].compare("c++") == 0)
-		{
-			std::cout << "<<INFO>> will export in C++ format" << std::endl;
-			save_cpp(filename, args);
-		}
-        else if(args["export"].compare("matlab") == 0)
-        {
-            std::cout << "<<INFO>> will export in matlab format" << std::endl;
-            save_matlab(filename, args);
-        }
-        else
-		{
-			std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
-		}
-	}
-	else
-	{
-		std::cout << "<<INFO>> will export the rational coefficients" << std::endl;
-		save_rational_function(filename) ;
-	}
-}
 
 //! \todo it should handle parametrization
 void rational_function::save_matlab(const std::string& filename, const arguments& args) const
@@ -587,7 +562,7 @@ void rational_function::save_gnuplot(const std::string& filename, const data* d,
 	file.close();
 }
 
-void rational_function::save_rational_function(const std::string& filename) const 
+void rational_function::save(const std::string& filename) const 
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	file << "#DIM " << _nX << " " << _nY << std::endl ;

@@ -41,7 +41,30 @@ class function
 		//! be used to differenciate the type of export.
 		//!
 		//! \see rational_function.cpp for an example
-		virtual void save(const std::string& filename, const arguments& args) const = 0 ;
+		virtual void save(const std::string& filename, const arguments& args) const
+		{
+			if(args.is_defined("export"))
+			{
+				if(args["export"].compare("c++") == 0)
+				{
+					std::cout << "<<INFO>> will export in C++ format" << std::endl;
+					save_cpp(filename, args);
+				}
+				else if(args["export"].compare("matlab") == 0)
+				{
+					std::cout << "<<INFO>> will export in matlab format" << std::endl;
+					save_matlab(filename, args);
+				}
+				else
+				{
+					std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
+				}
+			}
+			else
+			{
+				save(filename) ;
+			}
+		}
 
 		//! Provide the dimension of the input space of the function
 		virtual int dimX() const { return _nX ; }
@@ -87,8 +110,37 @@ class function
 
             _in_param = new_param;
         }
+		
+	protected: // function
 
-	protected: //data
+		//! \brief Standard saving function.
+		virtual void save(const std::string& filename) const
+		{ 
+			NOT_IMPLEMENTED(); 
+		}
+
+		//! \brief Output the rational function as a gnuplot file. It requires
+		//! the data object to output the function at the input location only.
+		virtual void save_gnuplot(const std::string& filename, const data* d, 
+		                          const arguments& args) const 
+		{
+			NOT_IMPLEMENTED();
+		}
+		
+		//! \brief Output the rational function using a C++ function formating.
+		virtual void save_cpp(const std::string& filename, const arguments& args) const 
+		{ 
+			NOT_IMPLEMENTED();
+		}
+
+		//! \brief Output the rational function using a C++ function formating.
+		virtual void save_matlab(const std::string& filename, const arguments& args) const 
+		{ 
+			NOT_IMPLEMENTED(); 
+		}
+
+
+	protected: // data
 
 		// Dimension of the function & domain of definition.
 		int _nX, _nY ;
