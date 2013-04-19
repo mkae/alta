@@ -114,29 +114,29 @@ class function
 	protected: // function
 
 		//! \brief Standard saving function.
-		virtual void save(const std::string& filename) const
-		{ 
-			NOT_IMPLEMENTED(); 
+		virtual void save(const std::string& filename) const 
+		{
+			NOT_IMPLEMENTED();
 		}
 
 		//! \brief Output the rational function as a gnuplot file. It requires
 		//! the data object to output the function at the input location only.
 		virtual void save_gnuplot(const std::string& filename, const data* d, 
-		                          const arguments& args) const 
+		                          const arguments& args) const
 		{
 			NOT_IMPLEMENTED();
 		}
 		
 		//! \brief Output the rational function using a C++ function formating.
 		virtual void save_cpp(const std::string& filename, const arguments& args) const 
-		{ 
+
+		{
 			NOT_IMPLEMENTED();
 		}
-
 		//! \brief Output the rational function using a C++ function formating.
 		virtual void save_matlab(const std::string& filename, const arguments& args) const 
-		{ 
-			NOT_IMPLEMENTED(); 
+		{
+			NOT_IMPLEMENTED();
 		}
 
 

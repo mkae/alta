@@ -19,6 +19,11 @@
 
 using namespace std;
 
+fitter* provide_fitter()
+{
+	return new rational_fitter_quadprog();
+}
+
 data* rational_fitter_quadprog::provide_data() const
 {
 	return new vertical_segment() ;

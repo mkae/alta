@@ -357,7 +357,10 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 
     std::ofstream file(filename.c_str(), std::ios_base::trunc);
 
-    file << "global s = [";
+
+    file << "function y = brdf(x)" << std::endl;
+    file << std::endl;
+    file << "\ts = [";
     for(int i=0; i<dimX(); ++i)
     {
         file << 1.0 / (_max[i]-_min[i]);
@@ -367,7 +370,7 @@ void rational_function::save_matlab(const std::string& filename, const arguments
         }
     }
     file << "];" << std::endl;
-    file << "global c = [";
+    file << "\tc = [";
     for(int i=0; i<dimX(); ++i)
     {
         file << _min[i];
@@ -379,33 +382,31 @@ void rational_function::save_matlab(const std::string& filename, const arguments
     file << "];" << std::endl;
     file << std::endl ;
 
-    file << "function y = brdf(x)" << std::endl;
-    file << std::endl;
-    file << "\tp, q;" << std::endl;
-
     // Export each color channel independantly
     for(int j=0; j<dimY(); ++j)
     {
         // Export the numerator of the jth color channel
-        file << "\tp = ";
+        file << "\tp(" << j+1 << ",:) = ";
         for(unsigned int i=0; i<np; ++i)
         {
             if(i > 0 && a[np*j + i] >= 0.0)
-            {
                 file << " + ";
-            }
+            else if(a[np*j + i] < 0.0)
+                file << " " ;
+
             file << a[np*j + i];
 
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+               file << ".*legendrepoly(" << degree[k] << ", 2.0*((x(" << k+1 << ",:)"
+					     << "-c(" << k+1 << "))/s(" << k+1 << ") - 0.5))" ;
             }
         }
         file << ";" << std::endl;
 
         // Export the denominator of the jth color channel
-        file << "\tq = ";
+        file << "\tq(" << j+1 << ",:) = ";
         for(unsigned int i=0; i<nq; ++i)
         {
             if(i > 0 && b[np*j + i] >= 0.0)
@@ -418,12 +419,13 @@ void rational_function::save_matlab(const std::string& filename, const arguments
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+               file << ".*legendrepoly(" << degree[k] << ", 2.0*((x(" << k+1 << ",:)" 
+					     << "-c(" << k+1 << "))/s(" << k+1 << ") - 0.5))" ;
             }
         }
         file << ";" << std::endl;
 
-        file << "\ty[" << j << "] = p/q;" << std::endl;
+        file << "\ty(" << j+1 << ",:) = p./q;" << std::endl;
         if(j < dimY()-1)
         {
             file << std::endl;
@@ -479,7 +481,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
     file << "    }" << std::endl;
     file << "    else" << std::endl;
     file << "    {" << std::endl;
-    file << "        return ((2*i-1)*x*legendre(x, i-1) - (i-1)*legendre(x, i-2)) / (double)i ;" << std::endl;
+    file << "        return ((2*i-1)*x*l(x, i-1) - (i-1)*l(x, i-2)) / (double)i ;" << std::endl;
     file << "    }" << std::endl;
     file << "}" << std::endl;
     file << std::endl;
@@ -504,7 +506,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -523,7 +525,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -568,7 +570,7 @@ void rational_function::save(const std::string& filename) const
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NP " << a.size() / _nY << std::endl ;
 	file << "#NQ " << b.size() / _nY << std::endl ;
-    file << "#BASIS LEGENDRE" << std::endl ;
+   file << "#BASIS LEGENDRE" << std::endl ;
 
 	unsigned int np = a.size() / _nY ;
     unsigned int nq = b.size() / _nY ;
