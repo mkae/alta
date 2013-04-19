@@ -173,11 +173,12 @@ bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, in
     }
     
     VectorXd res = ((D.leftCols(np) * pq.head(np)).array() / (D.rightCols(nq) * pq.tail(nq)).array() - Y.array());
-    std::cout << "Real LS norm (1): "
-      << res.norm() / Y.norm()
-      << " ; inf " << res.lpNorm<Infinity>() / Y.lpNorm<Infinity>()
-      << " ; L1  " << res.lpNorm<1>() / Y.lpNorm<1>() << std::endl;
-
+/*
+  std::cout << "<<INFO>> Real LS norm (1): "
+		 << res.norm() / Y.norm()
+		 << " ; inf " << res.lpNorm<Infinity>() / Y.lpNorm<Infinity>()
+		 << " ; L1  " << res.lpNorm<1>() / Y.lpNorm<1>() << std::endl;
+*/
     // Step 2 fit f_i using p/q with q fix
     {
       // This scheme gives more weights to small values: (not good)

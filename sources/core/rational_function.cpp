@@ -400,7 +400,7 @@ void rational_function::save_matlab(const std::string& filename, const arguments
             for(unsigned int k=0; k<degree.size(); ++k)
             {
                file << ".*legendrepoly(" << degree[k] << ", 2.0*((x(" << k+1 << ",:)"
-					     << "-c(" << k+1 << "))/s(" << k+1 << ") - 0.5))" ;
+					     << "-c(" << k+1 << "))*s(" << k+1 << ") - 0.5))" ;
             }
         }
         file << ";" << std::endl;
@@ -420,7 +420,7 @@ void rational_function::save_matlab(const std::string& filename, const arguments
             for(unsigned int k=0; k<degree.size(); ++k)
             {
                file << ".*legendrepoly(" << degree[k] << ", 2.0*((x(" << k+1 << ",:)" 
-					     << "-c(" << k+1 << "))/s(" << k+1 << ") - 0.5))" ;
+					     << "-c(" << k+1 << "))*s(" << k+1 << ") - 0.5))" ;
             }
         }
         file << ";" << std::endl;
