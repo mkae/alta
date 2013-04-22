@@ -18,6 +18,11 @@
 
 #include "quadratic_program.h"
 
+fitter* provide_fitter()
+{
+	return new rational_fitter_parallel();
+}
+
 data* rational_fitter_parallel::provide_data() const
 {
 	return new vertical_segment() ;
@@ -85,6 +90,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 #endif
 
 		omp_set_num_threads(nb_cores) ;
+		
 		std::vector<rational_function*> rs;
 		for(int j=0; j<nb_cores; ++j)
 		{
@@ -108,7 +114,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		int nb_sol_found = 0;
 		int np, nq ;
 
-		//        #pragma omp parallel for
+		#pragma omp parallel for
 		for(int j=1; j<i; ++j)
 		{
 			int temp_np = i - j;
