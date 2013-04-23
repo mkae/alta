@@ -61,8 +61,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	const int _max_np = args.get_int("np", _min_np);
 	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
 
-
-	for(int i=_min_np; i<=_max_np; ++i)
+    int k = 1;
+    for(int i=_min_np; i<=_max_np; i+=rational_function::estimate_dk(k++, d->dimX()))
 	{
 		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
 		std::cout.flush() ;
@@ -109,9 +109,26 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			rs.push_back(rj);
 		}
 
+        // Solution for the case of optimizing the L2 norm
+        double min_l2 = std::numeric_limits<double>::max();
+        rational_function* min_l2_fun = dynamic_cast<rational_function*>(plugins_manager::get_function(args["func"]));
+        min_l2_fun->setDimX(d->dimX()) ;
+        min_l2_fun->setDimY(d->dimY()) ;
+        min_l2_fun->setMin(d->min()) ;
+        min_l2_fun->setMax(d->max()) ;
 
-		double min_delta = std::numeric_limits<double>::max();
-		int nb_sol_found = 0;
+        // Solution for the case of optimizing the LINF norm
+        double min_linf = std::numeric_limits<double>::max();
+        rational_function* min_linf_fun = dynamic_cast<rational_function*>(plugins_manager::get_function(args["func"]));
+        min_linf_fun->setDimX(d->dimX()) ;
+        min_linf_fun->setDimY(d->dimY()) ;
+        min_linf_fun->setMin(d->min()) ;
+        min_linf_fun->setMax(d->max()) ;
+
+        double min_delta  = std::numeric_limits<double>::max();
+        double mean_delta = 0.0;
+        int nb_sol_found  = 0;
+        int nb_sol_tested = 0;
 		int np, nq ;
 
 		#pragma omp parallel for
@@ -122,16 +139,26 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 
 			vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
 
-			double delta;
-			bool is_fitted = fit_data(d, temp_np, temp_nq, rs[omp_get_thread_num()], p, q, delta);
+            double delta, linf_dist, l2_dist;
+            bool is_fitted = fit_data(d, temp_np, temp_nq, rs[omp_get_thread_num()], args, p, q, delta, linf_dist, l2_dist);
 			if(is_fitted)
 			{
 #pragma omp critical
 				{
 					++nb_sol_found ;
+                    mean_delta += delta ;
+
+                    std::cout << "<<INFO>> found a solution with np=" << temp_np << ", nq = " << temp_nq << std::endl;
+                    std::cout << "<<INFO>> Linf error = " << linf_dist << std::endl;
+                    std::cout << "<<INFO>> L2   error = " << l2_dist << std::endl;
+                    std::cout << "<<INFO>>      delta = " << delta << std::endl;
+                    std::cout << std::endl;
+
+                    // Get the solution with the minimum delta
 					if(delta < min_delta)
 					{
-						min_delta = delta ;
+                        min_delta   = delta ;
+
 #ifdef DEBUG
 						std::cout << p << std::endl ;
 						std::cout << q << std::endl ;
@@ -140,9 +167,33 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 						np = p.size() / d->dimY();
 						nq = q.size() / d->dimY();
 					}
+
+                    // Get the solution with the minumum L2 norm
+                    if(l2_dist < min_l2)
+                    {
+                        min_l2 = l2_dist;
+                        min_l2_fun->update(p, q);
+                    }
+
+                    // Get the solution with the minumum LINF norm
+                    if(linf_dist < min_linf)
+                    {
+                        min_linf = linf_dist;
+                        min_linf_fun->update(p, q);
+                    }
+
 				}
 			}
+
+#pragma omp critical
+            {
+                // Update the solution
+                nb_sol_tested++;
+                std::cout << "<<DEBUG>> nb solutions tested: " << nb_sol_tested << " / " << i << "\r";
+                std::cout.flush();
+            }
 		}
+
 
 		// Clean memory
 		for(int j=0; j<nb_cores; ++j)
@@ -150,8 +201,28 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			delete rs[j];
 		}
 
+        if(min_l2 < std::numeric_limits<double>::max())
+        {
+            std::cout << "<<INFO>>  min L2 = " << min_l2 << std::endl;
+            std::cout << *min_l2_fun << std::endl;
+            std::cout << std::endl;
+        }
+        delete min_l2_fun;
+
+        if(min_linf < std::numeric_limits<double>::max())
+        {
+            std::cout << "<<INFO>>  min Linf = " << min_linf << std::endl;
+            std::cout << *min_linf_fun << std::endl;
+            std::cout << std::endl;
+        }
+        delete min_linf_fun;
+
 		if(min_delta < std::numeric_limits<double>::max())
 		{
+            std::cout << "<<INFO>> mean delta = " << mean_delta/nb_sol_found << std::endl;
+            std::cout << "<<INFO>>  min delta = " << min_delta << std::endl;
+            std::cout << *r<< std::endl;
+
 			int msec = time.elapsed() ;
 			int sec  = (msec / 1000) % 60 ;
 			int min  = (msec / 60000) % 60 ;
@@ -173,8 +244,8 @@ void rational_fitter_parallel::set_parameters(const arguments& args)
 
 
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, 
-		rational_function* r, 
-		vec& P, vec& Q, double& delta)
+        rational_function* r, const arguments &args,
+        vec& P, vec& Q, double& delta, double& linf_dist, double& l2_dist)
 {
 	for(int j=0; j<d->dimY(); ++j)
 	{
@@ -186,6 +257,29 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 		for(int i=0; i<nq; ++i) { Q[j*nq + i] = q[i] ; }
 	}
 
+    rational_function* rj = dynamic_cast<rational_function*>(plugins_manager::get_function(args["func"]));
+
+    rj->setDimX(d->dimX()) ;
+    rj->setDimY(d->dimY()) ;
+    rj->setMin(d->min()) ;
+    rj->setMax(d->max()) ;
+    rj->update(P, Q);
+
+    linf_dist = 0.0;
+    for(int i=0; i<d->size(); ++i)
+    {
+        vec dat = d->get(i);
+        vec y(d->dimY());
+        for(int j=0; j<d->dimY(); ++j)
+            y[j] = dat[d->dimX()+j];
+
+        linf_dist = std::max<double>(linf_dist, std::abs<double>(norm(y-rj->value(dat))));
+        l2_dist  += std::pow(norm(y-rj->value(dat)), 2);
+    }
+    l2_dist = std::sqrt(l2_dist / d->size());
+
+    delete rj;
+
 	return true ;
 }
 
@@ -195,7 +289,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // the function return a ration BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
 		rational_function* r,
-		vec& p, vec& q, double& delta)
+        vec& p, vec& q, double& delta)
 {
 	const int m = d->size(); // 2*m = number of constraints
 	const int n = np+nq;     // n = np+nq

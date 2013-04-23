@@ -50,6 +50,9 @@ class rational_function : public QObject, public function
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;
 
+        static int estimate_dk(int k, int d);
+        static void populate(std::vector<int>& vec, int N, int M, int j);
+
 	protected: // functions
 		
         //! Convert a 1D index into a vector of degree for a

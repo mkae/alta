@@ -47,8 +47,8 @@ class rational_fitter_parallel : public QObject, public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit, vec& p, vec& q, double& delta) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit, vec& p, vec& q, double& delta) ;
+        virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit, const arguments &args, vec& p, vec& q, double& delta, double& linf_dist,double& l2_dist) ;
+        virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit, vec& p, vec& q, double& delta) ;
 
         //! \brief Create a constraint vector given its index i in the data
         // object and the rational function object to fit.

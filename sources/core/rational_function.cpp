@@ -106,7 +106,7 @@ vec rational_function::q(const vec& x) const
 // Estimate the number of configuration for an indice
 // vector of dimension d with maximum element value
 // being k.
-int estimate_dk(int k, int d)
+int rational_function::estimate_dk(int k, int d)
 {
 	if(d == 1)
 	{
@@ -130,7 +130,7 @@ int estimate_dk(int k, int d)
 // Populate a vector of degrees of dimension N using a
 // maximum degree of M. The index at the current level
 // is j
-void populate(std::vector<int>& vec, int N, int M, int j)
+void rational_function::populate(std::vector<int>& vec, int N, int M, int j)
 {
 	// For each dimension, estimate the current level
 	// based on the number of configurations in the

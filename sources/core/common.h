@@ -146,6 +146,16 @@ class vec : public std::vector<double>
 			}
 			return c ;
 		}
+        friend double norm(const vec& a)
+        {
+            double norm = 0.0 ;
+            for(unsigned int i=0; i<a.size(); ++i)
+            {
+                norm += a[i]*a[i];
+            }
+            return sqrt(norm);
+        }
+
 		friend vec normalize(const vec& a)
 		{
 			vec b(a.size());
