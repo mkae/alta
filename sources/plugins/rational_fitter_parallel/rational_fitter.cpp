@@ -201,6 +201,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			delete rs[j];
 		}
 
+        std::cout << "                                                                           \r";
         if(min_l2 < std::numeric_limits<double>::max())
         {
             std::cout << "<<INFO>>  min L2 = " << min_l2 << std::endl;

@@ -53,6 +53,10 @@ class rational_function : public QObject, public function
         static int estimate_dk(int k, int d);
         static void populate(std::vector<int>& vec, int N, int M, int j);
 
+        //! \brief Output the rational function as a gnuplot file. It requires
+        //! the data object to output the function at the input location only.
+        virtual void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
+
 	protected: // functions
 		
         //! Convert a 1D index into a vector of degree for a
@@ -61,11 +65,7 @@ class rational_function : public QObject, public function
 		std::vector<int> index2degree(int i) const ;
 		
 		//! \brief Save the rational function to the rational format (see \ref formating).
-		virtual void save(const std::string& filename) const ;
-
-		//! \brief Output the rational function as a gnuplot file. It requires
-		//! the data object to output the function at the input location only.
-		virtual void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
+        virtual void save(const std::string& filename) const ;
 
 		//! \brief Output the rational function using a C++ function formating.
 		virtual void save_cpp(const std::string& filename, const arguments& args) const ;

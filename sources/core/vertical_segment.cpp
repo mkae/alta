@@ -119,26 +119,27 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				// TODO Specify the delta in case
 				// Handle multiple dim
 				double dt = args.get_float("dt", 0.1);
-
-                if(std::abs(v[dimX() + i]) > 0.0)
-                {
 #ifdef RELATIVE_ERROR
-                    v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 - dt) ;
-                    v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + dt) ;
-#endif
-                    v[dimX() +   dimY()+i] = std::max(v[dimX() + i] - dt, 0.0) ;
+                v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 - dt) ;
+                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + dt) ;
+#else
+                if(v[dimX() + i] > dt)
+                {
+                    v[dimX() +   dimY()+i] = v[dimX() + i] - dt ;
                     v[dimX() + 2*dimY()+i] = v[dimX() + i] + dt ;
+
                 }
                 else
                 {
                     v[dimX() +   dimY()+i] = 0.0 ;
                     v[dimX() + 2*dimY()+i] = dt ;
+
                 }
+#endif
 			}
 		}
 		
 		// If data is not in the interval of fit
-		// TODO: Update to more dims
 		bool is_in = true ;
 		for(int i=0; i<dimX(); ++i)
 		{

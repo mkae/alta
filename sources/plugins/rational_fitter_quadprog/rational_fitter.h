@@ -39,6 +39,8 @@ class rational_fitter_quadprog : public QObject, public fitter
 		virtual data*     provide_data() const ;
 		virtual function* provide_function() const ;
 
+    private: // methods
+
 	protected: // data
 
 		// Fitting a data object using np elements in the numerator and nq 
@@ -49,5 +51,9 @@ class rational_fitter_quadprog : public QObject, public fitter
 		// min and Max usable np and nq values for the fitting
 		int _max_np, _max_nq ;
 		int _min_np, _min_nq ;
+
+        // Add constraints to the boundary of the domain. You can shrink it of
+        // the parameter --boundary-constraint *double*
+        double _boundary;
 } ;
 
