@@ -54,11 +54,17 @@ int main(int argc, char** argv)
 	}
 
 	bool plot_error = false ;
+    bool linear_plot = false;
 	if(args.is_defined("error"))
 	{
 		std::cout << "<<INFO>> Exporting an error plot" << std::endl;
 		plot_error = true ;
 	}
+    else if(args.is_defined("linear_error"))
+    {
+        std::cout << "<<INFO>> Exporting linear error plot" << std::endl;
+        linear_plot = true;
+    }
 
 	// Load the BRDF
 	f->load(args["input"]);
@@ -73,15 +79,29 @@ int main(int argc, char** argv)
 			vec v = d->get(i) ;
 
 			vec y2 = f->value(v) ;
-			for(int u=0; u<d->dimX(); ++u)
-				file << v[u] << "\t" ;
+            if(linear_plot)
+            {
+                for(int u=0; u<d->dimX(); ++u)
+                    file << v[u] << "\t" ;
+            }
+            else
+            {
+                file << i << "\t" ;
+            }
 
 			for(int u=0; u<d->dimY(); ++u)
 			{
-				if(plot_error) {
-					file << y2[u] << "\t" ;
-				} else {
-					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+                if(plot_error)
+                {
+                    file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+                }
+                else if(linear_plot)
+                {
+                    file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+                }
+                else
+                {
+                    file << y2[u] << "\t" ;
 				}
 			}
 

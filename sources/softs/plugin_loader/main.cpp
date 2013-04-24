@@ -107,9 +107,9 @@ int main(int argc, char** argv)
             }
             file.close();
 //*/
-			std::string error_filename = args["output"].substr(0,n); 
-			error_filename.append(".errorplot") ;
-			std::ofstream efile(error_filename.c_str(), std::ios_base::trunc);
+            std::string error_filename = args["output"].substr(0,n);
+            error_filename.append(".errorplot") ;
+            file.open(error_filename.c_str(), std::ios_base::trunc);
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
@@ -118,13 +118,33 @@ int main(int argc, char** argv)
 
 				vec y2 = f->value(v) ;
 				for(int u=0; u<d->dimX(); ++u)
-					efile << v[u] << "\t" ;
+                    file << v[u] << "\t" ;
 					
 				for(int u=0; u<d->dimY(); ++u)
-					efile << y2[u]-y1[u] << "\t" ;
+                    file << y2[u]-y1[u] << "\t" ;
 					
-				efile << std::endl ;
+                file << std::endl ;
 			}
+            file.close();
+
+            std::string linerror_filename = args["output"].substr(0,n);
+            linerror_filename.append(".linearerrorplot") ;
+            file.open(linerror_filename.c_str(), std::ios_base::trunc);
+            for(int i=0; i<d->size(); ++i)
+            {
+                vec v = d->get(i) ;
+
+                vec y1(d->dimY()) ;
+                for(int k=0; k<d->dimY(); ++k) { y1[k] = 0.5*(v[d->dimX() + k] +v[d->dimX()+d->dimY() + k]); }
+                vec y2 = f->value(v) ;
+
+                file << i << "\t" ;
+                for(int u=0; u<d->dimY(); ++u)
+                    file << y2[u]-y1[u] << "\t" ;
+
+                file << std::endl ;
+            }
+            file.close();
 //*/
 #endif
 		}
