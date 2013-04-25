@@ -50,7 +50,7 @@ class vec : public std::vector<double>
 			}
 			return *this ;
 		}
-		
+
 		// Mathematical operators
 		//
 		friend vec operator-(const vec& a)
@@ -219,10 +219,24 @@ class vec : public std::vector<double>
 			out << "]" ;
 
 			return out ;
-		} ;
+        }
 
 
 } ;
+
+//! \brief locate the first index of value v in vector vec. Complexity in
+//! O(n) is the worst case.
+template<typename T> int is_in(std::vector<T> ve, T v)
+{
+    int res = -1;
+    for(unsigned int i=0; i<ve.size(); ++i)
+    {
+        if(ve[i] == v)
+            return i;
+    }
+
+    return res;
+}
 
 #define NOT_IMPLEMENTED() \
 std::cerr << "<<ERROR>> not implemented " << __FILE__ \

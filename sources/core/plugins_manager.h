@@ -7,6 +7,7 @@
 #include "data.h"
 #include "fitter.h"
 #include "args.h"
+#include "clustering.h"
 
 #define USING_STATIC
 
@@ -76,6 +77,13 @@ class plugins_manager
             else
             {
                 std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+            }
+
+            // Check is the data has to be clusterized
+            if(args.is_defined("cluster-dim"))
+            {
+                clustering* cluster = new clustering(d, args);
+                d = cluster;
             }
         }
 
