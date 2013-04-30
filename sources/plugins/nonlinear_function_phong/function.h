@@ -14,7 +14,7 @@
 #include <core/common.h>
 
 
-/*! \brief A phong lobe class. It is provided for testing with the nonlinear 
+/*! \brief A phong lobe class. It is provided for testing with the nonlinear
  *  fitting algorithms.
  *
  *  \details
@@ -27,17 +27,30 @@ class phong_function : public nonlinear_function, public QObject
 //    Q_OBJECT
     Q_INTERFACES(function)
 
-	public: // methods
+    public: // methods
 
-		// Overload the function operator
-		virtual vec operator()(const vec& x) const ;
-		virtual vec value(const vec& x) const ;
+        // Overload the function operator
+        virtual vec operator()(const vec& x) const ;
+        virtual vec value(const vec& x) const ;
+        virtual vec value(const vec& x, const vec& p) const
+        {
+            // Test input parameters for correct size
+            assert(p.size() == nbParameters());
+
+            vec res(dimY());
+            for(int i=0; i<dimY(); ++i)
+            {
+                const double kd = p[i*3 + 0];
+                const double ks = p[i*3 + 1];
+                const double N  = p[i*3 + 2];
+                res[i] = kd + ks * std::pow(x[0], N);
+            }
+
+            return res;
+        }
 
         //! \brief Load function specific files
 		virtual void load(const std::string& filename) ;
-
-        //! \brief Save the current function to a specific file type
-		virtual void save(const std::string& filename, const arguments& args) const ;
 		
         //! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const ;
@@ -78,6 +91,35 @@ class phong_function : public nonlinear_function, public QObject
             _kd.resize(_nY) ;
             _ks.resize(_nY) ;
             _N.resize(_nY) ;
+        }
+
+    protected: // methods
+
+        virtual void save(const std::string& filename) const
+        {
+            std::ofstream file(filename.c_str(), std::ios_base::trunc);
+            file << "#DIM " << _nX << " " << _nY << std::endl ;
+            file << "#kd" << std::endl;
+            for(int i=0; i<_nY; ++i)
+            {
+                file << _kd[i] << std::endl;
+            }
+            file << std::endl;
+
+            file << "#ks" << std::endl;
+            for(int i=0; i<_nY; ++i)
+            {
+                file << _ks[i] << std::endl;
+            }
+            file << std::endl;
+
+            file << "#N" << std::endl;
+            for(int i=0; i<_nY; ++i)
+            {
+                file << _N[i] << std::endl;
+            }
+            file << std::endl;
+
         }
 
 	private: // data

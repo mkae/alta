@@ -570,7 +570,7 @@ void rational_function::save(const std::string& filename) const
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NP " << a.size() / _nY << std::endl ;
 	file << "#NQ " << b.size() / _nY << std::endl ;
-   file << "#BASIS LEGENDRE" << std::endl ;
+    file << "#BASIS LEGENDRE" << std::endl ;
 
 	unsigned int np = a.size() / _nY ;
     unsigned int nq = b.size() / _nY ;

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <fstream>
 
 clustering::clustering(const data* d, const arguments& args)
 {
@@ -23,7 +24,6 @@ clustering::clustering(const data* d, const arguments& args)
     assert(indices.size() > 0 && indices.size() < d->dimX());
 
     // Fit the slice into the domain of definition of the data
-    int compressed_size = d->dimX()-indices.size();
     vec compressed_vec  = args.get_vec("cluster-slice", d->dimX(), std::numeric_limits<float>::max());
     for(int i=0; i<d->dimX(); ++i)
     {
@@ -70,6 +70,23 @@ clustering::clustering(const data* d, const arguments& args)
         _data.push_back(e);
     }
     std::cout << "<<INFO>> clustering left " << _data.size() << " elements" << std::endl;
+
+    save("cluster.txt");
+}
+
+void clustering::save(const std::string& filename)
+{
+    std::ofstream file(filename.c_str(), std::ios_base::trunc);
+    file << "#DIM " << _nX << " " << _nY << std::endl;
+    for(int i=0; i<size(); ++i)
+    {
+        for(int j=0; j<_nX+_nY; ++j)
+        {
+            file << _data[i][j] << "\t";
+        }
+        file << std::endl;
+    }
+    file.close();
 }
 
 vec clustering::get(int i) const

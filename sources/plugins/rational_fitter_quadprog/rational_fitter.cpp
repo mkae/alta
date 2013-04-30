@@ -82,11 +82,11 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
-		if(temp_np <= _max_np)
+        if(temp_np < _max_np)
 		{
 			++temp_np ;
 		}
-		if(temp_nq <= _max_nq)
+        if(temp_nq < _max_nq)
 		{
 			++temp_nq ;
 		}
@@ -101,6 +101,10 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 	_max_nq = args.get_float("nq", 10) ;
 	_min_np = args.get_float("min-np", _max_np) ;
     _min_nq = args.get_float("min-nq", _max_nq) ;
+
+    _max_np = std::max<int>(_max_np, _min_np);
+    _max_nq = std::max<int>(_max_nq, _min_nq);
+
     _boundary = args.get_float("boundary-constraint", 1.0f);
 }
 		

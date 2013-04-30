@@ -13,6 +13,9 @@ class clustering : public data
         //! it into a low dimension one.
         clustering(const data* d, const arguments& args);
 
+        //! \brief the clustering class can save a clustering to a file.
+        virtual void save(const std::string& filename);
+
         //! \brief the clustering class cannot load from a file. It requires
         //! a complete object to be created.
         virtual void load(const std::string& filename)

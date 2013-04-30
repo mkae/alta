@@ -2,14 +2,14 @@
 
 #include <functional>
 #include <string>
+#include <fstream>
 
 #include <QtPlugin>
 
 #include "common.h"
 #include "args.h"
 #include "params.h"
-
-class data ;
+#include "data.h"
 
 /*! \brief A representation of an analytical function.
  *  \ingroup core
@@ -123,9 +123,29 @@ class function
 		//! the data object to output the function at the input location only.
 		virtual void save_gnuplot(const std::string& filename, const data* d, 
 		                          const arguments& args) const
-		{
-			NOT_IMPLEMENTED();
-		}
+        {
+#ifdef OLD
+            std::ofstream file(filename.c_str(), std::ios_base::trunc);
+            for(int i=0; i<d->size(); ++i)
+            {
+                vec v = d->get(i) ;
+        //		vec y1 ; y1.assign(d->dimY(), 0.0) ;
+        //		for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+
+                vec y2 = value(v) ;
+                for(int u=0; u<d->dimX(); ++u)
+                    file << v[u] << "\t" ;
+
+                for(int u=0; u<d->dimY(); ++u)
+                    file << y2[u] << "\t" ;
+
+                file << std::endl ;
+            }
+            file.close();
+#else
+            NOT_IMPLEMENTED();
+#endif
+        }
 		
 		//! \brief Output the rational function using a C++ function formating.
 		virtual void save_cpp(const std::string& filename, const arguments& args) const 

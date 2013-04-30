@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 		int sec  = (msec / 1000) % 60 ;
 		int min  = (msec / 60000) % 60 ;
 		int hour = (msec / 3600000) ;
-		
+
 
 		// Display the result
 		if(is_fitted)
@@ -81,8 +81,8 @@ int main(int argc, char** argv)
 			}
 /*/
 
-			f->save(args["output"], args) ;
-#ifndef OLD // use brdf2gnuplot
+            f->save(args["output"], args) ;
+#ifdef OLD // use brdf2gnuplot
 			size_t n = args["output"].find('.') ;
 			std::string gnuplot_filename = args["output"].substr(0,n); 
 			gnuplot_filename.append(".gnuplot") ;

@@ -43,7 +43,7 @@ class rational_fitter_parallel : public QObject, public fitter
 		virtual data*     provide_data() const ;
 		virtual function* provide_function() const ;
 
-	protected: // data
+    protected: // methods
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
@@ -53,5 +53,10 @@ class rational_fitter_parallel : public QObject, public fitter
         //! \brief Create a constraint vector given its index i in the data
         // object and the rational function object to fit.
         virtual void get_constraint(int i, int np, int nq, int ny, const vertical_segment* data, const rational_function* func, vec& cu, vec& cl);
+
+    protected: // data
+
+        // Adding a factor to fit more aggresively the boundaries
+        double _boundary_factor;
 } ;
 

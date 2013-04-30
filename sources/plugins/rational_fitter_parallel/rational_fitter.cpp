@@ -241,6 +241,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 
 void rational_fitter_parallel::set_parameters(const arguments& args)
 {
+    _boundary_factor = args.get_float("boundary-constraint", 1.0f);
 }
 
 
@@ -295,7 +296,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 	const int m = d->size(); // 2*m = number of constraints
 	const int n = np+nq;     // n = np+nq
 
-	quadratic_program qp(np, nq);
+    quadratic_program qp(np, nq, _boundary_factor);
 
 #ifndef TODO_PUT_IN_METHOD
 	for(int i=0; i<d->size()/100; ++i)
