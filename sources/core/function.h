@@ -124,7 +124,7 @@ class function
 		virtual void save_gnuplot(const std::string& filename, const data* d, 
 		                          const arguments& args) const
         {
-#ifdef OLD
+#ifndef OLD
             std::ofstream file(filename.c_str(), std::ios_base::trunc);
             for(int i=0; i<d->size(); ++i)
             {

@@ -73,7 +73,19 @@ int main(int argc, char** argv)
 		for(int i=0; i<nbx; ++i)
 		{
 				const float x = i / (float)nbx ;
-				const float z = exp(-10.0 * x*x) + 0.1 ;
+				const float z = 0.1 + 0.5 * std::pow(x, 1.5) ;
+			
+				f << x << "\t" << z << std::endl ;
+		}
+	}
+   else if(k == 6)
+	{
+		f << "#DIM 1 1" << std::endl ;
+		f << "#PARAM_IN COS_TH" << std::endl;
+		for(int i=0; i<nbx; ++i)
+		{
+				const float x = i / (float)nbx ;
+				const float z = 1.0 - x ;
 			
 				f << x << "\t" << z << std::endl ;
 		}

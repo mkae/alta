@@ -2,7 +2,7 @@
 
 #include <Eigen/Dense>
 #include <Eigen/SVD>
-#include <unsupported/Eigen/NonLinearOptimization>
+#include <unsupported/Eigen/LevenbergMarquardt>
 
 #include <string>
 #include <iostream>
@@ -18,49 +18,61 @@ fitter* provide_fitter()
     return new nonlinear_fitter_eigen();
 }
 
-struct EigenFunctor
+struct EigenFunctor: Eigen::DenseFunctor<double>
 {
-    EigenFunctor(nonlinear_function* f, const data* d) : _f(f)
+    EigenFunctor(nonlinear_function* f, const data* d) : 
+		 DenseFunctor<double>(f->nbParameters(), d->size()), _f(f), _d(d)
 	{
+#ifndef DEBUG
+		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
+#endif
 	}
-
-    inline int inputs() const { return _f->nbParameters(); }
-    inline int values() const { return _f->dimY(); }
 
 	int operator()(const Eigen::VectorXd& x, Eigen::VectorXd& y) const
 	{
-        // Update the parameters vector
-        vec _p(inputs());
-        for(int i=0; i<inputs(); ++i)
-        {
-            _p[i] = x(i);
-        }
+		std::cout << "input vector = " << x << std::endl;
 
-        vec _x  = _d->get(0);
-        vec _di = vec(_f->dimY());
-        for(int i=0; i<_f->dimY(); ++i)
-            _di[i] = _x[_f->dimX() + i];
 
-        vec _y = (*_f)(_x) - _di;
-		for(int i=0; i<values(); ++i) y(i) = _y[i];
+		// Update the parameters vector
+		vec _p(inputs());
+		for(int i=0; i<inputs(); ++i)
+		{
+			_p[i] = x(i);
+		}
+		_f->setParameters(_p);
 
-        std::cout << "f(x) = " << y << std::endl;
+		for(int s=0; s<values(); ++s)
+		{
+			vec _x  = _d->get(s);
+
+			vec _di = vec(_f->dimY());
+			for(int i=0; i<_f->dimY(); ++i)
+				_di[i] = _x[_f->dimX() + i];
+
+			// Should add the resulting vector completely
+			vec _y = _di - (*_f)(_x);
+			y(s) = _y[0];
+		}
+		
 		return 0;
 	}
 
 	int df(const Eigen::VectorXd &x, Eigen::MatrixXd &fjac) const
 	{
-		vec _x(inputs());
-		for(int i=0; i<inputs(); ++i) _x[i] = x(i);
+		vec _p(inputs());
+		for(int i=0; i<inputs(); ++i) _p[i] = x(i);
+		_f->setParameters(_p);
 
-		vec _jac = _f->parametersJacobian(_x);
-		for(int j=0; j<_f->nbParameters(); ++j)
-			for(int i=0; i<values(); ++i)
+		for(int i=0; i<values(); ++i)
+		{
+			vec xi = _d->get(i);
+
+			vec _jac = _f->parametersJacobian(xi);
+			for(int j=0; j<_f->nbParameters(); ++j)
 			{
-				fjac(i,j) = _jac[values()*j + i];
+				fjac(i,j) = -_jac[j];
 			}
-
-        std::cout << "J = " <<  fjac << std::endl;
+		}
 
 		return 0;
 	}
@@ -93,15 +105,19 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
     }
     nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
 
+#ifndef DEBUG
+	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
+#endif
+
     /* the following starting values provide a rough fit. */
     int info;
     Eigen::VectorXd x;
     x.setConstant(nf->nbParameters(), 1.);
 
-
     EigenFunctor functor(nf, d);
     Eigen::LevenbergMarquardt<EigenFunctor> lm(functor);
-    info = lm.minimize(x);
+
+	 info = lm.minimize(x);
 
     if(info == Eigen::LevenbergMarquardtSpace::ImproperInputParameters)
     {
@@ -117,6 +133,9 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
         p[i] = x(i);
     }
     std::cout << "<<INFO>> found parameters: " << p << std::endl;
+#ifndef DEBUG
+    std::cout << "<<DEBUG>> using " << lm.iterations() << " iterations" << std::endl;
+#endif
     nf->setParameters(p);
     return true;
 

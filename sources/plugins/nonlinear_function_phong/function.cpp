@@ -72,28 +72,19 @@ vec phong_function::parametersJacobian(const vec& x) const
 {
     vec jac(dimY()*nbParameters());
     for(int i=0; i<dimY(); ++i)
-    {
-        for(int j=0; j<dimY(); ++j)
-        {
-            if(i == j)
-            {
-                // df / dk_d
-                jac[i+0*dimY() + j*nbParameters()] = 1.0;
+	 {
+		 // df / dk_d
+		 jac[i*nbParameters() + 0] = 1.0;
 
-                // df / dk_s
-                jac[i+1*dimY() + j*nbParameters()] = std::pow(x[0], _N[j]);
+		 // df / dk_s
+		 jac[i*nbParameters() + 1] = std::pow(x[0], _N[0]);
 
-                // df / dN
-                jac[i+2*dimY() + j*nbParameters()] = _N[j] * _ks[i] * std::pow(x[0], _N[j]);
-            }
-            else
-            {
-                jac[i+0*dimY() + j*nbParameters()] = 0.0;
-                jac[i+1*dimY() + j*nbParameters()] = 0.0;
-                jac[i+2*dimY() + j*nbParameters()] = 0.0;
-            }
-        }
-    }
+		 // df / dN
+		 if(x[0] == 0.0)
+			 jac[i*nbParameters() + 2] = 0.0;
+		 else
+			 jac[i*nbParameters() + 2] = _ks[0] * std::log(x[0]) * std::pow(x[0], _N[0]);
+	 }
 
     return jac;
 }
