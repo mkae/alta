@@ -68,14 +68,16 @@ int main(int argc, char** argv)
 	}
    else if(k == 5)
 	{
-		f << "#DIM 1 1" << std::endl ;
+		f << "#DIM 1 3" << std::endl ;
 		f << "#PARAM_IN COS_TH" << std::endl;
 		for(int i=0; i<nbx; ++i)
 		{
 				const float x = i / (float)nbx ;
-				const float z = 0.1 + 0.5 * std::pow(x, 1.5) ;
+				const float z1 = 0.1 + 0.5 * std::pow(x, 1.5) ;
+				const float z2 = 0.0 - 0.1 * std::pow(x, 4.0) ;
+				const float z3 = 0.5 + 0.7 * std::pow(x, 1.0) ;
 			
-				f << x << "\t" << z << std::endl ;
+				f << x << "\t" << z1 << "\t" << z2 << "\t" << z3 << std::endl ;
 		}
 	}
    else if(k == 6)
@@ -85,7 +87,7 @@ int main(int argc, char** argv)
 		for(int i=0; i<nbx; ++i)
 		{
 				const float x = i / (float)nbx ;
-				const float z = 1.0 - x ;
+				const float z = 0.1 + 0.5 * std::pow(x, 1.5) ;
 			
 				f << x << "\t" << z << std::endl ;
 		}

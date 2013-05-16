@@ -21,7 +21,7 @@ fitter* provide_fitter()
 struct EigenFunctor: Eigen::DenseFunctor<double>
 {
     EigenFunctor(nonlinear_function* f, const data* d) : 
-		 DenseFunctor<double>(f->nbParameters(), d->size()), _f(f), _d(d)
+		 DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
@@ -30,18 +30,16 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 	int operator()(const Eigen::VectorXd& x, Eigen::VectorXd& y) const
 	{
-		std::cout << "input vector = " << x << std::endl;
-
+#ifndef DEBUG
+		std::cout << "parameters:" << std::endl << x << std::endl << std::endl ;
+#endif
 
 		// Update the parameters vector
 		vec _p(inputs());
-		for(int i=0; i<inputs(); ++i)
-		{
-			_p[i] = x(i);
-		}
+		for(int i=0; i<inputs(); ++i) { _p[i] = x(i); }
 		_f->setParameters(_p);
 
-		for(int s=0; s<values(); ++s)
+		for(int s=0; s<_d->size(); ++s)
 		{
 			vec _x  = _d->get(s);
 
@@ -51,29 +49,56 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 			// Should add the resulting vector completely
 			vec _y = _di - (*_f)(_x);
-			y(s) = _y[0];
+			for(int i=0; i<_f->dimY(); ++i)
+				y(i*_d->size() + s) = _y[i];
 		}
+#ifndef DEBUG
+		std::cout << "diff vector:" << std::endl << y << std::endl << std::endl ;
+#endif
 		
 		return 0;
 	}
 
 	int df(const Eigen::VectorXd &x, Eigen::MatrixXd &fjac) const
 	{
+		// Update the paramters
 		vec _p(inputs());
-		for(int i=0; i<inputs(); ++i) _p[i] = x(i);
+		for(int i=0; i<inputs(); ++i) { _p[i] = x(i); }
 		_f->setParameters(_p);
 
-		for(int i=0; i<values(); ++i)
+		// For each element to fit, fill the rows of the matrix
+		for(int s=0; s<_d->size(); ++s)
 		{
-			vec xi = _d->get(i);
+			// Get the position
+			vec xi = _d->get(s);
 
+			// Get the associated jacobian
 			vec _jac = _f->parametersJacobian(xi);
+
+			// Fill the columns of the matrix
+#ifdef DEBUG
+			Eigen::MatrixXd temp (_f->dimY(), _f->nbParameters());
+#endif
 			for(int j=0; j<_f->nbParameters(); ++j)
 			{
-				fjac(i,j) = -_jac[j];
+				// For each output channel, update the subpart of the
+				// vector row
+				for(int i=0; i<_f->dimY(); ++i)
+				{
+					fjac(i*_d->size() + s, j) = -_jac[i*_f->nbParameters() + j];
+#ifdef DEBUG
+					temp(i, j) = _jac[i*_f->nbParameters() + j];
+#endif
+				}
 			}
-		}
 
+#ifdef DEBUG
+			std::cout << temp << std::endl << std::endl ;
+#endif
+		}
+#ifndef DEBUG
+			std::cout << "jacobian :" << std::endl << fjac << std::endl << std::endl;
+#endif
 		return 0;
 	}
 
@@ -111,7 +136,7 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 
     /* the following starting values provide a rough fit. */
     int info;
-    Eigen::VectorXd x;
+    Eigen::VectorXd x(6);
     x.setConstant(nf->nbParameters(), 1.);
 
     EigenFunctor functor(nf, d);
