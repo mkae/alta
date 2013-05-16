@@ -30,7 +30,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 	int operator()(const Eigen::VectorXd& x, Eigen::VectorXd& y) const
 	{
-#ifndef DEBUG
+#ifdef DEBUG
 		std::cout << "parameters:" << std::endl << x << std::endl << std::endl ;
 #endif
 
@@ -52,7 +52,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			for(int i=0; i<_f->dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
 		}
-#ifndef DEBUG
+#ifdef DEBUG
 		std::cout << "diff vector:" << std::endl << y << std::endl << std::endl ;
 #endif
 		
@@ -96,7 +96,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			std::cout << temp << std::endl << std::endl ;
 #endif
 		}
-#ifndef DEBUG
+#ifdef DEBUG
 			std::cout << "jacobian :" << std::endl << fjac << std::endl << std::endl;
 #endif
 		return 0;
