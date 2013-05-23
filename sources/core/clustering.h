@@ -1,17 +1,19 @@
 #pragma once
 
-#include "data.h"
 #include "common.h"
+#include "params.h"
 
 #include <vector>
 
+#ifdef OLD
 class clustering : public data
 {
     public: // methods
 
         //! \brief constructor loading a full dimension data and clustering
         //! it into a low dimension one.
-        clustering(const data* d, const arguments& args);
+
+        clustering::clustering(const data* d, const arguments& args);
 
         //! \brief the clustering class can save a clustering to a file.
         virtual void save(const std::string& filename);
@@ -46,3 +48,8 @@ class clustering : public data
         std::vector<vec> _data;
         vec _min, _max;
 };
+#else
+    template<class T> void clustering(const T* in_data , int nY, params::input in_param, params::input out_param, std::vector<vec>& out_data);
+#endif
+
+#include "clustering.cpp"

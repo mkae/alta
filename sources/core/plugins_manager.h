@@ -79,12 +79,14 @@ class plugins_manager
                 std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
             }
 
+            /*
             // Check is the data has to be clusterized
             if(args.is_defined("cluster-dim"))
             {
                 clustering* cluster = new clustering(d, args);
                 d = cluster;
             }
+            */
         }
 
 		//! \brief Provide a measure of how much memory there is on the system.

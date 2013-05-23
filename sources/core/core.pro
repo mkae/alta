@@ -18,4 +18,4 @@ HEADERS  = args.h               \
 SOURCES  = plugins_manager.cpp  \
            vertical_segment.cpp \
 			  rational_function.cpp \
-    clustering.cpp
+    #clustering.cpp

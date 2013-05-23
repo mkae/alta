@@ -85,7 +85,7 @@ class params
             if(dim > 0)
             {
                 double* outvec = new double[dim];
-                double  temvec[6]; // Temp CARTESIAN vectors
+                double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Temp CARTESIAN vectors
                 to_cartesian(invec, intype, temvec);
                 from_cartesian(temvec, outtype, outvec);
 
@@ -103,8 +103,13 @@ class params
         static void convert(const double* invec, params::input intype,
                             params::input outtype, double* outvec)
         {
-            double  temvec[6]; // Temp CARTESIAN vectors
+            double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Temp CARTESIAN vectors
             to_cartesian(invec, intype, temvec);
+#ifdef DEBUG
+            std::cout << "<<DEBUG>> temp vec = ["
+                      << temvec[0] << ", " << temvec[1] << ", " << temvec[2] << "] => ["
+                      << temvec[3] << ", " << temvec[4] << ", " << temvec[5] << "]" << std::endl;
+#endif
             from_cartesian(temvec, outtype, outvec);
         }
 
@@ -194,7 +199,7 @@ class params
                     break;
 
                 default:
-                    throw("Transformation not implemented, params::from_cartesian");
+                    assert(false);
                     break;
             }
         }
@@ -211,6 +216,7 @@ class params
 
                 // 2D Parametrizations
                 case params::ISOTROPIC_TD_PD:
+                case params::RUSIN_TH_TD:
                 case params::ROMEIRO_TH_TD:
                 case params::COS_TH_TD:
                     return 2;
@@ -235,6 +241,7 @@ class params
                     break;
 
                 default:
+                    assert(false);
                     return -1;
                     break;
             }
@@ -258,6 +265,7 @@ class params
                     break;
 
                 default:
+                    assert(false);
                     return -1;
                     break;
             }
@@ -278,8 +286,8 @@ class params
             out[0] = sin(theta_d)*cos(phi_d);
             out[1] = sin(theta_d)*sin(phi_d);
             out[2] = cos(theta_d);
-            rotate_binormal(out, theta_h);
-            rotate_normal(out, phi_h);
+            rotate_binormal(out, phi_h);
+            rotate_normal(out, theta_h);
 
             // Compute the out vector from the in vector and the half
             // vector.
