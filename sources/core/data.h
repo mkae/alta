@@ -117,18 +117,18 @@ class data_params : public data
 
 		//! \brief contructor requires the definition of a base class that
 		//! has a parametrization, and a new parametrization.
-        data_params(const data* d, params::input new_param,
+		data_params(const data* d, params::input new_param,
 				data_params::clustrering method = data_params::NONE) :
-            _clustering_method(method)
+			_clustering_method(method)
 		{
-            _nX = params::dimension(new_param);
+			_nX = params::dimension(new_param);
 			_nY = d->dimY();
 
-            std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
-            clustering<data>(d, _nY, d->parametrization(), new_param, _data);
+			std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
+			clustering<data>(d, _nY, d->parametrization(), new_param, _data);
 
-            std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
-            save(std::string("cluster.gnuplot"));
+			std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
+			save(std::string("cluster.gnuplot"));
 		}
 
 		// Load data from a file

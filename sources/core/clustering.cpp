@@ -122,8 +122,10 @@ template<class T> void clustering(const T* in_data, int _nY, params::input in_pa
     const int in_nX  = params::dimension(in_param);
     const int out_nX = params::dimension(out_param);
 
+#ifdef DEBUG
     std::cout << " in dim = " <<  in_nX << std::endl;
     std::cout << "out dim = " << out_nX << std::endl;
+#endif
 
     for(int i=0; i<in_data->size(); ++i)
     {
@@ -156,8 +158,10 @@ template<class T> void clustering(const T* in_data, int _nY, params::input in_pa
             for(int j=0; j<_nY; ++j)
                 e[out_nX + j] = p[in_nX + j];
 
+#ifdef DEBUG
             std::cout << " in = " << p << std::endl;
             std::cout << "out = " << e << std::endl;
+#endif
             out_data.push_back(e);
         }
     }
