@@ -122,6 +122,10 @@ class phong_function : public nonlinear_function, public QObject
 
         }
 
+        //! \brief Output the function using a BRDF Explorer formating.
+        virtual void save_brdfexplorer(const std::string& filename,
+                                       const arguments& args) const;
+
 	private: // data
 
         //! \brief The phong lobe data

@@ -43,6 +43,7 @@ class function
 		//! \see rational_function.cpp for an example
 		virtual void save(const std::string& filename, const arguments& args) const
 		{
+            std::cout << "<<DEBUG>> Exporting the function" << std::endl;
 			if(args.is_defined("export"))
 			{
 				if(args["export"].compare("c++") == 0)
@@ -55,6 +56,11 @@ class function
 					std::cout << "<<INFO>> will export in matlab format" << std::endl;
 					save_matlab(filename, args);
 				}
+                else if(args["export"].compare("explorer") == 0)
+                {
+                    std::cout << "<<INFO>> will export in BRDF explorer format" << std::endl;
+                    save_brdfexplorer(filename, args);
+                }
 				else
 				{
 					std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
@@ -119,7 +125,7 @@ class function
 			NOT_IMPLEMENTED();
 		}
 
-		//! \brief Output the rational function as a gnuplot file. It requires
+        //! \brief Output the function as a gnuplot file. It requires
 		//! the data object to output the function at the input location only.
 		virtual void save_gnuplot(const std::string& filename, const data* d, 
 		                          const arguments& args) const
@@ -147,17 +153,24 @@ class function
 #endif
         }
 		
-		//! \brief Output the rational function using a C++ function formating.
+        //! \brief Output the function using a C++ function formating.
 		virtual void save_cpp(const std::string& filename, const arguments& args) const 
 
 		{
 			NOT_IMPLEMENTED();
 		}
-		//! \brief Output the rational function using a C++ function formating.
+
+        //! \brief Output the function using a C++ function formating.
 		virtual void save_matlab(const std::string& filename, const arguments& args) const 
 		{
 			NOT_IMPLEMENTED();
 		}
+
+        //! \brief Output the function using a BRDF Explorer formating.
+        virtual void save_brdfexplorer(const std::string& filename, const arguments& args) const
+        {
+            NOT_IMPLEMENTED();
+        }
 
 
 	protected: // data

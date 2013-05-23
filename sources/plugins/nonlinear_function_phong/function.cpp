@@ -99,4 +99,74 @@ vec phong_function::parametersJacobian(const vec& x) const
     return jac;
 }
 
+std::ofstream& type_affectation(std::ofstream& out, 
+                                const std::string& name, 
+                                const vec& x, int  nY)
+{
+	if(nY == 1)
+		out << "float " ;
+	else
+		out << "vec" << nY << " ";
+	
+	out << name << " = ";
+
+	if(nY != 1)
+		out << "vec" << nY << "(";
+
+	for(int i=0; i<nY; ++i)
+	{
+		if(i != 0) out << ", ";
+		out << x[i];
+	}
+
+	if(nY != 1)
+		out << ")";
+
+	out << ";" << std::endl;
+
+	return out;
+}
+
+//! \brief Output the function using a BRDF Explorer formating.
+void phong_function::save_brdfexplorer(const std::string& filename,
+                                       const arguments& args) const
+{
+    std::ofstream file(filename.c_str(), std::ios_base::trunc);
+    file << "analytic" << std::endl;
+
+    file << std::endl;
+//    file << "::begin parameters" << std::endl;
+//    file << "::end parameters" << std::endl;
+//    file << std::endl;
+    file << std::endl;
+    file << "::begin shader" << std::endl;
+	 
+	 type_affectation(file, std::string("n"),  _N,  _nY);
+	 type_affectation(file, std::string("kd"), _kd, _nY);
+	 type_affectation(file, std::string("ks"), _ks, _nY);
+
+    file << std::endl;
+    file << "const float PI = 3.14159265358979323846;" << std::endl;
+    file << std::endl;
+    file << "vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )" << std::endl;
+    file << "{" << std::endl;
+    file << "    vec3 H = normalize(L+V);" << std::endl;
+    if(_nY == 1)
+    {
+        file << "    float D = kd + ks * pow(max(0, dot(N,H)),n);" << std::endl;
+    }
+    else
+    {
+        file << "    vec" << _nY << " D = kd + ks * pow(vec" << _nY << "(max(0.0, dot(N,H))),n);" << std::endl;
+    }
+	 file << "    return vec3(D);" << std::endl;
+//    file << "    if (normalized)" << std::endl;
+//    file << "        D *= (2+n) / (2*PI);" << std::endl;
+    file << "}" << std::endl;
+    file << std::endl;
+    file << "::end shader" << std::endl;
+    file.close();
+}
+
+
 Q_EXPORT_PLUGIN2(phong_function, phong_function)
