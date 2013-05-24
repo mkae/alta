@@ -123,7 +123,16 @@ class params
             {
                 // 1D Parametrizations
                 case params::COS_TH:
-                    half_to_cartesian(acos(invec[0]), 0.0, 0.0, 0.0, outvec);
+#ifndef USE_HALF
+						 half_to_cartesian(acos(invec[0]), 0.0, 0.0, 0.0, outvec);
+#else
+						 outvec[0] = sqrt(1.0 - invec[0]*invec[0]);
+						 outvec[1] = 0;
+						 outvec[2] = invec[0];							
+						 outvec[3] = sqrt(1.0 - invec[0]*invec[0]);
+						 outvec[4] = 0;
+						 outvec[5] = invec[0];							
+#endif
                     break;
 
                 // 2D Parametrizations
@@ -286,15 +295,20 @@ class params
             out[0] = sin(theta_d)*cos(phi_d);
             out[1] = sin(theta_d)*sin(phi_d);
             out[2] = cos(theta_d);
-            rotate_binormal(out, phi_h);
-            rotate_normal(out, theta_h);
+
+				//! \todo investigate here, the rotation along N should be
+				//1 of phi_h not theta_h !
+            rotate_normal(out, phi_h);
+            rotate_binormal(out, theta_h);
 
             // Compute the out vector from the in vector and the half
             // vector.
             const double dot = out[0]*half[0] + out[1]*half[1] + out[2]*half[2];
-            out[3] = -out[0] + 2.0*dot * half[0];
-            out[4] = -out[1] + 2.0*dot * half[1];
-            out[5] = -out[2] + 2.0*dot * half[2];
+            out[3] = -out[0] + (dot+1.0) * half[0];
+            out[4] = -out[1] + (dot+1.0) * half[1];
+            out[5] = -out[2] + (dot+1.0) * half[2];
+
+				assert(out[5] >= 0.0);
         }
 
         //! \brief rotate a cartesian vector with respect to the normal of

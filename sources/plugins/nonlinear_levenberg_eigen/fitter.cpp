@@ -136,8 +136,9 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 
     /* the following starting values provide a rough fit. */
     int info;
-    Eigen::VectorXd x(6);
+    Eigen::VectorXd x(nf->nbParameters());
     x.setConstant(nf->nbParameters(), 1.);
+
 
     EigenFunctor functor(nf, d);
     Eigen::LevenbergMarquardt<EigenFunctor> lm(functor);
