@@ -12,10 +12,10 @@ HEADERS  = args.h               \
  			  plugins_manager.h    \
 			  vertical_segment.h   \
 			  rational_function.h  \
-			  params.h \
-    clustering.h
+			  params.h             \
+           clustering.h
 
-SOURCES  = plugins_manager.cpp  \
-           vertical_segment.cpp \
+SOURCES  = plugins_manager.cpp   \
+           vertical_segment.cpp  \
 			  rational_function.cpp \
-    #clustering.cpp
+#clustering.cpp

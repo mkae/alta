@@ -38,12 +38,17 @@ void phong_function::load(const std::string& filename)
 //! Number of parameters to this non-linear function
 int phong_function::nbParameters() const 
 {
+#ifdef FIT_DIFFUSE
     return 3*dimY();
+#else
+    return 2*dimY();
+#endif
 }
 
 //! Get the vector of parameters for the function
 vec phong_function::parameters() const 
 {
+#ifdef FIT_DIFFUSE
     vec res(3*dimY());
     for(int i=0; i<dimY(); ++i)
     {
@@ -51,6 +56,14 @@ vec phong_function::parameters() const
         res[i*3 + 1] = _ks[i];
         res[i*3 + 2] = _N[i];
     }
+#else
+    vec res(2*dimY());
+    for(int i=0; i<dimY(); ++i)
+    {
+        res[i*2 + 0] = _ks[i];
+        res[i*2 + 1] = _N[i];
+    }
+#endif
 
     return res;
 }
@@ -60,9 +73,14 @@ void phong_function::setParameters(const vec& p)
 {
     for(int i=0; i<dimY(); ++i)
     {
+#ifdef FIT_DIFFUSE
         _kd[i] = p[i*3 + 0];
         _ks[i] = p[i*3 + 1];
         _N[i]  = p[i*3 + 2];
+#else
+        _ks[i] = p[i*2 + 0];
+        _N[i]  = p[i*2 + 1];
+#endif
     }
 }
 
@@ -76,6 +94,7 @@ vec phong_function::parametersJacobian(const vec& x) const
 		 {
 			 if(i == j)
 			 {
+#ifdef FIT_DIFFUSE
 				 // df / dk_d
 				 jac[i*nbParameters() + j*3+0] = 1.0;
 
@@ -87,16 +106,48 @@ vec phong_function::parametersJacobian(const vec& x) const
 					 jac[i*nbParameters() + j*3+2] = 0.0;
 				 else
 					 jac[i*nbParameters() + j*3+2] = _ks[j] * std::log(x[0]) * std::pow(x[0], _N[j]);
-			 }
+#else
+
+                 // df / dk_s
+                 jac[i*nbParameters() + j*2+0] = std::pow(x[0], _N[j]);
+
+                 // df / dN
+                 if(x[0] == 0.0)
+                     jac[i*nbParameters() + j*2+1] = 0.0;
+                 else
+                     jac[i*nbParameters() + j*2+1] = _ks[j] * std::log(x[0]) * std::pow(x[0], _N[j]);
+#endif
+             }
 			 else
 			 {
+#ifdef FIT_DIFFUSE
 				 jac[i*nbParameters() + j*3+0] = 0.0;
 				 jac[i*nbParameters() + j*3+1] = 0.0;
 				 jac[i*nbParameters() + j*3+2] = 0.0;
+#else
+                 jac[i*nbParameters() + j*2+0] = 0.0;
+                 jac[i*nbParameters() + j*2+1] = 0.0;
+#endif
 			 }
 		 }
 
     return jac;
+}
+
+
+void phong_function::boostrap(const data* d, const arguments& args)
+{
+
+    vec x0 = d->get(0);
+    for(int i=0; i<d->dimY(); ++i)
+        _kd[i] = x0[d->dimX() + i];
+
+    for(int i=1; i<d->size(); ++i)
+    {
+        vec xi = d->get(i);
+        for(int j=0; j<d->dimY(); ++j)
+            _kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+    }
 }
 
 std::ofstream& type_affectation(std::ofstream& out, 

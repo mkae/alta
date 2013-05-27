@@ -123,12 +123,14 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
     fit->setMin(d->min()) ;
     fit->setMax(d->max()) ;
 
+	 // Convert the function and boostrap it with the data
     if(dynamic_cast<nonlinear_function*>(fit) == NULL)
     {
         std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
         return false;
     }
     nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
+	 nf->boostrap(d, args);
 
 #ifndef DEBUG
 	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
