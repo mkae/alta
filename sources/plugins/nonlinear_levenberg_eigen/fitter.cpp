@@ -137,9 +137,13 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 #endif
 
     /* the following starting values provide a rough fit. */
+    vec nf_x = nf->parameters();
     int info;
     Eigen::VectorXd x(nf->nbParameters());
-    x.setConstant(nf->nbParameters(), 1.);
+    for(int i=0; i<nf->nbParameters(); ++i)
+    {
+        x[i] = nf_x[i];
+    }
 
 
     EigenFunctor functor(nf, d);
