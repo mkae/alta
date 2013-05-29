@@ -136,7 +136,7 @@ template<class T> void clustering(const T* in_data, int _nY, params::input in_pa
         params::convert(&p[0], in_param, out_param, &e[0]);
 
         // Search for duplicates
-		  /*
+		  
         bool already_exist = false;
         for(unsigned int j=0; j<out_data.size(); ++j)
         {
@@ -154,7 +154,6 @@ template<class T> void clustering(const T* in_data, int _nY, params::input in_pa
         }
 
         if(!already_exist)
-			  */
         {
             // Fill the output part of the vector
             for(int j=0; j<_nY; ++j)
