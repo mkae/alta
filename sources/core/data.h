@@ -44,18 +44,26 @@ class data
 		// Acces to data
 		virtual vec get(int i) const = 0 ;
 		virtual vec operator[](int i) const = 0 ;
-		virtual vec value(vec in, vec out) const 
-		{
-			return vec(_nY) ;
-		}
+
+		//! \brief Provide an evaluation in a BRDF way of the data. 
+		//!
+		//! \details
+		//! The input vector in (can have texture coordinate) and the output
+		//! vector out are taken to grad a value and return it. The two vectors 
+		//! should be compliant with the size and parametrization of the data.
+		virtual vec value(vec in, vec out) const = 0;
+
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;
+
 
 		// Get min and max input space values
 		virtual vec min() const = 0 ;
 		virtual vec max() const = 0 ;
 
+
+		// Get the size of the input X domain and output Y domain
 		virtual int dimX() const { return _nX ; }
 		virtual int dimY() const { return _nY ; }
 
@@ -129,6 +137,12 @@ class data_params : public data
 
 			std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
 			save(std::string("cluster.gnuplot"));
+		}
+
+		virtual vec value(vec in, vec out) const 
+		{
+			std::cerr << "<<ERROR>> not implemented: " << __func__ << std::endl;
+			throw;
 		}
 
 		// Load data from a file

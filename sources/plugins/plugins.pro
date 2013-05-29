@@ -13,5 +13,6 @@ SUBDIRS  = \
 			  nonlinear_levenberg_eigen     \
 			  nonlinear_function_phong      \
            nonlinear_function_lafortune  \
-			  data_merl
+			  data_merl                     \
+			  data_astm
 
