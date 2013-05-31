@@ -32,6 +32,12 @@ int main(int argc, char** argv)
 		fit = manager.get_fitter() ;
 	}
 
+	if(args.is_defined("available_params"))
+	{
+		params::print_input_params();
+		return 0;
+	}
+
 	if(! args.is_defined("input")) {
 		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
 		return 1 ;

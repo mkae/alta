@@ -4,6 +4,8 @@ CONFIG  *= static \
 
 DESTDIR  = ../build
 
+QMAKE_CXXFLAGS += -std=c++11
+
 HEADERS  = args.h               \
            common.h             \
 		 	  data.h               \
@@ -18,4 +20,5 @@ HEADERS  = args.h               \
 SOURCES  = plugins_manager.cpp   \
            vertical_segment.cpp  \
 			  rational_function.cpp \
-#clustering.cpp
+			  params.cpp				\
+#          clustering.cpp
