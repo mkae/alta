@@ -8,7 +8,7 @@
 
 class data_merl : public QObject, public data
 {
-	Q_OBJECT
+//	Q_OBJECT
 	Q_INTERFACES(data)
 
 	public: // methods
@@ -24,6 +24,11 @@ class data_merl : public QObject, public data
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const ;
+		
+		virtual params::input parametrization() const
+		{
+			return params::RUSIN_TH_TD;
+		}
 
 		// Get min and max input space values
 		virtual vec min() const ;

@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 
+#ifdef OLD
 clustering::clustering(const data* d, const arguments& args)
 {
     // List of the indices of the clustering
@@ -113,3 +114,58 @@ vec clustering::max() const
 {
     return _max;
 }
+#else
+template<class T> void clustering(const T* in_data, int _nY, params::input in_param, params::input out_param, std::vector<vec>& out_data)
+{
+
+    // Set the dimensions
+    const int in_nX  = params::dimension(in_param);
+    const int out_nX = params::dimension(out_param);
+
+#ifdef DEBUG
+    std::cout << " in dim = " <<  in_nX << std::endl;
+    std::cout << "out dim = " << out_nX << std::endl;
+#endif
+
+    for(int i=0; i<in_data->size(); ++i)
+    {
+        vec p = in_data->get(i);
+        vec e (out_nX + _nY);
+
+        // Fill the input part of the vector
+        params::convert(&p[0], in_param, out_param, &e[0]);
+
+        // Search for duplicates
+		  
+        bool already_exist = false;
+        for(unsigned int j=0; j<out_data.size(); ++j)
+        {
+            vec test_e = out_data[j];
+
+            double dist = 0.0;
+            for(int k=0; k<out_nX; ++k)
+            {
+                const double temp = test_e[k]-e[k];
+                dist += temp*temp;
+            }
+
+            if(dist < 1.0E-5)
+                already_exist = true;
+        }
+
+        if(!already_exist)
+        {
+            // Fill the output part of the vector
+            for(int j=0; j<_nY; ++j)
+                e[out_nX + j] = p[in_nX + j];
+
+#ifdef DEBUG
+            std::cout << " in = " << p << std::endl;
+            std::cout << "out = " << e << std::endl;
+#endif
+            out_data.push_back(e);
+        }
+    }
+
+}
+#endif

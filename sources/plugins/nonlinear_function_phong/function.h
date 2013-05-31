@@ -49,6 +49,10 @@ class phong_function : public nonlinear_function, public QObject
             return res;
         }
 
+
+    //! \brief Boostrap the function by defining the diffuse term
+    virtual void boostrap(const data* d, const arguments& args);
+
         //! \brief Load function specific files
 		virtual void load(const std::string& filename) ;
 		
@@ -121,6 +125,10 @@ class phong_function : public nonlinear_function, public QObject
             file << std::endl;
 
         }
+
+        //! \brief Output the function using a BRDF Explorer formating.
+        virtual void save_brdfexplorer(const std::string& filename,
+                                       const arguments& args) const;
 
 	private: // data
 

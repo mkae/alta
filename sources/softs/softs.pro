@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS  = generate_data   \
-           plugin_loader   \
+           data2brdf       \
 			  brdf2gnuplot    \
 			  data2gnuplot    \
+			  data2diff       \
 			  fourieranalysis

@@ -1,5 +1,13 @@
 #pragma once
 
+#include <string>
+#include <map>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+#include <iostream>
+
 /*! \brief a static class allowing to change from one parametrization
  *  to another.
  *  \ingroup core
@@ -12,42 +20,53 @@ class params
 {
     public: // data
 
-        //! \brief list of all supported parametrization for the input space.
-        //! An unsupported parametrization will go under the name
-        //! <em>unknown</em>.
-        enum input
-        {
-            ROMEIRO_TH_TD,
-            RUSIN_TH_TD,
-            RUSIN_TH_PH_TD,
-            RUSIN_TH_TD_PD,
-            RUSIN_TH_PH_TD_PD,
-            COS_TH,
-            COS_TH_TD,
-            ISOTROPIC_TV_TL_DPHI,
-            ISOTROPIC_TD_PD, // Difference between two directions such as R and H
-            CARTESIAN,
-            SPHERICAL_TL_PL_TV_PV,
-            UNKNOWN_INPUT
-        };
+		 //! \brief list of all supported parametrization for the input space.
+		 //! An unsupported parametrization will go under the name
+		 //! <em>unknown</em>.
+		 enum input
+		 {
+			 ROMEIRO_TH_TD,
+			 RUSIN_TH_TD,
+			 RUSIN_TH_PH_TD,
+			 RUSIN_TH_TD_PD,
+			 RUSIN_TH_PH_TD_PD,
+			 COS_TH,
+			 COS_TH_TD,
+			 ISOTROPIC_TV_TL_DPHI,
+			 ISOTROPIC_TD_PD, // Difference between two directions such as R and H
+			 CARTESIAN,
+			 SPHERICAL_TL_PL_TV_PV,
+			 UNKNOWN_INPUT
+		 };
 
-        //! \brief list of all supported parametrization for the output space.
-        //! An unsupported parametrization will go under the name
-        //! <em>unknown</em>.
-        enum output
-        {
-            INV_STERADIAN,
-            ENERGY,
-            RGB_COLOR,
-            XYZ_COLOR,
-            UNKNOWN_OUTPUT
-        };
+		 //! \brief list of all supported parametrization for the output space.
+		 //! An unsupported parametrization will go under the name
+		 //! <em>unknown</em>.
+		 enum output
+		 {
+			 INV_STERADIAN,
+			 ENERGY,
+			 RGB_COLOR,
+			 XYZ_COLOR,
+			 UNKNOWN_OUTPUT
+		 };
 
     public: // methods
 
         //! \brief parse a string to provide a parametrization type.
         static params::input parse_input(const std::string& txt)
         {
+				for(std::map<params::input, const params::param_info>::const_iterator it=input_map.begin(); it != input_map.end(); ++it)
+				{
+					if(txt.compare(it->second.name) == 0)
+					{
+						return it->first;
+					}
+				}
+
+				return params::UNKNOWN_INPUT;
+
+			  /*
             if(txt == std::string("COS_TH"))
             {
                 return params::COS_TH;
@@ -56,10 +75,15 @@ class params
             {
                 return params::RUSIN_TH_TD;
             }
+            else if(txt == std::string("RUSIN_TH_PH_TD_PD"))
+            {
+                return params::RUSIN_TH_PH_TD_PD;
+            }
             else
             {
                 return params::UNKNOWN_INPUT;
             }
+				*/
         }
 
         //! \brief parse a string to provide a parametrization type.
@@ -85,7 +109,7 @@ class params
             if(dim > 0)
             {
                 double* outvec = new double[dim];
-                double  temvec[6]; // Temp CARTESIAN vectors
+                double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Temp CARTESIAN vectors
                 to_cartesian(invec, intype, temvec);
                 from_cartesian(temvec, outtype, outvec);
 
@@ -103,8 +127,13 @@ class params
         static void convert(const double* invec, params::input intype,
                             params::input outtype, double* outvec)
         {
-            double  temvec[6]; // Temp CARTESIAN vectors
+            double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Temp CARTESIAN vectors
             to_cartesian(invec, intype, temvec);
+#ifdef DEBUG
+            std::cout << "<<DEBUG>> temp vec = ["
+                      << temvec[0] << ", " << temvec[1] << ", " << temvec[2] << "] => ["
+                      << temvec[3] << ", " << temvec[4] << ", " << temvec[5] << "]" << std::endl;
+#endif
             from_cartesian(temvec, outtype, outvec);
         }
 
@@ -118,7 +147,16 @@ class params
             {
                 // 1D Parametrizations
                 case params::COS_TH:
-                    half_to_cartesian(acos(invec[0]), 0.0, 0.0, 0.0, outvec);
+#ifndef USE_HALF
+						 half_to_cartesian(acos(invec[0]), 0.0, 0.0, 0.0, outvec);
+#else
+						 outvec[0] = sqrt(1.0 - invec[0]*invec[0]);
+						 outvec[1] = 0;
+						 outvec[2] = invec[0];							
+						 outvec[3] = sqrt(1.0 - invec[0]*invec[0]);
+						 outvec[4] = 0;
+						 outvec[5] = invec[0];							
+#endif
                     break;
 
                 // 2D Parametrizations
@@ -140,6 +178,14 @@ class params
                     half_to_cartesian(invec[0], invec[1], invec[2], invec[3], outvec);
                     break;
 
+                case params::SPHERICAL_TL_PL_TV_PV:
+                    outvec[0] = cos(invec[1])*sin(invec[0]);
+                    outvec[1] = sin(invec[1])*sin(invec[0]);
+						  outvec[2] = cos(invec[0]);
+                    outvec[3] = cos(invec[3])*sin(invec[2]);
+                    outvec[4] = sin(invec[3])*sin(invec[2]);
+						  outvec[5] = cos(invec[2]);
+                    break;
 
                 // 6D Parametrization
                 case params::CARTESIAN:
@@ -167,6 +213,9 @@ class params
             half[0] /= half_norm;
             half[1] /= half_norm;
             half[2] /= half_norm;
+            
+				// Difference vector 
+				double diff[3];
 
             switch(outtype)
             {
@@ -187,6 +236,29 @@ class params
                     outvec[1] = atan2(half[0], half[1]);
                     outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
                     break;
+                
+                // 4D Parametrization
+                case params::RUSIN_TH_PH_TD_PD:
+						  outvec[0] = acos(half[2]);
+                    outvec[1] = atan2(half[0], half[1]);
+						  
+						  // Compute the diff vector
+						  diff[0] = invec[0];
+						  diff[1] = invec[1];
+						  diff[2] = invec[2];
+						  rotate_normal(diff, -outvec[1]);
+						  rotate_binormal(diff, -outvec[0]);
+
+						  outvec[2] = acos(diff[2]);
+						  outvec[3] = atan2(diff[0], diff[1]);
+                    break;
+
+					 case params::SPHERICAL_TL_PL_TV_PV:
+						  outvec[0] = acos(invec[2]);
+						  outvec[1] = atan2(invec[0], invec[1]);
+						  outvec[2] = acos(invec[5]);
+						  outvec[3] = atan2(invec[3], invec[4]);
+						  break;
 
                 // 6D Parametrization
                 case params::CARTESIAN:
@@ -194,7 +266,7 @@ class params
                     break;
 
                 default:
-                    throw("Transformation not implemented, params::from_cartesian");
+                    assert(false);
                     break;
             }
         }
@@ -202,6 +274,16 @@ class params
         //! \brief provide a dimension associated with a parametrization
         static int  dimension(params::input t)
         {
+			  std::map<params::input, const params::param_info>::const_iterator it = params::input_map.find(t);
+			  if(it != params::input_map.end())
+			  {
+				  return it->second.dimension;
+			  }
+			  else
+			  {
+				  return -1;
+			  }
+			  /*
             switch(t)
             {
                 // 1D Parametrizations
@@ -211,6 +293,7 @@ class params
 
                 // 2D Parametrizations
                 case params::ISOTROPIC_TD_PD:
+                case params::RUSIN_TH_TD:
                 case params::ROMEIRO_TH_TD:
                 case params::COS_TH_TD:
                     return 2;
@@ -235,9 +318,11 @@ class params
                     break;
 
                 default:
+                    assert(false);
                     return -1;
                     break;
             }
+				*/
         }
 
         //! \brief provide a dimension associated with a parametrization
@@ -258,6 +343,7 @@ class params
                     break;
 
                 default:
+                    assert(false);
                     return -1;
                     break;
             }
@@ -278,15 +364,20 @@ class params
             out[0] = sin(theta_d)*cos(phi_d);
             out[1] = sin(theta_d)*sin(phi_d);
             out[2] = cos(theta_d);
-            rotate_binormal(out, theta_h);
+
+				//! \todo investigate here, the rotation along N should be
+				//1 of phi_h not theta_h !
             rotate_normal(out, phi_h);
+            rotate_binormal(out, theta_h);
 
             // Compute the out vector from the in vector and the half
             // vector.
             const double dot = out[0]*half[0] + out[1]*half[1] + out[2]*half[2];
-            out[3] = -out[0] + 2.0*dot * half[0];
-            out[4] = -out[1] + 2.0*dot * half[1];
-            out[5] = -out[2] + 2.0*dot * half[2];
+            out[3] = -out[0] + (dot+1.0) * half[0];
+            out[4] = -out[1] + (dot+1.0) * half[1];
+            out[5] = -out[2] + (dot+1.0) * half[2];
+
+				assert(out[5] >= 0.0);
         }
 
         //! \brief rotate a cartesian vector with respect to the normal of
@@ -310,4 +401,26 @@ class params
             vec[0] = cost * vec[0] - sint * vec[2];
             vec[2] = sint * vec[0] + cost * vec[2];
         }
+
+		  static void print_input_params()
+		  {
+				for(std::map<params::input, const params::param_info>::const_iterator it=input_map.begin(); it != input_map.end(); ++it)
+				{
+					std::cout << it->second.name << std::endl;
+				}
+		  }
+
+	 protected:
+
+		  struct param_info
+		  {
+				param_info(std::string n, int d, std::string i) : 
+					name(n), dimension(d), info(i) { };
+
+			  std::string name;
+			  int dimension;
+			  std::string info;
+		  };
+
+		  static const std::map<params::input, const params::param_info> input_map;
 };

@@ -209,7 +209,7 @@ data* plugins_manager::get_data(const std::string& n)
         return NULL;
     }
 
-    DataPrototype myData = (DataPrototype) data_lib.resolve("_Z16provide_datav");
+    DataPrototype myData = (DataPrototype) data_lib.resolve("_Z12provide_datav");
 
     if(myData != NULL)
     {

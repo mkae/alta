@@ -2,12 +2,16 @@
 
 #include <string>
 #include <utility>
+#include <iostream>
+#include <limits>
+#include <fstream>
 
 #include <QtPlugin>
 
 #include "common.h"
 #include "args.h"
 #include "params.h"
+#include "clustering.h"
 
 /*! \brief A data object. Allows to load data from files.
  *  \ingroup core
@@ -20,21 +24,46 @@ class data
 		virtual void load(const std::string& filename) = 0 ;
 		virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
+        // Save the data to a file
+        virtual void save(const std::string& filename)
+        {
+            std::ofstream file(filename.c_str(), std::ios_base::trunc);
+            file << "#DIM " << _nX << " " << _nY << std::endl;
+            for(int i=0; i<size(); ++i)
+            {
+                vec x = this->get(i);
+                for(int j=0; j<_nX+_nY; ++j)
+                {
+                    file << x[j] << "\t";
+                }
+                file << std::endl;
+            }
+            file.close();
+        }
+
 		// Acces to data
 		virtual vec get(int i) const = 0 ;
 		virtual vec operator[](int i) const = 0 ;
-		virtual vec value(vec in, vec out) const 
-		{
-			return vec(_nY) ;
-		}
+
+		//! \brief Provide an evaluation in a BRDF way of the data. 
+		//!
+		//! \details
+		//! The input vector in (can have texture coordinate) and the output
+		//! vector out are taken to grad a value and return it. The two vectors 
+		//! should be compliant with the size and parametrization of the data.
+		virtual vec value(vec in, vec out) const = 0;
+
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;
+
 
 		// Get min and max input space values
 		virtual vec min() const = 0 ;
 		virtual vec max() const = 0 ;
 
+
+		// Get the size of the input X domain and output Y domain
 		virtual int dimX() const { return _nX ; }
 		virtual int dimY() const { return _nY ; }
 
@@ -96,17 +125,24 @@ class data_params : public data
 
 		//! \brief contructor requires the definition of a base class that
 		//! has a parametrization, and a new parametrization.
-		data_params(const data* d, params::input param,
+		data_params(const data* d, params::input new_param,
 				data_params::clustrering method = data_params::NONE) :
-			_d(d), _param_in(param), _clustering_method(method)
+			_clustering_method(method)
 		{
-			_nX = params::dimension(param);
+			_nX = params::dimension(new_param);
 			_nY = d->dimY();
 
-			if(_nX < _d->dimX() && method == data_params::NONE)
-			{
-				throw("No cluster method provided");
-			}
+			std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
+			clustering<data>(d, _nY, d->parametrization(), new_param, _data);
+
+			std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
+			save(std::string("cluster.gnuplot"));
+		}
+
+		virtual vec value(vec in, vec out) const 
+		{
+			std::cerr << "<<ERROR>> not implemented: " << __func__ << std::endl;
+			throw;
 		}
 
 		// Load data from a file
@@ -125,13 +161,7 @@ class data_params : public data
 		// Acces to data
 		virtual vec get(int i) const
 		{
-			vec res(_nX + _nY);
-			vec in = _d->get(i);
-
-			params::convert(&in[0], _d->parametrization(), _param_in, &res[0]);
-			memcpy(&res[_nX], &in[_d->dimX()], _nY*sizeof(double));
-
-			return res;
+            return _data[i];
 		}
 		virtual vec operator[](int i) const
 		{
@@ -141,24 +171,24 @@ class data_params : public data
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const
 		{
-			return _d->size();
+            return _data.size();
 		}
 
 		// Get min and max input space values
 		virtual vec min() const
 		{
-			return _d->min();
+            return _min;
 		}
 		virtual vec max() const
 		{
-			return _d->max();
+            return _max;
 		}
 
 	protected: // data
 
-		const data* _d;
-		params::input _param_in;
 		data_params::clustrering _clustering_method;
 
-		//! \todo Add a cluster object that will duplicate data or store indices.
+        std::vector<vec> _data;
+
+        vec _min, _max;
 };
