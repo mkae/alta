@@ -206,6 +206,14 @@ vec vertical_segment::get(int i) const
 	return _data[i] ;
 }
 
+//! \todo Check the vertical segment size and if the data
+//! is not already present.
+void vertical_segment::set(vec x)
+{
+	assert(x.size() == _nX + _nY);
+	_data.push_back(x);
+}
+
 int vertical_segment::size() const
 {
 	return _data.size() ;

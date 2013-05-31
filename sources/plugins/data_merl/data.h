@@ -21,6 +21,9 @@ class data_merl : public QObject, public data
 		virtual vec get(int i) const ;
 		virtual vec operator[](int i) const ;
 		virtual vec value(vec in, vec out) const ;
+		
+		// Set data
+		virtual void set(vec x);
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const ;

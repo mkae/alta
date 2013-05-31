@@ -280,6 +280,21 @@ vec data_merl::operator[](int i) const
 {
 	return get(i) ;
 }
+
+//! \todo Test this function
+void data_merl::set(vec x)
+{
+	assert(x.size() == 6);
+	const int phid_ind = (int)floor((x[2] / M_PI) * (BRDF_SAMPLING_RES_PHI_D/2));
+	const int thed_ind = (int)floor((x[1] / (0.5*M_PI)) * BRDF_SAMPLING_RES_THETA_D);
+	const int theh_ind = (int)floor((x[0] / (0.5*M_PI)) * BRDF_SAMPLING_RES_THETA_H);
+
+	const int i = (theh_ind*BRDF_SAMPLING_RES_THETA_D + thed_ind)*(BRDF_SAMPLING_RES_PHI_D/2) + phid_ind;
+	brdf[i] = x[3] / RED_SCALE;
+	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] = x[4] / GREEN_SCALE;
+	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
+}
+
 vec data_merl::value(vec in, vec out) const
 {
 	// compute  thetain fi_in, theta_out fi_out

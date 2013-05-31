@@ -27,6 +27,9 @@ class vertical_segment : public data
 			std::cerr << "<<ERROR>> not implemented: " << __func__ << std::endl;
 			throw;
 		}
+
+		//! \brief Put the sample inside the data
+		virtual void set(vec x);
 		
 		//! \brief Specific accessor to a vertical segment, this gives the
 		//! complete vector, plus the ordinate segment

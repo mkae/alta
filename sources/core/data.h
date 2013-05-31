@@ -53,6 +53,9 @@ class data
 		//! should be compliant with the size and parametrization of the data.
 		virtual vec value(vec in, vec out) const = 0;
 
+		//! \brief Put the sample inside the data
+		virtual void set(vec x) = 0;
+
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;
@@ -166,6 +169,12 @@ class data_params : public data
 		virtual vec operator[](int i) const
 		{
 			return this->get(i);
+		}
+		
+		//! \todo This should crash at execution.
+		virtual void set(vec x)
+		{
+			this->set(x);
 		}
 
 		// Get data size, e.g. the number of samples to fit
