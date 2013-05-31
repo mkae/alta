@@ -25,6 +25,8 @@ int main(int argc, char** argv)
 	if(args.is_defined("help")) {
 		std::cout << "<<HELP>> data2diff --input data.file --output gnuplot.file --data loader.so --param RUSIN_TH_PH_TD_PD --partial 0" << std::endl ;
 		std::cout << " - input, output, data and param are mandatory parameters" << std::endl ;
+		std::cout << std::endl << "Available parametrizations: " << std::endl ;
+		params::print_input_params();
 		return 0 ;
 	}
 
