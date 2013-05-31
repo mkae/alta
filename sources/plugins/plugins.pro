@@ -10,7 +10,7 @@ SUBDIRS  = \
            rational_function_chebychev   \
 #           rational_fitter_matlab        \
 #           rational_fitter_dca           \
-			  nonlinear_levenberg_eigen     \
+#			  nonlinear_levenberg_eigen     \
 			  nonlinear_function_phong      \
            nonlinear_function_lafortune  \
 			  data_merl                     \

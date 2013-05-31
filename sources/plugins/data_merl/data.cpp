@@ -34,6 +34,13 @@
 #ifdef WIN32
 #define M_PI	3.1415926535897932384626433832795
 #endif
+
+data_merl::data_merl()
+{
+	const int n = BRDF_SAMPLING_RES_PHI_D/2 * BRDF_SAMPLING_RES_THETA_D * BRDF_SAMPLING_RES_THETA_H;
+	brdf = (double*) malloc (sizeof(double)*3*n);
+}
+
 // cross product of two vectors
 void cross_product (double* v1, double* v2, double* out)
 {
@@ -232,7 +239,6 @@ bool read_brdf(const char *filename, double* &brdf)
 		return false;
 	}
 
-	brdf = (double*) malloc (sizeof(double)*3*n);
 	fread(brdf, sizeof(double), 3*n, f);
 
 	fclose(f);
@@ -256,6 +262,23 @@ void data_merl::load(const std::string& filename, const arguments& args)
 		std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
 		throw;
 	}
+}
+
+void data_merl::save(const std::string& filename) const 
+{
+	FILE *f = fopen(filename.c_str(), "wb");
+
+	int dims[3];
+	dims[0] = BRDF_SAMPLING_RES_PHI_D/2;
+	dims[1] = BRDF_SAMPLING_RES_THETA_D;
+	dims[2] = BRDF_SAMPLING_RES_THETA_H;
+
+	const int n = dims[0]*dims[1]*dims[2];
+
+	fwrite(dims, sizeof(int), 3, f);
+	fwrite(brdf, sizeof(double), 3*n, f);
+
+	fclose(f);
 }
 
 // Acces to data

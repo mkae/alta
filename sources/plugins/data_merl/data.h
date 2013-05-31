@@ -13,9 +13,13 @@ class data_merl : public QObject, public data
 
 	public: // methods
 
+		data_merl();
+
 		// Load data from a file
 		virtual void load(const std::string& filename) ;
 		virtual void load(const std::string& filename, const arguments& args) ;
+		
+		virtual void save(const std::string& filename) const ;
 
 		// Acces to data
 		virtual vec get(int i) const ;

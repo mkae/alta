@@ -25,7 +25,7 @@ class data
 		virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
         // Save the data to a file
-        virtual void save(const std::string& filename)
+        virtual void save(const std::string& filename) const
         {
             std::ofstream file(filename.c_str(), std::ios_base::trunc);
             file << "#DIM " << _nX << " " << _nY << std::endl;

@@ -66,6 +66,9 @@ int main(int argc, char** argv)
 			dim = p_idx;
 	}	
 
+	// Get the output data object
+	data* out_d = manager.get_data(args["data"]);
+
 	if(d != NULL)
 	{
 		float dt = 0.01;
@@ -74,7 +77,7 @@ int main(int argc, char** argv)
 		{
 			// Copy the input vector
 			vec x = d->get(i);
-			vec dx = x;
+			vec out_x = x;
 		
 			// Convert input to required param
 			params::convert(&x[0], d->parametrization(), p_in, &tempParam[0]);
@@ -93,7 +96,14 @@ int main(int argc, char** argv)
 			V[0] = tempCart[3]; V[1] = tempCart[4]; V[2] = tempCart[5];
 			vec y2 = d->value(L, V);
 
+			// Compute the diff vector
+			for(int j=0; j<d->dimY(); ++j)
+				out_x[d->dimX() + j] = (y1[j]-y2[j])/(2.0*dt);
 
+			// Store it into the output data object
+			out_d->set(out_x);
+
+/*
 			// Print the input vector	
 			for(int j=0; j<d->dimX(); ++j)
 				file << x[j] << "\t";
@@ -103,7 +113,10 @@ int main(int argc, char** argv)
 				file << (y1[j]-y2[j])/(2.0*dt) << "\t";
 
 			file << std::endl;
+*/
 		}	
+
+		out_d->save(args["output"]);
 
 		file.close();
 	}	
