@@ -86,6 +86,17 @@ class params
 				*/
         }
 
+		  static std::string get_name(const params::input param)
+		  {
+			  std::map<params::input, const params::param_info>::const_iterator it = input_map.find(param);
+			  if(it != input_map.end())
+			  {
+				  return it->second.name;
+			  }
+
+			  return std::string();
+		  }
+
         //! \brief parse a string to provide a parametrization type.
         static params::output parse_output(const std::string& txt)
         {
@@ -172,6 +183,9 @@ class params
                 case params::RUSIN_TH_PH_TD:
                     half_to_cartesian(invec[0], invec[1], invec[2], 0.0, outvec);
                     break;
+                case params::RUSIN_TH_TD_PD:
+                    half_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
+                    break;
 
                 // 4D Parametrization
                 case params::RUSIN_TH_PH_TD_PD:
@@ -228,6 +242,10 @@ class params
                 case params::COS_TH_TD:
                     outvec[0] = half[2];
                     outvec[1] = half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2];
+                    break;
+                case params::RUSIN_TH_TD:
+                    outvec[0] = acos(half[2]);
+                    outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
                     break;
 
                 // 3D Parametrization
@@ -409,6 +427,7 @@ class params
 					std::cout << it->second.name << std::endl;
 				}
 		  }
+
 
 	 protected:
 

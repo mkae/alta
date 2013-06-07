@@ -40,11 +40,12 @@ int main(int argc, char** argv)
 		std::cerr << "<<ERROR>> the data exporter is not defined" << std::endl ;
 		return 1 ;
 	}
+/*
 	if(! args.is_defined("func")) {
 		std::cerr << "<<ERROR>> the function importer is not defined" << std::endl ;
 		return 1 ;
 	}
-
+*/
 	// Import data
 	data* d = NULL ;
 	d = manager.get_data(args["data"]) ;
@@ -55,15 +56,18 @@ int main(int argc, char** argv)
 
 	// Modify function or data to provide coherent
 	// interfaces
-	plugins_manager::check_compatibility(d, f, args);	
+//	plugins_manager::check_compatibility(d, f, args);	
 
 	if(d != NULL && f != NULL)
 	{
+		vec temp(f->dimX());
 		for(int i=0; i<d->size(); ++i)
 		{
 			// Copy the input vector
 			vec x = d->get(i);
-			vec y = f->value(x);
+			params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
+
+			vec y = f->value(temp);
 
 			for(int j=0; j<d->dimY(); ++j)
 			{

@@ -156,7 +156,17 @@ function* plugins_manager::get_function(const std::string& n)
     }
 
 #ifdef USING_STATIC
-    QString path = QDir::currentPath() + QString(n.c_str()) ;
+	 std::string file;
+	 if(n[0] == '.')
+	 {
+		 file = n.substr(1, n.size()-1);
+	 }
+	 else
+	 {
+		 file = n;
+	 }
+
+    QString path = QDir::currentPath() + QString(file.c_str()) ;
     QLibrary function_lib(path);
     if(!function_lib.isLoaded())
     {
@@ -201,7 +211,17 @@ data* plugins_manager::get_data(const std::string& n)
     }
 
 #ifdef USING_STATIC
-    QString path = QDir::currentPath() + QString(n.c_str()) ;
+	 std::string file;
+	 if(n[0] == '.')
+	 {
+		 file = n.substr(1, n.size()-1);
+	 }
+	 else
+	 {
+		 file = n;
+	 }
+
+    QString path = QDir::currentPath() + QString(file.c_str()) ;
     QLibrary data_lib(path);
     if(!data_lib.isLoaded())
     {
@@ -246,7 +266,17 @@ fitter* plugins_manager::get_fitter(const std::string& n)
     }
 
 #ifdef USING_STATIC
-    QString path = QDir::currentPath() + QString(n.c_str()) ;
+	 std::string file;
+	 if(n[0] == '.')
+	 {
+		 file = n.substr(1, n.size()-1);
+	 }
+	 else
+	 {
+		 file = n;
+	 }
+
+    QString path = QDir::currentPath() + QString(file.c_str()) ;
     QLibrary fitting_lib(path);
     if(!fitting_lib.isLoaded())
     {

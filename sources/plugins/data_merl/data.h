@@ -34,7 +34,7 @@ class data_merl : public QObject, public data
 		
 		virtual params::input parametrization() const
 		{
-			return params::RUSIN_TH_TD;
+			return params::RUSIN_TH_TD_PD;
 		}
 
 		// Get min and max input space values

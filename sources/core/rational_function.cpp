@@ -304,6 +304,12 @@ void rational_function::load(const std::string& filename)
 				linestream >> nq ;
 				b.resize(nq*nY);
 			}
+			else if(comment == std::string("INPUT_PARAM"))
+			{
+				std::string param;
+				linestream >> param ;
+				setParametrization(params::parse_input(param));
+			}
 			continue ;
 		} 
 		else if(line.empty())
@@ -570,7 +576,8 @@ void rational_function::save(const std::string& filename) const
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NP " << a.size() / _nY << std::endl ;
 	file << "#NQ " << b.size() / _nY << std::endl ;
-    file << "#BASIS LEGENDRE" << std::endl ;
+	file << "#BASIS LEGENDRE" << std::endl ;
+	file << "#INPUT_PARAM " << params::get_name(this->parametrization()) << std::endl;
 
 	unsigned int np = a.size() / _nY ;
     unsigned int nq = b.size() / _nY ;

@@ -78,12 +78,12 @@ class plugins_manager
             {
                 std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
             }
-
+/*
 				if(f->dimY() != d->dimY())
 				{
 					std::cout << "<<ERROR>> the data and the function have different Y dimensions" << std::endl;
 				}
-
+*/
             /*
             // Check is the data has to be clusterized
             if(args.is_defined("cluster-dim"))
