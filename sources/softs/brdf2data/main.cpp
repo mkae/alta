@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
 	// Modify function or data to provide coherent
 	// interfaces
-	data_manage::check_compatibility(d, f, args);	
+	plugins_manager::check_compatibility(d, f, args);	
 
 	if(d != NULL && f != NULL)
 	{
@@ -74,8 +74,6 @@ int main(int argc, char** argv)
 		}	
 
 		d->save(args["output"]);
-
-		file.close();
 	}	
 	else
 	{
