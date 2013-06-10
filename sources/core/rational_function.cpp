@@ -512,7 +512,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x[" << k << "]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -531,7 +531,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x[" << k << "]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;

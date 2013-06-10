@@ -82,16 +82,15 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
-        if(temp_np < _max_np)
+      if(temp_np < _max_np)
 		{
 			++temp_np ;
 		}
-        if(temp_nq < _max_nq)
+      if(temp_nq < _max_nq)
 		{
 			++temp_nq ;
 		}
 	}
-
 	return false ;
 }
 
@@ -176,9 +175,9 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
         vec xi = d->get(i) ;
 
         bool is_boundary = false;
-        for(int i=0; i<d->dimX(); ++i)
+        for(int k=0; k<d->dimX(); ++k)
         {
-            is_boundary = is_boundary || (xi[i] <= d->min()[i]) || (xi[i] >= d->max()[i]);
+            is_boundary = is_boundary || (xi[k] <= d->min()[k]) || (xi[k] >= d->max()[k]);
         }
 
 		// A row of the constraint matrix has this 
