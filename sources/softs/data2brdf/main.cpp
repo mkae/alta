@@ -50,16 +50,22 @@ int main(int argc, char** argv)
 //	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fit->set_parameters(args) ;
-        function* f = plugins_manager::get_function(args["func"]);
-        data*     d = plugins_manager::get_data(args["data"]);
+		function* f = plugins_manager::get_function(args["func"]);
+		data*     d = plugins_manager::get_data(args["data"]);
 		d->load(args["input"], args);
 
-        // Check the compatibility between the data and the function
-        plugins_manager::check_compatibility(d, f, args);
+		// Check the compatibility between the data and the function
+		plugins_manager::check_compatibility(d, f, args);
 
+
+		// Start a timer
 		QTime time ;
 		time.start() ;
-        bool is_fitted = fit->fit_data(d, f, args) ;
+
+		// Fit the data
+		bool is_fitted = fit->fit_data(d, f, args) ;
+
+		// Get the fitting duration
 		int msec = time.elapsed() ;
 		int sec  = (msec / 1000) % 60 ;
 		int min  = (msec / 60000) % 60 ;

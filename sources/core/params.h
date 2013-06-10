@@ -115,142 +115,12 @@ class params
         //! output vector in a cartesian parametrization, that is two 3d
         //! vectors concatenated.
         static void to_cartesian(const double* invec, params::input intype,
-                                 double* outvec)
-        {
-            switch(intype)
-            {
-                // 1D Parametrizations
-                case params::COS_TH:
-#ifndef USE_HALF
-						 half_to_cartesian(acos(invec[0]), 0.0, 0.0, 0.0, outvec);
-#else
-						 outvec[0] = sqrt(1.0 - invec[0]*invec[0]);
-						 outvec[1] = 0;
-						 outvec[2] = invec[0];							
-						 outvec[3] = sqrt(1.0 - invec[0]*invec[0]);
-						 outvec[4] = 0;
-						 outvec[5] = invec[0];							
-#endif
-                    break;
-
-                // 2D Parametrizations
-                case params::COS_TH_TD:
-                    half_to_cartesian(acos(invec[0]), 0.0, acos(invec[1]), 0.0, outvec);
-                    break;
-
-                case params::RUSIN_TH_TD:
-                    half_to_cartesian(invec[0], 0.0, invec[1], 0.0, outvec);
-                    break;
-
-                // 3D Parametrization
-                case params::RUSIN_TH_PH_TD:
-                    half_to_cartesian(invec[0], invec[1], invec[2], 0.0, outvec);
-                    break;
-                case params::RUSIN_TH_TD_PD:
-                    half_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
-                    break;
-
-                // 4D Parametrization
-                case params::RUSIN_TH_PH_TD_PD:
-                    half_to_cartesian(invec[0], invec[1], invec[2], invec[3], outvec);
-                    break;
-
-                case params::SPHERICAL_TL_PL_TV_PV:
-                    outvec[0] = cos(invec[1])*sin(invec[0]);
-                    outvec[1] = sin(invec[1])*sin(invec[0]);
-						  outvec[2] = cos(invec[0]);
-                    outvec[3] = cos(invec[3])*sin(invec[2]);
-                    outvec[4] = sin(invec[3])*sin(invec[2]);
-						  outvec[5] = cos(invec[2]);
-                    break;
-
-                // 6D Parametrization
-                case params::CARTESIAN:
-                    memcpy(outvec, invec, 6*sizeof(double));
-                    break;
-
-                default:
-                    throw("Transformation not implemented, params::to_cartesian");
-                    break;
-            }
-
-        }
+                                 double* outvec);
 
         //! \brief convert a input CARTESIAN vector, that is two 3d vectors
         //! concatenated  to an output vector in a given parametrization.
         static void from_cartesian(const double* invec, params::input outtype,
-                                   double* outvec)
-        {
-            // Compute the half vector
-            double half[3] ;
-            half[0] = invec[0] + invec[3];
-            half[1] = invec[1] + invec[4];
-            half[2] = invec[2] + invec[5];
-            double half_norm = sqrt(half[0]*half[0] + half[1]*half[1] + half[2]*half[2]);
-            half[0] /= half_norm;
-            half[1] /= half_norm;
-            half[2] /= half_norm;
-            
-				// Difference vector 
-				double diff[3];
-
-            switch(outtype)
-            {
-                // 1D Parametrizations
-                case params::COS_TH:
-                    outvec[0] = half[2];
-                    break;
-
-                // 2D Parametrizations
-                case params::COS_TH_TD:
-                    outvec[0] = half[2];
-                    outvec[1] = half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2];
-                    break;
-                case params::RUSIN_TH_TD:
-                    outvec[0] = acos(half[2]);
-                    outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
-                    break;
-
-                // 3D Parametrization
-                case params::RUSIN_TH_PH_TD:
-                    outvec[0] = acos(half[2]);
-                    outvec[1] = atan2(half[0], half[1]);
-                    outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
-                    break;
-                
-                // 4D Parametrization
-                case params::RUSIN_TH_PH_TD_PD:
-						  outvec[0] = acos(half[2]);
-                    outvec[1] = atan2(half[0], half[1]);
-						  
-						  // Compute the diff vector
-						  diff[0] = invec[0];
-						  diff[1] = invec[1];
-						  diff[2] = invec[2];
-						  rotate_normal(diff, -outvec[1]);
-						  rotate_binormal(diff, -outvec[0]);
-
-						  outvec[2] = acos(diff[2]);
-						  outvec[3] = atan2(diff[0], diff[1]);
-                    break;
-
-					 case params::SPHERICAL_TL_PL_TV_PV:
-						  outvec[0] = acos(invec[2]);
-						  outvec[1] = atan2(invec[0], invec[1]);
-						  outvec[2] = acos(invec[5]);
-						  outvec[3] = atan2(invec[3], invec[4]);
-						  break;
-
-                // 6D Parametrization
-                case params::CARTESIAN:
-                    memcpy(outvec, invec, 6*sizeof(double));
-                    break;
-
-                default:
-                    assert(false);
-                    break;
-            }
-        }
+                                   double* outvec);
 
         //! \brief provide a dimension associated with a parametrization
         static int  dimension(params::input t);
@@ -309,6 +179,19 @@ class params
 
 				assert(out[5] >= 0.0);
         }
+			
+        //! \brief from the 4D definition of a classical vector parametrization,
+        //! export the cartesian coordinates.
+		  static void classical_to_cartesian(double theta_l, double phi_l, 
+		                                     double theta_v, double phi_v, double* out)
+		  {
+			  out[0] = cos(phi_l)*sin(theta_l);
+			  out[1] = sin(phi_l)*sin(theta_l);
+			  out[2] = cos(theta_l);
+			  out[3] = cos(phi_v)*sin(theta_v);
+			  out[4] = sin(phi_v)*sin(theta_v);
+			  out[5] = cos(theta_v);
+		  }
 
         //! \brief rotate a cartesian vector with respect to the normal of
         //! theta degrees.

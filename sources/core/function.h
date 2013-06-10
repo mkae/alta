@@ -114,6 +114,14 @@ class function
 		{
 			return _in_param;
 		}
+		
+		//! \brief provide the output parametrization of the function.
+		//! \note some function type can modify the parametrization to adapt
+		//! to the data.
+		virtual params::output out_parametrization() const
+		{
+			return _out_param;
+		}
 
 		//! \brief can set the input parametrization of a non-parametrized
 		//! function. Throw an exception if it tries to erase a previously
@@ -124,6 +132,17 @@ class function
 				throw("A parametrization is already defined");
 
 			_in_param = new_param;
+		}
+		
+		//! \brief can set the output parametrization of a non-parametrized
+		//! function. Throw an exception if it tries to erase a previously
+		//! defined one.
+		virtual void setParametrization(params::output new_param)
+		{
+			if(_out_param != params::UNKNOWN_OUTPUT)
+				throw("A parametrization is already defined");
+
+			_out_param = new_param;
 		}
 
 	protected: // function

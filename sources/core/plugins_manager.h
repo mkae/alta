@@ -63,6 +63,11 @@ class plugins_manager
         static void check_compatibility(data*& d, function*& f,
                                         const arguments& args)
         {
+				if(d->parametrization() == params::UNKNOWN_INPUT)
+				{
+					std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
+				}
+
             if(f->parametrization() == params::UNKNOWN_INPUT)
             {
                 std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
@@ -78,12 +83,12 @@ class plugins_manager
             {
                 std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
             }
-/*
+
 				if(f->dimY() != d->dimY())
 				{
-					std::cout << "<<ERROR>> the data and the function have different Y dimensions" << std::endl;
+					std::cout << "<<WARNING>> the data and the function have different Y dimensions" << std::endl;
 				}
-*/
+
             /*
             // Check is the data has to be clusterized
             if(args.is_defined("cluster-dim"))
