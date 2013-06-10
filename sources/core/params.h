@@ -54,48 +54,11 @@ class params
     public: // methods
 
         //! \brief parse a string to provide a parametrization type.
-        static params::input parse_input(const std::string& txt)
-        {
-				for(std::map<params::input, const params::param_info>::const_iterator it=input_map.begin(); it != input_map.end(); ++it)
-				{
-					if(txt.compare(it->second.name) == 0)
-					{
-						return it->first;
-					}
-				}
+        static params::input parse_input(const std::string& txt);
 
-				return params::UNKNOWN_INPUT;
-
-			  /*
-            if(txt == std::string("COS_TH"))
-            {
-                return params::COS_TH;
-            }
-            else if(txt == std::string("RUSIN_TH_TD"))
-            {
-                return params::RUSIN_TH_TD;
-            }
-            else if(txt == std::string("RUSIN_TH_PH_TD_PD"))
-            {
-                return params::RUSIN_TH_PH_TD_PD;
-            }
-            else
-            {
-                return params::UNKNOWN_INPUT;
-            }
-				*/
-        }
-
-		  static std::string get_name(const params::input param)
-		  {
-			  std::map<params::input, const params::param_info>::const_iterator it = input_map.find(param);
-			  if(it != input_map.end())
-			  {
-				  return it->second.name;
-			  }
-
-			  return std::string();
-		  }
+		  //! \brief look for the string associated with a parametrization
+		  //! type.
+		  static std::string get_name(const params::input param);
 
         //! \brief parse a string to provide a parametrization type.
         static params::output parse_output(const std::string& txt)
@@ -290,58 +253,7 @@ class params
         }
 
         //! \brief provide a dimension associated with a parametrization
-        static int  dimension(params::input t)
-        {
-			  std::map<params::input, const params::param_info>::const_iterator it = params::input_map.find(t);
-			  if(it != params::input_map.end())
-			  {
-				  return it->second.dimension;
-			  }
-			  else
-			  {
-				  return -1;
-			  }
-			  /*
-            switch(t)
-            {
-                // 1D Parametrizations
-                case params::COS_TH:
-                    return 1;
-                    break;
-
-                // 2D Parametrizations
-                case params::ISOTROPIC_TD_PD:
-                case params::RUSIN_TH_TD:
-                case params::ROMEIRO_TH_TD:
-                case params::COS_TH_TD:
-                    return 2;
-                    break;
-
-                // 3D Parametrization
-                case params::RUSIN_TH_PH_TD:
-                case params::RUSIN_TH_TD_PD:
-                case params::ISOTROPIC_TV_TL_DPHI:
-                    return 3;
-                    break;
-
-                // 4D Parametrization
-                case params::RUSIN_TH_PH_TD_PD:
-                case params::SPHERICAL_TL_PL_TV_PV:
-                    return 4;
-                    break;
-
-                // 6D Parametrization
-                case params::CARTESIAN:
-                    return 6;
-                    break;
-
-                default:
-                    assert(false);
-                    return -1;
-                    break;
-            }
-				*/
-        }
+        static int  dimension(params::input t);
 
         //! \brief provide a dimension associated with a parametrization
         static int  dimension(params::output t)
@@ -420,26 +332,6 @@ class params
             vec[2] = sint * vec[0] + cost * vec[2];
         }
 
-		  static void print_input_params()
-		  {
-				for(std::map<params::input, const params::param_info>::const_iterator it=input_map.begin(); it != input_map.end(); ++it)
-				{
-					std::cout << it->second.name << std::endl;
-				}
-		  }
+		  static void print_input_params();
 
-
-	 protected:
-
-		  struct param_info
-		  {
-				param_info(std::string n, int d, std::string i) : 
-					name(n), dimension(d), info(i) { };
-
-			  std::string name;
-			  int dimension;
-			  std::string info;
-		  };
-
-		  static const std::map<params::input, const params::param_info> input_map;
 };
