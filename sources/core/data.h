@@ -144,8 +144,7 @@ class data_params : public data
 
 		virtual vec value(vec in, vec out) const 
 		{
-			std::cerr << "<<ERROR>> not implemented: " << __func__ << std::endl;
-			throw;
+			NOT_IMPLEMENTED();
 		}
 
 		// Load data from a file

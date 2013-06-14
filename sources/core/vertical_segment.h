@@ -5,6 +5,7 @@
 #include <string>
 
 // Interface
+#include "common.h"
 #include "function.h"
 #include "data.h"
 #include "fitter.h"
@@ -24,8 +25,7 @@ class vertical_segment : public data
 		virtual vec operator[](int i) const ;
 		virtual vec value(vec in, vec out) const 
 		{
-			std::cerr << "<<ERROR>> not implemented: " << __func__ << std::endl;
-			throw;
+			NOT_IMPLEMENTED();
 		}
 
 		//! \brief Put the sample inside the data
