@@ -242,3 +242,7 @@ template<typename T> int is_in(std::vector<T> ve, T v)
 std::cerr << "<<ERROR>> not implemented " << __FILE__ \
           << ":" << __LINE__ << std::endl; \
 throw
+
+#ifdef WIN32
+#define M_PI 3.14159265
+#endif

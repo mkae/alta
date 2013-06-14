@@ -307,6 +307,8 @@ std::ofstream& type_definition(std::ofstream& out, int nY)
         out << "float " ;
     else
         out << "vec" << nY ;
+
+    return out;
 }
 
 std::ofstream& type_affectation(std::ofstream& out, const std::string& name, const vec& x, int  nY, int n=0, int s=0, int S=1)

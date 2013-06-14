@@ -17,8 +17,6 @@
 #define isnan(X) ((X != X))
 #endif
 
-using namespace std;
-
 fitter* provide_fitter()
 {
 	return new rational_fitter_quadprog();
