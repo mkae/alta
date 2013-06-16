@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <cmath>
 
-function* provide_function()
+#include <core/common.h>
+
+ALTA_DLL_EXPORT function* provide_function()
 {
     return new phong_function();
 }

@@ -246,3 +246,9 @@ throw
 #ifdef WIN32
 #define M_PI 3.14159265
 #endif
+
+#ifdef WIN32
+#define ALTA_DLL_EXPORT extern "C" __declspec(dllexport)
+#else
+#define ALTA_DLL_EXPORT extern "C"
+#endif

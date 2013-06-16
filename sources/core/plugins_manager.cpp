@@ -174,7 +174,7 @@ function* plugins_manager::get_function(const std::string& n)
         return NULL;
     }
 
-    FunctionPrototype myFunction = (FunctionPrototype) function_lib.resolve("_Z16provide_functionv");
+    FunctionPrototype myFunction = (FunctionPrototype) function_lib.resolve("provide_function");
 
     if(myFunction != NULL)
     {
@@ -229,7 +229,7 @@ data* plugins_manager::get_data(const std::string& n)
         return NULL;
     }
 
-    DataPrototype myData = (DataPrototype) data_lib.resolve("_Z12provide_datav");
+    DataPrototype myData = (DataPrototype) data_lib.resolve("provide_data");
 
     if(myData != NULL)
     {
@@ -284,7 +284,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
         return NULL;
     }
 
-    FitterPrototype myFitter = (FitterPrototype) fitting_lib.resolve("_Z14provide_fitterv");
+	FitterPrototype myFitter = (FitterPrototype) fitting_lib.resolve("provide_fitter");
 
     if(myFitter != NULL)
     {

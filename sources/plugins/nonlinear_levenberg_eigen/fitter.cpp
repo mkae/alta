@@ -13,7 +13,9 @@
 
 #include <QTime>
 
-fitter* provide_fitter()
+#include <core/common.h>
+
+ALTA_DLL_EXPORT fitter* provide_fitter()
 {
     return new nonlinear_fitter_eigen();
 }

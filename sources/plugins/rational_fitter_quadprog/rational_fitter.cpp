@@ -17,7 +17,9 @@
 #define isnan(X) ((X != X))
 #endif
 
-fitter* provide_fitter()
+#include <core/common.h>
+
+ALTA_DLL_EXPORT fitter* provide_fitter()
 {
 	return new rational_fitter_quadprog();
 }

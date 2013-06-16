@@ -1,4 +1,5 @@
-CONFIG         += qt
+CONFIG         += qt \
+                  console
 
 DESTDIR         = ../../build
 INCLUDEPATH    += ../../ ../../libs/rational_1d \
