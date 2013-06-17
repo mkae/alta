@@ -200,6 +200,13 @@ class function
 			NOT_IMPLEMENTED();
 		}
 
+	public: // methods
+
+		//! \brief L2 norm to data.
+		double L2_distance(const data* d) const ;
+
+		//! \brief Linf norm to data.
+		double Linf_distance(const data* d) const ;
 
 	protected: // data
 

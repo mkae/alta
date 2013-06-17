@@ -371,7 +371,7 @@ int data_merl::dimY() const
 	return 3 ; 
 }
 
-data* provide_data()
+ALTA_DLL_EXPORT data* provide_data()
 {
     return new data_merl();
 }
