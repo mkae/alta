@@ -4,7 +4,7 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <iostream>
 #include <vector>
@@ -15,7 +15,7 @@
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv, false);
+	QCoreApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
 	plugins_manager manager(args) ;
@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 			vec v = d->get(i) ;
 
 			vec y2 = f->value(v) ;
-            if(linear_plot)
+            if(!linear_plot)
             {
                 for(int u=0; u<d->dimX(); ++u)
                     file << v[u] << "\t" ;
