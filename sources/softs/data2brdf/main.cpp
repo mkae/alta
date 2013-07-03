@@ -6,7 +6,7 @@
 
 #include <QPluginLoader>
 #include <QtPlugin>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <QTime>
 
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 //	QCoreApplication::addLibraryPath() ;
 //	QCoreApplication::addLibraryPath(QString("/home/belcour/Projects/alta/sources/tests/plugin_loader/")) ;
 
-	QApplication app(argc, argv, false);
+	QCoreApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
 	plugins_manager manager(args) ;

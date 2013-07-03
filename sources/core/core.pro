@@ -4,7 +4,7 @@ CONFIG  *= static \
 
 DESTDIR  = ../build
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++0x
 
 HEADERS  = args.h               \
            common.h             \
