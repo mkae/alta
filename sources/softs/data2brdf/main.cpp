@@ -6,7 +6,7 @@
 
 #include <QPluginLoader>
 #include <QtPlugin>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <QTime>
 
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 //	QCoreApplication::addLibraryPath() ;
 //	QCoreApplication::addLibraryPath(QString("/home/belcour/Projects/alta/sources/tests/plugin_loader/")) ;
 
-	QApplication app(argc, argv, false);
+	QCoreApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
 	plugins_manager manager(args) ;
@@ -30,6 +30,12 @@ int main(int argc, char** argv)
 	if(fit == NULL)
 	{
 		fit = manager.get_fitter() ;
+	}
+
+	if(args.is_defined("available_params"))
+	{
+		params::print_input_params();
+		return 0;
 	}
 
 	if(! args.is_defined("input")) {
@@ -44,18 +50,27 @@ int main(int argc, char** argv)
 //	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fit->set_parameters(args) ;
-        function* f = plugins_manager::get_function(args["func"]);
-        data*     d = plugins_manager::get_data(args["data"]);
+		function* f = plugins_manager::get_function(args["func"]);
+		data*     d = plugins_manager::get_data(args["data"]);
 		d->load(args["input"], args);
 
+		// Check the compatibility between the data and the function
+		plugins_manager::check_compatibility(d, f, args);
+
+
+		// Start a timer
 		QTime time ;
 		time.start() ;
-        bool is_fitted = fit->fit_data(d, f, args) ;
+
+		// Fit the data
+		bool is_fitted = fit->fit_data(d, f, args) ;
+
+		// Get the fitting duration
 		int msec = time.elapsed() ;
 		int sec  = (msec / 1000) % 60 ;
 		int min  = (msec / 60000) % 60 ;
 		int hour = (msec / 3600000) ;
-		
+
 
 		// Display the result
 		if(is_fitted)
@@ -77,9 +92,13 @@ int main(int argc, char** argv)
 				std::cout << x << "\t" << f->value(vx)[0] << std::endl ;
 			}
 /*/
+			double L2   = f->L2_distance(d);
+			double Linf = f->Linf_distance(d);
+			std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
+			std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
 
-			f->save(args["output"], args) ;
-#ifndef OLD // use brdf2gnuplot
+            f->save(args["output"], args) ;
+#ifdef OLD // use brdf2gnuplot
 			size_t n = args["output"].find('.') ;
 			std::string gnuplot_filename = args["output"].substr(0,n); 
 			gnuplot_filename.append(".gnuplot") ;
@@ -104,9 +123,9 @@ int main(int argc, char** argv)
             }
             file.close();
 //*/
-			std::string error_filename = args["output"].substr(0,n); 
-			error_filename.append(".errorplot") ;
-			std::ofstream efile(error_filename.c_str(), std::ios_base::trunc);
+            std::string error_filename = args["output"].substr(0,n);
+            error_filename.append(".errorplot") ;
+            file.open(error_filename.c_str(), std::ios_base::trunc);
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
@@ -115,13 +134,33 @@ int main(int argc, char** argv)
 
 				vec y2 = f->value(v) ;
 				for(int u=0; u<d->dimX(); ++u)
-					efile << v[u] << "\t" ;
+                    file << v[u] << "\t" ;
 					
 				for(int u=0; u<d->dimY(); ++u)
-					efile << y2[u]-y1[u] << "\t" ;
+                    file << y2[u]-y1[u] << "\t" ;
 					
-				efile << std::endl ;
+                file << std::endl ;
 			}
+            file.close();
+
+            std::string linerror_filename = args["output"].substr(0,n);
+            linerror_filename.append(".linearerrorplot") ;
+            file.open(linerror_filename.c_str(), std::ios_base::trunc);
+            for(int i=0; i<d->size(); ++i)
+            {
+                vec v = d->get(i) ;
+
+                vec y1(d->dimY()) ;
+                for(int k=0; k<d->dimY(); ++k) { y1[k] = 0.5*(v[d->dimX() + k] +v[d->dimX()+d->dimY() + k]); }
+                vec y2 = f->value(v) ;
+
+                file << i << "\t" ;
+                for(int u=0; u<d->dimY(); ++u)
+                    file << y2[u]-y1[u] << "\t" ;
+
+                file << std::endl ;
+            }
+            file.close();
 //*/
 #endif
 		}

@@ -12,6 +12,13 @@
 
 #include <QTime>
 
+#include <core/common.h>
+
+ALTA_DLL_EXPORT fitter* provide_fitter()
+{
+	return new rational_fitter_eigen();
+}
+
 data* rational_fitter_eigen::provide_data() const
 {
 	return new vertical_segment() ;

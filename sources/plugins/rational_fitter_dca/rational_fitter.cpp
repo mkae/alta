@@ -14,6 +14,11 @@
 
 #define BUFFER_SIZE 10000
 
+fitter* provide_fitter()
+{
+    return new rational_fitter_dca();
+}
+
 data* rational_fitter_dca::provide_data() const
 {
 	return new vertical_segment() ;

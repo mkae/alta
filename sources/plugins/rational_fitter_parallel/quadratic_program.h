@@ -11,7 +11,8 @@ class quadratic_program
 {
 	public:
 		//! \brief Constructor need to specify the number of coefficients
-		quadratic_program(int np, int nq) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0) { }
+        quadratic_program(int np, int nq) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0), _boundary_factor(1.0) { }
+        quadratic_program(int np, int nq, double boundary_factor) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0), _boundary_factor(boundary_factor) { }
 
 		//! \brief Remove the already defined constraints
 		void clear_constraints()
@@ -163,6 +164,25 @@ class quadratic_program
 				vec x, yl, yu;
 				data->get(n, x, yl, yu);
 
+                // <boundary conditions>
+                if(_boundary_factor != 1.0)
+                {
+                    bool is_boundary = false;
+                    for(int i=0; i<data->dimX(); ++i)
+                    {
+                        is_boundary = is_boundary || (x[i] <= data->min()[i]) || (x[i] >= data->max()[i]);
+                    }
+
+                    if(is_boundary)
+                    {
+                        vec mean = 0.5*(yl+yu);
+                        yl = mean + _boundary_factor * (yl - mean);
+                        yu = mean + _boundary_factor * (yu - mean);
+                    }
+                }
+                // </boundary condition>
+
+
 				vec y = r->value(x);
 				bool fail_upper = y > yu;
 				bool fail_lower = y < yl;
@@ -237,5 +257,8 @@ class quadratic_program
 	protected:
 		int _np, _nq ;
 		QuadProgPP::Matrix<double> CI;
+
+        // Boundary conditions factor
+        double _boundary_factor;
 
 };

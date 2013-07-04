@@ -23,7 +23,7 @@ class arguments
 		// Constructor and destructor
 		arguments()
 		{
-		} ;
+        }
 		arguments(int argc, char** const argv)
 		{
 			std::string key ;
@@ -53,8 +53,10 @@ class arguments
 				}
 				_map.insert(std::pair<std::string, std::string>(key, data)) ;
 			}
-		} ;
-		~arguments() { } ;
+        }
+        ~arguments()
+        {
+        }
 
 		//! \brief is the elements in the command line ?
 		bool is_defined(const std::string& key) const
@@ -67,7 +69,7 @@ class arguments
 			{
 				return false ;
 			}
-		} ;
+        }
 		//! \brief access the element stored value
 		std::string operator[](const std::string& key) const
 		{
@@ -80,7 +82,7 @@ class arguments
                 //std::cerr << "Underfined request to key : \"" << key << "\"" << std::endl ;
 				return std::string() ;
 			}
-		} ;
+        }
 		//! \brief acces to the float value associated with the parameter
 		//! \a key.
 		//!
@@ -113,10 +115,13 @@ class arguments
 		vec get_vec(const std::string& key, int size, float default_value = 0.0f) const
 		{
 			vec res(size);
+            for(int i=0; i<size; ++i)
+                res[i] = default_value;
+
 			if(_map.count(key) > 0)
 			{
 				std::string s = _map.find(key)->second;
-				if(s[0] == '\[') // Is an array of type [a, b, c]
+				if(s[0] == '[') // Is an array of type [a, b, c]
 				{
 					int i = 0;
 					size_t pos = 1;

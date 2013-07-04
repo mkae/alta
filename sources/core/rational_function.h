@@ -38,7 +38,6 @@ class rational_function : public QObject, public function
 
 		// IO function to text files
 		virtual void load(const std::string& filename) ;
-		virtual void save(const std::string& filename, const arguments& args) const ;
 	
 		// Update the function
 		virtual void update(const std::vector<double>& in_a, 
@@ -51,13 +50,12 @@ class rational_function : public QObject, public function
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function& r) ;
 
-        //! \brief Save the rational function to the rational format (see \ref formating).
-		void save_rational_function(const std::string& filename) const ;
+        static int estimate_dk(int k, int d);
+        static void populate(std::vector<int>& vec, int N, int M, int j);
+
         //! \brief Output the rational function as a gnuplot file. It requires
         //! the data object to output the function at the input location only.
-		void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
-        //! \brief Output the rational function using a C++ function formating.
-		void save_cpp(const std::string& filename, const arguments& args) const ;
+        virtual void save_gnuplot(const std::string& filename, const data* d, const arguments& args) const ;
 
 	protected: // functions
 		
@@ -65,6 +63,15 @@ class rational_function : public QObject, public function
         //! multinomial coeffcient. The resulting vector v should
         //! be used as prod_k x[k]^v[k] for the monomial basis
 		std::vector<int> index2degree(int i) const ;
+		
+		//! \brief Save the rational function to the rational format (see \ref formating).
+        virtual void save(const std::string& filename) const ;
+
+		//! \brief Output the rational function using a C++ function formating.
+		virtual void save_cpp(const std::string& filename, const arguments& args) const ;
+
+		//! \brief Output the rational function using a C++ function formating.
+		virtual void save_matlab(const std::string& filename, const arguments& args) const ;
 
 	protected: // data
 

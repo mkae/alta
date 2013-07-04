@@ -72,6 +72,18 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				linestream >> t ;
 				vs[current_vs] = t ; ++current_vs ;
 			}
+         else if(comment == std::string("PARAM_IN"))
+         {
+				std::string param;
+				linestream >> param;
+				_in_param = params::parse_input(param);
+         }
+         else if(comment == std::string("PARAM_OUT"))
+         {
+				std::string param;
+				linestream >> param;
+				_out_param = params::parse_output(param);
+         }
 			continue ;
 		} 
 		else if(line.empty())
@@ -107,13 +119,27 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				// TODO Specify the delta in case
 				// Handle multiple dim
 				double dt = args.get_float("dt", 0.1);
-				v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 - dt) ;
-				v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + dt) ;
+#ifdef RELATIVE_ERROR
+                v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 - dt) ;
+                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + dt) ;
+#else
+                if(v[dimX() + i] > dt)
+                {
+                    v[dimX() +   dimY()+i] = v[dimX() + i] - dt ;
+                    v[dimX() + 2*dimY()+i] = v[dimX() + i] + dt ;
+
+                }
+                else
+                {
+                    v[dimX() +   dimY()+i] = 0.0 ;
+                    v[dimX() + 2*dimY()+i] = dt ;
+
+                }
+#endif
 			}
 		}
 		
 		// If data is not in the interval of fit
-		// TODO: Update to more dims
 		bool is_in = true ;
 		for(int i=0; i<dimX(); ++i)
 		{
@@ -178,6 +204,14 @@ vec vertical_segment::operator[](int i) const
 vec vertical_segment::get(int i) const 
 {
 	return _data[i] ;
+}
+
+//! \todo Check the vertical segment size and if the data
+//! is not already present.
+void vertical_segment::set(vec x)
+{
+	assert(x.size() == _nX + _nY);
+	_data.push_back(x);
 }
 
 int vertical_segment::size() const

@@ -106,7 +106,7 @@ vec rational_function::q(const vec& x) const
 // Estimate the number of configuration for an indice
 // vector of dimension d with maximum element value
 // being k.
-int estimate_dk(int k, int d)
+int rational_function::estimate_dk(int k, int d)
 {
 	if(d == 1)
 	{
@@ -130,7 +130,7 @@ int estimate_dk(int k, int d)
 // Populate a vector of degrees of dimension N using a
 // maximum degree of M. The index at the current level
 // is j
-void populate(std::vector<int>& vec, int N, int M, int j)
+void rational_function::populate(std::vector<int>& vec, int N, int M, int j)
 {
 	// For each dimension, estimate the current level
 	// based on the number of configurations in the
@@ -304,6 +304,12 @@ void rational_function::load(const std::string& filename)
 				linestream >> nq ;
 				b.resize(nq*nY);
 			}
+			else if(comment == std::string("INPUT_PARAM"))
+			{
+				std::string param;
+				linestream >> param ;
+				setParametrization(params::parse_input(param));
+			}
 			continue ;
 		} 
 		else if(line.empty())
@@ -348,25 +354,94 @@ void rational_function::load(const std::string& filename)
 	}
 */
 }
-void rational_function::save(const std::string& filename, const arguments& args) const
+
+//! \todo it should handle parametrization
+void rational_function::save_matlab(const std::string& filename, const arguments& args) const
 {
-    if(args.is_defined("export"))
-	{
-        if(args["export"].compare("c++") == 0)
-		{
-			std::cout << "<<INFO>> will export in C++ format" << std::endl;
-			save_cpp(filename, args);
-		}
-		else
-		{
-			std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
-		}
-	}
-	else
-	{
-		std::cout << "<<INFO>> will export the rational coefficients" << std::endl;
-		save_rational_function(filename) ;
-	}
+    unsigned int np = a.size() / _nY ;
+    unsigned int nq = b.size() / _nY ;
+
+    std::ofstream file(filename.c_str(), std::ios_base::trunc);
+
+
+    file << "function y = brdf(x)" << std::endl;
+    file << std::endl;
+    file << "\ts = [";
+    for(int i=0; i<dimX(); ++i)
+    {
+        file << 1.0 / (_max[i]-_min[i]);
+        if(i < dimX()-1)
+        {
+            file << ", ";
+        }
+    }
+    file << "];" << std::endl;
+    file << "\tc = [";
+    for(int i=0; i<dimX(); ++i)
+    {
+        file << _min[i];
+        if(i < dimX()-1)
+        {
+            file << ", ";
+        }
+    }
+    file << "];" << std::endl;
+    file << std::endl ;
+
+    // Export each color channel independantly
+    for(int j=0; j<dimY(); ++j)
+    {
+        // Export the numerator of the jth color channel
+        file << "\tp(" << j+1 << ",:) = ";
+        for(unsigned int i=0; i<np; ++i)
+        {
+            if(i > 0 && a[np*j + i] >= 0.0)
+                file << " + ";
+            else if(a[np*j + i] < 0.0)
+                file << " " ;
+
+            file << a[np*j + i];
+
+            std::vector<int> degree = index2degree(i);
+            for(unsigned int k=0; k<degree.size(); ++k)
+            {
+               file << ".*legendrepoly(" << degree[k] << ", 2.0*((x(" << k+1 << ",:)"
+					     << "-c(" << k+1 << "))*s(" << k+1 << ") - 0.5))" ;
+            }
+        }
+        file << ";" << std::endl;
+
+        // Export the denominator of the jth color channel
+        file << "\tq(" << j+1 << ",:) = ";
+        for(unsigned int i=0; i<nq; ++i)
+        {
+            if(i > 0 && b[np*j + i] >= 0.0)
+                file << " + ";
+            else if(b[np*j + i] < 0.0)
+                file << " " ;
+
+            file << b[np*j + i] ;
+
+            std::vector<int> degree = index2degree(i);
+            for(unsigned int k=0; k<degree.size(); ++k)
+            {
+               file << ".*legendrepoly(" << degree[k] << ", 2.0*((x(" << k+1 << ",:)" 
+					     << "-c(" << k+1 << "))*s(" << k+1 << ") - 0.5))" ;
+            }
+        }
+        file << ";" << std::endl;
+
+        file << "\ty(" << j+1 << ",:) = p./q;" << std::endl;
+        if(j < dimY()-1)
+        {
+            file << std::endl;
+        }
+    }
+
+
+    file << "endfunction" << std::endl;
+
+    file.close() ;
 }
 
 //! \todo it should handle parametrization
@@ -399,7 +474,24 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
     file << "};" << std::endl;
     file << std::endl ;
 
-    file << "// l(double x, int i) is the Legendre polynomial of order i evaluated in x" << std::endl;
+    file << "// The Legendre polynomial of order i evaluated in x" << std::endl;
+    file << "double l(double x, int i)" << std::endl;
+    file << "{" << std::endl;
+    file << "    if(i == 0)" << std::endl;
+    file << "    {" << std::endl;
+    file << "        return 1;" << std::endl;
+    file << "    }" << std::endl;
+    file << "    else if(i == 1)" << std::endl;
+    file << "    {" << std::endl;
+    file << "        return x;" << std::endl;
+    file << "    }" << std::endl;
+    file << "    else" << std::endl;
+    file << "    {" << std::endl;
+    file << "        return ((2*i-1)*x*l(x, i-1) - (i-1)*l(x, i-2)) / (double)i ;" << std::endl;
+    file << "    }" << std::endl;
+    file << "}" << std::endl;
+    file << std::endl;
+
     file << "void brdf(double* x, double* y)" << std::endl;
     file << "{" << std::endl;
     file << "\tdouble p, q;" << std::endl;
@@ -420,7 +512,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x[" << k << "]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
@@ -431,17 +523,20 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
         {
             if(i > 0 && b[np*j + i] >= 0.0)
                 file << " + ";
+            else if(b[np*j + i] < 0.0)
+                file << " " ;
+
             file << b[np*j + i] ;
 
             std::vector<int> degree = index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
-                file << "*l(x\[" << k << "\]-c[" << k << "])/s[" << k << "] - 0.5), " << degree[k] << ")" ;
+                file << "*l(2.0*((x[" << k << "]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
             }
         }
         file << ";" << std::endl;
 
-        file << "\t y[" << j << "] = p/q;" << std::endl;
+        file << "\ty[" << j << "] = p/q;" << std::endl;
         if(j < dimY()-1)
         {
             file << std::endl;
@@ -475,13 +570,14 @@ void rational_function::save_gnuplot(const std::string& filename, const data* d,
 	file.close();
 }
 
-void rational_function::save_rational_function(const std::string& filename) const 
+void rational_function::save(const std::string& filename) const 
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NP " << a.size() / _nY << std::endl ;
 	file << "#NQ " << b.size() / _nY << std::endl ;
-	file << "#BASIS poly" << std::endl ;
+	file << "#BASIS LEGENDRE" << std::endl ;
+	file << "#INPUT_PARAM " << params::get_name(this->parametrization()) << std::endl;
 
 	unsigned int np = a.size() / _nY ;
     unsigned int nq = b.size() / _nY ;

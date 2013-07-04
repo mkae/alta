@@ -79,7 +79,6 @@ plugins_manager::plugins_manager(const arguments& args)
 	}
 }
 
-#define USING_STATIC
 #ifdef USING_STATIC
 typedef function* (*FunctionPrototype)();
 typedef fitter*   (*FitterPrototype)();
@@ -105,7 +104,7 @@ function* plugins_manager::get_function()
 #endif
 
 }
-data* plugins_manager::get_data()     const 
+data* plugins_manager::get_data()
 {
 	//if(_datas.empty())
 	{
@@ -122,8 +121,11 @@ data* plugins_manager::get_data()     const
 		return _datas.begin()->second ;
 	}*/
 }
-fitter* plugins_manager::get_fitter()   const 
+fitter* plugins_manager::get_fitter()
 {
+#ifdef USING_STATIC
+    return NULL;
+#else
 	if(_fitters.empty())
 	{
 		return NULL ;
@@ -135,6 +137,7 @@ fitter* plugins_manager::get_fitter()   const
 #endif
 		return _fitters.begin()->second ;
 	}
+#endif
 }
 
 
@@ -153,7 +156,25 @@ function* plugins_manager::get_function(const std::string& n)
     }
 
 #ifdef USING_STATIC
-    FunctionPrototype myFunction = (FunctionPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_functionv");
+	 std::string file;
+	 if(n[0] == '.')
+	 {
+		 file = n.substr(1, n.size()-1);
+	 }
+	 else
+	 {
+		 file = n;
+	 }
+
+    QString path = QDir::currentPath() + QString(file.c_str()) ;
+    QLibrary function_lib(path);
+    if(!function_lib.isLoaded())
+    {
+        std::cerr << "<<ERROR>> unable to load file \"" << path.toStdString() << "\"" << std::endl;
+        return NULL;
+    }
+
+    FunctionPrototype myFunction = (FunctionPrototype) function_lib.resolve("provide_function");
 
     if(myFunction != NULL)
     {
@@ -190,7 +211,25 @@ data* plugins_manager::get_data(const std::string& n)
     }
 
 #ifdef USING_STATIC
-    DataPrototype myData = (DataPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_datav");
+	 std::string file;
+	 if(n[0] == '.')
+	 {
+		 file = n.substr(1, n.size()-1);
+	 }
+	 else
+	 {
+		 file = n;
+	 }
+
+    QString path = QDir::currentPath() + QString(file.c_str()) ;
+    QLibrary data_lib(path);
+    if(!data_lib.isLoaded())
+    {
+        std::cerr << "<<ERROR>> unable to load file \"" << path.toStdString() << "\"" << std::endl;
+        return NULL;
+    }
+
+    DataPrototype myData = (DataPrototype) data_lib.resolve("provide_data");
 
     if(myData != NULL)
     {
@@ -216,7 +255,7 @@ data* plugins_manager::get_data(const std::string& n)
     }
 #endif
 }
-fitter* plugins_manager::get_fitter(const std::string& n)   const 
+fitter* plugins_manager::get_fitter(const std::string& n)
 {
     if(n.empty())
     {
@@ -226,8 +265,26 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
         return NULL;
     }
 
-#ifndef USING_STATIC
-    FitterPrototype myFitter = (FitterPrototype) QLibrary::resolve(QString(n.c_str()), "_Z16provide_fitter");
+#ifdef USING_STATIC
+	 std::string file;
+	 if(n[0] == '.')
+	 {
+		 file = n.substr(1, n.size()-1);
+	 }
+	 else
+	 {
+		 file = n;
+	 }
+
+    QString path = QDir::currentPath() + QString(file.c_str()) ;
+    QLibrary fitting_lib(path);
+    if(!fitting_lib.isLoaded())
+    {
+        std::cerr << "<<ERROR>> unable to load file \"" << path.toStdString() << "\"" << std::endl;
+        return NULL;
+    }
+
+	FitterPrototype myFitter = (FitterPrototype) fitting_lib.resolve("provide_fitter");
 
     if(myFitter != NULL)
     {
@@ -238,8 +295,8 @@ fitter* plugins_manager::get_fitter(const std::string& n)   const
     }
     else
     {
-        std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
-        return new NULL() ;
+        std::cerr << "<<ERROR>> no fitter provider found in file \"" << n << "\"" << std::endl;
+        return NULL ;
     }
 #else
 	if(_fitters.count(n) == 0)

@@ -34,6 +34,13 @@
 #ifdef WIN32
 #define M_PI	3.1415926535897932384626433832795
 #endif
+
+data_merl::data_merl()
+{
+	const int n = BRDF_SAMPLING_RES_PHI_D/2 * BRDF_SAMPLING_RES_THETA_D * BRDF_SAMPLING_RES_THETA_H;
+	brdf = (double*) malloc (sizeof(double)*3*n);
+}
+
 // cross product of two vectors
 void cross_product (double* v1, double* v2, double* out)
 {
@@ -232,7 +239,6 @@ bool read_brdf(const char *filename, double* &brdf)
 		return false;
 	}
 
-	brdf = (double*) malloc (sizeof(double)*3*n);
 	fread(brdf, sizeof(double), 3*n, f);
 
 	fclose(f);
@@ -258,6 +264,23 @@ void data_merl::load(const std::string& filename, const arguments& args)
 	}
 }
 
+void data_merl::save(const std::string& filename) const 
+{
+	FILE *f = fopen(filename.c_str(), "wb");
+
+	int dims[3];
+	dims[0] = BRDF_SAMPLING_RES_PHI_D/2;
+	dims[1] = BRDF_SAMPLING_RES_THETA_D;
+	dims[2] = BRDF_SAMPLING_RES_THETA_H;
+
+	const int n = dims[0]*dims[1]*dims[2];
+
+	fwrite(dims, sizeof(int), 3, f);
+	fwrite(brdf, sizeof(double), 3*n, f);
+
+	fclose(f);
+}
+
 // Acces to data
 vec data_merl::get(int i) const 
 {
@@ -268,9 +291,9 @@ vec data_merl::get(int i) const
 
 
 	vec res(6) ;
-	res[0] = phid_ind * M_PI / (BRDF_SAMPLING_RES_PHI_D / 2);
+	res[2] = phid_ind * M_PI / (BRDF_SAMPLING_RES_PHI_D / 2);
 	res[1] = thed_ind * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_D);
-	res[2] = theh_ind * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_H);
+	res[0] = theh_ind * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_H);
 	res[3] = brdf[i] * RED_SCALE;
 	res[4] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 	res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
@@ -280,6 +303,21 @@ vec data_merl::operator[](int i) const
 {
 	return get(i) ;
 }
+
+//! \todo Test this function
+void data_merl::set(vec x)
+{
+	assert(x.size() == 6);
+	const int phid_ind = (int)floor((x[2] / M_PI) * (BRDF_SAMPLING_RES_PHI_D/2));
+	const int thed_ind = (int)floor((x[1] / (0.5*M_PI)) * BRDF_SAMPLING_RES_THETA_D);
+	const int theh_ind = (int)floor((x[0] / (0.5*M_PI)) * BRDF_SAMPLING_RES_THETA_H);
+
+	const int i = (theh_ind*BRDF_SAMPLING_RES_THETA_D + thed_ind)*(BRDF_SAMPLING_RES_PHI_D/2) + phid_ind;
+	brdf[i] = x[3] / RED_SCALE;
+	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] = x[4] / GREEN_SCALE;
+	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
+}
+
 vec data_merl::value(vec in, vec out) const
 {
 	// compute  thetain fi_in, theta_out fi_out
@@ -333,7 +371,7 @@ int data_merl::dimY() const
 	return 3 ; 
 }
 
-data* provide_data()
+ALTA_DLL_EXPORT data* provide_data()
 {
     return new data_merl();
 }

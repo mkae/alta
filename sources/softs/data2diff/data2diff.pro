@@ -1,5 +1,4 @@
-CONFIG         += qt      \
-                  console
+CONFIG         += qt
 
 INCLUDEPATH    += ../../
 DESTDIR         = ../../build

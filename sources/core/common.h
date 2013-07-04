@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core
@@ -28,7 +29,15 @@ class vec : public std::vector<double>
 		}
 		virtual ~vec() 
 		{
-		}
+        }
+
+        //! \brief get a subpart of the vector
+        vec subvector(int start, int n) const
+        {
+            vec res(n);
+            memcpy(&res[0], &this->at(start), n*sizeof(double));
+            return res;
+        }
 
 		//! \brief copy operator. It resize the left operand to the size of the 
 		//! right operand.
@@ -41,7 +50,7 @@ class vec : public std::vector<double>
 			}
 			return *this ;
 		}
-		
+
 		// Mathematical operators
 		//
 		friend vec operator-(const vec& a)
@@ -137,6 +146,16 @@ class vec : public std::vector<double>
 			}
 			return c ;
 		}
+        friend double norm(const vec& a)
+        {
+            double norm = 0.0 ;
+            for(unsigned int i=0; i<a.size(); ++i)
+            {
+                norm += a[i]*a[i];
+            }
+            return sqrt(norm);
+        }
+
 		friend vec normalize(const vec& a)
 		{
 			vec b(a.size());
@@ -169,14 +188,14 @@ class vec : public std::vector<double>
         friend bool operator<(const vec& a, const vec& b)
         {
             bool lessthan = true ;
-            for(int i=0; i<a.size(); ++i)
+            for(unsigned int i=0; i<a.size(); ++i)
                 lessthan &= a[i] < b[i];
             return lessthan;
         }
         friend bool operator>(const vec& a, const vec& b)
         {
             bool greatthan = true ;
-            for(int i=0; i<a.size(); ++i)
+            for(unsigned int i=0; i<a.size(); ++i)
                 greatthan &= a[i] > b[i];
             return greatthan;
         }
@@ -200,7 +219,36 @@ class vec : public std::vector<double>
 			out << "]" ;
 
 			return out ;
-		} ;
+        }
 
 
 } ;
+
+//! \brief locate the first index of value v in vector vec. Complexity in
+//! O(n) is the worst case.
+template<typename T> int is_in(std::vector<T> ve, T v)
+{
+    int res = -1;
+    for(unsigned int i=0; i<ve.size(); ++i)
+    {
+        if(ve[i] == v)
+            return i;
+    }
+
+    return res;
+}
+
+#define NOT_IMPLEMENTED() \
+std::cerr << "<<ERROR>> not implemented " << __FILE__ \
+          << ":" << __LINE__ << std::endl; \
+throw
+
+#ifdef WIN32
+#define M_PI 3.14159265
+#endif
+
+#ifdef WIN32
+#define ALTA_DLL_EXPORT extern "C" __declspec(dllexport)
+#else
+#define ALTA_DLL_EXPORT extern "C"
+#endif

@@ -67,7 +67,9 @@ int main(int argc, char** argv)
 
 				file << phi << "\t" << theta << "\t" ;
 				for(int u=0; u<d->dimY(); ++u)
+                {
 					file << v[u] << "\t" ;
+                }
 			
 				file << std::endl ;
 			}

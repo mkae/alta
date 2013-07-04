@@ -13,6 +13,17 @@
 
 #include <QTime>
 
+#ifdef WIN32
+#define isnan(X) ((X != X))
+#endif
+
+#include <core/common.h>
+
+ALTA_DLL_EXPORT fitter* provide_fitter()
+{
+	return new rational_fitter_quadprog();
+}
+
 data* rational_fitter_quadprog::provide_data() const
 {
 	return new vertical_segment() ;
@@ -23,7 +34,7 @@ function* rational_fitter_quadprog::provide_function() const
 	return new rational_function() ;
 }
 
-rational_fitter_quadprog::rational_fitter_quadprog() : QObject()
+rational_fitter_quadprog::rational_fitter_quadprog() : QObject(), _boundary(1.0)
 {
 }
 rational_fitter_quadprog::~rational_fitter_quadprog() 
@@ -71,16 +82,15 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
 
-		if(temp_np <= _max_np)
+      if(temp_np < _max_np)
 		{
 			++temp_np ;
 		}
-		if(temp_nq <= _max_nq)
+      if(temp_nq < _max_nq)
 		{
 			++temp_nq ;
 		}
 	}
-
 	return false ;
 }
 
@@ -89,7 +99,12 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
 	_min_np = args.get_float("min-np", _max_np) ;
-	_min_nq = args.get_float("min-nq", _max_nq) ;
+    _min_nq = args.get_float("min-nq", _max_nq) ;
+
+    _max_np = std::max<int>(_max_np, _min_np);
+    _max_nq = std::max<int>(_max_nq, _min_nq);
+
+    _boundary = args.get_float("boundary-constraint", 1.0f);
 }
 		
 
@@ -157,7 +172,13 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 		double a0_norm = 0.0 ;
 		double a1_norm = 0.0 ;
 
-		vec xi = d->get(i) ;
+        vec xi = d->get(i) ;
+
+        bool is_boundary = false;
+        for(int k=0; k<d->dimX(); ++k)
+        {
+            is_boundary = is_boundary || (xi[k] <= d->min()[k]) || (xi[k] >= d->max()[k]);
+        }
 
 		// A row of the constraint matrix has this 
 		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
@@ -183,6 +204,14 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 			{
 				vec yl, yu ; 
 				d->get(i, yl, yu) ;
+
+                // Add a constraints for boundary conditions
+                if(is_boundary)
+                {
+                    vec mean = 0.5*(yl+yu);
+                    yl = mean + _boundary * (yl - mean);
+                    yu = mean + _boundary * (yu - mean);
+                }
 
 				const double qi = r->q(xi, j-np) ;
 				a0_norm += qi*qi * (yl[ny]*yl[ny]) ;
@@ -233,7 +262,8 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 	
 	double delta = sigma_m / sigma_M ;
-	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
+
+	if(isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 #ifdef DEBUG
 		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
@@ -270,7 +300,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	for(int i=0; i<np+nq; ++i)
 	{
 		const double v = x[i];
-		solves_qp = solves_qp && !std::isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
+		solves_qp = solves_qp && !isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
 	}
 
 	if(solves_qp)
