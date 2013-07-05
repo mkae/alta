@@ -6,6 +6,12 @@ our data.
 
 \todo [Ongoing] Matusik on beige, blue-metallic paint, nickel, chrome
 
+    * f( cos(tH), cos(tD) ) : Cosine parametrization
+    * f( cos(tH, cos(tD) ) * cos(tL ) : BRDF * cosine factor
+		* f( cos(tH), cos(tD), Phi_D = 0 ) * cos(tL) : 
+		* f( cos(tH), cos(tD), Phi_D = pi/2 ) * cos(tL) : 
+      
+
 \todo [Ongoing] Retro-reflective materials (from CEA)
 
 \todo [Tested] 6D/4D data from Eric H.
