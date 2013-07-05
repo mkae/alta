@@ -1,15 +1,43 @@
 /**
-\page todo_list Todo
+\page Development 
 
+
+\todo [DEBUG] Non-linear fitting plugin (Eigen)
+\todo Call to Non-linear Matlab optimization routines 
+
+\todo CDF and inverse CDF fitting with appropriate constraints
+
+\todo data2data:  a simple command line tool that reads BRDF
+      measurements and exports them to a specified format. 
+      
+			Possible options are the file format, the parametrizations, the precision (double, float , long double),
+      specifications of the angles (in radiance or degrees)
+
+
+\todo To specify the fitting output format
+
+\todo To specify a Binary format for ALTA file
+
+\todo Rational Functions Export in monomial basis
+
+\todo Export polynomials and rational functions with Horner factorization (Opt.)
+
+
+\todo Plasma  plugin. High performance CPU library for SVD on skinny and
+tall matrices
+
+\todo Magma  plugin. Same as plasma but for GPU
+
+
+\todo To define  unit and non-regression tests
+
+
+\todo Remove Qt dependencies
 \todo Change the automatic compilation soft to Cmake of scons
 
-\todo Load data file in binary format. 
 
-\todo Specify filename extensions (.txt for text file and .bin for binary ? ) for alta input data file.
-
-\todo Code/Develop brdf2alta:  a simple command line tool that reads BRDF files and exports them in ALTA format. 
-      Possible options are the file format, the parametrizations, the precision (double, float , long double),
-      specifications of the angles (in radiance or degrees)
+\todo Documentation and Tutorials
+\todo Licence choice
 
 
 */
