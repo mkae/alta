@@ -163,10 +163,12 @@ int main(int argc, char** argv)
             file.close();
 //*/
 #endif
+			return 0;
 		}
 		else
 		{
 			std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
+			return 1;
 		}
 
 	}	

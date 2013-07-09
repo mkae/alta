@@ -270,6 +270,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
     rj->update(P, Q);
 
     linf_dist = 0.0;
+	l2_dist   = 0.0;
     for(int i=0; i<d->size(); ++i)
     {
         vec dat = d->get(i);

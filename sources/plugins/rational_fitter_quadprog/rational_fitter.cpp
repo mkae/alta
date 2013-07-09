@@ -79,8 +79,14 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 			return true ;
 		}
 
+		
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed\r"  ;
 		std::cout.flush() ;
+
+		if(temp_np == _max_np && temp_nq == _max_nq)
+		{
+			return false;
+		}
 
       if(temp_np < _max_np)
 		{

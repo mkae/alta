@@ -9,7 +9,7 @@
 #include <cmath>
 #include <cassert>
 
-#define RELATIVE_ERROR
+//#define RELATIVE_ERROR
 
 void vertical_segment::load(const std::string& filename) 
 {

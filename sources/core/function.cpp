@@ -5,53 +5,35 @@
 //! \brief L2 norm to data.
 double function::L2_distance(const data* d) const
 {
-	double l2 = 0.0;
-	int nb_points = d->size();
-	for(int i=0; i<nb_points; ++i)
-	{
-		// Get data point
-		vec x = d->get(i);
-		vec y1(d->dimY());
-		for(int j=0; j<d->dimY(); ++j)
-			y1 = x[d->dimX() + j];
+	double l2_dist = 0.0;
+    for(int i=0; i<d->size(); ++i)
+    {
+        vec dat = d->get(i);
+        vec y(d->dimY());
+        for(int j=0; j<d->dimY(); ++j)
+            y[j] = dat[d->dimX()+j];
 
-		// Evaluate data
-		vec y2 = this->value(x);
-
-		double dist = norm(y1-y2);
-		l2 += dist*dist;
-	}
-
-	double factor = 1.0/(double)nb_points;
-	vec _min = d->min();
-	vec _max = d->max();
-	for(int i=0; i<d->dimX(); ++i)
-	{
-		factor *= _max[i]-_min[i];
-	}
-
-	return sqrt(l2)*factor;
+        //linf_dist = std::max<double>(linf_dist, std::abs<double>(norm(y-rj->value(dat))));
+        l2_dist  += std::pow(norm(y-value(dat)), 2);
+    }
+    l2_dist = std::sqrt(l2_dist / d->size());
+	return l2_dist;
 }
 
 //! \brief Linf norm to data.
 double function::Linf_distance(const data* d) const
 {
-	double linf = 0.0;
-	int nb_points = d->size();
-	for(int i=0; i<nb_points; ++i)
-	{
-				// Get data point
-		vec x = d->get(i);
-		vec y1(d->dimY());
-		for(int j=0; j<d->dimY(); ++j)
-			y1 = x[d->dimX() + j];
 
-		// Evaluate data
-		vec y2 = this->value(x);
+	double linf_dist = 0.0;
+    for(int i=0; i<d->size(); ++i)
+    {
+        vec dat = d->get(i);
+        vec y(d->dimY());
+        for(int j=0; j<d->dimY(); ++j)
+            y[j] = dat[d->dimX()+j];
 
-		double dist = norm(y1-y2);
-		linf = std::max(dist, linf);
-	}
-
-	return linf;
+        linf_dist = std::max<double>(linf_dist, std::abs(norm(y-value(dat))));
+    }
+	
+	return linf_dist;
 }
