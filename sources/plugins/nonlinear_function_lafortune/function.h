@@ -13,7 +13,7 @@
 #include <core/args.h>
 #include <core/common.h>
 
-#define ADAPT_TO_PARAM
+//#define ADAPT_TO_PARAM
 //#define FIT_DIFFUSE
 
 /*! \brief A lafortune lobe class. It is provided for testing with the nonlinear
@@ -43,7 +43,7 @@ class lafortune_function : public nonlinear_function, public QObject
 		virtual void load(const std::string& filename) ;
 
 		//! \brief Boostrap the function by defining the diffuse term
-		virtual void boostrap(const data* d, const arguments& args);
+		virtual void bootstrap(const data* d, const arguments& args);
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const ;

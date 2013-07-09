@@ -211,6 +211,7 @@ params::input params::parse_input(const std::string& txt)
 		}
 	}
 
+	std::cout << "<<ERROR>> the input parametrization in unknown" << std::endl;
 	return params::UNKNOWN_INPUT;
 }
 		  

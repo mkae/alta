@@ -24,6 +24,11 @@ function* rational_fitter_matlab::provide_function() const
 	return new rational_function() ;
 }
 
+ALTA_DLL_EXPORT fitter* provide_fitter()
+{
+	return new rational_fitter_matlab();
+}
+
 rational_fitter_matlab::rational_fitter_matlab() : QObject()
 {
 }

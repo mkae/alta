@@ -137,7 +137,7 @@ vec phong_function::parametersJacobian(const vec& x) const
 }
 
 
-void phong_function::boostrap(const data* d, const arguments& args)
+void phong_function::bootstrap(const data* d, const arguments& args)
 {
 
     vec x0 = d->get(0);

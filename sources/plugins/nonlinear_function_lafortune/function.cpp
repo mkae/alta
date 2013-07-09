@@ -1,6 +1,7 @@
 #include "function.h"
 
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <limits>
@@ -107,13 +108,6 @@ vec lafortune_function::value(const vec& x, const vec& p) const
 	}
 
 	return res;
-}
-
-//! Load function specific files
-void lafortune_function::load(const std::string& filename) 
-{
-    std::cerr << "Not implemented " << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
 }
 
 // Set the number of lobes of the Lafortune BRDF
@@ -273,7 +267,7 @@ vec lafortune_function::parametersJacobian(const vec& x) const
     return jac;
 }
 		
-void lafortune_function::boostrap(const data* d, const arguments& args)
+void lafortune_function::bootstrap(const data* d, const arguments& args)
 {
     // Check the arguments for the number of lobes
     this->setNbLobes(args.get_int("lobes", 1));
@@ -336,28 +330,77 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 }
 
 
+//! Load function specific files
+void lafortune_function::load(const std::string& filename)
+{
+	std::ifstream file(filename.c_str()) ;
+	if(!file.is_open())
+	{
+		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+		throw ;
+	}
+
+	_nX = 0 ; _nY = 0 ;
+	_n = 0;
+
+	double x, y, dy ;
+	while(file.peek() == '#')
+	{
+		std::string line ;
+		std::getline(file, line) ;
+		std::stringstream linestream(line) ;
+
+		linestream.ignore(1) ;
+
+		std::string comment ;
+		linestream >> comment ;
+
+		if(comment == std::string("DIM"))
+		{
+			linestream >> _nX >> _nY ;
+		}
+		else if(comment == std::string("NB_LOBES"))
+		{
+			linestream >> _n ;
+		}
+	}
+
+	setNbLobes(_n);
+
+	for(int n=0; n<_n; ++n)
+	{
+		std::cout << (char)file.peek() << std::endl;
+
+		for(int i=0; i<_nY; ++i)
+		{
+			file >> _C[(n*_nY + i)*3 + 0] >> _C[(n*_nY + i)*3 + 1] >> _C[(n*_nY + i)*3 + 2];
+		}
+	}
+}
+
 void lafortune_function::save(const std::string& filename) const
 {
-    std::ofstream file(filename.c_str(), std::ios_base::trunc);
-    file << "#DIM " << _nX << " " << _nY << std::endl ;
+	std::ofstream file(filename.c_str(), std::ios_base::trunc);
+	file << "#DIM " << _nX << " " << _nY << std::endl ;
+	file << "#NB_LOBES " << _n << std::endl ;
 
-        for(int n=0; n<_n; ++n)
-        {
-            file << "#Lobe number " << n << std::endl;
-        file << "#Cx Cy Cz" << std::endl;
-         for(int i=0; i<_nY; ++i)
-          {
-                file << _C[(n*_nY + i)*3 + 0] << _C[(n*_nY + i)*3 + 2] << _C[(n*_nY + i)*3 + 1] << std::endl;
-           }
-        file << std::endl;
+	for(int n=0; n<_n; ++n)
+	{
+		file << "#Lobe number " << n << std::endl;
+		file << "#Cx Cy Cz" << std::endl;
+		for(int i=0; i<_nY; ++i)
+		{
+			file << _C[(n*_nY + i)*3 + 0] << " " << _C[(n*_nY + i)*3 + 2] << " " << _C[(n*_nY + i)*3 + 1] << std::endl;
+		}
+		file << std::endl;
 
-         file << "#N" << std::endl;
-          for(int i=0; i<_nY; ++i)
-           {
-                 file << _N[i] << std::endl;
-            }
-        file << std::endl;
-        }
+		file << "#N" << std::endl;
+		for(int i=0; i<_nY; ++i)
+		{
+			file << _N[i] << std::endl;
+		}
+		file << std::endl;
+	}
 
 }
 
@@ -389,6 +432,20 @@ void lafortune_function::save_brdfexplorer(const std::string& filename,
     file << "{" << std::endl;
     if(_nY == 1)
     {
+        file << "    ";
+        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
+
+        for(int n=0; n<_n; ++n)
+        {
+            file << "    // Lobe number " << n+1 << std::endl;
+            file << "    n  = " << _N[n] << "; " << std::endl;
+            file << "    Cx = " << _C[0*_n + n] << "; " << std::endl;
+            file << "    Cy = " << _C[1*_n + n] << "; " << std::endl;
+            file << "    Cz = " << _C[2*_n + n] << "; " << std::endl;
+            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
+            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
+            file << std::endl;
+        }
     }
     else
     {

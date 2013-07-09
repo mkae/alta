@@ -9,6 +9,8 @@
 #include <cmath>
 #include <cassert>
 
+#define RELATIVE_ERROR
+
 void vertical_segment::load(const std::string& filename) 
 {
 	arguments args ;
@@ -138,7 +140,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 #endif
 			}
 		}
-		
+
 		// If data is not in the interval of fit
 		bool is_in = true ;
 		for(int i=0; i<dimX(); ++i)

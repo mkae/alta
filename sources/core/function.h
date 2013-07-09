@@ -42,7 +42,7 @@ class function
 		//! \details
 		//! Can be used to set the diffuse component of the function for
 		//! example.
-		virtual void boostrap(const data* d, const arguments& args) {}
+		virtual void bootstrap(const data* d, const arguments& args) {}
 
 		//! \brief Save the current function to a specific file type, args can 
 		//! be used to differenciate the type of export.

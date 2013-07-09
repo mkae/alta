@@ -22,7 +22,15 @@ double function::L2_distance(const data* d) const
 		l2 += dist*dist;
 	}
 
-	return sqrt(l2)/(double)nb_points;
+	double factor = 1.0/(double)nb_points;
+	vec _min = d->min();
+	vec _max = d->max();
+	for(int i=0; i<d->dimX(); ++i)
+	{
+		factor *= _max[i]-_min[i];
+	}
+
+	return sqrt(l2)*factor;
 }
 
 //! \brief Linf norm to data.

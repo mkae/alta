@@ -21,6 +21,7 @@ int main(int argc, char** argv)
 	if(k == 1)
 	{
 		f << "#DIM 1 1" << std::endl ;
+		f << "#PARAM_IN COS_TH" << std::endl;
 		for(int i=0; i<nbx; ++i)
 		{
 			const float x = i / (float)nbx ;
@@ -32,6 +33,7 @@ int main(int argc, char** argv)
     else if(k == 2)
     {
         f << "#DIM 1 1" << std::endl ;
+		f << "#PARAM_IN COS_TH" << std::endl;
         for(int i=0; i<nbx; ++i)
         {
             const float x = i / (float)nbx ;

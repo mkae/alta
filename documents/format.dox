@@ -6,6 +6,21 @@
 
 <h2>Input file format</h2>
 
+For a text data file with <em>n</em> data entries where the input domain has <em>N</em> dimensions and a <em>input_param</em> parametrization and the output domain has <em>P</em> dimensions and a <em>output_param</em> parametrization, our file format is the following:
+
+\verbatim
+#DIM N P 
+#PARAM_IN  %input_param%
+#PARAM_OUT %output_param%
+#VS [0|1|2] (P times)
+x_{1,1} ... x_{1,N}  y_{1,1} ... y_{1,P}
+...
+x_{i,1} ... x_{i,N}  y_{i,1} ... y_{i,P}
+...
+x_{n,1} ... x_{n,N}  y_{n,1} ... y_{n,P}
+\endverbatim
+
+Vertical segments are not defined if VS is 0. For a VS of 1, each sample as a radius associated for the associated dimension. If VS is 2, each sample has a min and max segment value for the associated dimension.
 
 <h3> Parametrization format </h3>
 
