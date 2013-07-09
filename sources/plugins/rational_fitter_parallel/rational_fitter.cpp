@@ -18,7 +18,7 @@
 
 #include "quadratic_program.h"
 
-fitter* provide_fitter()
+ALTA_DLL_EXPORT fitter* provide_fitter()
 {
 	return new rational_fitter_parallel();
 }
@@ -207,6 +207,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
             std::cout << "<<INFO>>  min L2 = " << min_l2 << std::endl;
             std::cout << *min_l2_fun << std::endl;
             std::cout << std::endl;
+	    ((function*)min_l2_fun)->save(std::string("temp.rational"), args);
+	    min_l2_fun->save_gnuplot(std::string("temp_2.gnuplot"), d, args);
         }
         delete min_l2_fun;
 
