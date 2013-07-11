@@ -290,8 +290,8 @@ void lafortune_function::bootstrap(const data* d, const arguments& args)
         {
             double theta = 0.5 * M_PI * n / (double)_n;
 
-            _C[(n*dimY() + i)*3 + 0] = 1.0;
-            _C[(n*dimY() + i)*3 + 1] = sin(theta);
+            _C[(n*dimY() + i)*3 + 0] = -sin(theta);
+            _C[(n*dimY() + i)*3 + 1] = -sin(theta);
             _C[(n*dimY() + i)*3 + 2] = cos(theta);
             _N[n*dimY()  + i]        = (double)_n;
         }
