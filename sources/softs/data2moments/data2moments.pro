@@ -1,12 +1,7 @@
-CONFIG         += qt      \
-                  console
+CONFIG         += qt
 
 INCLUDEPATH    += ../../
 DESTDIR         = ../../build
 
 SOURCES        += main.cpp
 LIBS           += -L../../build -lcore
-
-unix{
-   PRE_TARGETDEPS += ../../build/libcore.a
-}

@@ -9,6 +9,8 @@ int main(int argc, char** argv)
 	std::ofstream f("input.gnuplot") ;
 	arguments args(argc, argv);	
 
+    std::cout.precision(10);
+
 	int nbx = 100;
 	int nby = 100;
 	int nbz = 100;
@@ -22,12 +24,14 @@ int main(int argc, char** argv)
 	{
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN COS_TH" << std::endl;
+        f << "#VS 2" << std::endl;
 		for(int i=0; i<nbx; ++i)
 		{
 			const float x = i / (float)nbx ;
-            const float y = 100.0f * exp(-10.0 * x*x) * x*x - 0.01 *x*x*x + 0.1 ;
+            //const float y = 100.0f * exp(-10.0 * x*x) * x*x - 0.01 *x*x*x + 0.1 ;
+            const float y = (1.0) / (1.0E-5 + x*x*x);
 
-			f << x << "\t" << y << "\t" << 0.1f << std::endl ;
+            f << x << "\t" << y << "\t" << y*0.9f << "\t" << y*1.1f << std::endl ;
 		}
 	}
     else if(k == 2)
@@ -52,7 +56,7 @@ int main(int argc, char** argv)
 				const float y = j / (float)nby ; 
 				const float z = 1 + 0.1f*x;
 			
-				f << x << "\t" << y << "\t" << z << "\t" << 0.1f << std::endl ;
+                f << x << "\t" << y << "\t" << z << "\t" << z-0.1f << "\t" << z+0.1 << std::endl ;
 			}
 	}
     else if(k == 4)
@@ -63,7 +67,8 @@ int main(int argc, char** argv)
 			{
 				const float x = i / (float)nbx ;
 				const float y = j / (float)nby ; 
-				const float z = exp(-10.0 * x*x) +  x*y ;
+                const float z = x*y / (1.0E-3 + x*x*x) + 10.;
+
 			
 				f << x << "\t" << y << "\t" << z << "\t" << 0.1f << std::endl ;
 			}

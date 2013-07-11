@@ -17,6 +17,16 @@ class vertical_segment : public data
 
 		// Load data from a file
 		virtual void load(const std::string& filename) ;
+
+        //! \brief Load data from a file using the command line arguments
+        //!
+        //! \details
+        //! Specific arguments for the vertical segment data
+        //!   --dt specify a value for the absolute/relative segment if not defined
+        //!        in the data
+        //!   --data-positive for the data to be positive
+        //!   --dt-relative use a relative segment intervale. The dt is used
+        //!     multipled by the data
 		virtual void load(const std::string& filename, const arguments& args) ;
 
 

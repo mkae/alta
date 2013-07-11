@@ -5,4 +5,5 @@ SUBDIRS  = generate_data   \
 			  brdf2gnuplot    \
 			  data2gnuplot    \
 			  data2diff       \
+           data2moments    \
 #			  fourieranalysis
