@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
     if(d != NULL)
     {
-        vec L(3), V(3), tempParam(params::dimension(p_in)), tempCart(6);
+        //vec L(3), V(3), tempParam(params::dimension(p_in)), tempCart(6);
         for(int i=0; i<d->size(); ++i)
         {
             // Copy the input vector
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
             vec out_x = x;
 
             // Convert input to required param
-            params::convert(&x[0], d->parametrization(), p_in, &tempParam[0]);
+            //params::convert(&x[0], d->parametrization(), p_in, &tempParam[0]);
 
             // TODO Integrate
         }
