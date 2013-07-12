@@ -361,17 +361,48 @@ void lafortune_function::load(const std::string& filename)
 		}
 	}
 
+	_kd = vec(_nY);
 	setNbLobes(_n);
+		
+	// Parse the diffuse
+	for(int i=0; i<_nY; ++i)
+	{
+		file >> _kd[i];
+	}
 
+	// Parse the lobe
 	for(int n=0; n<_n; ++n)
 	{
-		std::cout << (char)file.peek() << std::endl;
+		// TODO find a way to discard those lines
+		while(file.peek() == '#')
+		{
+			std::string line ;
+			std::getline(file, line) ;
+		}
 
+//		std::cout << (char)file.peek() << std::endl;
 		for(int i=0; i<_nY; ++i)
 		{
 			file >> _C[(n*_nY + i)*3 + 0] >> _C[(n*_nY + i)*3 + 1] >> _C[(n*_nY + i)*3 + 2];
 		}
+		
+		// TODO find a way to discard those lines
+		while(file.peek() == '#')
+		{
+			std::string line ;
+			std::getline(file, line) ;
+		}
+		
+		for(int i=0; i<_nY; ++i)
+		{
+			file >> _N[i];
+		}
+
 	}
+	
+	std::cout << "<<INFO>> Kd = " << _kd << std::endl;
+	std::cout << "<<INFO>> Cd = " << _C << std::endl;
+	std::cout << "<<INFO>> N = " << _N << std::endl;
 }
 
 void lafortune_function::save(const std::string& filename) const
@@ -379,6 +410,12 @@ void lafortune_function::save(const std::string& filename) const
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	file << "#DIM " << _nX << " " << _nY << std::endl ;
 	file << "#NB_LOBES " << _n << std::endl ;
+		
+	for(int i=0; i<_nY; ++i)
+	{
+		file << _kd[i] << std::endl;
+	}
+	file << std::endl;
 
 	for(int n=0; n<_n; ++n)
 	{

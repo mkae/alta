@@ -21,7 +21,7 @@ do
     
     if [ $? -eq 0 ]; then
         echo "Test number $i passed"
-    	#./build/brdf2gnuplot --input tests/output_lafortune_$i.lafortune $function --data tests/input_$i.gnuplot --output tests/output_lafortune_$i.gnuplot > /dev/null
+    	./build/brdf2gnuplot --input tests/output_lafortune_$i.lafortune $function --data tests/input_$i.gnuplot --output tests/output_lafortune_$i.gnuplot #> /dev/null
    	else
         echo "Test number $i failed"
    	fi

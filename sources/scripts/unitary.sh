@@ -16,8 +16,8 @@ test_kirby=1
 test_alta=1
 
 #fitter="matlab"
-fitter="quadprog"
-#fitter="cgal"
+#fitter="quadprog"
+fitter="cgal"
 #fitter="parallel"
 fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
 

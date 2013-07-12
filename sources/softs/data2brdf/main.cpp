@@ -19,9 +19,6 @@
 
 int main(int argc, char** argv)
 {
-//	QCoreApplication::addLibraryPath() ;
-//	QCoreApplication::addLibraryPath(QString("/home/belcour/Projects/alta/sources/tests/plugin_loader/")) ;
-
 	QCoreApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
@@ -47,7 +44,7 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-//	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
+	//	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fit->set_parameters(args) ;
 		function* f = plugins_manager::get_function(args["func"]);
@@ -76,56 +73,56 @@ int main(int argc, char** argv)
 		if(is_fitted)
 		{
 			std::cout << "<<INFO>> total time: " << hour << "h " << min << "m " << sec << "s" << std::endl ;
-/*
-			vec min, max ;
-			min.assign(2, args.get_float("min", 0.0f)) ;
-			max.assign(2, args.get_float("max", 1.5f)) ;
+			/*
+				vec min, max ;
+				min.assign(2, args.get_float("min", 0.0f)) ;
+				max.assign(2, args.get_float("max", 1.5f)) ;
 
-			int nb_samples = args.get_int("nb_samples", 100) ;
-			double dt = (max[0]-min[0]) / nb_samples ;
+				int nb_samples = args.get_int("nb_samples", 100) ;
+				double dt = (max[0]-min[0]) / nb_samples ;
 
-			std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
-			for(double x=min[0]; x<=max[0]; x+=dt)
-			{
+				std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+				for(double x=min[0]; x<=max[0]; x+=dt)
+				{
 				vec vx ; for(int i=0;i<2; ++i) { vx.push_back(x) ; }
 				file << x << "\t" << f->value(vx)[0] << std::endl ;
 				std::cout << x << "\t" << f->value(vx)[0] << std::endl ;
+				}
+			/*/
+			  double L2   = f->L2_distance(d);
+			  double Linf = f->Linf_distance(d);
+			  std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
+			  std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
+
+			  f->save(args["output"], args) ;
+#ifdef OLD // use brdf2gnuplot
+           size_t n = args["output"].find('.') ;
+			  std::string gnuplot_filename = args["output"].substr(0,n); 
+			  gnuplot_filename.append(".gnuplot") ;
+			/*
+				f->save_gnuplot(gnuplot_filename, d, args);				
+			/*/
+			  std::ofstream file(gnuplot_filename.c_str(), std::ios_base::trunc);
+			  for(int i=0; i<d->size(); ++i)
+			  {
+			  vec v = d->get(i) ;
+			//				vec y1(d->dimY()) ;
+			//				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+
+			vec y2 = f->value(v) ;
+			for(int u=0; u<d->dimX(); ++u)
+			file << v[u] << "\t" ;
+
+			for(int u=0; u<d->dimY(); ++u)
+			file << y2[u] << "\t" ;
+
+			file << std::endl ;
 			}
-/*/
-			double L2   = f->L2_distance(d);
-			double Linf = f->Linf_distance(d);
-			std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
-			std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
-
-            f->save(args["output"], args) ;
-#ifndef OLD // use brdf2gnuplot
-			size_t n = args["output"].find('.') ;
-			std::string gnuplot_filename = args["output"].substr(0,n); 
-			gnuplot_filename.append(".gnuplot") ;
-/*
-			f->save_gnuplot(gnuplot_filename, d, args);				
-/*/
-			std::ofstream file(gnuplot_filename.c_str(), std::ios_base::trunc);
-			for(int i=0; i<d->size(); ++i)
-			{
-				vec v = d->get(i) ;
-//				vec y1(d->dimY()) ;
-//				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
-
-				vec y2 = f->value(v) ;
-				for(int u=0; u<d->dimX(); ++u)
-					file << v[u] << "\t" ;
-					
-				for(int u=0; u<d->dimY(); ++u)
-					file << y2[u] << "\t" ;
-					
-				file << std::endl ;
-            }
-            file.close();
-//*/
-            std::string error_filename = args["output"].substr(0,n);
-            error_filename.append(".errorplot") ;
-            file.open(error_filename.c_str(), std::ios_base::trunc);
+			file.close();
+			//*/
+			std::string error_filename = args["output"].substr(0,n);
+			error_filename.append(".errorplot") ;
+			file.open(error_filename.c_str(), std::ios_base::trunc);
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;
@@ -134,34 +131,34 @@ int main(int argc, char** argv)
 
 				vec y2 = f->value(v) ;
 				for(int u=0; u<d->dimX(); ++u)
-                    file << v[u] << "\t" ;
-					
+					file << v[u] << "\t" ;
+
 				for(int u=0; u<d->dimY(); ++u)
-                    file << y2[u]-y1[u] << "\t" ;
-					
-                file << std::endl ;
+					file << y2[u]-y1[u] << "\t" ;
+
+				file << std::endl ;
 			}
-            file.close();
+			file.close();
 
-            std::string linerror_filename = args["output"].substr(0,n);
-            linerror_filename.append(".linearerrorplot") ;
-            file.open(linerror_filename.c_str(), std::ios_base::trunc);
-            for(int i=0; i<d->size(); ++i)
-            {
-                vec v = d->get(i) ;
+			std::string linerror_filename = args["output"].substr(0,n);
+			linerror_filename.append(".linearerrorplot") ;
+			file.open(linerror_filename.c_str(), std::ios_base::trunc);
+			for(int i=0; i<d->size(); ++i)
+			{
+				vec v = d->get(i) ;
 
-                vec y1(d->dimY()) ;
-                for(int k=0; k<d->dimY(); ++k) { y1[k] = 0.5*(v[d->dimX() + k] +v[d->dimX()+d->dimY() + k]); }
-                vec y2 = f->value(v) ;
+				vec y1(d->dimY()) ;
+				for(int k=0; k<d->dimY(); ++k) { y1[k] = 0.5*(v[d->dimX() + k] +v[d->dimX()+d->dimY() + k]); }
+				vec y2 = f->value(v) ;
 
-                file << i << "\t" ;
-                for(int u=0; u<d->dimY(); ++u)
-                    file << y2[u]-y1[u] << "\t" ;
+				file << i << "\t" ;
+				for(int u=0; u<d->dimY(); ++u)
+					file << y2[u]-y1[u] << "\t" ;
 
-                file << std::endl ;
-            }
-            file.close();
-//*/
+				file << std::endl ;
+			}
+			file.close();
+			//*/
 #endif
 			return 0;
 		}
@@ -172,11 +169,11 @@ int main(int argc, char** argv)
 		}
 
 	}	
-/*	else
-	{
+	/*	else
+		{
 		std::cout << "<<ERROR>> not enough plugin defined" << std::endl ;
-	}
-*/
+		}
+		*/
 
 	return 0 ;
 }

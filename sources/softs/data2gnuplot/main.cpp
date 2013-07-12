@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 	if(d != NULL)
 	{
 		std::cout << "<<INFO>> will export " << d->size() << " elements" << std::endl ;
-	
+
 		double theta_in = (double)args.get_float("theta", 0.0f);
 		double phi_in   = (double)args.get_float("phi", 0.0f);
 		vec in(3), out(3) ;
@@ -67,10 +67,10 @@ int main(int argc, char** argv)
 
 				file << phi << "\t" << theta << "\t" ;
 				for(int u=0; u<d->dimY(); ++u)
-                {
+				{
 					file << v[u] << "\t" ;
-                }
-			
+				}
+
 				file << std::endl ;
 			}
 	}	

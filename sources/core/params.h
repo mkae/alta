@@ -156,28 +156,29 @@ class params
         {
             // Calculate the half vector
             double half[3];
-            half[0] = sin(theta_h)*cos(phi_h);
-            half[1] = sin(theta_h)*sin(phi_h);
+            half[0] = sin(theta_h)*sin(phi_h);
+            half[1] = sin(theta_h)*cos(phi_h);
             half[2] = cos(theta_h);
 
             // Compute the light vector using the rotation formula.
-            out[0] = sin(theta_d)*cos(phi_d);
-            out[1] = sin(theta_d)*sin(phi_d);
+            out[0] = sin(theta_d)*sin(phi_d);
+            out[1] = sin(theta_d)*cos(phi_d);
             out[2] = cos(theta_d);
 
-				//! \todo investigate here, the rotation along N should be
-				//1 of phi_h not theta_h !
+				// Rotate the diff vector to get the output vector
             rotate_binormal(out, theta_h);
             rotate_normal(out, phi_h);
 
             // Compute the out vector from the in vector and the half
             // vector.
             const double dot = out[0]*half[0] + out[1]*half[1] + out[2]*half[2];
-            out[3] = -out[0] + (dot+1.0) * half[0];
-            out[4] = -out[1] + (dot+1.0) * half[1];
-            out[5] = -out[2] + (dot+1.0) * half[2];
+            out[3] = -out[0] + 2.0*dot * half[0];
+            out[4] = -out[1] + 2.0*dot * half[1];
+            out[5] = -out[2] + 2.0*dot * half[2];
 
-				assert(out[5] >= 0.0);
+#ifdef DEBUG
+				assert(out[2] >= 0.0 && out[5] >= 0.0);
+#endif
         }
 			
         //! \brief from the 4D definition of a classical vector parametrization,
@@ -200,8 +201,10 @@ class params
             const double cost = cos(theta);
             const double sint = sin(theta);
 
-            vec[0] = cost * vec[0] - sint * vec[1];
-            vec[1] = sint * vec[0] + cost * vec[1];
+				const double temp = cost * vec[0] + sint * vec[1];
+
+            vec[1] = cost * vec[1] - sint * vec[0];
+            vec[0] = temp;
         }
 
         //! \brief rotate a cartesian vector with respect to the bi-normal of
@@ -211,8 +214,10 @@ class params
             const double cost = cos(theta);
             const double sint = sin(theta);
 
-            vec[1] = cost * vec[1] - sint * vec[2];
-            vec[2] = sint * vec[1] + cost * vec[2];
+				const double temp = cost * vec[1] + sint * vec[2];
+
+            vec[2] = cost * vec[2] - sint * vec[1];
+            vec[1] = temp;
         }
 
 		  static void print_input_params();
