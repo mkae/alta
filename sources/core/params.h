@@ -167,8 +167,8 @@ class params
 
 				//! \todo investigate here, the rotation along N should be
 				//1 of phi_h not theta_h !
-            rotate_normal(out, phi_h);
             rotate_binormal(out, theta_h);
+            rotate_normal(out, phi_h);
 
             // Compute the out vector from the in vector and the half
             // vector.
@@ -211,8 +211,8 @@ class params
             const double cost = cos(theta);
             const double sint = sin(theta);
 
-            vec[0] = cost * vec[0] - sint * vec[2];
-            vec[2] = sint * vec[0] + cost * vec[2];
+            vec[1] = cost * vec[1] - sint * vec[2];
+            vec[2] = sint * vec[1] + cost * vec[2];
         }
 
 		  static void print_input_params();

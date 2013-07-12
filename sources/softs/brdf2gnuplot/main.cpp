@@ -79,29 +79,29 @@ int main(int argc, char** argv)
 			vec v = d->get(i) ;
 
 			vec y2 = f->value(v) ;
-            if(!linear_plot)
-            {
-                for(int u=0; u<d->dimX(); ++u)
-                    file << v[u] << "\t" ;
-            }
-            else
-            {
-                file << i << "\t" ;
-            }
+			if(!linear_plot)
+			{
+				for(int u=0; u<d->dimX(); ++u)
+					file << v[u] << "\t" ;
+			}
+			else
+			{
+				file << i << "\t" ;
+			}
 
 			for(int u=0; u<d->dimY(); ++u)
 			{
-                if(plot_error)
-                {
-                    file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
-                }
-                else if(linear_plot)
-                {
-                    file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
-                }
-                else
-                {
-                    file << y2[u] << "\t" ;
+				if(plot_error)
+				{
+					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+				}
+				else if(linear_plot)
+				{
+					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+				}
+				else
+				{
+					file << y2[u] << "\t" ;
 				}
 			}
 

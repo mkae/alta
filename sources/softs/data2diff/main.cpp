@@ -5,7 +5,7 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <iostream>
 #include <vector>
@@ -17,7 +17,7 @@
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv, false);
+	QCoreApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
 
 	plugins_manager manager(args) ;

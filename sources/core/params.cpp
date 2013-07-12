@@ -82,7 +82,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 
 		case params::RUSIN_TH_TD:
-            half_to_cartesian(invec[0], 0.0, invec[1], 0.5*M_PI, outvec);
+            half_to_cartesian(invec[0], 0.0, invec[1], 0.0, outvec);
 			break;
 
 			// 3D Parametrization

@@ -6,4 +6,5 @@ SUBDIRS  = generate_data   \
 			  data2gnuplot    \
 			  data2diff       \
            data2moments    \
+           tests           \
 #			  fourieranalysis
