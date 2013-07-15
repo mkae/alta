@@ -13,6 +13,7 @@
 			Possible options are the file format, the parametrizations, the precision (double, float , long double),
       specifications of the angles (in radiance or degrees)
 
+\todo brdf2matlab:  analog of brdf2gnuplot except that it outputs just the evaluation of the fitted rational function as a matrix text file.
 
 \todo To specify the fitting output format
 
