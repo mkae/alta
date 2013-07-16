@@ -30,7 +30,9 @@ tall matrices
 
 \todo Remove Qt dependencies
 \todo Change the automatic compilation soft to Cmake of scons
+\todo Redefine compilation outputs arborescence. Automatic move of scripts
 \todo Include the QuadProg++ lib in the compilation
+\todo Pythons scripts
 
 \todo Documentation and Tutorials
 \todo Licence choice L-GPL vs M-GPL (go see Gael!)
