@@ -14,6 +14,12 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
+/*! \brief A rational function optimizer following the DCA algorithm.
+ *
+ * \todo Implement Papamarkos fitter?
+ * \todo I should be able to test when load a BRDF text file to ensure the
+ * loaded object is correct.
+ */
 class rational_fitter_dca : public QObject, public fitter
 {
 	Q_OBJECT
@@ -43,8 +49,9 @@ class rational_fitter_dca : public QObject, public fitter
 		// elements in the denominator
         virtual bool fit_data(const data* d, int np, int nq, rational_function* fit) ;
 
-        // Bootstrap the DCA algorithm with the Papamarkos fitting
-        // algorithm [Papamarkos 1988]
+        //! \brief Bootstrap the DCA algorithm with an already fitted function. It will
+		//! load the the rational function object from a text file defined in the argument
+		//! --bootstrap %filename%.
         void bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta) ;
 
 	protected: // data

@@ -109,16 +109,25 @@ double distance(const rational_function* f, const data* d)
 	return distance;
 }
 
-// Bootstrap the DCA algorithm with the Papamarkos fitting
-// algorithm [Papamarkos 1988]
-// \todo Finish the Papamarkos implementation
+// Bootstrap the DCA algorithm with an already done fit
 void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta)
 {
 	vec p(np*d->dimY());
 	vec q(nq*d->dimY());
-	q[0] = 1.0;
+	
+	if(args.is_defined("bootstrap"))
+	{
+		fit->load(args["bootstrap"];
+	}
+	else
+	{
+#ifdef DEBUG
+		std::cout << "<<DEBUG>> Using the constant function equals to 0 as input: not optimal" << std::endl;
+#endif
+		q[0] = 1.0;
+		fit->update(p, q);
+	}
 
-	fit->update(p, q);
 	delta = distance(fit, d);
 }
 
