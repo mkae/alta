@@ -57,7 +57,5 @@ tall matrices
 
 \todo Export polynomials and rational functions with Horner factorization (Opt.)
 
-\todo Add input plugin into the DCA algorithm
-
 \todo Add a fitter that modify the vertical segment stategy
 */
