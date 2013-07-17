@@ -19,9 +19,6 @@
 class data : public parametrized
 {
 	public: // methods
-/*
-		data() : _in_param(params::UNKNOWN_INPUT), _out_param(params::UNKNOWN_OUTPUT) { }
-*/
 
 		// Load data from a file
 		virtual void load(const std::string& filename) = 0 ;
@@ -72,35 +69,11 @@ class data : public parametrized
 		// Get the size of the input X domain and output Y domain
 		virtual int dimX() const { return _nX ; }
 		virtual int dimY() const { return _nY ; }
-/*
-		//! \brief provide the parametrization of the function.
-		//! \note some function type can modify the parametrization to adapt
-		//! to the data.
-		virtual params::input parametrization() const
-		{
-			return _in_param;
-		}
 
-		//! \brief can set the input parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		virtual void setParametrization(params::input new_param)
-		{
-			if(_in_param != params::UNKNOWN_INPUT)
-				throw("A parametrization is already defined");
-
-			_in_param = new_param;
-		}
-*/
 	protected: // data
 
 		// Dimensions of the data
 		int _nX, _nY ;
-/*
-		// Input and output parametrization
-		params::input  _in_param ;
-		params::output _out_param ;
-		*/
 } ;
 	 
 Q_DECLARE_INTERFACE(data, "Fitter.Data")

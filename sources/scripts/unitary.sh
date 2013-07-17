@@ -12,8 +12,8 @@ if [ $use_relative -eq 1 ]; then
 fi
 
 test_generated=1
-test_kirby=0
-test_alta=0
+test_kirby=1
+test_alta=1
 test_merl=0
 
 #fitter="matlab"
@@ -23,7 +23,10 @@ test_merl=0
 fitter="eigen"
 
 #fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
-fitter_args="--np 3 --nq 3"
+fitter_args="--np 10 --nq 10"
+
+#Use the DCA optimizer afterwards
+use_dca=1
 
 mkdir tests
 
@@ -41,12 +44,20 @@ do
 		 echo "Test number ${i} passed"
 		 ./build/brdf2gnuplot --input tests/output${function_append}_${i}.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}.gnuplot > /dev/null
 
-		#DCA Optimization 
-		./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_dca.rational $function --fitter /build/librational_fitter_dca.so --bootstrap tests/output${function_append}_${i}.rational > tests/output${function_append}_${i}_dca.out
 
-		 if [ $? -eq 0 ]; then
-			./build/brdf2gnuplot --input tests/output${function_append}_${i}_dca.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}_dca.gnuplot > /dev/null
+
+		#DCA Optimization 
+		if [ $use_dca -eq 1 ]; then
+			./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_dca.rational $function --fitter /build/librational_fitter_dca.so --bootstrap tests/output${function_append}_${i}.rational > tests/output${function_append}_${i}_dca.out
+
+			 if [ $? -eq 0 ]; then
+				echo "Optimized using DCA"
+				./build/brdf2gnuplot --input tests/output${function_append}_${i}_dca.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}_dca.gnuplot > /dev/null
+			 fi
 		 fi
+
+
+
 	 else
 		 echo "Test number $i failed"
 	 fi

@@ -26,10 +26,6 @@ class function : public parametrized
 {
 	public: // methods
 
-		// Constructor
-/*		function() : _in_param(params::UNKNOWN_INPUT),
-		_out_param(params::UNKNOWN_OUTPUT) { }
-*/
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const = 0 ;
 		virtual vec value(const vec& x) const = 0 ;
@@ -106,58 +102,6 @@ class function : public parametrized
 		}
 		virtual vec getMin() const { return _min ; }
 		virtual vec getMax() const { return _max ; }
-/*
-		//! \brief provide the parametrization of the function.
-		//! \note some function type can modify the parametrization to adapt
-		//! to the data.
-		virtual params::input parametrization() const
-		{
-			return _in_param;
-		}
-		
-		//! \brief provide the output parametrization of the function.
-		//! \note some function type can modify the parametrization to adapt
-		//! to the data.
-		virtual params::output out_parametrization() const
-		{
-			return _out_param;
-		}
-
-		//! \brief can set the input parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		virtual void setParametrization(params::input new_param)
-		{
-			//! \todo Here is something strange happening. The equality between
-			//! those enums is not correct for UNKNOWN_INPUT
-			if(_in_param == new_param)
-			{
-				return;
-			}
-			else if(_in_param == params::UNKNOWN_INPUT)
-			{
-				_in_param = new_param;
-			}
-			else
-			{
-				std::cout << "<<ERROR>> a parametrization is already defined: " << params::get_name(_in_param) << std::endl;
-				std::cout << "<<ERROR>> trying to change to: " << params::get_name(new_param) << std::endl;
-			}
-		}
-		
-		//! \brief can set the output parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		virtual void setParametrization(params::output new_param)
-		{
-			if(_out_param == new_param || _out_param == params::UNKNOWN_OUTPUT)
-				_out_param = new_param;
-			else
-			{
-				std::cout << "<<ERROR>> A parametrization is already defined" << std::endl;
-			}
-		}
-		*/
 
 	protected: // function
 
@@ -227,10 +171,6 @@ class function : public parametrized
 		// Dimension of the function & domain of definition.
 		int _nX, _nY ;
 		vec _min, _max ;
-/*
-		// Input and output parametrization
-		params::input  _in_param ;
-		params::output _out_param ;*/
 };
 
 /*! \brief Non-linear function interface
