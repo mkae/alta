@@ -65,13 +65,13 @@ bool rational_fitter_dca::fit_data(const data* dat, function* fit, const argumen
 	QTime time ;
 	time.start() ;
 
-	if(fit_data(d, _max_np, _max_nq, r, args))
+    if(fit_data(d, r, args))
 	{
 		int msec = time.elapsed() ;
 		int sec  = (msec / 1000) % 60 ;
 		int min  = (msec / 60000) % 60 ;
 		int hour = (msec / 3600000) ;
-		std::cout << "<<INFO>> got a fit using np = " << _max_np << " & nq =  " << _max_nq << "      " << std::endl ;
+        std::cout << "<<INFO>> got a fit using np = " << r->getP().size() << " & nq =  " << r->getQ().size() << "      " << std::endl ;
 		std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
 
 		return true ;
@@ -83,8 +83,6 @@ bool rational_fitter_dca::fit_data(const data* dat, function* fit, const argumen
 
 void rational_fitter_dca::set_parameters(const arguments& args)
 {
-	_max_np = args.get_float("np", 10) ;
-	_max_nq = args.get_float("nq", 10) ;
 }
 
 double distance(const rational_function* f, const data* d)
@@ -98,33 +96,40 @@ double distance(const rational_function* f, const data* d)
 
 		for(int j=0; j<d->dimY(); ++j)
 		{
-			double diff = y[j] - xi[d->dimX()+j];
+            double diff = std::abs(y[j] - xi[d->dimX()+j]);
 			current_d += diff;
 		}
 
 		current_d = std::abs(current_d);
-		if(current_d > distance)
-			distance = current_d;
+        distance = std::max(current_d, distance);
 	}
 	return distance;
 }
 
 // Bootstrap the DCA algorithm with an already done fit
-void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta, const arguments& args)
+void rational_fitter_dca::bootstrap(const data* d, int& np, int& nq, rational_function* fit, double& delta, const arguments& args)
 {
-	vec p(np*d->dimY());
-	vec q(nq*d->dimY());
 	
 	if(args.is_defined("bootstrap"))
 	{
 		fit->load(args["bootstrap"]);
+        np = fit->getP().size();
+        nq = fit->getQ().size();
 	}
 	else
 	{
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> Using the constant function equals to 0 as input: not optimal" << std::endl;
 #endif
+
+        np = args.get_int("np", 10);
+        nq = args.get_int("nq", 10);
+
+        vec p(np*d->dimY());
+        vec q(nq*d->dimY());
+
 		q[0] = 1.0;
+        p[1] = 0.0;
 		fit->update(p, q);
 	}
 
@@ -135,17 +140,20 @@ void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_func
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_function* r, const arguments& args)
+bool rational_fitter_dca::fit_data(const data* d, rational_function* r, const arguments& args)
 {
+    int np, nq;
+
+    // Bootstrap the delta and rational function using the Papamarkos
+    // algorithm.
+    double delta = 0.0;
+    bootstrap(d, np, nq, r, delta, args);
+
 	// Size of the problem
-	int N  = np+nq+1 ;
-	int M  = d->size() ;
+    int N  = np+nq+1;
+    int M  = d->size();
 	int nY = d->dimY();	
 
-	// Bootstrap the delta and rational function using the Papamarkos
-	// algorithm.
-	double delta = 0.0;
-	bootstrap(d, np, nq, r, delta, args);
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta value after boostrap: " << delta << std::endl;
 	std::cout << "<<DEBUG>> r: " << *r << std::endl;
@@ -202,6 +210,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 		// delta_{k+1} = delta_{k}
 		//delta_k = distance(r, d);
 		delta_k = delta;
+        std::cout << "<<DEBUG>> input delta = " << delta << std::endl;
 
 		// The function to minimize is \delta which is the last element of
 		// the result vector
@@ -302,7 +311,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 		engOutputBuffer(ep, output, BUFFER_SIZE) ;
 
 		engEvalString(ep, "[x, fval, flag] = linprog(f,A,b,[],[], l, u);");
-#ifdef DEBUG
+#ifndef DEBUG
 		std::cout << output << std::endl ;
 #endif
 
@@ -335,13 +344,13 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 		// Compute the new delta_k, the distance to the data points
 		delta = distance(r, d);
 		//delta = val[(np+nq)*nY];
+        std::cout << "<<DEBUG>> pass n°" << nb_passes << "delta = " << delta << " / " << val[(np+nq)*nY] << std::endl;
 		
 
 		// Stopping condition if the optimization did not manage to improve the
 		// L_inf norm quit !
 		if(delta > delta_k)
 		{
-
 			r->update(tempP, tempQ);
 			break;
 		}
@@ -357,12 +366,13 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 
 	if(nb_passes == 1)
 	{
-		std::cout << "<<ERROR>> Could no optimize with respect to Linf" << std::endl;
+        std::cout << "<<ERROR>> could no optimize with respect to Linf" << std::endl;
 		return false;
 	}
 	else
 	{
-		std::cout << "<<INFO>> Used " << nb_passes << " passes to optimize the solution" << std::endl;
+        std::cout << "<<INFO>> used " << nb_passes << " passes to optimize the solution" << std::endl;
+        std::cout << "<<INFO>> got solution " << *r << std::endl ;
 		return true;
 	}
 }

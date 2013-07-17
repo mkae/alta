@@ -47,19 +47,17 @@ class rational_fitter_dca : public QObject, public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-        virtual bool fit_data(const data* d, int np, int nq, rational_function* fit, const arguments& args) ;
+        virtual bool fit_data(const data* d, rational_function* fit, const arguments& args) ;
 
         //! \brief Bootstrap the DCA algorithm with an already fitted function. It will
 		//! load the the rational function object from a text file defined in the argument
 		//! --bootstrap %filename%.
-        void bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta,
+        void bootstrap(const data* d, int& np, int& nq, rational_function* fit, double& delta,
 				           const arguments& args) ;
 
 	protected: // data
 
-		// min and Max usable np and nq values for the fitting
-		// 
-		int _max_np, _max_nq ;
+        // Matlab Engine
 		Engine *ep;
 } ;
 

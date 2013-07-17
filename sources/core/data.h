@@ -16,9 +16,12 @@
 /*! \brief A data object. Allows to load data from files.
  *  \ingroup core
  */
-class data
+class data : public parametrized
 {
 	public: // methods
+/*
+		data() : _in_param(params::UNKNOWN_INPUT), _out_param(params::UNKNOWN_OUTPUT) { }
+*/
 
 		// Load data from a file
 		virtual void load(const std::string& filename) = 0 ;
@@ -69,7 +72,7 @@ class data
 		// Get the size of the input X domain and output Y domain
 		virtual int dimX() const { return _nX ; }
 		virtual int dimY() const { return _nY ; }
-
+/*
 		//! \brief provide the parametrization of the function.
 		//! \note some function type can modify the parametrization to adapt
 		//! to the data.
@@ -88,15 +91,16 @@ class data
 
 			_in_param = new_param;
 		}
-
+*/
 	protected: // data
 
 		// Dimensions of the data
 		int _nX, _nY ;
-
+/*
 		// Input and output parametrization
 		params::input  _in_param ;
 		params::output _out_param ;
+		*/
 } ;
 	 
 Q_DECLARE_INTERFACE(data, "Fitter.Data")

@@ -23,7 +23,7 @@ test_merl=0
 fitter="eigen"
 
 #fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
-fitter_args="--np 10 --nq 10"
+fitter_args="--np 3 --nq 3"
 
 mkdir tests
 

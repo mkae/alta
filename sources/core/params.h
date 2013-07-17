@@ -223,3 +223,78 @@ class params
 		  static void print_input_params();
 
 };
+
+/*! \brief A parametrized object. Allow to define function object (either data
+ *  or functions that are defined over an input space and output space. This
+ *  Object allowas to change the parametrization of the input or output space.
+ */
+class parametrized
+{
+	public:
+		parametrized() : _in_param(params::UNKNOWN_INPUT), 
+		                 _out_param(params::UNKNOWN_OUTPUT) { }
+
+
+		//! \brief provide the input parametrization of the object.
+		virtual params::input parametrization() const
+		{
+			return _in_param;
+		}
+		
+		//! \brief provide the input parametrization of the object.
+		virtual params::input input_parametrization() const
+		{
+			return _in_param;
+		}
+		
+		//! \brief provide the outout parametrization of the object.
+		virtual params::output output_parametrization() const
+		{
+			return _out_param;
+		}
+
+		//! \brief can set the input parametrization of a non-parametrized
+		//! object. Print an error if it is already defined.
+		virtual void setParametrization(params::input new_param)
+		{
+			//! \todo Here is something strange happening. The equality between
+			//! those enums is not correct for UNKNOWN_INPUT
+			if(_in_param == new_param)
+			{
+				return;
+			}
+			else if(_in_param == params::UNKNOWN_INPUT)
+			{
+				_in_param = new_param;
+			}
+			else
+			{
+				std::cout << "<<ERROR>> an input parametrization is already defined: " << params::get_name(_in_param) << std::endl;
+				std::cout << "<<ERROR>> trying to change to: " << params::get_name(new_param) << std::endl;
+			}
+		}
+		
+		//! \brief can set the output parametrization of a non-parametrized
+		//! function. Throw an exception if it tries to erase a previously
+		//! defined one.
+		virtual void setParametrization(params::output new_param)
+		{
+			if(_out_param == new_param)
+			{
+				return;
+			}
+			else if(_out_param == params::UNKNOWN_INPUT)
+			{
+				_out_param = new_param;
+			}
+			else
+			{
+				std::cout << "<<ERROR>> an output parametrization is already defined: " << std::endl;
+			}
+		}
+
+	protected:
+		// Input and output parametrization
+		params::input  _in_param ;
+		params::output _out_param ;
+};

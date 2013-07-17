@@ -1,6 +1,7 @@
 TEMPLATE = lib
-CONFIG  *= static \
-           qt
+CONFIG  *= static  \
+           qt      \
+           console
 
 DESTDIR  = ../build
 

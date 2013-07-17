@@ -22,14 +22,14 @@
  *  Any function used by the fitting algorithm should overload publicly this
  *  interface.
  */
-class function 
+class function : public parametrized
 {
 	public: // methods
 
 		// Constructor
-		function() : _in_param(params::UNKNOWN_INPUT),
+/*		function() : _in_param(params::UNKNOWN_INPUT),
 		_out_param(params::UNKNOWN_OUTPUT) { }
-
+*/
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const = 0 ;
 		virtual vec value(const vec& x) const = 0 ;
@@ -106,7 +106,7 @@ class function
 		}
 		virtual vec getMin() const { return _min ; }
 		virtual vec getMax() const { return _max ; }
-
+/*
 		//! \brief provide the parametrization of the function.
 		//! \note some function type can modify the parametrization to adapt
 		//! to the data.
@@ -154,9 +154,10 @@ class function
 				_out_param = new_param;
 			else
 			{
-				std::cout << "<<ERROR>> A parametrization is already defined: " << params::get_name(_in_param) << std::endl;
+				std::cout << "<<ERROR>> A parametrization is already defined" << std::endl;
 			}
 		}
+		*/
 
 	protected: // function
 
@@ -226,10 +227,10 @@ class function
 		// Dimension of the function & domain of definition.
 		int _nX, _nY ;
 		vec _min, _max ;
-
+/*
 		// Input and output parametrization
 		params::input  _in_param ;
-		params::output _out_param ;
+		params::output _out_param ;*/
 };
 
 /*! \brief Non-linear function interface
