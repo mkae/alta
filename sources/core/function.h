@@ -128,10 +128,11 @@ class function
 		//! defined one.
 		virtual void setParametrization(params::input new_param)
 		{
-			if(_in_param != params::UNKNOWN_INPUT)
+			if(_in_param == new_param || _in_param == params::UNKNOWN_INPUT)
+				_in_param = new_param;
+			else
 				throw("A parametrization is already defined");
 
-			_in_param = new_param;
 		}
 		
 		//! \brief can set the output parametrization of a non-parametrized
@@ -139,10 +140,11 @@ class function
 		//! defined one.
 		virtual void setParametrization(params::output new_param)
 		{
-			if(_out_param != params::UNKNOWN_OUTPUT)
+			if(_out_param == new_param || _out_param == params::UNKNOWN_OUTPUT)
+				_out_param = new_param;
+			else
 				throw("A parametrization is already defined");
 
-			_out_param = new_param;
 		}
 
 	protected: // function

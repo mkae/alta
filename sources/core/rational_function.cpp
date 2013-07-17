@@ -308,6 +308,8 @@ void rational_function::load(const std::string& filename)
 			{
 				std::string param;
 				linestream >> param ;
+
+				
 				setParametrization(params::parse_input(param));
 			}
 			continue ;

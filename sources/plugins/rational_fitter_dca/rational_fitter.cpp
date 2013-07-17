@@ -194,6 +194,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	engPutVariable(ep, "l", l);
 
 	double delta_k;
+	unsigned int nb_passes = 1;
 
 	// Loop until you get a converge solution \delta > \delta_k
 	do
@@ -322,6 +323,10 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 				b.push_back(val[i]) ;
 			}
 		}
+		
+		std::vector<double> tempP = r->getP();
+		std::vector<double> tempQ = r->getQ();
+
 		r->update(a, b) ;
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> current rational function: " <<  *r << std::endl ;
@@ -330,8 +335,19 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 		// Compute the new delta_k, the distance to the data points
 		delta = distance(r, d);
 		//delta = val[(np+nq)*nY];
+		
+
+		// Stopping condition if the optimization did not manage to improve the
+		// L_inf norm quit !
+		if(delta > delta_k)
+		{
+
+			r->update(tempP, tempQ);
+			break;
+		}
 	
-	}while(delta <= delta_k);
+		++nb_passes;
+	}while(true);
 
 	mxDestroyArray(f);
 	mxDestroyArray(A);
@@ -339,7 +355,16 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	mxDestroyArray(u);
 	mxDestroyArray(l);
 
-	return true ;
+	if(nb_passes == 1)
+	{
+		std::cout << "<<ERROR>> Could no optimize with respect to Linf" << std::endl;
+		return false;
+	}
+	else
+	{
+		std::cout << "<<INFO>> Used " << nb_passes << " passes to optimize the solution" << std::endl;
+		return true;
+	}
 }
 
 Q_EXPORT_PLUGIN2(rational_fitter_dca, rational_fitter_dca)
