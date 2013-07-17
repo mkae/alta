@@ -14,7 +14,7 @@
 
 #define BUFFER_SIZE 10000
 
-fitter* provide_fitter()
+ALTA_DLL_EXPORT fitter* provide_fitter()
 {
     return new rational_fitter_dca();
 }
@@ -196,10 +196,10 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	double delta_k;
 
 	// Loop until you get a converge solution \delta > \delta_k
-	// \todo add the correct looping condition
 	do
 	{
 		// delta_{k+1} = delta_{k}
+		//delta_k = distance(r, d);
 		delta_k = delta;
 
 		// The function to minimize is \delta which is the last element of
@@ -328,7 +328,8 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 #endif
 
 		// Compute the new delta_k, the distance to the data points
-//		delta = distance(r, d);
+		delta = distance(r, d);
+		//delta = val[(np+nq)*nY];
 	
 	}while(delta <= delta_k);
 
