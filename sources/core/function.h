@@ -128,11 +128,21 @@ class function
 		//! defined one.
 		virtual void setParametrization(params::input new_param)
 		{
-			if(_in_param == new_param || _in_param == params::UNKNOWN_INPUT)
+			//! \todo Here is something strange happening. The equality between
+			//! those enums is not correct for UNKNOWN_INPUT
+			if(_in_param == new_param)
+			{
+				return;
+			}
+			else if(_in_param == params::UNKNOWN_INPUT)
+			{
 				_in_param = new_param;
+			}
 			else
-				throw("A parametrization is already defined");
-
+			{
+				std::cout << "<<ERROR>> a parametrization is already defined: " << params::get_name(_in_param) << std::endl;
+				std::cout << "<<ERROR>> trying to change to: " << params::get_name(new_param) << std::endl;
+			}
 		}
 		
 		//! \brief can set the output parametrization of a non-parametrized
@@ -143,8 +153,9 @@ class function
 			if(_out_param == new_param || _out_param == params::UNKNOWN_OUTPUT)
 				_out_param = new_param;
 			else
-				throw("A parametrization is already defined");
-
+			{
+				std::cout << "<<ERROR>> A parametrization is already defined: " << params::get_name(_in_param) << std::endl;
+			}
 		}
 
 	protected: // function

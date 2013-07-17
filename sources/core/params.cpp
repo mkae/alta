@@ -211,7 +211,7 @@ params::input params::parse_input(const std::string& txt)
 		}
 	}
 
-	std::cout << "<<ERROR>> the input parametrization in unknown" << std::endl;
+	std::cout << "<<INFO>> the input parametrization is UNKNOWN_INPUT" << std::endl;
 	return params::UNKNOWN_INPUT;
 }
 		  
@@ -223,7 +223,7 @@ std::string params::get_name(const params::input param)
 		return it->second.name;
 	}
 
-	return std::string();
+	return std::string("UNKNOWN_INPUT");
 }
 
 int  params::dimension(params::input t)
