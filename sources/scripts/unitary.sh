@@ -11,14 +11,15 @@ if [ $use_relative -eq 1 ]; then
 	relative="--dt-relative"
 fi
 
-test_generated=1
-test_kirby=1
+test_generated=0
+test_kirby=0
 test_alta=1
+test_merl=0
 
 #fitter="matlab"
 #fitter="quadprog"
-fitter="cgal"
-#fitter="parallel"
+#fitter="cgal"
+fitter="parallel"
 fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
 
 mkdir tests
@@ -58,12 +59,27 @@ fi
 ## Test with ALTA internal data
 ##
 if [ $test_alta -eq 1 ]; then
-    ./build/data2brdf --input ../data/2d/matusik_merl/beige-fabric-double-cc-cos-th-td-90deg.dat --output tests/beige${function_append}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.5 --dt-relative > tests/beige${function_append}.out
+	 
+    ## Beige matusik fitting only a 2D accumulation in the ROMEIRO param
+	 ##
+    echo "./build/data2brdf --input ../data/2d/matusik_merl/beige-fabric-double-cc-cos-th-td-90deg.dat --output tests/beige${function_append}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.5 --dt-relative > tests/beige${function_append}.out"
 
-    if [ $? -eq 0 ]; then
-        echo "Test beige matusik passed"
-        ./build/brdf2gnuplot --input tests/beige${function_append}.rational $function --data ../data/2d/matusik_merl/beige-fabric-double-cc-cos-th-td-90deg.dat --output tests/output_beige.gnuplot > /dev/null
-    else
-        echo "Test beige matusik failed"
-    fi
+#    if [ $? -eq 0 ]; then
+#        echo "Test beige matusik passed"
+#        ./build/brdf2gnuplot --input tests/beige${function_append}.rational $function --data ../data/2d/matusik_merl/beige-fabric-double-cc-cos-th-td-90deg.dat --output tests/output_beige.gnuplot > /dev/null
+#    else
+#        echo "Test beige matusik failed"
+#	 fi
+
+
+	 ## Beige matusik fitting only a 2D slice in the ROMEIRO param
+	 ##
+    echo "./build/data2brdf --input ../data/2d/matusik_merl/beige_fab_cos_th_td.dat --output tests/beige_fab${function_append}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.5 --dt-relative > tests/beige_fab${function_append}.out"
+
+#    if [ $? -eq 0 ]; then
+#        echo "Test beige matusik passed"
+        echo "./build/brdf2gnuplot --input tests/beige_fab${function_append}.rational $function --data ../data/2d/matusik_merl/beige_fab_cos_th_td.dat --output tests/output_beige_fab${function_append}.gnuplot > /dev/null"
+#    else
+#        echo "Test beige matusik failed"
+#    fi
 fi

@@ -32,12 +32,12 @@ class lafortune_function : public nonlinear_function, public QObject
 
 	public: // methods
 
-        lafortune_function() : _n(1) { }
+        lafortune_function() : _n(1), _isotropic(false) { }
 
 	// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;
-		virtual vec value(const vec& x, const vec& p) const;
+		virtual vec value(const vec& x, const vec& p);
 
 		//! \brief Load function specific files
 		virtual void load(const std::string& filename) ;
@@ -109,9 +109,18 @@ class lafortune_function : public nonlinear_function, public QObject
 		//! n for the color channel number c.
 		void getCurrentLobe(int n, int c, double& Cx, double& Cy, double& Cz, double& N) const 
 		{
-			Cx = _C[(n*_nY + c)*3 + 0];
-			Cy = _C[(n*_nY + c)*3 + 1];
-			Cz = _C[(n*_nY + c)*3 + 2];
+			if(_isotropic)
+			{
+				Cx = _C[(n*_nY + c)*2 + 0];
+				Cy = Cx;
+				Cz = _C[(n*_nY + c)*2 + 1];
+			}
+			else
+			{
+				Cx = _C[(n*_nY + c)*3 + 0];
+				Cy = _C[(n*_nY + c)*3 + 1];
+				Cz = _C[(n*_nY + c)*3 + 2];
+			}
 			N  = _N[n*_nY + c];
 		}
 
@@ -122,5 +131,8 @@ class lafortune_function : public nonlinear_function, public QObject
 		int _n; // Number of lobes
 		vec _N, _C; // Lobes data
 		vec _kd; // Diffuse term
+
+		//!\brief Flags to get an isotropic lobe
+		bool _isotropic;
 } ;
 

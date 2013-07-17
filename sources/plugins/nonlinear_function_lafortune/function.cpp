@@ -62,10 +62,12 @@ vec lafortune_function::value(const vec& x) const
     return res;
 }
         
-vec lafortune_function::value(const vec& x, const vec& p) const
+vec lafortune_function::value(const vec& x, const vec& p)
 {
-	// Test input parameters for correct size
+	// Test input parameters for correct size and update the
+	// values of the function.
 	assert(p.size() == nbParameters());
+	setParameters(p);
 
 	vec res(dimY());
 
@@ -112,7 +114,10 @@ void lafortune_function::setNbLobes(int N)
     _n = N;
 
     // Update the length of the vectors
-    _C.resize(_n*_nY*3) ;
+	 if(_isotropic)
+		 _C.resize(_n*_nY*2) ;
+	 else
+		 _C.resize(_n*_nY*3) ;
     _N.resize(_n*_nY) ;
 }
 
@@ -122,7 +127,10 @@ void lafortune_function::setDimY(int nY)
     _nY = nY ;
 
     // Update the length of the vectors
-    _C.resize(_n*_nY*3) ;
+	 if(_isotropic)
+		 _C.resize(_n*_nY*2) ;
+	 else
+		 _C.resize(_n*_nY*3) ;
     _N.resize(_n*_nY) ;
     _kd.resize(_nY);
 
@@ -134,33 +142,47 @@ void lafortune_function::setDimY(int nY)
 int lafortune_function::nbParameters() const 
 {
 #ifdef FIT_DIFFUSE
-    return (4*_n+1)*dimY();
+	if(_isotropic)
+		return (3*_n+1)*dimY();
+	else
+		return (4*_n+1)*dimY();
 #else
-    return (4*_n)*dimY();
+	if(_isotropic)
+		return (3*_n)*dimY();
+	else
+		return (4*_n)*dimY();
 #endif
 }
 
 //! Get the vector of parameters for the function
 vec lafortune_function::parameters() const 
 {
-#ifdef FIT_DIFFUSE
-    vec res((4*_n+1)*dimY());
-#else
-    vec res((4*_n)*dimY());
-#endif
-    for(int n=0; n<_n; ++n)
-	    for(int i=0; i<dimY(); ++i)
-		 {
-			  res[(n*dimY() + i)*4 + 0] = _C[(n*dimY() + i)*3 + 0];
-			  res[(n*dimY() + i)*4 + 1] = _C[(n*dimY() + i)*3 + 1];
-			  res[(n*dimY() + i)*4 + 2] = _C[(n*dimY() + i)*3 + 2];
-			  res[(n*dimY() + i)*4 + 3] = _N[n*dimY()  + i];
-		 }
+	vec res(nbParameters());
+	for(int n=0; n<_n; ++n)
+		for(int i=0; i<dimY(); ++i)
+		{
+			if(_isotropic)
+			{
+				res[(n*dimY() + i)*3 + 0] = _C[(n*dimY() + i)*2 + 0];
+				res[(n*dimY() + i)*3 + 1] = _C[(n*dimY() + i)*2 + 1];
+				res[(n*dimY() + i)*3 + 2] = _N[n*dimY()  + i];
+			}
+			else
+			{
+				res[(n*dimY() + i)*4 + 0] = _C[(n*dimY() + i)*3 + 0];
+				res[(n*dimY() + i)*4 + 1] = _C[(n*dimY() + i)*3 + 1];
+				res[(n*dimY() + i)*4 + 2] = _C[(n*dimY() + i)*3 + 2];
+				res[(n*dimY() + i)*4 + 3] = _N[n*dimY()  + i];
+			}
+		}
 
 #ifdef FIT_DIFFUSE
 	 for(int i=0; i<dimY(); ++i)
 	 {
-		 res[4*_n*dimY() + i] = _kd[i];
+		 if(_isotropic)
+		 {
+			res[3*_n*dimY() + i] = _kd[i];
+		 }
 	 }
 #endif
     return res;

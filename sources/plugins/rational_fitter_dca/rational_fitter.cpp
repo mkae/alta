@@ -65,7 +65,7 @@ bool rational_fitter_dca::fit_data(const data* dat, function* fit, const argumen
 	QTime time ;
 	time.start() ;
 
-	if(fit_data(d, _max_np, _max_nq, r))
+	if(fit_data(d, _max_np, _max_nq, r, args))
 	{
 		int msec = time.elapsed() ;
 		int sec  = (msec / 1000) % 60 ;
@@ -110,14 +110,14 @@ double distance(const rational_function* f, const data* d)
 }
 
 // Bootstrap the DCA algorithm with an already done fit
-void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta)
+void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_function* fit, double& delta, const arguments& args)
 {
 	vec p(np*d->dimY());
 	vec q(nq*d->dimY());
 	
 	if(args.is_defined("bootstrap"))
 	{
-		fit->load(args["bootstrap"];
+		fit->load(args["bootstrap"]);
 	}
 	else
 	{
@@ -135,7 +135,7 @@ void rational_fitter_dca::bootstrap(const data* d, int np, int nq, rational_func
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_function* r)
+bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_function* r, const arguments& args)
 {
 	// Size of the problem
 	int N  = np+nq+1 ;
@@ -145,7 +145,7 @@ bool rational_fitter_dca::fit_data(const data* d, int np, int nq, rational_funct
 	// Bootstrap the delta and rational function using the Papamarkos
 	// algorithm.
 	double delta = 0.0;
-	bootstrap(d, np, nq, r, delta);
+	bootstrap(d, np, nq, r, delta, args);
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> delta value after boostrap: " << delta << std::endl;
 	std::cout << "<<DEBUG>> r: " << *r << std::endl;
