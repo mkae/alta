@@ -16,17 +16,12 @@ test_kirby=1
 test_alta=1
 test_merl=0
 
-#fitter="matlab"
-#fitter="quadprog"
-#fitter="cgal"
-#fitter="parallel"
-fitter="eigen"
-
+fitters="matlab quadprog parallel eigen cgal"
 #fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
-fitter_args="--np 10 --nq 10"
+fitter_args="--np 2 --nq 2"
 
 #Use the DCA optimizer afterwards
-use_dca=1
+use_dca=0
 
 mkdir tests
 
@@ -38,21 +33,27 @@ for i in `seq $min_test $max_test`
 do
 	./build/generate_data --f $i	
 	mv input.gnuplot tests/input_${i}.gnuplot
-    ./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.1 $relative > tests/output${function_append}_${i}.out
+
+	for fitter in ${fitters};
+	do
+		echo "Using fitter ${fitter} with generated data";
+		echo "------------------------------------------";
+
+    ./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_${fitter}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.1 $relative > tests/output${function_append}_${i}_${fitter}.out
     
 	 if [ $? -eq 0 ]; then
 		 echo "Test number ${i} passed"
-		 ./build/brdf2gnuplot --input tests/output${function_append}_${i}.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}.gnuplot > /dev/null
+		 ./build/brdf2gnuplot --input tests/output${function_append}_${i}_${fitter}.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}_${fitter}.gnuplot > /dev/null
 
 
 
 		#DCA Optimization 
 		if [ $use_dca -eq 1 ]; then
-			./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_dca.rational $function --fitter /build/librational_fitter_dca.so --bootstrap tests/output${function_append}_${i}.rational > tests/output${function_append}_${i}_dca.out
+			./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_${fitter}_dca.rational $function --fitter /build/librational_fitter_dca.so --bootstrap tests/output${function_append}_${i}_${fitter}.rational > tests/output${function_append}_${i}_${fitter}_dca.out
 
 			 if [ $? -eq 0 ]; then
 				echo "Optimized using DCA"
-				./build/brdf2gnuplot --input tests/output${function_append}_${i}_dca.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}_dca.gnuplot > /dev/null
+				./build/brdf2gnuplot --input tests/output${function_append}_${i}_${fitter}_dca.rational $function --data tests/input_${i}.gnuplot --output tests/output_${i}_${fitter}_dca.gnuplot > /dev/null
 			 fi
 		 fi
 
@@ -61,6 +62,10 @@ do
 	 else
 		 echo "Test number $i failed"
 	 fi
+
+		echo "\n\n";
+
+	done
 done
 fi
 

@@ -276,7 +276,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 		return false ;
 	}
-	else if(delta == 0.0)
+    else if(delta <= 0.0)
 	{
 		delta = 1.0 ;
 	}
@@ -288,8 +288,8 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	for(int i=0; i<2*d->size(); ++i)	
 	{		
 		ci[i] = ci[i] * delta ; 
-#ifdef DEBUG
-		std::cout << ci[i] << "\t" ;
+#ifndef DEBUG
+        std::cout << i << "\t" << -ci[i] << std::endl ;
 #endif
 	}
 #ifdef DEBUG

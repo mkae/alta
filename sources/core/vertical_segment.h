@@ -37,6 +37,10 @@ class vertical_segment : public data
 		{
 			NOT_IMPLEMENTED();
 		}
+        virtual vec value(vec in) const
+        {
+            NOT_IMPLEMENTED();
+        }
 
 		//! \brief Put the sample inside the data
 		virtual void set(vec x);

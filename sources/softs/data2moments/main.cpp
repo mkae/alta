@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     plugins_manager manager(args) ;
 
     if(args.is_defined("help")) {
-        std::cout << "<<HELP>> data2moments --input data.file --output gnuplot.file --data loader.so --param RUSIN_TH_PH_TD_PD --partial 0" << std::endl ;
+        std::cout << "<<HELP>> data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
         std::cout << " - input, output and data are mandatory parameters" << std::endl ;
         return 0 ;
     }
@@ -40,10 +40,6 @@ int main(int argc, char** argv)
         std::cerr << "<<ERROR>> the data loader is not defined" << std::endl ;
         return 1 ;
     }
-    if(! args.is_defined("param")) {
-        std::cerr << "<<ERROR>> the parametrization is not defined" << std::endl ;
-        return 1 ;
-    }
 
     // Import data
     data* d = NULL ;
@@ -55,17 +51,50 @@ int main(int argc, char** argv)
 
     if(d != NULL)
     {
-        //vec L(3), V(3), tempParam(params::dimension(p_in)), tempCart(6);
-        for(int i=0; i<d->size(); ++i)
+        // Data parametrization
+        params::input data_param = d->parametrization();
+        int d_size = params::dimension(data_param);
+
+        double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
+
+        // Sample every degree
+        double dtheta = 0.5*M_PI / 90.0;
+
+        // Moments
+        vec mean(d->dimY());
+
+        for(int theta_in=0; theta_in<90; theta_in++)
         {
-            // Copy the input vector
-            vec x = d->get(i);
-            vec out_x = x;
+            in_angle[0] = theta_in * 0.5*M_PI / 90.0;
 
-            // Convert input to required param
-            //params::convert(&x[0], d->parametrization(), p_in, &tempParam[0]);
+            // Integrate over the light hemisphere
+            for(int theta_out=0; theta_out<90; theta_out++)
+            {
+                in_angle[2] = theta_out * 0.5*M_PI / 90.0;
+                for(int phi_out=0; phi_out<180; phi_out++)
+                {
+                    in_angle[3] = theta_out * 0.5*M_PI / 180.0;
 
-            // TODO Integrate
+                    vec in(d_size);
+                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
+
+                    // Copy the input vector
+                    vec x = d->value(in);
+
+                    for(int i=0; i<mean.size(); ++i)
+                        mean[i] += x[i];
+                }
+            }
+
+            for(int i=0; i<mean.size(); ++i)
+                mean[i] /= 180.0*90.0;
+
+            // Output the value into the file
+            file << in_angle[0] << "\t";
+            for(int i=0; i<mean.size(); ++i)
+                file << mean[i] << "\t";
+            file << std::endl;
+
         }
 
         file.close();

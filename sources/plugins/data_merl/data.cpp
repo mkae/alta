@@ -39,6 +39,12 @@ data_merl::data_merl()
 {
 	const int n = BRDF_SAMPLING_RES_PHI_D/2 * BRDF_SAMPLING_RES_THETA_D * BRDF_SAMPLING_RES_THETA_H;
 	brdf = (double*) malloc (sizeof(double)*3*n);
+
+    // Set the input and output parametrization
+    _in_param  = params::RUSIN_TH_TD_PD;
+    _out_param = params::RGB_COLOR;
+    _nX = 3;
+    _nY = 3;
 }
 
 // cross product of two vectors
@@ -202,6 +208,10 @@ void lookup_brdf_val(double* brdf, double theta_in, double fi_in,
 	std_coords_to_half_diff_coords(theta_in, fi_in, theta_out, fi_out,
 		       theta_half, fi_half, theta_diff, fi_diff);
 
+    // Testing the input domain
+    assert(theta_half >= 0.0); assert(theta_half <= 0.5*M_PI);
+    assert(theta_diff >= 0.0); assert(theta_diff <= 0.5*M_PI);
+    assert(fi_diff >= 0.0);    assert(fi_diff <= 2.0*M_PI);
 
 	// Find index.
 	// Note that phi_half is ignored, since isotropic BRDFs are assumed
@@ -216,7 +226,7 @@ void lookup_brdf_val(double* brdf, double theta_in, double fi_in,
 
 	
 	if (red_val < 0.0 || green_val < 0.0 || blue_val < 0.0)
-		fprintf(stderr, "Below horizon.\n");
+        fprintf(stderr, "Negative value [%f, %f, %f].\n", theta_half, theta_diff, fi_diff);
 
 }
 
@@ -334,6 +344,20 @@ vec data_merl::value(vec in, vec out) const
 	res[1] = g;
 	res[2] = b;
 	return res;
+}
+vec data_merl::value(vec in) const
+{
+    double r, g, b;
+
+    double t_in[4];
+    params::convert(&in[0], params::RUSIN_TH_TD_PD, params::SPHERICAL_TL_PL_TV_PV, t_in);
+    lookup_brdf_val(brdf, t_in[0], t_in[1], t_in[2], t_in[3], r, g, b) ;
+
+    vec res(3);
+    res[0] = r;
+    res[1] = g;
+    res[2] = b;
+    return res;
 }
 
 // Get data size, e.g. the number of samples to fit

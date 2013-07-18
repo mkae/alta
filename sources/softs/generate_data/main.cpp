@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
 	std::cout.precision(10);
 
-	int nbx = 100;
+	int nbx = 10000;
 	int nby = 100;
 	int nbz = 100;
 	if(args.is_defined("nbx"))
@@ -30,9 +30,9 @@ int main(int argc, char** argv)
 		{
 			const float x = i / (float)nbx ;
 			//const float y = 100.0f * exp(-10.0 * x*x) * x*x - 0.01 *x*x*x + 0.1 ;
-			const float y = (1.0) / (1.0E-10 + x*x*x);
+			const float y = (1.0) / (1.0E-10 + x);
 
-			f << x << "\t" << y << "\t" << y*0.9f << "\t" << y*1.1f << std::endl ;
+			f << x << "\t" << y << /*"\t" << y*0.9f << "\t" << y*1.1f <<*/ std::endl ;
 		}
 	}
 	else if(k == 2)

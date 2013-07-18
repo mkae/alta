@@ -234,7 +234,6 @@ class parametrized
 		parametrized() : _in_param(params::UNKNOWN_INPUT), 
 		                 _out_param(params::UNKNOWN_OUTPUT) { }
 
-
 		//! \brief provide the input parametrization of the object.
 		virtual params::input parametrization() const
 		{

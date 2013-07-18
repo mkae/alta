@@ -13,7 +13,7 @@ class data_merl : public QObject, public data
 
 	public: // methods
 
-		data_merl();
+        data_merl();
 
 		// Load data from a file
 		virtual void load(const std::string& filename) ;
@@ -24,18 +24,15 @@ class data_merl : public QObject, public data
 		// Acces to data
 		virtual vec get(int i) const ;
 		virtual vec operator[](int i) const ;
+
 		virtual vec value(vec in, vec out) const ;
+        virtual vec value(vec in) const;
 		
 		// Set data
 		virtual void set(vec x);
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const ;
-		
-		virtual params::input parametrization() const
-		{
-			return params::RUSIN_TH_TD_PD;
-		}
 
 		// Get min and max input space values
 		virtual vec min() const ;

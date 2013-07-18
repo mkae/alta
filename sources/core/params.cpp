@@ -161,6 +161,19 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[1] = atan2(half[0], half[1]);
 			outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
 			break;
+        case params::RUSIN_TH_TD_PD:
+            outvec[0] = acos(half[2]);
+
+            // Compute the diff vector
+            diff[0] = invec[0];
+            diff[1] = invec[1];
+            diff[2] = invec[2];
+            rotate_normal(diff, -outvec[1]);
+            rotate_binormal(diff, -outvec[0]);
+
+            outvec[1] = acos(diff[2]);
+            outvec[2] = atan2(diff[0], diff[1]);
+            break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
 			outvec[1] = 0.0;
@@ -197,6 +210,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 
 		default:
+        std::cout << "<<ERROR>> not defined input param: " << get_name(outtype) << std::endl;
 			assert(false);
 			break;
 	}
