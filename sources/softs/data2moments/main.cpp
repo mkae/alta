@@ -5,7 +5,7 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <iostream>
 #include <vector>
@@ -17,7 +17,7 @@
 
 int main(int argc, char** argv)
 {
-    QApplication app(argc, argv, false);
+    QCoreApplication app(argc, argv, false);
     arguments args(argc, argv) ;
 
     plugins_manager manager(args) ;
@@ -54,6 +54,7 @@ int main(int argc, char** argv)
         // Data parametrization
         params::input data_param = d->parametrization();
         int d_size = params::dimension(data_param);
+		int y_size = d->dimY();
 
         double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
 
@@ -62,37 +63,59 @@ int main(int argc, char** argv)
 
         // Moments
         vec mean(d->dimY());
+		vec raw_mnt_0(d->dimY());
+		vec raw_mnt_1(d->dimY());
 
-        for(int theta_in=0; theta_in<90; theta_in++)
+		// Number of elements for the integration and reconstruction
+		// of the moment.
+		int nb_theta_in  = 90;
+		int nb_theta_out = 90;
+		int nb_phi_out   = 360;
+
+		double nb_elements = (double)(nb_phi_out*nb_theta_out);
+
+		for(int theta_in=0; theta_in<nb_theta_in; theta_in++)
         {
-            in_angle[0] = theta_in * 0.5*M_PI / 90.0;
+            in_angle[0] = theta_in * 0.5*M_PI / (double)nb_theta_in;
 
             // Integrate over the light hemisphere
-            for(int theta_out=0; theta_out<90; theta_out++)
+            for(int theta_out=0; theta_out<nb_theta_out; theta_out++)
             {
-                in_angle[2] = theta_out * 0.5*M_PI / 90.0;
-                for(int phi_out=0; phi_out<180; phi_out++)
+                in_angle[2] = theta_out * 0.5*M_PI / (double)nb_theta_out;
+                for(int phi_out=0; phi_out<nb_phi_out; phi_out++)
                 {
-                    in_angle[3] = theta_out * 0.5*M_PI / 180.0;
+                    in_angle[3] = phi_out * 2.0*M_PI / (double)nb_phi_out - M_PI;
 
                     vec in(d_size);
-                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
+                    params::convert(&in_angle[0], params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
 
                     // Copy the input vector
                     vec x = d->value(in);
 
-                    for(int i=0; i<mean.size(); ++i)
-                        mean[i] += x[i];
+                    for(int i=0; i<y_size; ++i)
+					{
+                        raw_mnt_0[i] += x[i] * sin(in_angle[2]);
+						raw_mnt_1[i] += ((abs(in_angle[3]) < 0.5*M_PI) ? 1.0 : -1.0)*mean[i] * in_angle[2];
+					}
                 }
             }
 
-            for(int i=0; i<mean.size(); ++i)
-                mean[i] /= 180.0*90.0;
+			// Normalize and center the moments before export
+            for(int i=0; i<y_size; ++i)
+			{
+				raw_mnt_0[i] /= nb_elements;
+				raw_mnt_1[i] /= raw_mnt_0[i] * nb_elements;
+			}
 
             // Output the value into the file
             file << in_angle[0] << "\t";
-            for(int i=0; i<mean.size(); ++i)
-                file << mean[i] << "\t";
+            
+			for(int i=0; i<raw_mnt_0.size(); ++i)
+                file << raw_mnt_0[i] << "\t";
+
+			for(int i=0; i<raw_mnt_1.size(); ++i)
+                file << raw_mnt_1[i] << "\t";
+
             file << std::endl;
 
         }
