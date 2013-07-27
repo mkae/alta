@@ -91,6 +91,9 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 		case params::RUSIN_TH_TD_PD:
 			half_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
+#ifdef DEBUG
+			std::cout << outvec[2] << std::endl;
+#endif
 			break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			classical_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
@@ -202,6 +205,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[1] = atan2(invec[0], invec[1]);
 			outvec[2] = acos(invec[5]);
 			outvec[3] = atan2(invec[3], invec[4]);
+#ifdef DEBUG
+			std::cout << invec[2] << " - acos -> " << outvec[0] << std::endl;
+#endif
 			break;
 
 			// 6D Parametrization

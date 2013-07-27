@@ -201,7 +201,7 @@ class params
             const double cost = cos(theta);
             const double sint = sin(theta);
 
-				const double temp = cost * vec[0] + sint * vec[1];
+			const double temp = cost * vec[0] + sint * vec[1];
 
             vec[1] = cost * vec[1] - sint * vec[0];
             vec[0] = temp;
@@ -214,9 +214,15 @@ class params
             const double cost = cos(theta);
             const double sint = sin(theta);
 
-				const double temp = cost * vec[1] + sint * vec[2];
+			const double temp = cost * vec[1] + sint * vec[2];
 
+#ifdef DEBUG
+			std::cout << acos(vec[2]) << std::endl;
+#endif
             vec[2] = cost * vec[2] - sint * vec[1];
+#ifdef DEBUG
+			std::cout << acos(vec[2]) << std::endl;
+#endif
             vec[1] = temp;
         }
 

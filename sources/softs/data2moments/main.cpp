@@ -55,47 +55,79 @@ int main(int argc, char** argv)
         params::input data_param = d->parametrization();
         int d_size = params::dimension(data_param);
 		int y_size = d->dimY();
-
-        double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
-
-        // Sample every degree
-        double dtheta = 0.5*M_PI / 90.0;
-
-        // Moments
-        vec mean(d->dimY());
-		vec raw_mnt_0(d->dimY());
-		vec raw_mnt_1(d->dimY());
+        vec in_angle(4);
 
 		// Number of elements for the integration and reconstruction
 		// of the moment.
 		int nb_theta_in  = 90;
 		int nb_theta_out = 90;
-		int nb_phi_out   = 360;
+		int nb_phi_out   = 360; // Bug here if there is a dense sampling of this domain
+
+		// Moments
+		vec raw_mnt_0(d->dimY());
+		vec raw_mnt_1(d->dimY());
+		vec raw_mnt_2(d->dimY());
+		vec raw_mnt_3(d->dimY());
 
 		double nb_elements = (double)(nb_phi_out*nb_theta_out);
+		double weight = M_PI*M_PI/nb_elements;
 
-		for(int theta_in=0; theta_in<nb_theta_in; theta_in++)
+		for(int theta_in=0; theta_in<nb_theta_in; ++theta_in)
         {
             in_angle[0] = theta_in * 0.5*M_PI / (double)nb_theta_in;
 
+			// Init value for mnts
+            for(int i=0; i<y_size; ++i)
+			{
+				raw_mnt_0[i] = 0.0;
+				raw_mnt_1[i] = 0.0;
+				raw_mnt_2[i] = 0.0;
+				raw_mnt_3[i] = 0.0;
+			}
+
             // Integrate over the light hemisphere
-            for(int theta_out=0; theta_out<nb_theta_out; theta_out++)
+            for(int theta_out=0; theta_out<nb_theta_out; ++theta_out)
             {
                 in_angle[2] = theta_out * 0.5*M_PI / (double)nb_theta_out;
-                for(int phi_out=0; phi_out<nb_phi_out; phi_out++)
+
+                for(int phi_out=0; phi_out<nb_phi_out; ++phi_out)
                 {
-                    in_angle[3] = phi_out * 2.0*M_PI / (double)nb_phi_out - M_PI;
+                    in_angle[3] = phi_out * 2.0*M_PI / (double)nb_phi_out;
+					
+					//! \todo Do not compute like Pascal! It does not make sense to do moments
+					//! in the hemispherical parametrization. Use vectors instead (but they might
+					//! degenerate to zero).
+					double signed_theta_out = ((abs(in_angle[3]-M_PI) < 0.5*M_PI) ? -1.0 : 1.0) * in_angle[2];
 
+					// Change the parametrization from SPHERICAL to BRDF's param
                     vec in(d_size);
-                    params::convert(&in_angle[0], params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
+					try
+					{
+						//std::cout << in_angle << std::endl;
+						params::convert(&in_angle[0], params::SPHERICAL_TL_PL_TV_PV, params::RUSIN_TH_TD_PD, &in[0]);
+					}
+					catch(...)
+					{
+						std::cout << "<<DEBUG>> error during conversion of " << in_angle << " to " << params::get_name(data_param) << std::endl;
+						return 1;
+					}
 
-                    // Copy the input vector
+#ifdef DEBUG
+					std::cout << std::endl;
+					std::cout << in_angle << " -> " << in << std::endl;
+#endif
+
+                    // Evaluate the BRDF
                     vec x = d->value(in);
+
+					double inv_pdf = 1.0 / cos(in_angle[1]);
 
                     for(int i=0; i<y_size; ++i)
 					{
-                        raw_mnt_0[i] += x[i] * sin(in_angle[2]);
-						raw_mnt_1[i] += ((abs(in_angle[3]) < 0.5*M_PI) ? 1.0 : -1.0)*mean[i] * in_angle[2];
+						raw_mnt_0[i] += x[i] * cos(in_angle[1]) * weight;
+						raw_mnt_1[i] += raw_mnt_0[i] * signed_theta_out;
+						raw_mnt_2[i] += raw_mnt_1[i] * signed_theta_out;
+						raw_mnt_3[i] += raw_mnt_2[i] * signed_theta_out;
 					}
                 }
             }
@@ -103,8 +135,10 @@ int main(int argc, char** argv)
 			// Normalize and center the moments before export
             for(int i=0; i<y_size; ++i)
 			{
-				raw_mnt_0[i] /= nb_elements;
-				raw_mnt_1[i] /= raw_mnt_0[i] * nb_elements;
+				raw_mnt_0[i] ;
+				raw_mnt_1[i] /= raw_mnt_0[i];
+				raw_mnt_2[i] /= raw_mnt_0[i];
+				raw_mnt_3[i] /= raw_mnt_0[i];
 			}
 
             // Output the value into the file
@@ -115,6 +149,12 @@ int main(int argc, char** argv)
 
 			for(int i=0; i<raw_mnt_1.size(); ++i)
                 file << raw_mnt_1[i] << "\t";
+
+			for(int i=0; i<raw_mnt_2.size(); ++i)
+                file << raw_mnt_2[i] << "\t";
+
+			for(int i=0; i<raw_mnt_3.size(); ++i)
+                file << raw_mnt_3[i] << "\t";
 
             file << std::endl;
 
