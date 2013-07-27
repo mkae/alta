@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 					//! \todo Do not compute like Pascal! It does not make sense to do moments
 					//! in the hemispherical parametrization. Use vectors instead (but they might
 					//! degenerate to zero).
-					double signed_theta_out = ((abs(in_angle[3]-M_PI) < 0.5*M_PI) ? -1.0 : 1.0) * in_angle[2];
+					double signed_theta_out = ((abs(in_angle[3]-M_PI) < 0.5*M_PI) ? -1.0 : 1.0) * in_angle[3];
 
 					// Change the parametrization from SPHERICAL to BRDF's param
                     vec in(d_size);
@@ -120,11 +120,12 @@ int main(int argc, char** argv)
                     // Evaluate the BRDF
                     vec x = d->value(in);
 
-					double inv_pdf = 1.0 / cos(in_angle[1]);
+					// Density of samples
+					double pdf = sin(in_angle[2]);
 
                     for(int i=0; i<y_size; ++i)
 					{
-						raw_mnt_0[i] += x[i] * cos(in_angle[1]) * weight;
+						raw_mnt_0[i] += x[i] * cos(in_angle[2]) * pdf * weight;
 						raw_mnt_1[i] += raw_mnt_0[i] * signed_theta_out;
 						raw_mnt_2[i] += raw_mnt_1[i] * signed_theta_out;
 						raw_mnt_3[i] += raw_mnt_2[i] * signed_theta_out;
@@ -135,7 +136,7 @@ int main(int argc, char** argv)
 			// Normalize and center the moments before export
             for(int i=0; i<y_size; ++i)
 			{
-				raw_mnt_0[i] ;
+				//raw_mnt_0[i] ;
 				raw_mnt_1[i] /= raw_mnt_0[i];
 				raw_mnt_2[i] /= raw_mnt_0[i];
 				raw_mnt_3[i] /= raw_mnt_0[i];
