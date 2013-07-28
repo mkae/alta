@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 					try
 					{
 						//std::cout << in_angle << std::endl;
-						params::convert(&in_angle[0], params::SPHERICAL_TL_PL_TV_PV, params::RUSIN_TH_TD_PD, &in[0]);
+						params::convert(&in_angle[0], params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
 					}
 					catch(...)
 					{
@@ -125,18 +125,21 @@ int main(int argc, char** argv)
 
                     for(int i=0; i<y_size; ++i)
 					{
-						raw_mnt_0[i] += x[i] * cos(in_angle[2]) * pdf * weight;
-						raw_mnt_1[i] += raw_mnt_0[i] * signed_theta_out;
-						raw_mnt_2[i] += raw_mnt_1[i] * signed_theta_out;
-						raw_mnt_3[i] += raw_mnt_2[i] * signed_theta_out;
+						raw_mnt_0[i] += x[i] * pdf * weight;
+						raw_mnt_1[i] += signed_theta_out * x[i] * pdf * weight;
+						raw_mnt_2[i] += signed_theta_out*signed_theta_out * x[i] * pdf * weight;
+						raw_mnt_3[i] += signed_theta_out*signed_theta_out*signed_theta_out * x[i] * pdf * weight;
 					}
                 }
             }
-
+			/*
+			double norm = 0.0;
+			for(int i=0; i<y_size; ++i)
+				norm += raw_mnt_0[i] / 3.0;
+			*/
 			// Normalize and center the moments before export
             for(int i=0; i<y_size; ++i)
 			{
-				//raw_mnt_0[i] ;
 				raw_mnt_1[i] /= raw_mnt_0[i];
 				raw_mnt_2[i] /= raw_mnt_0[i];
 				raw_mnt_3[i] /= raw_mnt_0[i];
