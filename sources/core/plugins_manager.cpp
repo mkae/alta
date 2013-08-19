@@ -140,6 +140,35 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
+#ifdef WIN32
+#else
+    #include <stdio.h>
+    #include <dlfcn.h>
+#endif
+
+void* open_library(const std::string& filename, const char* function)
+{
+#ifdef WIN32
+    return NULL;
+#else
+    void* handle = dlopen(filename.c_str(), RTLD_LAZY);
+    if(handle != NULL)
+    {
+        void* res = dlsym(handle, function);
+
+        if(dlerror() == NULL)
+        {
+            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+        }
+
+        return res;
+    }
+    else
+    {
+        return NULL;
+    }
+#endif
+}
 
 // Get instances of the function, the data and the
 // fitter, select one based on the name. Return null
