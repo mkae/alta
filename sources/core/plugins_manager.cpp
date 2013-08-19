@@ -156,15 +156,19 @@ void* open_library(const std::string& filename, const char* function)
     {
         void* res = dlsym(handle, function);
 
-        if(dlerror() == NULL)
+        if(dlerror() != NULL)
         {
             std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+            return NULL;
         }
-
+#ifdef DEBUG_CORE
+        std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
+#endif
         return res;
     }
     else
     {
+        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
         return NULL;
     }
 #endif
@@ -306,6 +310,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 	 }
 
     QString path = QDir::currentPath() + QString(file.c_str()) ;
+/*
     QLibrary fitting_lib(path);
     if(!fitting_lib.isLoaded())
     {
@@ -314,6 +319,9 @@ fitter* plugins_manager::get_fitter(const std::string& n)
     }
 
 	FitterPrototype myFitter = (FitterPrototype) fitting_lib.resolve("provide_fitter");
+*/
+    void* link = open_library(path.toStdString(), "provide_fitter");
+    FitterPrototype myFitter = (FitterPrototype)link;
 
     if(myFitter != NULL)
     {
