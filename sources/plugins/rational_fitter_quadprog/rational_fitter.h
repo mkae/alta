@@ -46,8 +46,11 @@ class rational_fitter_quadprog : public QObject, public fitter
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
 		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit) ;
-
+#ifdef NEW
+		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function_1d* fit) ;
+#else
+        virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit) ;
+#endif
 		// min and Max usable np and nq values for the fitting
 		int _max_np, _max_nq ;
 		int _min_np, _min_nq ;

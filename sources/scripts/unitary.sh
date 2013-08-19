@@ -16,7 +16,8 @@ test_kirby=1
 test_alta=1
 test_merl=0
 
-fitters="matlab quadprog parallel eigen cgal"
+fitters="matlab parallel"
+#fitters="matlab quadprog parallel eigen cgal"
 #fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
 fitter_args="--np 2 --nq 2"
 
@@ -28,7 +29,7 @@ mkdir tests
 ## Test with generated data
 ##
 if [ $test_generated -eq 1 ]; then
-min_test=1; max_test=6
+min_test=1; max_test=7
 for i in `seq $min_test $max_test`
 do
 	./build/generate_data --f $i	

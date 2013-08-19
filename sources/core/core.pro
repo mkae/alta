@@ -26,3 +26,4 @@ SOURCES  = plugins_manager.cpp   \
 		   params.cpp			 \
            function.cpp          \
 #          clustering.cpp
+    rational_function.inl

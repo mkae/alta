@@ -21,7 +21,8 @@ int main(int argc, char** argv)
 		nby = args.get_int("nby", 100) ;
 
 	const int k = args.get_int("f", 1) ;
-	if(k == 1)
+	int K = 1;
+	if(k == K++)
 	{
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN UNKNOWN" << std::endl;
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
 			f << x << "\t" << y << /*"\t" << y*0.9f << "\t" << y*1.1f <<*/ std::endl ;
 		}
 	}
-	else if(k == 2)
+	else if(k == K++)
 	{
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN UNKNOWN" << std::endl;
@@ -47,7 +48,7 @@ int main(int argc, char** argv)
 			f << x << "\t" << y << "\t" << 0.1f << std::endl ;
 		}
 	}
-	else if(k == 3)
+	else if(k == K++)
 	{
 		f << "#DIM 2 1" << std::endl ;
 		for(int i=0; i<nbx; ++i)
@@ -60,7 +61,7 @@ int main(int argc, char** argv)
 				f << x << "\t" << y << "\t" << z << "\t" << z-0.1f << "\t" << z << std::endl ;
 			}
 	}
-	else if(k == 4)
+	else if(k == K++)
 	{
 		f << "#DIM 2 1" << std::endl ;
 		f << "#PARAM_IN UNKNOWN" << std::endl;
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
 				f << x << "\t" << y << "\t" << z << std::endl ;
 			}
 	}
-	else if(k == 5)
+	else if(k == K++)
 	{
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN COS_TH" << std::endl;
@@ -94,7 +95,7 @@ int main(int argc, char** argv)
 			f << std::endl ;
 		}
 	}
-	else if(k == 6)
+	else if(k == K++)
 	{
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN COS_TH" << std::endl;
@@ -106,9 +107,24 @@ int main(int argc, char** argv)
 			f << x << "\t" << z << std::endl ;
 		}
 	}
+	// Multidimensional data
+	else if(k == K++)
+	{
+		f << "#DIM 1 3" << std::endl ;
+		f << "#PARAM_IN UNKNOWN" << std::endl;
+		for(int i=0; i<nbx; ++i)
+		{
+			const double x = i / (float)nbx ;
+			const double z1 = 0.1 + x -0.2 * x*x ;
+			const double z2 = 0.1 - 0.001* x*x;
+			const double z3 = 0.1 + 0.5 * std::pow(x, 1.5) ;
+
+			f << x << "\t" << z1 << "\t" << z2 << "\t" << z3 << std::endl ;
+		}
+	}
 	// Lafortune fitting
 	// Single lobe (0.86, 0.77, 18.6)
-	else if(k == 7)
+	else if(k == K++)
 	{
 		f << "#DIM 2 1" << std::endl ;
 		f << "#PARAM_IN RUSIN_TH_TD" << std::endl;
@@ -142,7 +158,7 @@ int main(int argc, char** argv)
 	}
 	// Lafortune fitting
 	// Triple lobe (0.86, 0.77, 18.6), (-0.41, 0.018, 2.58), (-1.03, 0.7, 63.8)
-	else if(k == 8)
+	else if(k == K++)
 	{
 		f << "#DIM 2 1" << std::endl ;
 		f << "#PARAM_IN RUSIN_TH_TD" << std::endl;

@@ -151,18 +151,18 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			// 2D Parametrizations
 		case params::COS_TH_TD:
 			outvec[0] = half[2];
-			outvec[1] = half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2];
+			outvec[1] = half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2];
 			break;
 		case params::RUSIN_TH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
+			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
 
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
 			outvec[0] = acos(half[2]);
 			outvec[1] = atan2(half[0], half[1]);
-			outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
+			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
         case params::RUSIN_TH_TD_PD:
             outvec[0] = acos(half[2]);

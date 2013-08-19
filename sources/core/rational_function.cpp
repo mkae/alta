@@ -8,6 +8,296 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef NEW
+rational_function_1d::rational_function_1d()
+{
+}
+
+rational_function_1d::rational_function_1d(int np, int nq) 
+{
+	a.resize(np);
+	b.resize(nq);
+}
+		
+rational_function_1d::rational_function_1d(const std::vector<double>& a, 
+                                           const std::vector<double>& b) :
+	a(a), b(b)
+{
+}
+
+void rational_function_1d::load(const std::string& filename)
+{
+}
+
+void rational_function_1d::update(const std::vector<double>& in_a,
+                                  const std::vector<double>& in_b)
+{
+	a.reserve(in_a.size()) ;
+	b.reserve(in_b.size()) ;
+	a = in_a ;
+	b = in_b ;
+}
+		
+void rational_function_1d::resize(int np, int nq)
+{
+	const int old_np = a.size();
+	const int old_nq = b.size();
+
+	// Resize the vector
+	a.resize(np);
+	b.resize(nq);
+
+	// Set the new coeffs to zero
+	for(int i=old_np; i<np; ++i) { a[i] = 0.0; }
+	for(int i=old_nq; i<nq; ++i) { b[i] = 0.0; }
+}
+
+
+
+// Get the p_i and q_j function
+vec rational_function_1d::p(const vec& x) const
+{
+	vec res(_nY) ;
+
+    unsigned int const np = a.size() / _nY ;
+
+	for(int k=0; k<_nY; ++k)
+	{
+		double p = 0.0f ;
+		
+		for(unsigned int i=0; i<np; ++i)
+		{
+			p += a[k*_nY + i]*this->p(x, i) ;
+		}
+
+		res[k] = p ;
+	}
+	return res ;
+}
+vec rational_function_1d::q(const vec& x) const 
+{
+	vec res(_nY) ;
+
+    unsigned int const nq = b.size() / _nY ;
+
+	for(int k=0; k<_nY; ++k)
+	{
+		double q = 0.0f ;
+
+		for(unsigned int i=0; i<nq; ++i)
+		{
+			q += b[k*_nY + i]*this->q(x, i) ;
+		}
+
+		res[k] = q ;
+	}
+	return res ;
+}
+
+// Estimate the number of configuration for an indice
+// vector of dimension d with maximum element value
+// being k.
+int rational_function_1d::estimate_dk(int k, int d)
+{
+	if(d == 1)
+	{
+		return 1;
+	}
+	else if(d ==2)
+	{
+		return k+1;
+	}
+	else
+	{
+		int res = 0;
+		for(int i=0; i<=k; ++i)
+		{
+			res += estimate_dk(k-i, d-1);
+		}
+		return res;
+	}
+}
+
+// Populate a vector of degrees of dimension N using a
+// maximum degree of M. The index at the current level
+// is j
+void rational_function_1d::populate(std::vector<int>& vec, int N, int M, int j)
+{
+	// For each dimension, estimate the current level
+	// based on the number of configurations in the
+	// other dimensions
+	int current_M = M ;
+	int nb_conf = 0;
+	for(int d=0; d<N-1; ++d)
+	{
+		int k;
+		for(k=0; k<=current_M; ++k)
+		{
+			int oracle = estimate_dk(current_M-k, N-(d+1));
+			if(nb_conf <= j && j < nb_conf+oracle)
+			{
+				break;
+			}
+			nb_conf += oracle;
+		}
+		
+		vec[N-1 - d] = k ;	
+		current_M -= k ;
+	}
+	vec[0] = current_M;
+}
+
+std::vector<int> rational_function_1d::index2degree(int i) const
+{
+	std::vector<int> deg ; deg.assign(dimX(), 0) ;
+
+	if(i == 0)
+		return deg ;
+		
+	if(dimX() == 1)
+	{
+	    deg[0] = i;
+	}
+    else if(dimX() == 2)
+	{
+		int Nk = 1 ;
+		int k  = 1 ;
+		while(!(i >= Nk && i < Nk+k+1))
+		{
+			Nk += k+1 ;
+			++k ;
+		}
+
+		int r = i-Nk ;
+		deg[0] = k-r;
+		deg[1] = r;
+	}
+	else
+	{
+		int Nk = 1 ;
+		int k  = 1 ;
+		int dk = estimate_dk(k, dimX()) ;
+		while(!(i >= Nk && i < Nk+dk))
+		{
+			Nk += dk ;
+			++k ;
+			dk = estimate_dk(k, dimX()) ;
+		}
+
+		// Populate the vector from front to back
+		int j = i-Nk ;
+		populate(deg, dimX(), k, j) ;
+	}
+
+	return deg ;
+
+}
+
+double legendre(double x, int i)
+{
+	if(i == 0)
+	{
+		return 1;
+	}
+	else if(i == 1)
+	{
+		return x;
+	}
+	else
+	{
+		return ((2*i-1)*x*legendre(x, i-1) - (i-1)*legendre(x, i-2)) / (double)i ;
+	}
+}
+
+//#define POLYNOMIALS
+
+// Get the p_i and q_j function
+double rational_function_1d::p(const vec& x, int i) const
+{
+	std::vector<int> deg = index2degree(i);
+	double res = 1.0;
+	for(int k=0; k<dimX(); ++k)
+	{
+#ifdef POLYNOMIALS
+		res *= pow(x[k], deg[k]) ;
+#else // LEGENDRE
+		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
+#endif
+	}
+
+	return res ;
+}
+double rational_function_1d::q(const vec& x, int i) const 
+{
+	std::vector<int> deg = index2degree(i);
+	double res = 1.0; 
+	for(int k=0; k<dimX(); ++k)
+	{
+#ifdef POLYNOMIALS
+		res *= pow(x[k], deg[k]) ;
+#else // LEGENDRE
+		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
+#endif
+	}
+
+	return res ;
+}
+
+// Overload the function operator
+vec rational_function_1d::value(const vec& x) const 
+{
+	vec res(1) ;
+
+	unsigned int const np = a.size() / _nY ;
+	unsigned int const nq = b.size() / _nY ;
+
+	double p = 0.0f ;
+	double q = 0.0f ;
+
+	for(unsigned int i=0; i<np; ++i)
+	{
+		p += a[i]*this->p(x, i) ;
+	}
+
+	for(unsigned int i=0; i<nq; ++i)
+	{
+		q += b[i]*this->q(x, i) ;
+	}
+
+	res[0] = p/q ;
+	return res ;
+}
+
+
+std::ostream& operator<< (std::ostream& out, const rational_function_1d& r) 
+{
+	std::cout << "p = [" ;
+	for(unsigned int i=0; i<r.a.size(); ++i)
+	{
+		if(i != 0)
+		{
+			std::cout << ", " ;
+		}
+		std::cout << r.a[i] ;
+	}
+	std::cout << "]" << std::endl ;
+
+	std::cout << "q = [" ;
+	for(unsigned int i=0; i<r.b.size(); ++i)
+	{
+		if(i != 0)
+		{
+			std::cout << ", " ;
+		}
+		std::cout << r.b[i] ;
+	}
+	std::cout << "]" << std::endl ;
+
+	return out ;
+}
+
+
+#else
 
 rational_function::rational_function() : a(), b()
 {
@@ -22,10 +312,7 @@ rational_function::rational_function(const std::vector<double>& a,
 	a(a), b(b)
 {
 }
-rational_function::~rational_function()
-{
-}
-		
+
 void rational_function::update(const std::vector<double>& in_a,
                                const std::vector<double>& in_b)
 {
@@ -33,34 +320,6 @@ void rational_function::update(const std::vector<double>& in_a,
 	b.reserve(in_b.size()) ;
 	a = in_a ;
 	b = in_b ;
-}
-
-// Overload the function operator
-vec rational_function::value(const vec& x) const 
-{
-	vec res(_nY) ;
-
-    unsigned int const np = a.size() / _nY ;
-    unsigned int const nq = b.size() / _nY ;
-
-	for(int k=0; k<_nY; ++k)
-	{
-		double p = 0.0f ;
-		double q = 0.0f ;
-		
-		for(unsigned int i=0; i<np; ++i)
-		{
-			p += a[k*_nY + i]*this->p(x, i) ;
-		}
-
-		for(unsigned int i=0; i<nq; ++i)
-		{
-			q += b[k*_nY + i]*this->q(x, i) ;
-		}
-
-		res[k] = p/q ;
-	}
-	return res ;
 }
 
 // Get the p_i and q_j function
@@ -249,6 +508,34 @@ double rational_function::q(const vec& x, int i) const
 #endif
 	}
 
+	return res ;
+}
+
+// Overload the function operator
+vec rational_function::value(const vec& x) const 
+{
+	vec res(_nY) ;
+
+    unsigned int const np = a.size() / _nY ;
+    unsigned int const nq = b.size() / _nY ;
+
+	for(int k=0; k<_nY; ++k)
+	{
+		double p = 0.0f ;
+		double q = 0.0f ;
+		
+		for(unsigned int i=0; i<np; ++i)
+		{
+			p += a[k*_nY + i]*this->p(x, i) ;
+		}
+
+		for(unsigned int i=0; i<nq; ++i)
+		{
+			q += b[k*_nY + i]*this->q(x, i) ;
+		}
+
+		res[k] = p/q ;
+	}
 	return res ;
 }
 
@@ -634,6 +921,12 @@ std::ostream& operator<< (std::ostream& out, const rational_function& r)
 
 	return out ;
 }
+
+		
+#endif
+
+		
+
 
 
 //Q_EXPORT_PLUGIN2(rational_function, rational_function)

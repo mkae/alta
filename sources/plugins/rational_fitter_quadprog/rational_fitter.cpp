@@ -105,12 +105,12 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
 	_min_np = args.get_float("min-np", _max_np) ;
-    _min_nq = args.get_float("min-nq", _max_nq) ;
+	_min_nq = args.get_float("min-nq", _max_nq) ;
 
-    _max_np = std::max<int>(_max_np, _min_np);
-    _max_nq = std::max<int>(_max_nq, _min_nq);
+	_max_np = std::max<int>(_max_np, _min_np);
+	_max_nq = std::max<int>(_max_nq, _min_nq);
 
-    _boundary = args.get_float("boundary-constraint", 1.0f);
+	_boundary = args.get_float("boundary-constraint", 1.0f);
 }
 		
 
@@ -118,19 +118,48 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 {
 
 	// Multidimensional coefficients
+	/*
 	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
 	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
-
+	*/
 	for(int j=0; j<d->dimY(); ++j)
 	{
-		if(!fit_data(d, np, nq, j, r))
+#ifdef NEW
+		rational_function_1d* rs = r->get(j);
+		rs->resize(np, nq);
+
+		if(!fit_data(d, np, nq, j, rs))
 			return false ;
 
+#ifndef DEBUG_MULTIDIMENSIONAL
+		std::stringstream filename;
+		filename << "/tmp/fit_channel" << j << ".gnuplot" ;
+		std::ofstream file(filename.str().c_str(), std::ios_base::trunc);
+		for(int i=0; i<d->size(); ++i)
+		{
+			vec v = d->get(i) ;
+			//				vec y1(d->dimY()) ;
+			//				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+
+			vec y2 = rs->value(v) ;
+			for(int u=0; u<d->dimX(); ++u)
+				file << v[u] << "\t" ;
+
+			file << y2[0] << "\t" ;
+
+			file << std::endl ;
+		}
+		file.close();
+#endif
+
+		/*
 		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
 		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-	}
+		*/
+#endif
+    }
 
-	r->update(Pn, Qn) ;
+	//r->update(Pn, Qn) ;
 	return true ;
 }
 
@@ -138,9 +167,12 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf) 
+#ifdef NEW
+bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function_1d* r) 
+#else
+bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* r)
+#endif
 {
-	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
 	if(r == NULL || d == NULL)
 	{
@@ -288,7 +320,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	for(int i=0; i<2*d->size(); ++i)	
 	{		
 		ci[i] = ci[i] * delta ; 
-#ifndef DEBUG
+#ifdef DEBUG
         std::cout << i << "\t" << -ci[i] << std::endl ;
 #endif
 	}
