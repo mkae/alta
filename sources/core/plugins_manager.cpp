@@ -8,10 +8,11 @@
 */
 
 #ifdef WIN32
+    #include <windows.h>
 #else
-    #include <stdio.h>
     #include <dlfcn.h>
 #endif
+#include <stdio.h>
 
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
 //! provide function. The template argument is used to cast the library to a
@@ -19,7 +20,27 @@
 template<typename T> T open_library(const std::string& filename, const char* function)
 {
 #ifdef WIN32
-    return NULL;
+    HINSTANCE handle = LoadLibrary((LPCTSTR)filename.c_str());
+    if(handle != NULL)
+    {
+        T res = (T)GetProcAddress(handle, function);
+
+        if(res == NULL)
+        {
+            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+            return NULL;
+        }
+#ifdef DEBUG_CORE
+        std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
+#endif
+        return res;
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
+        std::cerr << "          cause: \"" << GetLastError() << "\"" << std::endl;
+        return NULL;
+    }
 #else
     void* handle = dlopen(filename.c_str(), RTLD_LAZY);
     if(handle != NULL)
