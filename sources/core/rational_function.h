@@ -115,6 +115,22 @@ class rational_function : public function
 			rs.resize(nY);
 		}
 
+		//! \brief Set the size of the rational function. Any newly created 1D function
+		//! will have np and nq fixed as defined.
+		virtual void setSize(int np, int nq)
+		{
+			this->np = np;
+			this->nq = nq;
+			clear();
+		}
+
+		//! \brief Clear the vector of 1D rational functions.
+		virtual void clear()
+		{
+			rs.clear();
+			rs.resize(_nY);
+		}
+
 	protected: // functions
 
 		//! \brief Save the rational function to the rational format (see \ref formating).

@@ -13,5 +13,5 @@ SUBDIRS  = \
 				nonlinear_function_phong      \
 				nonlinear_function_lafortune  \
 				data_merl                     \
-			  data_astm
+#			  data_astm
 

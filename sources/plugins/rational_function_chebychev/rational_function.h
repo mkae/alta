@@ -34,7 +34,6 @@ class rational_function_chebychev : public rational_function
 	public: // methods
 
 		rational_function_chebychev() ;
-		rational_function_chebychev(const std::vector<double>& a, const std::vector<double>& b) ;
 		virtual ~rational_function_chebychev() ;
 
         //! Update the y-1D function for the ith dimension.

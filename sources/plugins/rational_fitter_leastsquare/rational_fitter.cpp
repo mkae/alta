@@ -52,6 +52,7 @@ bool rational_fitter_leastsquare::fit_data(const data* dat, function* fit, const
 	r->setDimY(d->dimY()) ;
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
+	r->setSize(_np, _nq);
 
 	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
 
@@ -68,7 +69,6 @@ bool rational_fitter_leastsquare::fit_data(const data* dat, function* fit, const
 		int hour = (msec / 3600000) ;
 		std::cout << "<<INFO>> got a fit" << std::endl ;
 		std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
-
 		return true ;
 	}
 
@@ -92,7 +92,6 @@ bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, in
     for(int j=0; j<d->dimY(); ++j)
     {
         rational_function_1d* rs = r->get(j);
-        rs->resize(np, nq);
 
         if(!fit_data(d, np, nq, j, rs))
         {

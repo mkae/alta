@@ -18,10 +18,6 @@ rational_function_chebychev::rational_function_chebychev() : rational_function()
 {
 }
 
-rational_function_chebychev::rational_function_chebychev(const std::vector<double>& a,
-                         const std::vector<double>& b) : rational_function(a, b)
-{
-}
 rational_function_chebychev::~rational_function_chebychev()
 {
 }
