@@ -332,6 +332,44 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 	}
 #endif
 }
+void plugins_manager::check_compatibility(data*& d, function*& f,
+                                          const arguments& args)
+{
+	if(d->parametrization() == params::UNKNOWN_INPUT)
+	{
+		std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
+	}
+
+	if(f->parametrization() == params::UNKNOWN_INPUT)
+	{
+		std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
+		f->setParametrization(d->parametrization());
+	}
+	else if(d->parametrization() != f->parametrization())
+	{
+		std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+		data_params* dd = new data_params(d, f->parametrization());
+		d = dd ;
+	}
+	else
+	{
+		std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+	}
+
+	if(f->dimY() != d->dimY())
+	{
+		std::cout << "<<WARNING>> the data and the function have different Y dimensions" << std::endl;
+	}
+
+	/*
+	// Check is the data has to be clusterized
+	if(args.is_defined("cluster-dim"))
+	{
+	clustering* cluster = new clustering(d, args);
+	d = cluster;
+	}
+	*/
+}
 		
 // \todo implement the Darwin (MACOS) version.
 #ifdef WIN32
