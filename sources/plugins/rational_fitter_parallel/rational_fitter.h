@@ -13,7 +13,7 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
-/*! \brief A fitter for rational functions that can run in parallel
+/*! \brief A vertical segment fitter for rational functions that can run in parallel
  *  using QuadProg++ quadratic solver.
  *  \ingroup plugins
  *

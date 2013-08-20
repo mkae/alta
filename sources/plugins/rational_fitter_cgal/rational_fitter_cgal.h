@@ -12,7 +12,9 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
-
+/*! \brief A vertical segment fitter for rational function using the library CGAL
+ *  \ingroup plugins
+ */
 class rational_fitter_cgal : public fitter
 {
 	public: // methods

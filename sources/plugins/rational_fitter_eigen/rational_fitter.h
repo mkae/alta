@@ -12,6 +12,9 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
+/*! \brief A least square fitter for rational function using the library Eigen
+ *  \ingroup plugins
+ */
 class rational_fitter_eigen : public fitter
 {
 
