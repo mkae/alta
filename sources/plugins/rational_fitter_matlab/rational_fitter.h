@@ -28,11 +28,6 @@ class rational_fitter_matlab : public fitter
 		//
 		virtual void set_parameters(const arguments& args) ;
 
-		// Obtain associated data and functions
-		//
-		virtual data*     provide_data() const ;
-		virtual function* provide_function() const ;
-
 	protected: // function
 
 		// Fitting a data object using np elements in the numerator and nq 

@@ -21,9 +21,15 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 
 rational_fitter_matlab::rational_fitter_matlab() 
 {
+	// Create matlab engine
+	if (!(ep = engOpen(""))) 
+	{
+		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
+	}
 }
 rational_fitter_matlab::~rational_fitter_matlab() 
 {
+	engClose(ep); 
 }
 
 bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const arguments &args)
@@ -36,14 +42,6 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const argu
 		return false ;
 	}
 	
-	// Create matlab engine
-	if (!(ep = engOpen(""))) 
-	{
-		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
-		return false ;
-	}
-	
-
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
@@ -85,7 +83,6 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const argu
 		}
 	}
 
-	engClose(ep); 
 	return false ;
 }
 

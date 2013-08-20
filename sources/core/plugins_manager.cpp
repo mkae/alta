@@ -43,6 +43,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     else
     {
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
+		  std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
         return NULL;
     }
 #endif
