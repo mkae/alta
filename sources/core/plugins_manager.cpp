@@ -2,14 +2,10 @@
 #include "rational_function.h"
 #include "vertical_segment.h"
 
-#include <QCoreApplication>
 /*
-#include <QPluginLoader>
-#include <QtPlugin>
-#include <QLibrary>
-*/
+#include <QCoreApplication>
 #include <QDir>
-
+*/
 
 #ifdef WIN32
 #else
@@ -53,7 +49,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 // Create the object, parse the argument and load all the plugins
 plugins_manager::plugins_manager(const arguments& args) 
 {
-
+/*
 	QDir pluginsDir;
 	if(args.is_defined("plugins"))
 	{
@@ -63,6 +59,7 @@ plugins_manager::plugins_manager(const arguments& args)
 	{
 		pluginsDir = QDir(QCoreApplication::instance()->applicationDirPath());
 	}
+	*/
 
 	/*
 	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) 
@@ -191,6 +188,7 @@ function* plugins_manager::get_function(const std::string& n)
     }
 
 #ifdef USING_STATIC
+	 /*
 	 std::string file;
 	 if(n[0] == '.')
 	 {
@@ -204,6 +202,8 @@ function* plugins_manager::get_function(const std::string& n)
     QString path = QDir::currentPath() + QString(file.c_str()) ;
 	 
 	 FunctionPrototype myFunction = open_library<FunctionPrototype>(path.toStdString(), "provide_function");
+	 */
+	 FunctionPrototype myFunction = open_library<FunctionPrototype>(n, "provide_function");
     if(myFunction != NULL)
     {
 #ifdef DEBUG
@@ -239,6 +239,7 @@ data* plugins_manager::get_data(const std::string& n)
     }
 
 #ifdef USING_STATIC
+	 /*
 	 std::string file;
 	 if(n[0] == '.')
 	 {
@@ -252,6 +253,8 @@ data* plugins_manager::get_data(const std::string& n)
     QString path = QDir::currentPath() + QString(file.c_str()) ;
 	 
 	 DataPrototype myData = open_library<DataPrototype>(path.toStdString(), "provide_data");
+	 */
+	 DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
     if(myData != NULL)
     {
 #ifdef DEBUG

@@ -1,6 +1,5 @@
 TEMPLATE = lib
 CONFIG  *= static  \
-           qt      \
            console
 
 DESTDIR  = ../build
@@ -22,7 +21,7 @@ HEADERS  = args.h               \
 
 SOURCES  = plugins_manager.cpp   \
            vertical_segment.cpp  \
-		   rational_function.cpp \
-		   params.cpp			 \
+		     rational_function.cpp \
+		     params.cpp			   \
            function.cpp          \
 #          clustering.cpp

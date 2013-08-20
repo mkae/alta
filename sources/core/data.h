@@ -6,8 +6,6 @@
 #include <limits>
 #include <fstream>
 
-#include <QtPlugin>
-
 #include "common.h"
 #include "args.h"
 #include "params.h"
@@ -81,8 +79,6 @@ class data : public parametrized
 		// Dimensions of the data
 		int _nX, _nY ;
 } ;
-	 
-Q_DECLARE_INTERFACE(data, "Fitter.Data")
 
 /*! \brief Change the parametrization of data to fit the parametrization of the
  *  function to be fitted.

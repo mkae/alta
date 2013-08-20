@@ -4,8 +4,6 @@
 #include <string>
 #include <fstream>
 
-#include <QtPlugin>
-
 #include "common.h"
 #include "args.h"
 #include "params.h"
@@ -209,6 +207,4 @@ class nonlinear_function: public function
 		// dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const = 0;
 };
-
-Q_DECLARE_INTERFACE(function, "Fitter.Function") 
 
