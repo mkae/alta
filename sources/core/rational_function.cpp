@@ -460,7 +460,7 @@ void rational_function::load(const std::string& filename)
 				i = 0 ;
 				get(j)->update(a, b);
 
-#ifndef DEBUG
+#ifdef DEBUG
 				std::cout << "<<DEBUG>> loading channel " << j << " with: " << std::endl;
 				std::cout << "          " << a << std::endl;
 				std::cout << "          " << b << std::endl;

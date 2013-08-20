@@ -16,10 +16,10 @@ test_kirby=1
 test_alta=1
 test_merl=0
 
-fitters="matlab parallel"
+fitters="quadprog eigen cgal"
 #fitters="matlab quadprog parallel eigen cgal"
 #fitter_args="--min-np 1 --np 100 --min-nq 1 --nq 100"
-fitter_args="--np 2 --nq 2"
+fitter_args="--np 10 --nq 10"
 
 #Use the DCA optimizer afterwards
 use_dca=0
@@ -40,7 +40,7 @@ do
 		echo "Using fitter ${fitter} with generated data";
 		echo "------------------------------------------";
 
-    ./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_${fitter}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.1 $relative > tests/output${function_append}_${i}_${fitter}.out
+    ./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_${fitter}.rational $function --fitter ./build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.1 $relative > tests/output${function_append}_${i}_${fitter}.out
     
 	 if [ $? -eq 0 ]; then
 		 echo "Test number ${i} passed"
@@ -50,7 +50,7 @@ do
 
 		#DCA Optimization 
 		if [ $use_dca -eq 1 ]; then
-			./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_${fitter}_dca.rational $function --fitter /build/librational_fitter_dca.so --bootstrap tests/output${function_append}_${i}_${fitter}.rational > tests/output${function_append}_${i}_${fitter}_dca.out
+			./build/data2brdf --input tests/input_${i}.gnuplot --output tests/output${function_append}_${i}_${fitter}_dca.rational $function --fitter ./build/librational_fitter_dca.so --bootstrap tests/output${function_append}_${i}_${fitter}.rational > tests/output${function_append}_${i}_${fitter}_dca.out
 
 			 if [ $? -eq 0 ]; then
 				echo "Optimized using DCA"
@@ -73,7 +73,7 @@ fi
 ## Test with Kirby2 dataset
 ##
 if [ $test_kirby -eq 1 ]; then
-    ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output tests/Kirby2${function_append}.rational $function --fitter /build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.1 $relative > tests/Kirby2${function_append}.out
+    ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output tests/Kirby2${function_append}.rational $function --fitter ./build/librational_fitter_${fitter}.so ${fitter_args} --dt 0.1 $relative > tests/Kirby2${function_append}.out
 
     if [ $? -eq 0 ]; then
         echo "Test Kirby2 passed"

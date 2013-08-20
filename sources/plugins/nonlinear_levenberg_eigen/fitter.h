@@ -18,21 +18,17 @@
 class nonlinear_fitter_eigen: public fitter
 {
 	public: // methods
-	
+
 		nonlinear_fitter_eigen() ;
 		virtual ~nonlinear_fitter_eigen() ;
-			
+
 		// Fitting a data object
 		//
-        virtual bool fit_data(const data* d, function* fit, const arguments& args) ;
+		virtual bool fit_data(const data* d, function* fit, const arguments& args) ;
 
 		// Provide user parameters to the fitter
 		//
 		virtual void set_parameters(const arguments& args) ;
-
-		// Unsable stuff
-		virtual data*     provide_data() const ;
-		virtual function* provide_function() const ;
 
 	protected: // function
 

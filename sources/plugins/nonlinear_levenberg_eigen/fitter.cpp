@@ -178,7 +178,3 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 void nonlinear_fitter_eigen::set_parameters(const arguments& args)
 {
 }
-		
-data*     nonlinear_fitter_eigen::provide_data() const { return NULL; }
-function* nonlinear_fitter_eigen::provide_function() const { return NULL; }
-
