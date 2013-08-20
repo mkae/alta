@@ -287,6 +287,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
     }
 
 #ifdef USING_STATIC
+/*
 	 std::string file;
 	 if(n[0] == '.')
 	 {
@@ -300,7 +301,8 @@ fitter* plugins_manager::get_fitter(const std::string& n)
     QString path = QDir::currentPath() + QString(file.c_str()) ;
     
 	 FitterPrototype myFitter = open_library<FitterPrototype>(path.toStdString(), "provide_fitter");
-
+*/
+	 FitterPrototype myFitter = open_library<FitterPrototype>(n, "provide_fitter");
     if(myFitter != NULL)
     {
 #ifdef DEBUG
