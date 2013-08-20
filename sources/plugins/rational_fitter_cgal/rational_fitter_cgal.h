@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/rational_function.h>
 #include <core/data.h>
@@ -14,7 +13,7 @@
 #include <core/args.h>
 
 
-class rational_fitter_cgal : public QObject, public fitter
+class rational_fitter_cgal : public fitter
 {
 	public: // methods
 	
@@ -28,11 +27,6 @@ class rational_fitter_cgal : public QObject, public fitter
 		// Provide user parameters to the fitter
 		//
 		virtual void set_parameters(const arguments& args) ;
-
-		// Obtain associated data and functions
-		//
-		virtual data*     provide_data() const ;
-		virtual function* provide_function() const ;
 
 	protected: // data
 

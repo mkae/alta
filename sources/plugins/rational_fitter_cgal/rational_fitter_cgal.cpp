@@ -25,17 +25,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
     return new rational_fitter_cgal();
 }
 
-data* rational_fitter_cgal::provide_data() const
-{
-	return new vertical_segment() ;
-}
-
-function* rational_fitter_cgal::provide_function() const 
-{
-	return new rational_function() ;
-}
-
-rational_fitter_cgal::rational_fitter_cgal() : QObject()
+rational_fitter_cgal::rational_fitter_cgal()
 {
 }
 rational_fitter_cgal::~rational_fitter_cgal() 
@@ -333,5 +323,3 @@ bool rational_fitter_cgal::fit_data(const vertical_segment* d, int np, int nq, i
 		return false; 
 	}
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_cgal, rational_fitter_cgal)
