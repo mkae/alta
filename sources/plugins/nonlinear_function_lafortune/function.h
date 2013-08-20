@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/rational_function.h>
 #include <core/data.h>
@@ -24,11 +23,8 @@
  *  version where the M matrix is diagonal of coefficients \f$(Cx, Cy, Cz)\f$
  *  \todo Fitting the diffuse part is not stable
  */
-class lafortune_function : public nonlinear_function, public QObject
+class lafortune_function : public nonlinear_function
 {
-
-	//    Q_OBJECT
-	Q_INTERFACES(function)
 
 	public: // methods
 

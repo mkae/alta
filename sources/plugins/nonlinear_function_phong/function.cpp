@@ -221,5 +221,3 @@ void phong_function::save_brdfexplorer(const std::string& filename,
     file.close();
 }
 
-
-Q_EXPORT_PLUGIN2(phong_function, phong_function)

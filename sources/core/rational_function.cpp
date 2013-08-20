@@ -516,12 +516,15 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 		file << "\tp(" << j+1 << ",:) = ";
 		for(unsigned int i=0; i<np; ++i)
 		{
-			if(i > 0 && a[np*j + i] >= 0.0)
+			if(i > 0 && a[i] >= 0.0)
+			{
 				file << " + ";
-			else if(a[np*j + i] < 0.0)
+			}
+			else if(a[i] < 0.0)
+			{
 				file << " " ;
-
-			file << a[np*j + i];
+			}
+			file << a[i];
 
 			std::vector<int> degree = rf->index2degree(i);
 			for(unsigned int k=0; k<degree.size(); ++k)
@@ -536,12 +539,15 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 		file << "\tq(" << j+1 << ",:) = ";
 		for(unsigned int i=0; i<nq; ++i)
 		{
-			if(i > 0 && b[np*j + i] >= 0.0)
+			if(i > 0 && b[i] >= 0.0)
+			{
 				file << " + ";
-			else if(b[np*j + i] < 0.0)
+			}
+			else if(b[i] < 0.0)
+			{
 				file << " " ;
-
-			file << b[np*j + i] ;
+			}
+			file << b[i] ;
 
 			std::vector<int> degree = rf->index2degree(i);
 			for(unsigned int k=0; k<degree.size(); ++k)
@@ -625,11 +631,15 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 		file << "\tp = ";
 		for(unsigned int i=0; i<np; ++i)
 		{
-			if(i > 0 && a[np*j + i] >= 0.0)
+			if(i > 0 && a[i] >= 0.0)
 			{
 				file << " + ";
 			}
-			file << a[np*j + i];
+			else if(a[i] < 0.0)
+			{
+				file << " " ;
+			}
+			file << a[i];
 
 			std::vector<int> degree = rf->index2degree(i);
 			for(unsigned int k=0; k<degree.size(); ++k)
@@ -643,12 +653,15 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 		file << "\tq = ";
 		for(unsigned int i=0; i<nq; ++i)
 		{
-			if(i > 0 && b[np*j + i] >= 0.0)
+			if(i > 0 && b[i] >= 0.0)
+			{
 				file << " + ";
-			else if(b[np*j + i] < 0.0)
+			}
+			else if(b[i] < 0.0)
+			{
 				file << " " ;
-
-			file << b[np*j + i] ;
+			}
+			file << b[i] ;
 
 			std::vector<int> degree = rf->index2degree(i);
 			for(unsigned int k=0; k<degree.size(); ++k)

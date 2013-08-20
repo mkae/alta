@@ -413,5 +413,3 @@ ALTA_DLL_EXPORT data* provide_data()
 }
 
 
-Q_EXPORT_PLUGIN2(data_merl, data_merl)
-

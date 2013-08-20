@@ -1,16 +1,11 @@
 #pragma once
 
-#include <QObject>
-
 #include <core/data.h>
 #include <core/common.h>
 #include <core/args.h>
 
-class data_merl : public QObject, public data
+class data_merl : public data
 {
-//	Q_OBJECT
-	Q_INTERFACES(data)
-
 	public: // methods
 
         data_merl();

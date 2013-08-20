@@ -529,4 +529,3 @@ void lafortune_function::save_brdfexplorer(const std::string& filename,
 }
 
 
-Q_EXPORT_PLUGIN2(lafortune_function, lafortune_function)

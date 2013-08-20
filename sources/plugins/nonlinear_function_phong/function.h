@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/rational_function.h>
 #include <core/data.h>
@@ -21,11 +20,8 @@
  *  A phong lobe is defined as \f$k_d + k_s |N.H|^a\f$
  *  \todo Finish implementation
  */
-class phong_function : public nonlinear_function, public QObject
+class phong_function : public nonlinear_function
 {
-
-//    Q_OBJECT
-    Q_INTERFACES(function)
 
     public: // methods
 
