@@ -71,7 +71,7 @@ bool rational_fitter_dca::fit_data(const data* dat, function* fit, const argumen
 		int sec  = (msec / 1000) % 60 ;
 		int min  = (msec / 60000) % 60 ;
 		int hour = (msec / 3600000) ;
-        std::cout << "<<INFO>> got a fit using np = " << r->getP().size() << " & nq =  " << r->getQ().size() << "      " << std::endl ;
+        std::cout << "<<INFO>> got a fit" << std::endl;
 		std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
 
 		return true ;
@@ -113,8 +113,9 @@ void rational_fitter_dca::bootstrap(const data* d, int& np, int& nq, rational_fu
 	if(args.is_defined("bootstrap"))
 	{
 		fit->load(args["bootstrap"]);
-        np = fit->getP().size();
-        nq = fit->getQ().size();
+        rational_function_1d* rf = fit->get(0);
+        np = rf->getP().size();
+        nq = rf->getQ().size();
 	}
 	else
 	{
@@ -130,7 +131,12 @@ void rational_fitter_dca::bootstrap(const data* d, int& np, int& nq, rational_fu
 
 		q[0] = 1.0;
         p[1] = 0.0;
-		fit->update(p, q);
+
+        for(int y=0; y<d->dimY(); ++y)
+        {
+            rational_function_1d* rf = fit->get(y);
+            rf->update(p, q);
+        }
 	}
 
 	delta = distance(fit, d);
@@ -246,11 +252,12 @@ bool rational_fitter_dca::fit_data(const data* d, rational_function* r, const ar
 				// Filling the p part
 				if(j<np)
 				{
-					const double pi = r->p(xi, j) ;
-
-					// Updating Eigen matrix
+                    // Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
+                        rational_function_1d* rf = r->get(y);
+                        const double pi = rf->p(xi, j) ;
+
 						CI(2*(nY*i + y)+0, nY*j + y) =  pi ;
 						CI(2*(nY*i + y)+1, nY*j + y) = -pi ;
 						CI(2*M*nY + 2*(nY*i+y) + 0, nY*j+y) = -pi ;
@@ -259,12 +266,13 @@ bool rational_fitter_dca::fit_data(const data* d, rational_function* r, const ar
 				}
 				// Filling the q part
 				else if(j<np+nq)
-				{
-					const double qi = r->q(xi, j-np) ;
-
+                {
 					// Updating Eigen matrix
 					for(int y=0; y<nY; ++y)
 					{
+                        rational_function_1d* rf = r->get(y);
+                        const double qi = rf->q(xi, j-np) ;
+
 						CI(2*(nY*i + y)+0, nY*j + y) = -(delta_k+xi[d->dimX()+y]) * qi ;
 						CI(2*(nY*i + y)+1, nY*j + y) = -(delta_k-xi[d->dimX()+y]) * qi ;
 						CI(2*M*nY + 2*(nY*i+y) + 0, nY*j + y) = 0.0 ;
@@ -274,9 +282,11 @@ bool rational_fitter_dca::fit_data(const data* d, rational_function* r, const ar
 				else
 				{
 					// Last column of the constraint matrix
-					vec qk = r->q(xi) ;
 					for(int y=0; y<nY; ++y)
 					{
+                        rational_function_1d* rf = r->get(y);
+                        vec qk = rf->q(xi) ;
+
 						CI(2*(nY*i + y)+0, nY*j + y) = -qk[y] ;
 						CI(2*(nY*i + y)+1, nY*j + y) = -qk[y] ;
 						CI(2*M*nY + 2*(nY*i+y) + 0, nY*j + y) = 0.0 ;
@@ -333,8 +343,8 @@ bool rational_fitter_dca::fit_data(const data* d, rational_function* r, const ar
 			}
 		}
 		
-		std::vector<double> tempP = r->getP();
-		std::vector<double> tempQ = r->getQ();
+        std::vector<double> tempP = rf->getP();
+        std::vector<double> tempQ = rf->getQ();
 
 		r->update(a, b) ;
 #ifdef DEBUG

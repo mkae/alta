@@ -114,52 +114,21 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
+bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r)
 {
-
-	// Multidimensional coefficients
-	/*
-	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
-	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
-	*/
+    // For each output dimension (color channel for BRDFs) perform
+    // a separate fit on the y-1D rational function.
 	for(int j=0; j<d->dimY(); ++j)
 	{
-#ifdef NEW
 		rational_function_1d* rs = r->get(j);
 		rs->resize(np, nq);
 
 		if(!fit_data(d, np, nq, j, rs))
+        {
 			return false ;
-
-#ifndef DEBUG_MULTIDIMENSIONAL
-		std::stringstream filename;
-		filename << "/tmp/fit_channel" << j << ".gnuplot" ;
-		std::ofstream file(filename.str().c_str(), std::ios_base::trunc);
-		for(int i=0; i<d->size(); ++i)
-		{
-			vec v = d->get(i) ;
-			//				vec y1(d->dimY()) ;
-			//				for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
-
-			vec y2 = rs->value(v) ;
-			for(int u=0; u<d->dimX(); ++u)
-				file << v[u] << "\t" ;
-
-			file << y2[0] << "\t" ;
-
-			file << std::endl ;
-		}
-		file.close();
-#endif
-
-		/*
-		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
-		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-		*/
-#endif
+        }
     }
 
-	//r->update(Pn, Qn) ;
 	return true ;
 }
 
@@ -167,11 +136,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-#ifdef NEW
 bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function_1d* r) 
-#else
-bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* r)
-#endif
 {
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
 	if(r == NULL || d == NULL)
@@ -373,4 +338,4 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	}
 }
 
-Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)
+//Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)

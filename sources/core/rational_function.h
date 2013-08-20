@@ -15,7 +15,7 @@
 
 
 //! \todo template this
-#ifdef NEW
+#ifndef NEW
 class rational_function_1d : public function
 {
 	public: // methods
@@ -57,15 +57,16 @@ class rational_function_1d : public function
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out, const rational_function_1d& r) ;
 
+
+        //! Convert a 1D index into a vector of degree for a
+        //! multinomial coeffcient. The resulting vector v should
+        //! be used as prod_k x[k]^v[k] for the monomial basis
+        std::vector<int> index2degree(int i) const ;
+
 	protected: // functions
-		
-      //! Convert a 1D index into a vector of degree for a
-      //! multinomial coeffcient. The resulting vector v should
-      //! be used as prod_k x[k]^v[k] for the monomial basis
-		std::vector<int> index2degree(int i) const ;
       
 		static int estimate_dk(int k, int d);
-      static void populate(std::vector<int>& vec, int N, int M, int j);
+        static void populate(std::vector<int>& vec, int N, int M, int j);
 
 		
 	protected: // data
@@ -75,22 +76,20 @@ class rational_function_1d : public function
 		std::vector<double> a ;
 		std::vector<double> b ;
 } ;
-
+/*
 // Prior definition for the standard output declaration
 template<class RF1D> class rational_function_t ;
 template<class RF1D> std::ostream& operator<< (std::ostream& out, rational_function_t<RF1D>& r) ;
+*/
 
-template<class RF1D> class rational_function_t : public QObject, public function
+/*template<class RF1D>*/ class rational_function : public function
 {
-	Q_OBJECT
-	Q_INTERFACES(function)
-
 	public: // methods
 
-        rational_function_t() ;
-      rational_function_t(int np, int nq) ;
-        rational_function_t(const std::vector<double>& a, const std::vector<double>& b) ;
-        virtual ~rational_function_t() ;
+        rational_function() ;
+      rational_function(int np, int nq) ;
+        rational_function(const std::vector<double>& a, const std::vector<double>& b) ;
+        virtual ~rational_function() ;
 
 		// Overload the function operator
 		virtual vec value(const vec& x) const ;
@@ -100,14 +99,15 @@ template<class RF1D> class rational_function_t : public QObject, public function
 		virtual void load(const std::string& filename) ;
 	
 		// Update the function
-        virtual void update(int i, RF1D* r) ;
+        virtual void update(int i, rational_function_1d* r) ;
 
 		//! Get the 1D function associated with color channel i. If no one exist, this
 		//! function allocates a new element. If i > nY, it returns NULL.
-        virtual RF1D* get(int i) ;
+        virtual rational_function_1d* get(int i) ;
+        virtual rational_function_1d* get(int i) const ;
 
         // STL stream ouput
-        friend std::ostream& operator<< <> (std::ostream& out, rational_function_t<RF1D>& r) ;
+        friend std::ostream& operator<<(std::ostream& out, rational_function& r) ;
 
       //! \brief Output the rational function as a gnuplot file. It requires
       //! the data object to output the function at the input location only.
@@ -136,7 +136,7 @@ template<class RF1D> class rational_function_t : public QObject, public function
 
 		// Store the y \in R rational functions. Each channel is a distinct polynomial
 		// and should be fitted separately.
-        std::vector<RF1D*> rs ;
+        std::vector<rational_function_1d*> rs ;
 
 		// Size of the polynomials
 		//! \todo Change it by a more adaptive scheme, with different np, nq per color 
@@ -145,15 +145,15 @@ template<class RF1D> class rational_function_t : public QObject, public function
 } ;
 
 #include "rational_function.inl"
-
+/*
 typedef rational_function_t<rational_function_1d> rational_function;
-
+*/
 #else
-class rational_function : public QObject, public function
-{
+class rational_function : /*public QObject,*/ public function
+{/*
 	Q_OBJECT
 	Q_INTERFACES(function)
-
+*/
 	public: // methods
 
 		rational_function() ;

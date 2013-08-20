@@ -62,7 +62,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
 
     int k = 1;
-    for(int i=_min_np; i<=_max_np; i+=rational_function::estimate_dk(k++, d->dimX()))
+    for(int i=_min_np; i<=_max_np; ++i)
 	{
 		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
 		std::cout.flush() ;
@@ -251,39 +251,23 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
         rational_function* r, const arguments &args,
         vec& P, vec& Q, double& delta, double& linf_dist, double& l2_dist)
 {
-	for(int j=0; j<d->dimY(); ++j)
-	{
-		vec p(np), q(nq);
-		if(!fit_data(d, np, nq, j, r, p, q, delta))
-			return false ;
-
-		for(int i=0; i<np; ++i) { P[j*np + i] = p[i] ; }
-		for(int i=0; i<nq; ++i) { Q[j*nq + i] = q[i] ; }
-	}
-
-    rational_function* rj = dynamic_cast<rational_function*>(plugins_manager::get_function(args["func"]));
-
     rj->setDimX(d->dimX()) ;
     rj->setDimY(d->dimY()) ;
     rj->setMin(d->min()) ;
     rj->setMax(d->max()) ;
-    rj->update(P, Q);
 
-    linf_dist = 0.0;
-	l2_dist   = 0.0;
-    for(int i=0; i<d->size(); ++i)
-    {
-        vec dat = d->get(i);
-        vec y(d->dimY());
-        for(int j=0; j<d->dimY(); ++j)
-            y[j] = dat[d->dimX()+j];
+	for(int j=0; j<d->dimY(); ++j)
+	{
+		vec p(np), q(nq);
+        rational_function_1d* rf = r->get(j);
+        if(!fit_data(d, np, nq, j, rf, p, q, delta))
+			return false ;
 
-        linf_dist = std::max<double>(linf_dist, std::abs<double>(norm(y-rj->value(dat))));
-        l2_dist  += std::pow(norm(y-rj->value(dat)), 2);
+        rf->update(p, q);
     }
-    l2_dist = std::sqrt(l2_dist / d->size());
 
-    delete rj;
+    linf_dist = r->Linf_distance(d);
+    l2_dist   = r->L2_distance(d);
 
 	return true ;
 }
@@ -293,7 +277,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
-		rational_function* r,
+        rational_function_1d* r,
         vec& p, vec& q, double& delta)
 {
 	const int m = d->size(); // 2*m = number of constraints

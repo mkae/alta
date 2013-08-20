@@ -41,7 +41,7 @@ class rational_fitter_leastsquare : public QObject, public fitter
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
 		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* fit) ;
+        virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function_1d* fit) ;
 
 	protected: // data
 

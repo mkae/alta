@@ -25,6 +25,22 @@ rational_function_chebychev::rational_function_chebychev(const std::vector<doubl
 rational_function_chebychev::~rational_function_chebychev()
 {
 }
+
+
+rational_function_chebychev_1d::rational_function_chebychev_1d()
+{
+}
+
+rational_function_chebychev_1d::rational_function_chebychev_1d(int np, int nq) :
+    rational_function_1d(np, nq)
+{
+}
+
+rational_function_chebychev_1d::rational_function_chebychev_1d(const std::vector<double>& a,
+                                                               const std::vector<double>& b) :
+    rational_function_1d(a, b)
+{
+}
 		
 
 double chebychev(double x, int i)
@@ -48,7 +64,7 @@ double chebychev(double x, int i)
 }
 
 // Get the p_i and q_j function
-double rational_function_chebychev::p(const vec& x, int i) const
+double rational_function_chebychev_1d::p(const vec& x, int i) const
 {
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0;
@@ -60,7 +76,7 @@ double rational_function_chebychev::p(const vec& x, int i) const
 
 	return res ;
 }
-double rational_function_chebychev::q(const vec& x, int i) const 
+double rational_function_chebychev_1d::q(const vec& x, int i) const
 {
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0; 
@@ -76,9 +92,6 @@ double rational_function_chebychev::q(const vec& x, int i) const
 //! \todo it should handle parametrization
 void rational_function_chebychev::save_matlab(const std::string& filename, const arguments& args) const
 {
-    unsigned int np = a.size() / _nY ;
-    unsigned int nq = b.size() / _nY ;
-
     std::ofstream file(filename.c_str(), std::ios_base::trunc);
 
 
@@ -109,6 +122,13 @@ void rational_function_chebychev::save_matlab(const std::string& filename, const
     // Export each color channel independantly
     for(int j=0; j<dimY(); ++j)
     {
+        rational_function_1d* rf = get(j);
+        std::vector<double> a = rf->getP();
+        std::vector<double> b = rf->getQ();
+
+        const unsigned int np = a.size();
+        const unsigned int nq = b.size();
+
         // Export the numerator of the jth color channel
         file << "\tp(" << j+1 << ",:) = ";
         for(unsigned int i=0; i<np; ++i)
@@ -120,7 +140,7 @@ void rational_function_chebychev::save_matlab(const std::string& filename, const
 
             file << a[np*j + i];
 
-            std::vector<int> degree = index2degree(i);
+            std::vector<int> degree = rf->index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
                file << ".*chebychevpoly(1," << degree[k] << ", 2.0*((x(" << k+1 << ",:)"
@@ -140,7 +160,7 @@ void rational_function_chebychev::save_matlab(const std::string& filename, const
 
             file << b[np*j + i] ;
 
-            std::vector<int> degree = index2degree(i);
+            std::vector<int> degree = rf->index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
                file << ".*chebychevpoly(1," << degree[k] << ", 2.0*((x(" << k+1 << ",:)"
@@ -165,9 +185,6 @@ void rational_function_chebychev::save_matlab(const std::string& filename, const
 //! \todo it should handle parametrization
 void rational_function_chebychev::save_cpp(const std::string& filename, const arguments& args) const
 {
-    unsigned int np = a.size() / _nY ;
-    unsigned int nq = b.size() / _nY ;
-
     std::ofstream file(filename.c_str(), std::ios_base::trunc);
 
     file << "double s[" << dimX() << "] = {";
@@ -206,6 +223,13 @@ void rational_function_chebychev::save_cpp(const std::string& filename, const ar
     // Export each color channel independantly
     for(int j=0; j<dimY(); ++j)
     {
+        rational_function_1d* rf = get(j);
+        std::vector<double> a = rf->getP();
+        std::vector<double> b = rf->getQ();
+
+        const unsigned int np = a.size();
+        const unsigned int nq = b.size();
+
         // Export the numerator of the jth color channel
         file << "\tp = ";
         for(unsigned int i=0; i<np; ++i)
@@ -216,7 +240,7 @@ void rational_function_chebychev::save_cpp(const std::string& filename, const ar
             }
             file << a[np*j + i];
 
-            std::vector<int> degree = index2degree(i);
+            std::vector<int> degree = rf->index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
                 file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
@@ -235,7 +259,7 @@ void rational_function_chebychev::save_cpp(const std::string& filename, const ar
 
             file << b[np*j + i] ;
 
-            std::vector<int> degree = index2degree(i);
+            std::vector<int> degree = rf->index2degree(i);
             for(unsigned int k=0; k<degree.size(); ++k)
             {
                 file << "*l(2.0*((x\[" << k << "\]-c[" << k << "])*s[" << k << "] - 0.5), " << degree[k] << ")" ;
@@ -260,17 +284,22 @@ void rational_function_chebychev::save(const std::string& filename) const
 {
     std::ofstream file(filename.c_str(), std::ios_base::trunc);
     file << "#DIM " << _nX << " " << _nY << std::endl ;
-    file << "#NP " << a.size() / _nY << std::endl ;
-    file << "#NQ " << b.size() / _nY << std::endl ;
+    file << "#NP " << np << std::endl ;
+    file << "#NQ " << nq << std::endl ;
     file << "#BASIS CHEBYCHEV" << std::endl ;
 
-    unsigned int np = a.size() / _nY ;
-    unsigned int nq = b.size() / _nY ;
     for(int k=0; k<_nY; ++k)
     {
+        rational_function_1d* rf = get(k);
+        std::vector<double> a = rf->getP();
+        std::vector<double> b = rf->getQ();
+
+        const unsigned int np = a.size();
+        const unsigned int nq = b.size();
+
         for(unsigned int i=0; i<np; ++i)
         {
-            std::vector<int> index = index2degree(i) ;
+            std::vector<int> index = rf->index2degree(i) ;
             for(unsigned int j=0; j<index.size(); ++j)
             {
                 file << index[j] << "\t" ;
@@ -280,7 +309,7 @@ void rational_function_chebychev::save(const std::string& filename) const
 
         for(unsigned int i=0; i<nq; ++i)
         {
-            std::vector<int> index = index2degree(i) ;
+            std::vector<int> index = rf->index2degree(i) ;
             for(unsigned int j=0; j<index.size(); ++j)
             {
                 file << index[j] << "\t" ;
@@ -293,4 +322,4 @@ void rational_function_chebychev::save(const std::string& filename) const
 
 
 
-Q_EXPORT_PLUGIN2(rational_function_chebychev, rational_function_chebychev)
+//Q_EXPORT_PLUGIN2(rational_function_chebychev, rational_function_chebychev)

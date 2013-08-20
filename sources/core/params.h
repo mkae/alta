@@ -288,7 +288,7 @@ class parametrized
 			{
 				return;
 			}
-			else if(_out_param == params::UNKNOWN_INPUT)
+            else if(_out_param == params::UNKNOWN_OUTPUT)
 			{
 				_out_param = new_param;
 			}
