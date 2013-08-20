@@ -109,7 +109,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
     const data* _d;
 };
 
-nonlinear_fitter_eigen::nonlinear_fitter_eigen() : QObject()
+nonlinear_fitter_eigen::nonlinear_fitter_eigen() 
 {
 }
 nonlinear_fitter_eigen::~nonlinear_fitter_eigen() 
@@ -182,4 +182,3 @@ void nonlinear_fitter_eigen::set_parameters(const arguments& args)
 data*     nonlinear_fitter_eigen::provide_data() const { return NULL; }
 function* nonlinear_fitter_eigen::provide_function() const { return NULL; }
 
-Q_EXPORT_PLUGIN2(nonlinear_fitter_eigen, nonlinear_fitter_eigen)

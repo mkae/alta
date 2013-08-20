@@ -106,6 +106,13 @@ class plugins_manager
 
 	private: //data
 
+		// Object provider prototypes
+		typedef function* (*FunctionPrototype)();
+		typedef fitter*   (*FitterPrototype)();
+		typedef data*     (*DataPrototype)();
+
+		// Map associating a filename to a provider. This is used to store a list of
+		// accessible provider to make automatic type testing.
 		std::map<std::string, function*> _functions ;
 		std::map<std::string, data*>     _datas ;
 		std::map<std::string, fitter*>   _fitters ;

@@ -29,7 +29,7 @@ function* rational_fitter_eigen::provide_function() const
 	return new rational_function() ;
 }
 
-rational_fitter_eigen::rational_fitter_eigen() : QObject()
+rational_fitter_eigen::rational_fitter_eigen() 
 {
 }
 rational_fitter_eigen::~rational_fitter_eigen() 
@@ -193,5 +193,3 @@ bool rational_fitter_eigen::fit_data(const vertical_segment* d, int np, int nq, 
 	}
 
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_eigen, rational_fitter_eigen)

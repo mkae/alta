@@ -34,7 +34,7 @@ function* rational_fitter_quadprog::provide_function() const
 	return new rational_function() ;
 }
 
-rational_fitter_quadprog::rational_fitter_quadprog() : QObject(), _boundary(1.0)
+rational_fitter_quadprog::rational_fitter_quadprog() : _boundary(1.0)
 {
 }
 rational_fitter_quadprog::~rational_fitter_quadprog() 
@@ -337,5 +337,3 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 		return false; 
 	}
 }
-
-//Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)

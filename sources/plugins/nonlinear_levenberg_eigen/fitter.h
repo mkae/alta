@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/data.h>
 #include <core/fitter.h>
@@ -16,11 +15,8 @@
  *  Levenberg-Marquardt solver.
  *  \ingroup plugins
  */
-class nonlinear_fitter_eigen: public QObject, public fitter
+class nonlinear_fitter_eigen: public fitter
 {
-	Q_OBJECT
-	Q_INTERFACES(fitter)
-
 	public: // methods
 	
 		nonlinear_fitter_eigen() ;

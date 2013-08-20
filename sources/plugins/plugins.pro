@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS  = \
 				rational_fitter_cgal          \
-  			rational_fitter_quadprog      \
+				rational_fitter_quadprog      \
 #				rational_fitter_parallel      \
 				rational_fitter_eigen         \
 				rational_fitter_leastsquare   \

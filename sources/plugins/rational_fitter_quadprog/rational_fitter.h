@@ -16,11 +16,8 @@
 /*! \brief A rational fitter using the library QuadProg++
  *  You can find the library here: http://quadprog.sourceforge.net/
  */
-class rational_fitter_quadprog : public QObject, public fitter
+class rational_fitter_quadprog : public fitter
 {
-	Q_OBJECT
-	Q_INTERFACES(fitter)
-
 	public: // methods
 	
 		rational_fitter_quadprog() ;

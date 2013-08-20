@@ -16,9 +16,6 @@
 
 class rational_fitter_cgal : public QObject, public fitter
 {
-	Q_OBJECT
-	Q_INTERFACES(fitter)
-
 	public: // methods
 	
 		rational_fitter_cgal() ;

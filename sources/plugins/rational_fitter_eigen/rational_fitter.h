@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/data.h>
 #include <core/fitter.h>
@@ -13,10 +12,8 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
-class rational_fitter_eigen : public QObject, public fitter
+class rational_fitter_eigen : public fitter
 {
-	Q_OBJECT
-	Q_INTERFACES(fitter)
 
 	public: // methods
 	

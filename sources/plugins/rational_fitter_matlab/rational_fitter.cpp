@@ -14,22 +14,12 @@
 
 #define BUFFER_SIZE 10000
 
-data* rational_fitter_matlab::provide_data() const
-{
-	return new vertical_segment() ;
-}
-
-function* rational_fitter_matlab::provide_function() const 
-{
-	return new rational_function() ;
-}
-
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
 	return new rational_fitter_matlab();
 }
 
-rational_fitter_matlab::rational_fitter_matlab() : QObject()
+rational_fitter_matlab::rational_fitter_matlab() 
 {
 }
 rational_fitter_matlab::~rational_fitter_matlab() 
@@ -360,5 +350,3 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		return false ;
 	}
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_matlab, rational_fitter_matlab)

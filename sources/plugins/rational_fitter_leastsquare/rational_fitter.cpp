@@ -29,7 +29,7 @@ function* rational_fitter_leastsquare::provide_function() const
 	return new rational_function() ;
 }
 
-rational_fitter_leastsquare::rational_fitter_leastsquare() : QObject()
+rational_fitter_leastsquare::rational_fitter_leastsquare() 
 {
 }
 rational_fitter_leastsquare::~rational_fitter_leastsquare() 
@@ -229,5 +229,3 @@ bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, in
   return true;
 
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_leastsquare, rational_fitter_leastsquare)
