@@ -18,7 +18,14 @@
  *  \details
  *  A isotropic_lafortune lobe is defined as \f$k_d + (L^T M V)^n\f$. We fit the restricted
  *  version where the M matrix is diagonal of coefficients \f$(Cx, Cy, Cz)\f$
- *  \todo Fitting the diffuse part is not stable
+ *
+ *  Options: the <em>bootstrap</em> function will read the arguments to set the first value 
+ *  of the function. By default, each lobe is defined as a forward lobe [-1,-1,1] using the 
+ *  number of the lobe as the exponent.
+ *
+ *  Another initialization method <em>--booststrap</em> will put either a forward lobe, 
+ *  a retro-reflective lobe [1,1,1] or the dot product [0,0,1]. The exponent will also 
+ *  be the number of the lobe.
  */
 class isotropic_lafortune_function : public nonlinear_function
 {
@@ -36,6 +43,8 @@ class isotropic_lafortune_function : public nonlinear_function
 		virtual void load(const std::string& filename) ;
 
 		//! \brief Boostrap the function by defining the diffuse term
+		//!
+		//! \details
 		virtual void bootstrap(const data* d, const arguments& args);
 
 		//! \brief Number of parameters to this non-linear function
