@@ -107,6 +107,20 @@ int main(int argc, char** argv)
 			f << x << "\t" << z << std::endl ;
 		}
 	}
+	else if(k == K++)
+	{
+		f << "#DIM 1 3" << std::endl ;
+		f << "#PARAM_IN COS_TH" << std::endl;
+		for(int i=0; i<nbx; ++i)
+		{
+			const double x = i / (float)nbx ;
+			const double z1 = 0.1 + 0.5 * std::pow(x, 1.5) ;
+			const double z2 = 1.0 + 0.4 * std::pow(x, 1000.0) ;
+			const double z3 = 0.5 + 0.3265 * std::pow(x, 0.1) ;
+
+			f << x << "\t" << z1 << "\t" << z2 << "\t" << z3 << std::endl ;
+		}
+	}
 	// Multidimensional data
 	else if(k == K++)
 	{

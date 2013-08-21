@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 			  std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
 
 			  f->save(args["output"], args) ;
-#ifndef OLD // use brdf2gnuplot
+#ifdef OLD // use brdf2gnuplot
            size_t n = args["output"].find('.') ;
 			  std::string gnuplot_filename = args["output"].substr(0,n); 
 			  gnuplot_filename.append(".gnuplot") ;
