@@ -216,14 +216,51 @@ void isotropic_lafortune_function::bootstrap(const data* d, const arguments& arg
 	}
 	std::cout << "<<INFO>> found diffuse: " << _kd << std::endl;
 
-    // The remaining data will be equal to one
-    for(int n=0; n<_n; ++n)
-        for(int i=0; i<dimY(); ++i)
-        {
-            _C[(n*dimY() + i)*2 + 0] = 0.0;
-            _C[(n*dimY() + i)*2 + 1] = 1.0;
-            _N[n*dimY()  + i]        = (double)_n;
-        }
+	// Upon user request, the starting position of the lobe can be either load
+	// from a file, a distribution beetwen forward backward and dot directions,
+	// etc.
+	if(args.is_defined("bootstrap"))
+	{
+		for(int n=0; n<_n; ++n)
+		{
+			double Cxy, Cz;
+			int mod = n % 3;
+			if(mod == 0)
+			{
+				Cxy = -1;
+				Cz  =  1;
+			}
+			else if(mod ==1)
+			{
+				Cxy = 1;
+				Cz  = 1;
+			}
+			else
+			{
+				Cxy = 0;
+				Cz  = 1;
+			}
+
+			for(int i=0; i<dimY(); ++i)
+			{
+				_C[(n*dimY() + i)*2 + 0] = Cxy;
+				_C[(n*dimY() + i)*2 + 1] = Cz;
+				_N[n*dimY()  + i]        = (double)_n;
+			}
+		}
+	}
+	// The default behaviour of the isotropic Lafortune distribution is to
+	// set the transform to [0,0,1] and vary the exponent.
+	else
+	{
+		for(int n=0; n<_n; ++n)
+			for(int i=0; i<dimY(); ++i)
+			{
+				_C[(n*dimY() + i)*2 + 0] = 0.0;
+				_C[(n*dimY() + i)*2 + 1] = 1.0;
+				_N[n*dimY()  + i]        = (double)_n;
+			}
+	}
 }
 
 std::ofstream& type_definition(std::ofstream& out, int nY)
