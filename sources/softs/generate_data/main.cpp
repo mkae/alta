@@ -174,6 +174,10 @@ int main(int argc, char** argv)
 	// Triple lobe (0.86, 0.77, 18.6), (-0.41, 0.018, 2.58), (-1.03, 0.7, 63.8)
 	else if(k == K++)
 	{
+		const double Cx[3] = {0.86, -0.410, -1.03};
+		const double Cz[3] = {0.77,  0.018,  0.70};
+		const double n[3]  = {18.6,  2.580,  63.8};
+
 		f << "#DIM 2 1" << std::endl ;
 		f << "#PARAM_IN RUSIN_TH_TD" << std::endl;
 		for(int i=0; i<=90; ++i)
@@ -185,10 +189,6 @@ int main(int argc, char** argv)
 				in_r[1] = M_PI * 0.5 * j / (double)90 ;
 
 				params::convert(in_r, params::RUSIN_TH_TD, params::CARTESIAN, in_c);
-
-				const double Cx[3] = {0.86, -0.410, -1.03};
-				const double Cz[3] = {0.77,  0.018,  0.70};
-				const double n[3]  = {18.6,  2.580,  63.8};
 
 				double z = 0.0;
 				for(int k=0; k<3; ++k)
@@ -202,6 +202,42 @@ int main(int argc, char** argv)
 					}
 				}
 				f << in_r[0] << "\t" << in_r[1] << "\t" << z << std::endl ;
+			}
+		}
+	}
+	// Lafortune fitting
+	// Simple lobe but multiple channels
+	// [(0.86, 0.77, 18.6), (-0.41, 0.018, 2.58), (-1.03, 0.7, 63.8)]
+	else if(k == K++)
+	{
+		const double Cx[3] = {0.86, -0.410, -1.03};
+		const double Cz[3] = {0.77,  0.018,  0.70};
+		const double n[3]  = {18.6,  2.580,  63.8};
+
+		f << "#DIM 2 3" << std::endl ;
+		f << "#PARAM_IN RUSIN_TH_TD" << std::endl;
+		for(int i=0; i<=90; ++i)
+		{
+			for(int j=0; j<=90; ++j)
+			{
+				double in_r[2], in_c[6];
+				in_r[0] = M_PI * 0.5 * i / (double)90 ;
+				in_r[1] = M_PI * 0.5 * j / (double)90 ;
+
+				params::convert(in_r, params::RUSIN_TH_TD, params::CARTESIAN, in_c);
+
+				double z[3] = {0.0, 0.0, 0.0};
+				for(int k=0; k<3; ++k)
+				{
+					const double cos = Cx[k] * (in_c[0]*in_c[3] + in_c[1]*in_c[4]) + Cz[k]*in_c[2]*in_c[5];
+
+					if(cos > 0.0)
+					{
+						z[k] += std::pow(cos, n[k]) ;
+
+					}
+				}
+				f << in_r[0] << "\t" << in_r[1] << "\t" << z[0] << "\t " << z[1] << "\t" << z[2] << std::endl ;
 			}
 		}
 	}
