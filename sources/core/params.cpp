@@ -119,7 +119,8 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 
 		default:
-			throw("Transformation not implemented, params::to_cartesian");
+			std::cerr << "<<ERROR>> Transformation not implemented, " << get_name(intype) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			throw;
 			break;
 	}
 
@@ -179,9 +180,8 @@ void params::from_cartesian(const double* invec, params::input outtype,
             break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
-			outvec[1] = 0.0;
-			outvec[2] = acos(invec[5]);
-			outvec[3] = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			outvec[1] = acos(invec[5]);
+			outvec[2] = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
 			break;
 
 			// 4D Parametrization
@@ -216,7 +216,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 
 		default:
-        std::cout << "<<ERROR>> not defined input param: " << get_name(outtype) << std::endl;
+			std::cerr << "<<ERROR>> Transformation not implemented, " << get_name(outtype) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			assert(false);
 			break;
 	}

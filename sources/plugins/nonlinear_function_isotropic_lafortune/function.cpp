@@ -88,7 +88,9 @@ vec isotropic_lafortune_function::value(const vec& x, const vec& p) const
 
 			const double d = Cx*(dx + dy) + Cz*dz;
 			if(d > 0.0)
+			{
 				res[i] += pow(d, N);
+			}
 		}
 
 	}

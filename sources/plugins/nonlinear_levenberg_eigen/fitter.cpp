@@ -53,6 +53,13 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			vec _y = _di - (*_f)(_x);
 			for(int i=0; i<_f->dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
+
+			/*
+			// Cosine term. It is supposed to improve the quality of the fit (see Ngan '05).
+			vec x2(3);
+			params::convert(&_x[0], _d->input_parametrization(), params::ISOTROPIC_TV_TL_DPHI, &x2[0]);
+			y *= cos(x2[1]);
+			*/
 		}
 #ifdef DEBUG
 		std::cout << "diff vector:" << std::endl << y << std::endl << std::endl ;
@@ -76,7 +83,12 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 			// Get the associated jacobian
 			vec _jac = _f->parametersJacobian(xi);
-
+		/*	
+			// Cosine term. It is supposed to improve the quality of the fit (see Ngan '05).
+			vec x2(3);
+			params::convert(&xi[0], _d->input_parametrization(), params::ISOTROPIC_TV_TL_DPHI, &x2[0]);
+			_jac = _jac * cos(x2[1]);
+		*/
 			// Fill the columns of the matrix
 #ifdef DEBUG
 			Eigen::MatrixXd temp (_f->dimY(), _f->nbParameters());

@@ -111,6 +111,9 @@ class data_params : public data
 				data_params::clustrering method = data_params::NONE) :
 			_clustering_method(method)
 		{
+			setParametrization(new_param);
+			setParametrization(d->output_parametrization());
+
 			_nX = params::dimension(new_param);
 			_nY = d->dimY();
 
