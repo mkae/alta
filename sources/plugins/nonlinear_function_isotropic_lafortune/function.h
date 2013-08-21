@@ -97,7 +97,7 @@ class isotropic_lafortune_function : public nonlinear_function
 
 		//! \brief Provide the coefficient of the monochromatic lobe number
 		//! n for the color channel number c.
-		void getCurrentLobe(int n, int c, double& Cx, double& Cz, double& N) const 
+		inline void getCurrentLobe(int n, int c, double& Cx, double& Cz, double& N) const 
 		{
 			Cx = _C[(n*_nY + c)*2 + 0];
 			Cz = _C[(n*_nY + c)*2 + 1];

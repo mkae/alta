@@ -442,9 +442,9 @@ void isotropic_lafortune_function::save_brdfexplorer(const std::string& filename
         {
             file << "    // Lobe number " << n+1 << std::endl;
             file << "    n  = " << _N[n] << "; " << std::endl;
-            file << "    Cx = " << _C[0*_n + n] << "; " << std::endl;
-            file << "    Cy = " << _C[0*_n + n] << "; " << std::endl;
-            file << "    Cz = " << _C[1*_n + n] << "; " << std::endl;
+            file << "    Cx = " << _C[2*n + 0] << "; " << std::endl;
+            file << "    Cy = " << _C[2*n + 0] << "; " << std::endl;
+            file << "    Cz = " << _C[2*n + 1] << "; " << std::endl;
             file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
             type_definition(file, _nY) << "(0.0)), n);" << std::endl;
             file << std::endl;
