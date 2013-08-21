@@ -47,6 +47,13 @@ vec isotropic_lafortune_function::value(const vec& x) const
 				res[i] += pow(d, N);
 			}
 		}
+
+#ifndef DEBUG
+		if(isnan(res[i]) || res[i] == std::numeric_limits<double>::infinity())
+		{
+			std::cout << "<<ERROR>> invalid value for input: " << x << std::endl;
+		}
+#endif	
 	}
 
 	return res;
@@ -341,33 +348,33 @@ void isotropic_lafortune_function::load(const std::string& filename)
 	}
 
 	// Parse the lobe
-	for(int n=0; n<_n; ++n)
+	int n=0;
+	std::string line ;
+	while(n < _n)
 	{
-		// TODO find a way to discard those lines
-		while(file.peek() == '#')
-		{
-			std::string line ;
-			std::getline(file, line) ;
-		}
+		std::getline(file, line) ;
 
-//		std::cout << (char)file.peek() << std::endl;
-		for(int i=0; i<_nY; ++i)
+		if(line.size() > 1)
 		{
-			file >> _C[(n*_nY + i)*2 + 0] >> _C[(n*_nY + i)*2 + 1];
-		}
-		
-		// TODO find a way to discard those lines
-		while(file.peek() == '#')
-		{
-			std::string line ;
-			std::getline(file, line) ;
-		}
-		
-		for(int i=0; i<_nY; ++i)
-		{
-			file >> _N[i];
-		}
+			std::string sub = line.substr(0,2);
 
+			if(sub == "#C")
+			{
+				for(int i=0; i<_nY; ++i)
+				{
+					file >> _C[(n*_nY + i)*2 + 0] >> _C[(n*_nY + i)*2 + 1];
+				}
+			}
+			else if(sub == "#N")
+			{
+				for(int i=0; i<_nY; ++i)
+				{
+					file >> _N[n*_nY+i];
+				}
+
+				++n;
+			}
+		}
 	}
 	
 	std::cout << "<<INFO>> Kd = " << _kd << std::endl;
@@ -400,7 +407,7 @@ void isotropic_lafortune_function::save(const std::string& filename) const
 		file << "#N" << std::endl;
 		for(int i=0; i<_nY; ++i)
 		{
-			file << _N[i] << std::endl;
+			file << _N[n*_nY + i] << std::endl;
 		}
 		file << std::endl;
 	}
