@@ -29,7 +29,7 @@ function* rational_fitter_leastsquare::provide_function() const
 	return new rational_function() ;
 }
 
-rational_fitter_leastsquare::rational_fitter_leastsquare() : QObject()
+rational_fitter_leastsquare::rational_fitter_leastsquare() 
 {
 }
 rational_fitter_leastsquare::~rational_fitter_leastsquare() 
@@ -52,6 +52,7 @@ bool rational_fitter_leastsquare::fit_data(const data* dat, function* fit, const
 	r->setDimY(d->dimY()) ;
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
+	r->setSize(_np, _nq);
 
 	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
 
@@ -68,7 +69,6 @@ bool rational_fitter_leastsquare::fit_data(const data* dat, function* fit, const
 		int hour = (msec / 3600000) ;
 		std::cout << "<<INFO>> got a fit" << std::endl ;
 		std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
-
 		return true ;
 	}
 
@@ -87,29 +87,26 @@ void rational_fitter_leastsquare::set_parameters(const arguments& args)
 		
 bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
 {
+    // For each output dimension (color channel for BRDFs) perform
+    // a separate fit on the y-1D rational function.
+    for(int j=0; j<d->dimY(); ++j)
+    {
+        rational_function_1d* rs = r->get(j);
 
-	// Multidimensional coefficients
-	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
-	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
+        if(!fit_data(d, np, nq, j, rs))
+        {
+            return false ;
+        }
+    }
 
-	for(int j=0; j<d->dimY(); ++j)
-	{
-		if(!fit_data(d, np, nq, j, r))
-			return false ;
-
-		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
-		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-	}
-
-	r->update(Pn, Qn) ;
-	return true ;
+    return true ;
 }
 
 // dat is the data object, it contains all the points to fit
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, int nq, int ny, rational_function* r) 
+bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, int nq, int ny, rational_function_1d* r)
 {
   using namespace Eigen;
   
@@ -232,5 +229,3 @@ bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, in
   return true;
 
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_leastsquare, rational_fitter_leastsquare)

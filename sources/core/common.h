@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <algorithm>
 
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core
@@ -236,6 +237,11 @@ template<typename T> int is_in(std::vector<T> ve, T v)
     }
 
     return res;
+}
+
+template<typename T> T clamp(T x, T a, T b)
+{
+	return std::max<T>(std::min<T>(x, b), a);
 }
 
 #define NOT_IMPLEMENTED() \

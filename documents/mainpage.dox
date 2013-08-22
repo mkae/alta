@@ -7,7 +7,7 @@ formulation, etc. It is decomposed in three components:
 	<li><em>\ref core</em>: a set of classes providing interfaces to BRDFs, data type 
 	and fitting algorithms. All the code using this library should rely on this
 	part.</li>
-	<li><em>\ref plugins</em>: a set of Qt plugins providing fitting algorithms
+	<li><em>\ref plugins</em>: a set of plugins providing fitting algorithms
 	for rational BRDFs, non-linear BRDFs, etc.</li>
 	<li><em>\ref softs</em>: a set of tools to fit data, convert data, export fitting to 
 	plots, etc.</li>

@@ -1,11 +1,12 @@
 TEMPLATE = lib
 CONFIG  *= static  \
-           qt      \
            console
 
 DESTDIR  = ../build
 
-QMAKE_CXXFLAGS += -std=c++0x
+unix{
+	QMAKE_CXXFLAGS += -std=c++0x -m64
+}
 
 HEADERS  = args.h               \
            common.h             \
@@ -20,7 +21,7 @@ HEADERS  = args.h               \
 
 SOURCES  = plugins_manager.cpp   \
            vertical_segment.cpp  \
-		   rational_function.cpp \
-		   params.cpp			 \
+		     rational_function.cpp \
+		     params.cpp			   \
            function.cpp          \
 #          clustering.cpp

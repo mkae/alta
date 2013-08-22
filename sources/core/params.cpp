@@ -91,6 +91,9 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 		case params::RUSIN_TH_TD_PD:
 			half_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
+#ifdef DEBUG
+			std::cout << outvec[2] << std::endl;
+#endif
 			break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			classical_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
@@ -116,7 +119,8 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 
 		default:
-			throw("Transformation not implemented, params::to_cartesian");
+			std::cerr << "<<ERROR>> Transformation not implemented, " << get_name(intype) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			throw;
 			break;
 	}
 
@@ -148,24 +152,36 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			// 2D Parametrizations
 		case params::COS_TH_TD:
 			outvec[0] = half[2];
-			outvec[1] = half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2];
+			outvec[1] = half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2];
 			break;
 		case params::RUSIN_TH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
+			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
 
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
 			outvec[0] = acos(half[2]);
 			outvec[1] = atan2(half[0], half[1]);
-			outvec[2] = acos(half[0]*outvec[0] + half[1]*outvec[1] + half[2]*outvec[2]);
+			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
+        case params::RUSIN_TH_TD_PD:
+            outvec[0] = acos(half[2]);
+
+            // Compute the diff vector
+            diff[0] = invec[0];
+            diff[1] = invec[1];
+            diff[2] = invec[2];
+            rotate_normal(diff, -outvec[1]);
+            rotate_binormal(diff, -outvec[0]);
+
+            outvec[1] = acos(diff[2]);
+            outvec[2] = atan2(diff[0], diff[1]);
+            break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
-			outvec[1] = 0.0;
-			outvec[2] = acos(invec[5]);
-			outvec[3] = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			outvec[1] = acos(invec[5]);
+			outvec[2] = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
 			break;
 
 			// 4D Parametrization
@@ -189,6 +205,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[1] = atan2(invec[0], invec[1]);
 			outvec[2] = acos(invec[5]);
 			outvec[3] = atan2(invec[3], invec[4]);
+#ifdef DEBUG
+			std::cout << invec[2] << " - acos -> " << outvec[0] << std::endl;
+#endif
 			break;
 
 			// 6D Parametrization
@@ -197,6 +216,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 
 		default:
+			std::cerr << "<<ERROR>> Transformation not implemented, " << get_name(outtype) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			assert(false);
 			break;
 	}

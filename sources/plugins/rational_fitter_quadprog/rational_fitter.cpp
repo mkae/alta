@@ -24,17 +24,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 	return new rational_fitter_quadprog();
 }
 
-data* rational_fitter_quadprog::provide_data() const
-{
-	return new vertical_segment() ;
-}
-
-function* rational_fitter_quadprog::provide_function() const 
-{
-	return new rational_function() ;
-}
-
-rational_fitter_quadprog::rational_fitter_quadprog() : QObject(), _boundary(1.0)
+rational_fitter_quadprog::rational_fitter_quadprog() : _boundary(1.0)
 {
 }
 rational_fitter_quadprog::~rational_fitter_quadprog() 
@@ -105,32 +95,30 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 	_max_np = args.get_float("np", 10) ;
 	_max_nq = args.get_float("nq", 10) ;
 	_min_np = args.get_float("min-np", _max_np) ;
-    _min_nq = args.get_float("min-nq", _max_nq) ;
+	_min_nq = args.get_float("min-nq", _max_nq) ;
 
-    _max_np = std::max<int>(_max_np, _min_np);
-    _max_nq = std::max<int>(_max_nq, _min_nq);
+	_max_np = std::max<int>(_max_np, _min_np);
+	_max_nq = std::max<int>(_max_nq, _min_nq);
 
-    _boundary = args.get_float("boundary-constraint", 1.0f);
+	_boundary = args.get_float("boundary-constraint", 1.0f);
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
+bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int nq, rational_function* r)
 {
-
-	// Multidimensional coefficients
-	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
-	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
-
+    // For each output dimension (color channel for BRDFs) perform
+    // a separate fit on the y-1D rational function.
 	for(int j=0; j<d->dimY(); ++j)
 	{
-		if(!fit_data(d, np, nq, j, r))
+		rational_function_1d* rs = r->get(j);
+		rs->resize(np, nq);
+
+		if(!fit_data(d, np, nq, j, rs))
+        {
 			return false ;
+        }
+    }
 
-		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
-		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-	}
-
-	r->update(Pn, Qn) ;
 	return true ;
 }
 
@@ -138,9 +126,8 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function* rf) 
+bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function_1d* r) 
 {
-	rational_function* r = dynamic_cast<rational_function*>(rf) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
 	if(r == NULL || d == NULL)
 	{
@@ -276,7 +263,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 #endif
 		return false ;
 	}
-	else if(delta == 0.0)
+    else if(delta <= 0.0)
 	{
 		delta = 1.0 ;
 	}
@@ -289,7 +276,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	{		
 		ci[i] = ci[i] * delta ; 
 #ifdef DEBUG
-		std::cout << ci[i] << "\t" ;
+        std::cout << i << "\t" << -ci[i] << std::endl ;
 #endif
 	}
 #ifdef DEBUG
@@ -340,5 +327,3 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 		return false; 
 	}
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_quadprog, rational_fitter_quadprog)

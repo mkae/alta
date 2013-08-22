@@ -39,6 +39,12 @@ data_merl::data_merl()
 {
 	const int n = BRDF_SAMPLING_RES_PHI_D/2 * BRDF_SAMPLING_RES_THETA_D * BRDF_SAMPLING_RES_THETA_H;
 	brdf = (double*) malloc (sizeof(double)*3*n);
+
+    // Set the input and output parametrization
+    _in_param  = params::RUSIN_TH_TD_PD;
+    _out_param = params::RGB_COLOR;
+    _nX = 3;
+    _nY = 3;
 }
 
 // cross product of two vectors
@@ -201,8 +207,20 @@ void lookup_brdf_val(double* brdf, double theta_in, double fi_in,
 	
 	std_coords_to_half_diff_coords(theta_in, fi_in, theta_out, fi_out,
 		       theta_half, fi_half, theta_diff, fi_diff);
+	
+#ifdef DEBUG
+	std::cout << theta_in << ", " << fi_in << ", " << theta_out << ", " << fi_out << " -> ";
+	std::cout << theta_half << ", " << theta_diff << ", " << fi_diff << std::endl;
+	std::cout << std::endl;
+#endif
 
-
+    // Testing the input domain
+	if(theta_half < 0.0 || theta_half > 0.5*M_PI || 
+	   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
+	   fi_diff > M_PI)
+	{
+		throw; //! \todo Add exception list
+	}
 	// Find index.
 	// Note that phi_half is ignored, since isotropic BRDFs are assumed
 	int ind = phi_diff_index(fi_diff) +
@@ -214,10 +232,10 @@ void lookup_brdf_val(double* brdf, double theta_in, double fi_in,
 	green_val = brdf[ind + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 	blue_val = brdf[ind + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
 
-	
+#ifdef DEBUG
 	if (red_val < 0.0 || green_val < 0.0 || blue_val < 0.0)
-		fprintf(stderr, "Below horizon.\n");
-
+        fprintf(stderr, "Negative value [%f, %f, %f].\n", theta_half, theta_diff, fi_diff);
+#endif
 }
 
 // Read BRDF data
@@ -335,6 +353,24 @@ vec data_merl::value(vec in, vec out) const
 	res[2] = b;
 	return res;
 }
+vec data_merl::value(vec in) const
+{
+    double r, g, b;
+
+    double t_in[4];
+    params::convert(&in[0], params::RUSIN_TH_TD_PD, params::SPHERICAL_TL_PL_TV_PV, &t_in[0]);
+#ifdef DEBUG
+	std::cout << "[" << in[0] << ", " << in[1] << ", " << in[2] << "] -> [" << t_in[0] << ", " << t_in[1] << ", " << t_in[2] << ", " << t_in[3] << "]" << std::endl;
+#endif
+
+    lookup_brdf_val(brdf, t_in[0], t_in[1], t_in[2], t_in[3], r, g, b) ;
+
+    vec res(3);
+    res[0] = r;
+    res[1] = g;
+    res[2] = b;
+    return res;
+}
 
 // Get data size, e.g. the number of samples to fit
 int data_merl::size() const 
@@ -376,6 +412,4 @@ ALTA_DLL_EXPORT data* provide_data()
     return new data_merl();
 }
 
-
-Q_EXPORT_PLUGIN2(data_merl, data_merl)
 

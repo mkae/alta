@@ -14,26 +14,22 @@
 
 #define BUFFER_SIZE 10000
 
-data* rational_fitter_matlab::provide_data() const
-{
-	return new vertical_segment() ;
-}
-
-function* rational_fitter_matlab::provide_function() const 
-{
-	return new rational_function() ;
-}
-
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
 	return new rational_fitter_matlab();
 }
 
-rational_fitter_matlab::rational_fitter_matlab() : QObject()
+rational_fitter_matlab::rational_fitter_matlab() 
 {
+	// Create matlab engine
+	if (!(ep = engOpen(""))) 
+	{
+		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
+	}
 }
 rational_fitter_matlab::~rational_fitter_matlab() 
 {
+	engClose(ep); 
 }
 
 bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const arguments &args)
@@ -46,14 +42,6 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const argu
 		return false ;
 	}
 	
-	// Create matlab engine
-	if (!(ep = engOpen(""))) 
-	{
-		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
-		return false ;
-	}
-	
-
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem
 	r->setDimX(d->dimX()) ;
@@ -95,7 +83,6 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const argu
 		}
 	}
 
-	engClose(ep); 
 	return false ;
 }
 
@@ -109,29 +96,27 @@ void rational_fitter_matlab::set_parameters(const arguments& args)
 		
 bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
 {
+    // For each output dimension (color channel for BRDFs) perform
+    // a separate fit on the y-1D rational function.
+    for(int j=0; j<d->dimY(); ++j)
+    {
+        rational_function_1d* rs = r->get(j);
+        rs->resize(np, nq);
 
-	// Multidimensional coefficients
-	std::vector<double> Pn ; Pn.reserve(d->dimY()*np) ;
-	std::vector<double> Qn ; Qn.reserve(d->dimY()*nq) ;
+        if(!fit_data(d, np, nq, j, rs))
+        {
+            return false ;
+        }
+    }
 
-	for(int j=0; j<d->dimY(); ++j)
-	{
-		if(!fit_data(d, np, nq, j, r))
-			return false ;
-
-		for(int i=0; i<np; ++i) { Pn.push_back(r->getP(i)) ; }
-		for(int i=0; i<nq; ++i) { Qn.push_back(r->getQ(i)) ; }
-	}
-
-	r->update(Pn, Qn) ;
-	return true ;
+    return true ;
 }
 
 // dat is the data object, it contains all the points to fit
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq, int ny, rational_function* r) 
+bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq, int ny, rational_function_1d* r)
 {
 	// Size of the problem
 	int N = np+nq ;
@@ -362,5 +347,3 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		return false ;
 	}
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_matlab, rational_fitter_matlab)

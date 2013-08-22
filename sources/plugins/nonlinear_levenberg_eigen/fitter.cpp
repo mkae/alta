@@ -53,6 +53,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			vec _y = _di - (*_f)(_x);
 			for(int i=0; i<_f->dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
+
 		}
 #ifdef DEBUG
 		std::cout << "diff vector:" << std::endl << y << std::endl << std::endl ;
@@ -76,7 +77,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 			// Get the associated jacobian
 			vec _jac = _f->parametersJacobian(xi);
-
+			
 			// Fill the columns of the matrix
 #ifdef DEBUG
 			Eigen::MatrixXd temp (_f->dimY(), _f->nbParameters());
@@ -109,7 +110,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
     const data* _d;
 };
 
-nonlinear_fitter_eigen::nonlinear_fitter_eigen() : QObject()
+nonlinear_fitter_eigen::nonlinear_fitter_eigen() 
 {
 }
 nonlinear_fitter_eigen::~nonlinear_fitter_eigen() 
@@ -178,8 +179,3 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 void nonlinear_fitter_eigen::set_parameters(const arguments& args)
 {
 }
-		
-data*     nonlinear_fitter_eigen::provide_data() const { return NULL; }
-function* nonlinear_fitter_eigen::provide_function() const { return NULL; }
-
-Q_EXPORT_PLUGIN2(nonlinear_fitter_eigen, nonlinear_fitter_eigen)

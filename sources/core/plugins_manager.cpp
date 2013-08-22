@@ -2,18 +2,75 @@
 #include "rational_function.h"
 #include "vertical_segment.h"
 
+/*
 #include <QCoreApplication>
-#include <QPluginLoader>
-#include <QtPlugin>
-#include <QLibrary>
 #include <QDir>
+*/
 
-// Create the object, parse the argument and load
-// all the plugins
-//
+#ifdef WIN32
+    #include <windows.h>
+#else
+    #include <dlfcn.h>
+#endif
+#include <stdio.h>
+
+//! \brief Open a dynamic library file (.so or .dll) and extract the associated
+//! provide function. The template argument is used to cast the library to a
+//! specific type.
+template<typename T> T open_library(const std::string& filename, const char* function)
+{
+#ifdef WIN32
+    HINSTANCE handle = LoadLibrary((LPCTSTR)filename.c_str());
+    if(handle != NULL)
+    {
+        T res = (T)GetProcAddress(handle, function);
+
+        if(res == NULL)
+        {
+            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+            return NULL;
+        }
+#ifdef DEBUG_CORE
+        std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
+#endif
+        return res;
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
+        std::cerr << "          cause: \"" << GetLastError() << "\"" << std::endl;
+        return NULL;
+    }
+#else
+    void* handle = dlopen(filename.c_str(), RTLD_LAZY);
+    if(handle != NULL)
+    {
+        void* res = dlsym(handle, function);
+
+        if(dlerror() != NULL)
+        {
+            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+            return NULL;
+        }
+#ifdef DEBUG_CORE
+        std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
+#endif
+        return (T)res;
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
+		  std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
+        return NULL;
+    }
+#endif
+}
+
+
+// Create the object, parse the argument and load all the plugins
 plugins_manager::plugins_manager(const arguments& args) 
 {
-
+/*
 	QDir pluginsDir;
 	if(args.is_defined("plugins"))
 	{
@@ -23,7 +80,9 @@ plugins_manager::plugins_manager(const arguments& args)
 	{
 		pluginsDir = QDir(QCoreApplication::instance()->applicationDirPath());
 	}
+	*/
 
+	/*
 	foreach (QString fileName, pluginsDir.entryList(QDir::Files)) 
 	{
 		QPluginLoader loader ;
@@ -77,13 +136,8 @@ plugins_manager::plugins_manager(const arguments& args)
 #endif
 		}
 	}
+	*/
 }
-
-#ifdef USING_STATIC
-typedef function* (*FunctionPrototype)();
-typedef fitter*   (*FitterPrototype)();
-typedef data*     (*DataPrototype)();
-#endif
 
 // Get instances of the function, the data and the
 // fitter
@@ -140,7 +194,6 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
-
 // Get instances of the function, the data and the
 // fitter, select one based on the name. Return null
 // if no one exist.
@@ -156,6 +209,7 @@ function* plugins_manager::get_function(const std::string& n)
     }
 
 #ifdef USING_STATIC
+	 /*
 	 std::string file;
 	 if(n[0] == '.')
 	 {
@@ -167,15 +221,10 @@ function* plugins_manager::get_function(const std::string& n)
 	 }
 
     QString path = QDir::currentPath() + QString(file.c_str()) ;
-    QLibrary function_lib(path);
-    if(!function_lib.isLoaded())
-    {
-        std::cerr << "<<ERROR>> unable to load file \"" << path.toStdString() << "\"" << std::endl;
-        return NULL;
-    }
-
-    FunctionPrototype myFunction = (FunctionPrototype) function_lib.resolve("provide_function");
-
+	 
+	 FunctionPrototype myFunction = open_library<FunctionPrototype>(path.toStdString(), "provide_function");
+	 */
+	 FunctionPrototype myFunction = open_library<FunctionPrototype>(n, "provide_function");
     if(myFunction != NULL)
     {
 #ifdef DEBUG
@@ -211,6 +260,7 @@ data* plugins_manager::get_data(const std::string& n)
     }
 
 #ifdef USING_STATIC
+	 /*
 	 std::string file;
 	 if(n[0] == '.')
 	 {
@@ -222,15 +272,10 @@ data* plugins_manager::get_data(const std::string& n)
 	 }
 
     QString path = QDir::currentPath() + QString(file.c_str()) ;
-    QLibrary data_lib(path);
-    if(!data_lib.isLoaded())
-    {
-        std::cerr << "<<ERROR>> unable to load file \"" << path.toStdString() << "\"" << std::endl;
-        return NULL;
-    }
-
-    DataPrototype myData = (DataPrototype) data_lib.resolve("provide_data");
-
+	 
+	 DataPrototype myData = open_library<DataPrototype>(path.toStdString(), "provide_data");
+	 */
+	 DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
     if(myData != NULL)
     {
 #ifdef DEBUG
@@ -266,6 +311,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
     }
 
 #ifdef USING_STATIC
+/*
 	 std::string file;
 	 if(n[0] == '.')
 	 {
@@ -277,15 +323,10 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 	 }
 
     QString path = QDir::currentPath() + QString(file.c_str()) ;
-    QLibrary fitting_lib(path);
-    if(!fitting_lib.isLoaded())
-    {
-        std::cerr << "<<ERROR>> unable to load file \"" << path.toStdString() << "\"" << std::endl;
-        return NULL;
-    }
-
-	FitterPrototype myFitter = (FitterPrototype) fitting_lib.resolve("provide_fitter");
-
+    
+	 FitterPrototype myFitter = open_library<FitterPrototype>(path.toStdString(), "provide_fitter");
+*/
+	 FitterPrototype myFitter = open_library<FitterPrototype>(n, "provide_fitter");
     if(myFitter != NULL)
     {
 #ifdef DEBUG
@@ -311,6 +352,44 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 		return _fitters.find(n)->second ;
 	}
 #endif
+}
+void plugins_manager::check_compatibility(data*& d, function*& f,
+                                          const arguments& args)
+{
+	if(d->parametrization() == params::UNKNOWN_INPUT)
+	{
+		std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
+	}
+
+	if(f->parametrization() == params::UNKNOWN_INPUT)
+	{
+		std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
+		f->setParametrization(d->parametrization());
+	}
+	else if(d->parametrization() != f->parametrization())
+	{
+		std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+		data_params* dd = new data_params(d, f->parametrization());
+		d = dd ;
+	}
+	else
+	{
+		std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+	}
+
+	if(f->dimY() != d->dimY())
+	{
+		std::cout << "<<WARNING>> the data and the function have different Y dimensions" << std::endl;
+	}
+
+	/*
+	// Check is the data has to be clusterized
+	if(args.is_defined("cluster-dim"))
+	{
+	clustering* cluster = new clustering(d, args);
+	d = cluster;
+	}
+	*/
 }
 		
 // \todo implement the Darwin (MACOS) version.

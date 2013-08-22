@@ -6,8 +6,6 @@
 #include <limits>
 #include <fstream>
 
-#include <QtPlugin>
-
 #include "common.h"
 #include "args.h"
 #include "params.h"
@@ -49,9 +47,15 @@ class data : public parametrized
 		//!
 		//! \details
 		//! The input vector in (can have texture coordinate) and the output
-		//! vector out are taken to grad a value and return it. The two vectors 
+        //! vector out are taken to grab a value and return it. The two vectors
 		//! should be compliant with the size and parametrization of the data.
 		virtual vec value(vec in, vec out) const = 0;
+
+        //! \brief Provide an evaluation in a BRDF way of the data.
+        //!
+        //! \details
+        //! The input vector must have the parametrization of the data.
+        virtual vec value(vec in) const = 0;
 
 		//! \brief Put the sample inside the data
 		virtual void set(vec x) = 0;
@@ -75,8 +79,6 @@ class data : public parametrized
 		// Dimensions of the data
 		int _nX, _nY ;
 } ;
-	 
-Q_DECLARE_INTERFACE(data, "Fitter.Data")
 
 /*! \brief Change the parametrization of data to fit the parametrization of the
  *  function to be fitted.
@@ -109,6 +111,9 @@ class data_params : public data
 				data_params::clustrering method = data_params::NONE) :
 			_clustering_method(method)
 		{
+			setParametrization(new_param);
+			setParametrization(d->output_parametrization());
+
 			_nX = params::dimension(new_param);
 			_nY = d->dimY();
 
@@ -123,6 +128,10 @@ class data_params : public data
 		{
 			NOT_IMPLEMENTED();
 		}
+        virtual vec value(vec in) const
+        {
+            NOT_IMPLEMENTED();
+        }
 
 		// Load data from a file
 		virtual void load(const std::string& filename)

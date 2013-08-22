@@ -156,7 +156,7 @@ class quadratic_program
 		}
 
 		//! \brief Test all the constraints of the data
-		bool test_constraints(int ny, const rational_function* r, const vertical_segment* data)
+        bool test_constraints(int ny, const rational_function_1d* r, const vertical_segment* data)
 		{
 			int nb_failed = 0;
 			for(int n=0; n<data->size(); ++n)
@@ -207,7 +207,7 @@ class quadratic_program
 		//! \brief Generate two constraint vectors from a vertical segment and a
 		//! ration function type.
 		inline void get_constraint(const vec& xi, const vec& yl, const vec& yu, int ny,
-				const rational_function* func,
+                const rational_function_1d* func,
 				vec& cu, vec& cl)
 		{
 			cu.resize(_np+_nq);
@@ -237,7 +237,7 @@ class quadratic_program
 
 		//! \brief Give the next position in the data that is not satisfied.
 		//! This method works only for a single color channel ny !
-		static int next_unmatching_constraint(int i, int ny, const rational_function* r, 
+        static int next_unmatching_constraint(int i, int ny, const rational_function_1d* r,
 				const vertical_segment* data)
 		{
 			for(int n=i; n<data->size(); ++n)
