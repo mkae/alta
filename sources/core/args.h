@@ -31,22 +31,28 @@ class arguments
                 std::string temp(argv[i]) ;
                 std::string key, data ;
 
-				if(temp.compare(0, 2, "--") == 0)
+                if(temp.compare(0, 2, "--") == 0)
 				{
 					key = temp.substr(2, temp.size()-2) ;
 					int j = i+1;
 					while(j < argc) 
-					{
+                    {
+
 						std::string next(argv[j]) ;
-						if(next.compare(0, 2, "--") != 0)
-						{
-							data.append(next) ;
-						}
+                        std::cout << next << std::endl;
+                        if(next[0] == '[' || next[next.size()-1] == ']' || next.compare(0, 2, "--") != 0)
+                        {
+                            if(j > i+1)
+                            {
+                                data.append(" ");
+                            }
+                            data.append(next);
+                        }
 						else
 						{
 							break ;
 						}
-						++j;
+                        ++j;
 					}
 				}
 				_map.insert(std::pair<std::string, std::string>(key, data)) ;
@@ -176,10 +182,9 @@ class arguments
             if(_map.count(key) > 0)
             {
                 std::string s = _map.find(key)->second;
-                std::cout << s << std::endl;
+
                 if(s[0] == '[') // Is an array of type [a, b, c]
                 {
-                    int i = 0;
                     size_t pos = 1;
                     while(pos != std::string::npos)
                     {
@@ -187,13 +192,15 @@ class arguments
 
                         if(ppos != std::string::npos)
                         {
-                            res.push_back(s.substr(pos, ppos-pos));
+                            std::string temp = s.substr(pos, ppos-pos);
+                            res.push_back(temp);
                             pos = ppos+1;
                         }
                         else
                         {
                             std::string temp = s.substr(pos, std::string::npos);
-                            res.push_back(temp.substr(0, temp.size()-1));
+                            temp = temp.substr(0, temp.size()-1);
+                            res.push_back(temp);
                             pos = ppos;
                         }
                     }

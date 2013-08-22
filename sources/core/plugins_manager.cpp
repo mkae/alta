@@ -194,6 +194,28 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
+arguments create_arguments(const std::string& n)
+{
+    std::vector<std::string> cmd_vec;
+    std::stringstream stream(n);
+    while(stream.good())
+    {
+        std::string temp;
+        stream >> temp;
+
+        cmd_vec.push_back(temp);
+    }
+    int argc = cmd_vec.size();
+    char* argv[argc];
+    for(int i=0; i<argc; ++i)
+    {
+        argv[i] = &cmd_vec[i][0];
+    }
+
+    arguments current_args(argc, argv);
+    return current_args;
+}
+
 //! Get an instance of the function selected based on the name <em>n</em>.
 //! Return NULL if no one exist.
 function* plugins_manager::get_function(const arguments& args)
@@ -205,6 +227,9 @@ function* plugins_manager::get_function(const arguments& args)
 #endif
         return new rational_function();
     }
+
+    // The function to be returned.
+    function* func = NULL;
 
     if(args.is_vec("func"))
     {
@@ -222,27 +247,9 @@ function* plugins_manager::get_function(const arguments& args)
         //! For each args_vec element, create a function object and add
         //! it to the compound one.
 
-        std::string n = args_vec[0];
-        std::vector<std::string> cmd_vec;
-        cmd_vec.push_back("--func");
-
-        std::stringstream stream(n);
-        while(stream.good())
-        {
-            std::string temp;
-            stream >> temp;
-
-            cmd_vec.push_back(temp);
-        }
-        int argc = cmd_vec.size();
-        char* argv[argc];
-        for(int i=0; i<argc; ++i)
-        {
-            argv[i] = &cmd_vec[i][0];
-        }
-
-        const arguments current_args(argc, argv);
-        return get_function(current_args);
+        std::string n("--func ");
+        n.append(args_vec[0]);
+        func = get_function(create_arguments(n));
 
         //! return the compound class
 
@@ -256,7 +263,7 @@ function* plugins_manager::get_function(const arguments& args)
 #ifdef DEBUG
             std::cout << "<<DEBUG>> using function provider in file \"" << filename << "\"" << std::endl;
 #endif
-            return myFunction();
+            func =  myFunction();
         }
         else
         {
@@ -264,6 +271,29 @@ function* plugins_manager::get_function(const arguments& args)
             return new rational_function() ;
         }
     }
+
+    // Treat the case of the Fresnel
+    if(args.is_defined("fresnel"))
+    {
+        std::cout << "<<DEBUG>> multiplying by a Fresnel term" << std::endl;
+
+        std::string n("--func ");
+        if(args.is_vec("fresnel"))
+        {
+            std::string temp = args["fresnel"];
+            n.append(temp.substr(1, temp.size()-2));
+        }
+        else
+        {
+            n.append(args["fresnel"]);
+        }
+
+        //fresnel* func_fres = dynamic_cast<fresnel*>(get_function(create_arguments(n)));
+        //func_fres->setBase(func)
+        //func = dynamic_cast<function*>(func_fres);
+    }
+
+    return func;
 }
 data* plugins_manager::get_data(const std::string& n)
 {
