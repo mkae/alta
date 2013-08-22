@@ -208,3 +208,98 @@ class nonlinear_function: public function
 		virtual vec parametersJacobian(const vec& x) const = 0;
 };
 
+/*! \brief A Fresnel interface
+ *  \ingroup core
+ */
+class fresnel : public nonlinear_function
+{
+    public: // methods
+
+        // Overload the function operator
+        virtual vec operator()(const vec& x) const
+		{
+			return f->value(x);
+		}
+        virtual vec value(const vec& x) const
+		{
+			return f->value(x);
+		}
+
+        //! Load function specific files
+        virtual void load(const std::string& filename)
+        {
+            if(f != NULL)
+			{
+				f->load(filename);
+			}
+			else
+			{
+				std::cout << "<<ERROR>> trying to load a Fresnel object with no base class" << std::endl;
+			}
+        }
+		
+		//! Number of parameters to this non-linear function
+		virtual int nbParameters() const
+		{
+			return f->nbParameters() + nbFresnelParameters();
+		}
+
+		//! Get the vector of parameters for the function
+		virtual vec parameters() const
+		{
+			int nb_func_params = f->nbParameters();
+			int nb_fres_params = nbFresnelParameters();
+			int nb_params = nb_func_params + nb_fres_params;
+			
+			vec params(nb_params);
+			
+			vec func_params = f->parameters();
+			for(int i=0; i<nb_func_params; ++i)
+			{
+				params[i] = func_params[i];
+			}
+			
+			for(int i=nb_func_params; i<nb_params; ++i)
+			{
+				params[i] = fres_params[i-nb_func_params];
+			}
+			
+			return params;
+		}
+
+		//! Update the vector of parameters for the function
+		virtual void setParameters(const vec& p) = 0;
+
+		//! \brief Obtain the derivatives of the function with respect to the 
+		//! parameters.
+		virtual vec parametersJacobian(const vec& x) const = 0;
+
+        //! \brief set the value for the base function
+        setBase(nonlinear_function* fin)
+        {
+            f = fin;
+        }
+
+    protected: // methods
+
+        //! \brief the interface for the Fresnel code
+        virtual vec fresnel(const vec& x) const  = 0;
+		
+		//! Number of parameters to this non-linear function
+		virtual int nbFresnelParameters() const = 0;
+
+		//! Get the vector of parameters for the function
+		virtual vec getFresnelParameters() const = 0;
+
+		//! Update the vector of parameters for the function
+		virtual void setFresnelParameters(const vec& p) = 0;
+
+		//! \brief Obtain the derivatives of the function with respect to the 
+		//! parameters.
+		virtual vec getFresnelParametersJacobian(const vec& x) const = 0;		
+
+    protected: //data
+
+        //! the base object
+        nonlinear_function* f;
+};
