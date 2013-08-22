@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 
                     for(int i=0; i<d->dimY(); ++i)
                     {
-								double val = x[i] * cos(in_angle[2]);
+                        double val = x[i] * cos(in_angle[2]);
 
                         rawm0[i] += val;
                         rawm1[i] += theta_out * val;

@@ -1,8 +1,9 @@
-#pragma once 
+#pragma once
 
 #include <map>
 #include <string>
 
+#include "args.h"
 #include "function.h"
 #include "data.h"
 #include "fitter.h"
@@ -45,7 +46,7 @@ class plugins_manager
 #ifdef USING_STATIC
 		static
 #endif
-		function* get_function(const std::string& n) ;
+        function* get_function(const arguments& args) ;
 			
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.

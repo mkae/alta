@@ -25,13 +25,11 @@ class arguments
 		{
         }
 		arguments(int argc, char** const argv)
-		{
-			std::string key ;
-			std::string data ;
+        {
 			for(int i=0; i<argc; ++i)
 			{
-				std::string temp(argv[i]) ;
-				std::string data ;
+                std::string temp(argv[i]) ;
+                std::string key, data ;
 
 				if(temp.compare(0, 2, "--") == 0)
 				{
@@ -70,6 +68,23 @@ class arguments
 				return false ;
 			}
         }
+
+        //! \brief is the data at the given key in a vector format?
+        //! No matter the type of the data, this function will test is the
+        //! mapped string is of type "[ .... ]".
+        //! It returns false if there is no associated entry.
+        bool is_vec(const std::string& key) const
+        {
+            if(_map.count(key) > 0)
+            {
+                return _map.find(key)->second[0] == '[' ;
+            }
+            else
+            {
+                return false ;
+            }
+        }
+
 		//! \brief access the element stored value
 		std::string operator[](const std::string& key) const
 		{
@@ -131,13 +146,14 @@ class arguments
 
 						if(ppos != std::string::npos)
 						{
-							res[i] = atof(s.substr(pos, ppos).c_str());
+                            res[i] = atof(s.substr(pos, ppos-pos).c_str());
 							pos = ppos+1;
 							++i;
 						}
 						else
 						{
-							res[i] = atof(s.substr(pos, ppos-1).c_str());
+                            std::string temp = s.substr(pos, std::string::npos);
+                            res[i] = atof(temp.substr(0, temp.size()-1).c_str());
 							pos = ppos;
 							++i;
 						}
@@ -153,6 +169,39 @@ class arguments
 			}
 			return res;
 		}
+
+        std::vector<std::string> get_vec(const std::string& key) const
+        {
+            std::vector<std::string> res;
+            if(_map.count(key) > 0)
+            {
+                std::string s = _map.find(key)->second;
+                std::cout << s << std::endl;
+                if(s[0] == '[') // Is an array of type [a, b, c]
+                {
+                    int i = 0;
+                    size_t pos = 1;
+                    while(pos != std::string::npos)
+                    {
+                        size_t ppos = s.find(',', pos);
+
+                        if(ppos != std::string::npos)
+                        {
+                            res.push_back(s.substr(pos, ppos-pos));
+                            pos = ppos+1;
+                        }
+                        else
+                        {
+                            std::string temp = s.substr(pos, std::string::npos);
+                            res.push_back(temp.substr(0, temp.size()-1));
+                            pos = ppos;
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
 
 	private: // data
 
