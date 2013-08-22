@@ -19,7 +19,7 @@
 
 int main(int argc, char** argv)
 {
-	QCoreApplication app(argc, argv, false);
+    QCoreApplication app(argc, argv);
 	arguments args(argc, argv) ;
 
 	plugins_manager manager(args) ;

@@ -20,7 +20,7 @@
 template<typename T> T open_library(const std::string& filename, const char* function)
 {
 #ifdef WIN32
-    HINSTANCE handle = LoadLibrary((LPCTSTR)filename.c_str());
+    HINSTANCE handle = LoadLibraryA(filename.c_str());
     if(handle != NULL)
     {
         T res = (T)GetProcAddress(handle, function);
