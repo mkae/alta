@@ -194,13 +194,43 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
-// Get instances of the function, the data and the
-// fitter, select one based on the name. Return null
-// if no one exist.
-//
-function* plugins_manager::get_function(const std::string& n)
+arguments create_arguments(const std::string& n)
 {
-    if(n.empty())
+    std::vector<std::string> cmd_vec;
+    std::stringstream stream(n);
+#ifdef DEBUG_ARGS
+	 std::cout << "<<DEBUG>> create argument vector: [";
+#endif
+    while(stream.good())
+    {
+        std::string temp;
+        stream >> temp;
+#ifdef DEBUG_ARGS
+		  std::cout << temp << ", ";
+#endif
+
+        cmd_vec.push_back(temp);
+    }
+#ifdef DEBUG_ARGS
+	 std::cout << "]" << std::endl;
+#endif
+
+    int argc = cmd_vec.size();
+    char* argv[argc];
+    for(int i=0; i<argc; ++i)
+    {
+        argv[i] = &cmd_vec[i][0];
+    }
+
+    arguments current_args(argc, argv);
+    return current_args;
+}
+
+//! Get an instance of the function selected based on the name <em>n</em>.
+//! Return NULL if no one exist.
+function* plugins_manager::get_function(const arguments& args)
+{
+    if(!args.is_defined("func"))
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
@@ -208,46 +238,91 @@ function* plugins_manager::get_function(const std::string& n)
         return new rational_function();
     }
 
-#ifdef USING_STATIC
-	 /*
-	 std::string file;
-	 if(n[0] == '.')
-	 {
-		 file = n.substr(1, n.size()-1);
-	 }
-	 else
-	 {
-		 file = n;
-	 }
+    // The function to be returned.
+    function* func = NULL;
 
-    QString path = QDir::currentPath() + QString(file.c_str()) ;
-	 
-	 FunctionPrototype myFunction = open_library<FunctionPrototype>(path.toStdString(), "provide_function");
-	 */
-	 FunctionPrototype myFunction = open_library<FunctionPrototype>(n, "provide_function");
-    if(myFunction != NULL)
+    if(args.is_vec("func"))
     {
-#ifdef DEBUG
-        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
-#endif
-        return myFunction();
+        std::vector<std::string> args_vec = args.get_vec("func");
+
+        // Treating the case []
+        if(args_vec.size() == 0)
+        {
+            return NULL;
+        }
+
+        //! \todo create a <em>compound</em> class to store multiple
+        //! functions in it.
+
+        //! For each args_vec element, create a function object and add
+        //! it to the compound one.
+
+        std::string n("--func ");
+        n.append(args_vec[0]);
+        func = get_function(create_arguments(n));
+
+        //! return the compound class
+
     }
     else
     {
-        std::cerr << "<<ERROR>> no function provider found in file \"" << n << "\"" << std::endl;
-        return new rational_function() ;
-    }
-#else
-
-	if(_functions.count(n) == 0)
-	{
-		return new rational_function() ;
-	}
-	else
-	{
-		return _functions.find(n)->second ;
-	}
+        std::string filename = args["func"];
+        FunctionPrototype myFunction = open_library<FunctionPrototype>(filename, "provide_function");
+        if(myFunction != NULL)
+        {
+#ifdef DEBUG
+            std::cout << "<<DEBUG>> using function provider in file \"" << filename << "\"" << std::endl;
 #endif
+            func =  myFunction();
+        }
+        else
+        {
+            std::cerr << "<<ERROR>> no function provider found in file \"" << filename << "\"" << std::endl;
+            return new rational_function() ;
+        }
+    }
+
+    // Treat the case of the Fresnel
+    if(args.is_defined("fresnel"))
+    {
+		 // Cast into a non linear function, only those are permitted to use
+		 // a Fresnel term.
+		 nonlinear_function* nl_func = dynamic_cast<nonlinear_function*>(func);
+		 if(nl_func == NULL)
+		 {
+			 std::cerr << "<<ERROR>> only non-linear function are permitted to use Fresnel" << std::endl;
+			 return func;
+		 }
+
+		 std::cout << "<<DEBUG>> multiplying by a Fresnel term" << std::endl;
+
+		 std::string n("--func ");
+		 if(args.is_vec("fresnel"))
+		 {
+			 std::string temp = args["fresnel"];
+			 n.append(temp.substr(1, temp.size()-2));
+		 }
+		 else
+		 {
+			 std::string fname = args["fresnel"];
+			 if(fname.empty()) // Nothing to do except print error, no plugin defined
+			 {
+				 std::cerr << "<<ERROR>> Fresnel plugin not defined" << std::endl;
+				 std::cerr << "<<ERROR>> using --fresnel alone is not permitted" << std::endl;
+				 return func;
+			 }
+			 else // Case where the fresnel parameters is only the plugin filename
+			 {
+				 n.append(fname);
+			 }
+		 }
+
+		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(create_arguments(n)));
+		 func_fres->setBase(nl_func);
+		 func = dynamic_cast<function*>(func_fres);
+	 }
+
+    return func;
 }
 data* plugins_manager::get_data(const std::string& n)
 {
@@ -259,22 +334,6 @@ data* plugins_manager::get_data(const std::string& n)
         return new vertical_segment();
     }
 
-#ifdef USING_STATIC
-	 /*
-	 std::string file;
-	 if(n[0] == '.')
-	 {
-		 file = n.substr(1, n.size()-1);
-	 }
-	 else
-	 {
-		 file = n;
-	 }
-
-    QString path = QDir::currentPath() + QString(file.c_str()) ;
-	 
-	 DataPrototype myData = open_library<DataPrototype>(path.toStdString(), "provide_data");
-	 */
 	 DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
     if(myData != NULL)
     {
@@ -288,17 +347,6 @@ data* plugins_manager::get_data(const std::string& n)
         std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
         return new vertical_segment() ;
     }
-#else
-
-    if(_functions.count(n) == 0)
-    {
-        return new vertical_segment() ;
-    }
-    else
-    {
-        return _datas.find(n)->second ;
-    }
-#endif
 }
 fitter* plugins_manager::get_fitter(const std::string& n)
 {
@@ -310,23 +358,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
         return NULL;
     }
 
-#ifdef USING_STATIC
-/*
-	 std::string file;
-	 if(n[0] == '.')
-	 {
-		 file = n.substr(1, n.size()-1);
-	 }
-	 else
-	 {
-		 file = n;
-	 }
-
-    QString path = QDir::currentPath() + QString(file.c_str()) ;
-    
-	 FitterPrototype myFitter = open_library<FitterPrototype>(path.toStdString(), "provide_fitter");
-*/
-	 FitterPrototype myFitter = open_library<FitterPrototype>(n, "provide_fitter");
+    FitterPrototype myFitter = open_library<FitterPrototype>(n, "provide_fitter");
     if(myFitter != NULL)
     {
 #ifdef DEBUG
@@ -339,20 +371,8 @@ fitter* plugins_manager::get_fitter(const std::string& n)
         std::cerr << "<<ERROR>> no fitter provider found in file \"" << n << "\"" << std::endl;
         return NULL ;
     }
-#else
-	if(_fitters.count(n) == 0)
-	{
-		return NULL ;
-	}
-	else
-	{
-#ifdef DEBUG
-		std::cout << "<<DEBUG>>  using \"" <<  n << "\"" << std::endl ;
-#endif
-		return _fitters.find(n)->second ;
-	}
-#endif
 }
+
 void plugins_manager::check_compatibility(data*& d, function*& f,
                                           const arguments& args)
 {

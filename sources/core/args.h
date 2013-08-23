@@ -23,40 +23,57 @@ class arguments
 		// Constructor and destructor
 		arguments()
 		{
-        }
+		}
 		arguments(int argc, char** const argv)
 		{
-			std::string key ;
-			std::string data ;
 			for(int i=0; i<argc; ++i)
 			{
 				std::string temp(argv[i]) ;
-				std::string data ;
+				std::string key, data ;
 
 				if(temp.compare(0, 2, "--") == 0)
 				{
 					key = temp.substr(2, temp.size()-2) ;
-					int j = i+1;
+#ifdef DEBUG_ARGS
+					std::cout << "<<DEBUG>> (" << i << ")" << key << " -> [ ";
+#endif
+					int k = i+1;
+					int j = k;
 					while(j < argc) 
 					{
+
 						std::string next(argv[j]) ;
-						if(next.compare(0, 2, "--") != 0)
+						if(next[0] == '[' || next[next.size()-1] == ']' || next.compare(0, 2, "--") != 0)
 						{
-							data.append(next) ;
+							if(j != k)
+							{
+								data.append(" ");
+#ifdef DEBUG_ARGS
+								std::cout << " ";
+#endif
+							}
+							data.append(next);
+#ifdef DEBUG_ARGS
+							std::cout << "(" << j << ")" << next;
+#endif
 						}
 						else
 						{
 							break ;
 						}
 						++j;
+						++i;
 					}
+#ifdef DEBUG_ARGS
+					std::cout << "]" << std::endl;
+#endif
 				}
 				_map.insert(std::pair<std::string, std::string>(key, data)) ;
 			}
-        }
-        ~arguments()
-        {
-        }
+		}
+		~arguments()
+		{
+		}
 
 		//! \brief is the elements in the command line ?
 		bool is_defined(const std::string& key) const
@@ -70,6 +87,23 @@ class arguments
 				return false ;
 			}
         }
+
+        //! \brief is the data at the given key in a vector format?
+        //! No matter the type of the data, this function will test is the
+        //! mapped string is of type "[ .... ]".
+        //! It returns false if there is no associated entry.
+        bool is_vec(const std::string& key) const
+        {
+            if(_map.count(key) > 0)
+            {
+                return _map.find(key)->second[0] == '[' ;
+            }
+            else
+            {
+                return false ;
+            }
+        }
+
 		//! \brief access the element stored value
 		std::string operator[](const std::string& key) const
 		{
@@ -131,13 +165,14 @@ class arguments
 
 						if(ppos != std::string::npos)
 						{
-							res[i] = atof(s.substr(pos, ppos).c_str());
+                            res[i] = atof(s.substr(pos, ppos-pos).c_str());
 							pos = ppos+1;
 							++i;
 						}
 						else
 						{
-							res[i] = atof(s.substr(pos, ppos-1).c_str());
+                            std::string temp = s.substr(pos, std::string::npos);
+                            res[i] = atof(temp.substr(0, temp.size()-1).c_str());
 							pos = ppos;
 							++i;
 						}
@@ -153,6 +188,40 @@ class arguments
 			}
 			return res;
 		}
+
+        std::vector<std::string> get_vec(const std::string& key) const
+        {
+            std::vector<std::string> res;
+            if(_map.count(key) > 0)
+            {
+                std::string s = _map.find(key)->second;
+
+                if(s[0] == '[') // Is an array of type [a, b, c]
+                {
+                    size_t pos = 1;
+                    while(pos != std::string::npos)
+                    {
+                        size_t ppos = s.find(',', pos);
+
+                        if(ppos != std::string::npos)
+                        {
+                            std::string temp = s.substr(pos, ppos-pos);
+                            res.push_back(temp);
+                            pos = ppos+1;
+                        }
+                        else
+                        {
+                            std::string temp = s.substr(pos, std::string::npos);
+                            temp = temp.substr(0, temp.size()-1);
+                            res.push_back(temp);
+                            pos = ppos;
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
 
 	private: // data
 

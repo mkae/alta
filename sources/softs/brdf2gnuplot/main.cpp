@@ -34,16 +34,7 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-	function* f = NULL;
-	if(args.is_defined("func"))
-	{
-		std::cout << "<<INFO>> Using plugin function \"" << args["func"] << "\"" << std::endl ;
-		f = manager.get_function(args["func"]) ;
-	}
-	else
-	{
-		f = manager.get_function() ;
-	}
+    function* f = manager.get_function(args) ;
 
 	data* d = NULL ;
 	if(args.is_defined("data"))
@@ -72,7 +63,7 @@ int main(int argc, char** argv)
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 
-	if(d != NULL)
+    if(d != NULL)
 	{
 		for(int i=0; i<d->size(); ++i)
 		{

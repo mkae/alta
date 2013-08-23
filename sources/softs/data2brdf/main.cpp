@@ -47,9 +47,16 @@ int main(int argc, char** argv)
 	//	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
 	{
 		fit->set_parameters(args) ;
-		function* f = plugins_manager::get_function(args["func"]);
+
+        function* f = plugins_manager::get_function(args);
 		data*     d = plugins_manager::get_data(args["data"]);
 		d->load(args["input"], args);
+
+        if(f == NULL || d == NULL)
+        {
+            std::cerr << "<<ERROR>> no function or data object correctly defined" << std::endl;
+            return 1;
+        }
 
 		// Check the compatibility between the data and the function
 		plugins_manager::check_compatibility(d, f, args);
