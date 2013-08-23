@@ -194,38 +194,6 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
-arguments create_arguments(const std::string& n)
-{
-    std::vector<std::string> cmd_vec;
-    std::stringstream stream(n);
-#ifdef DEBUG_ARGS
-	 std::cout << "<<DEBUG>> create argument vector: [";
-#endif
-    while(stream.good())
-    {
-        std::string temp;
-        stream >> temp;
-#ifdef DEBUG_ARGS
-		  std::cout << temp << ", ";
-#endif
-
-        cmd_vec.push_back(temp);
-    }
-#ifdef DEBUG_ARGS
-	 std::cout << "]" << std::endl;
-#endif
-
-    int argc = cmd_vec.size();
-    char* argv[argc];
-    for(int i=0; i<argc; ++i)
-    {
-        argv[i] = &cmd_vec[i][0];
-    }
-
-    arguments current_args(argc, argv);
-    return current_args;
-}
-
 //! Get an instance of the function selected based on the name <em>n</em>.
 //! Return NULL if no one exist.
 function* plugins_manager::get_function(const arguments& args)
@@ -259,7 +227,7 @@ function* plugins_manager::get_function(const arguments& args)
 
         std::string n("--func ");
         n.append(args_vec[0]);
-        func = get_function(create_arguments(n));
+        func = get_function(arguments::create_arguments(n));
 
         //! return the compound class
 
@@ -317,7 +285,7 @@ function* plugins_manager::get_function(const arguments& args)
 			 }
 		 }
 
-		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(create_arguments(n)));
+		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(arguments::create_arguments(n)));
 		 func_fres->setBase(nl_func);
 		 func = dynamic_cast<function*>(func_fres);
 	 }

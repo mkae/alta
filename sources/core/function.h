@@ -69,7 +69,7 @@ class function : public parametrized
 			}
 			else
 			{
-				save(filename) ;
+				save_alta(filename, args) ;
 			}
 		}
 
@@ -104,7 +104,7 @@ class function : public parametrized
 	protected: // function
 
 		//! \brief Standard saving function.
-		virtual void save(const std::string& filename) const 
+		virtual void save_alta(const std::string& filename, const arguments& args) const 
 		{
 			NOT_IMPLEMENTED();
 		}
@@ -154,6 +154,55 @@ class function : public parametrized
 		virtual void save_brdfexplorer(const std::string& filename, const arguments& args) const
 		{
 			NOT_IMPLEMENTED();
+		}
+
+		//! \brief parse the header of the file and return the corresponding
+		//! arguments and associate stream
+		void load_header(const std::string& filename, arguments& args, std::ifstream& file)
+		{
+			file.open(filename.c_str()) ;
+			if(!file.is_open())
+			{
+				std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+				throw ;
+			}
+
+			while(file.peek() == '#')
+			{
+				std::string line ;
+				std::getline(file, line) ;
+				std::stringstream linestream(line) ;
+
+				linestream.ignore(1) ;
+
+				std::string comment ;
+				linestream >> comment ;
+
+				if(comment == std::string("DIM"))
+				{
+					linestream >> _nX >> _nY ;
+				}
+				else if(comment == std::string("CMD"))
+				{
+					args = arguments::create_arguments(line.substr(5, std::string::npos));
+				}
+			}
+		}
+		
+		void save_header(const std::string& filename, arguments& args, std::ofstream& file)
+		{
+			file.open(filename.c_str()) ;
+			if(!file.is_open())
+			{
+				std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+				throw ;
+			}
+
+			file << "#CMD " << args.get_cmd() << std::endl;
+			file << "#DIM " << _nX << " " << _nY << std::endl;
+			file << "#PARAM_IN  " << params::get_name(input_parametrization()) << std::endl;
+			//file << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
+			file << std::endl;
 		}
 
 	public: // methods

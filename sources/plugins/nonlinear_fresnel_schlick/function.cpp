@@ -14,12 +14,14 @@ ALTA_DLL_EXPORT function* provide_function()
     return new schlick();
 }
 
-// Overload the function operator
-vec schlick::operator()(const vec& x) const 
+//! Load function specific files
+void schlick::load(const std::string& filename) 
 {
-	return value(x);
+    std::cerr << "Cannot load a Schlick file." << std::endl;
+    throw;
 }
-vec schlick::value(const vec& x) const 
+
+vec schlick::fresnelValue(const vec& x) const
 {
 	vec res(_nY);
 	for(int i=0; i<_nY; ++i)
@@ -30,37 +32,39 @@ vec schlick::value(const vec& x) const
 	return res;
 }
 
-//! Load function specific files
-void schlick::load(const std::string& filename) 
+//! \brief Number of parameters to this non-linear function
+int schlick::nbFresnelParameters() const 
 {
-    std::cerr << "Cannot load a Schlick file." << std::endl;
-    throw;
+	return dimY();
 }
 
-//! Number of parameters to this non-linear function
-int schlick::nbParameters() const 
+//! \brief Get the vector of parameters for the function
+vec schlick::getFresnelParameters() const 
 {
-	return 0;
+	vec p(1);
+	p[0] = R;
+	return p;
 }
 
-//! Get the vector of parameters for the function
-vec schlick::parameters() const 
+//! \brief Update the vector of parameters for the function
+void schlick::setFresnelParameters(const vec& p) 
 {
-	vec r(0);
-	return r;
+	R = p[0];
 }
 
-//! Update the vector of parameters for the function
-void schlick::setParameters(const vec& p) 
-{
-}
-
-//! Obtain the derivatives of the function with respect to the 
+//! \brief Obtain the derivatives of the function with respect to the
 //! parameters. 
-vec schlick::parametersJacobian(const vec& x) const 
+vec schlick::getFresnelParametersJacobian(const vec& x) const 
 {
-	vec r(0);
-	return r;
+	const int nY = dimY();
+
+	vec jac(nY);
+	for(int i=0; i<nY; ++i)
+	{
+		jac[i] = 1.0 - pow(1.0 - clamp(x[0], 0.0, 1.0), 5.0);
+	}
+
+	return jac;
 }
 
 
