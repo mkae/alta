@@ -291,7 +291,36 @@ class fresnel : public nonlinear_function
 
 		//! \brief Obtain the derivatives of the function with respect to the 
 		//! parameters.
-		virtual vec parametersJacobian(const vec& x) const = 0;
+		virtual vec parametersJacobian(const vec& x) const
+		{
+			int nb_func_params = f->nbParameters();
+			int nb_fres_params = nbFresnelParameters();
+			int nb_params = nb_func_params + nb_fres_params;
+
+			vec func_jacobian = f->parametersJacobian(x);
+			vec fres_jacobian = getFresnelParametersJacobian(x);
+
+			vec func_value = f->value(x);
+			vec fres_value = fresnelValue(x);
+
+			// F = fresnel; f = function
+			// d(F * f)(x) /dp = F(x) df(x) /dp + f(x) dF(x) / dp
+			vec jac(nb_params*_nY);
+			for(int y=0; y<_nY; ++y)
+			{
+				for(int i=0; i<nb_func_params; ++i)
+				{
+					jac[y + _nY*i] = func_jacobian[y + _nY*i] * fres_value[y];
+				}
+
+				for(int i=0; i<nb_fres_params; ++i)
+				{
+					jac[y + _nY*(i+nb_func_params)] = fres_jacobian[y + _nY*i] * fres_value[y];
+				}
+			}
+
+			return jac;
+		}
 
 		//! \brief set the value for the base function
 		void setBase(nonlinear_function* fin)
