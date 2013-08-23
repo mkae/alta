@@ -259,6 +259,7 @@ class fresnel : public nonlinear_function
 				params[i] = func_params[i];
 			}
 			
+			vec fres_params = getFresnelParameters();
 			for(int i=nb_func_params; i<nb_params; ++i)
 			{
 				params[i] = fres_params[i-nb_func_params];
@@ -275,7 +276,7 @@ class fresnel : public nonlinear_function
 		virtual vec parametersJacobian(const vec& x) const = 0;
 
         //! \brief set the value for the base function
-        setBase(nonlinear_function* fin)
+        void setBase(nonlinear_function* fin)
         {
             f = fin;
         }
@@ -283,7 +284,7 @@ class fresnel : public nonlinear_function
     protected: // methods
 
         //! \brief the interface for the Fresnel code
-        virtual vec fresnel(const vec& x) const  = 0;
+        virtual vec fresnelValue(const vec& x) const  = 0;
 		
 		//! Number of parameters to this non-linear function
 		virtual int nbFresnelParameters() const = 0;
