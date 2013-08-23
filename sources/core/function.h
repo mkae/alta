@@ -237,6 +237,37 @@ class fresnel : public nonlinear_function
 				std::cout << "<<ERROR>> trying to load a Fresnel object with no base class" << std::endl;
 			}
 		}
+		
+		//! Save the Fresnel part along with the function
+		virtual void save(const std::string& filename, const arguments& args) const
+		{
+			f->save(filename, args);
+		}
+
+		//! Set the dimension of the input space of the function
+		virtual void setDimX(int nX) 
+		{
+			function::setDimX(nX);
+			f->setDimX(nX);
+		}
+		//! Set the dimension of the output space of the function
+		virtual void setDimY(int nY)
+		{
+			function::setDimY(nY);
+			f->setDimY(nY);
+		}
+
+		// Acces to the domain of definition of the function
+		virtual void setMin(const vec& min) 
+		{
+			function::setMin(min);
+			f->setMin(min);
+		}
+		virtual void setMax(const vec& max) 
+		{
+			function::setMax(max);
+			f->setMax(max);
+		}
 
 		//! Number of parameters to this non-linear function
 		virtual int nbParameters() const
@@ -326,6 +357,24 @@ class fresnel : public nonlinear_function
 		void setBase(nonlinear_function* fin)
 		{
 			f = fin;
+		}
+		
+		
+		//! \brief can set the input parametrization of a non-parametrized
+		//! object. Print an error if it is already defined.
+		virtual void setParametrization(params::input new_param)
+		{
+			function::setParametrization(new_param);
+			f->setParametrization(new_param);
+		}
+		
+		//! \brief can set the output parametrization of a non-parametrized
+		//! function. Throw an exception if it tries to erase a previously
+		//! defined one.
+		virtual void setParametrization(params::output new_param)
+		{
+			function::setParametrization(new_param);
+			f->setParametrization(new_param);
 		}
 
 	protected: // methods
