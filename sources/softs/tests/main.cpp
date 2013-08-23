@@ -42,7 +42,6 @@ int main(int argc, char** argv)
 	// Evaluation tests
 	//
 
-
 	std::cout << "<<INFO>> " << nb_tests_failed << " tests failed" << std::endl;
 
 

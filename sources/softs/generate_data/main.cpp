@@ -4,6 +4,7 @@
 
 #include <core/args.h>
 #include <core/params.h>
+#include <nonlinear_fresnel_schlick/function.h>
 
 int main(int argc, char** argv)
 {

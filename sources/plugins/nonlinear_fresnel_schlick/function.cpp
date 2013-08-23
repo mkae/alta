@@ -70,4 +70,5 @@ vec schlick::getFresnelParametersJacobian(const vec& x) const
 
 void schlick::bootstrap(const data* d, const arguments& args)
 {
+	R = 1.0;
 }

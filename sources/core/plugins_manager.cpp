@@ -287,7 +287,8 @@ function* plugins_manager::get_function(const arguments& args)
 
 		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(arguments::create_arguments(n)));
 		 func_fres->setBase(nl_func);
-		 func = dynamic_cast<function*>(func_fres);
+		 return func_fres;
+
 	 }
 
     return func;
@@ -344,20 +345,20 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 void plugins_manager::check_compatibility(data*& d, function*& f,
                                           const arguments& args)
 {
-	if(d->parametrization() == params::UNKNOWN_INPUT)
+	if(d->input_parametrization() == params::UNKNOWN_INPUT)
 	{
 		std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
 	}
 
-	if(f->parametrization() == params::UNKNOWN_INPUT)
+	if(f->input_parametrization() == params::UNKNOWN_INPUT)
 	{
 		std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
-		f->setParametrization(d->parametrization());
+		f->setParametrization(d->input_parametrization());
 	}
-	else if(d->parametrization() != f->parametrization())
+	else if(d->input_parametrization() != f->input_parametrization())
 	{
 		std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
-		data_params* dd = new data_params(d, f->parametrization());
+		data_params* dd = new data_params(d, f->input_parametrization());
 		d = dd ;
 	}
 	else

@@ -267,11 +267,12 @@ class fresnel : public nonlinear_function
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const
 		{
-			return f->value(x);
+			return value(x);
 		}
 		virtual vec value(const vec& x) const
 		{
-			return f->value(x);
+			vec fres = fresnelValue(x);
+			return fres * f->value(x);
 		}
 
 		//! Load function specific files
@@ -408,6 +409,17 @@ class fresnel : public nonlinear_function
 			f = fin;
 		}
 		
+		//! \brief provide the input parametrization of the object.
+		virtual params::input input_parametrization() const
+		{
+			return f->input_parametrization();
+		}
+		
+		//! \brief provide the outout parametrization of the object.
+		virtual params::output output_parametrization() const
+		{
+			return f->output_parametrization();
+		}
 		
 		//! \brief can set the input parametrization of a non-parametrized
 		//! object. Print an error if it is already defined.
