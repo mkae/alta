@@ -5,7 +5,7 @@ CONFIG  *= static  \
 DESTDIR  = ../build
 
 unix{
-	QMAKE_CXXFLAGS += -std=c++0x -m64
+	QMAKE_CXXFLAGS += -std=c++0x
 }
 
 HEADERS  = args.h               \
