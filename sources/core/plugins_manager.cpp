@@ -194,6 +194,64 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
+
+		
+//! \brief load a function from the ALTA input file.
+function* plugins_manager::get_function(const std::string& filename)
+{
+	std::ifstream file;
+	file.open(filename.c_str()) ;
+	if(!file.is_open())
+	{
+		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+		throw ;
+	}
+
+	// Parameters of the function object
+	int nX, nY;
+	arguments args;
+
+	// Test for the first line of the file. Should be a ALTA FUNC HEADER
+	std::string line ;
+	std::getline(file, line) ;
+	if(line != "#ALTA FUNC HEADER")
+	{
+		std::cerr << "<<ERROR>> this is not a function file" << std::endl;
+	}
+
+	// Parse the header for the function command line and the dimension
+	// of the function
+	while(line != "#ALTA HEADER END")
+	{
+		std::getline(file, line) ;
+		std::stringstream linestream(line) ;
+
+		linestream.ignore(1) ;
+
+		std::string comment ;
+		linestream >> comment ;
+
+		if(comment == std::string("DIM"))
+		{
+			linestream >> nX >> nY ;
+		}
+		else if(comment == std::string("CMD"))
+		{
+			args = arguments::create_arguments(line.substr(4, std::string::npos));
+		}
+	}
+
+	// Create the function from the command line
+	function* f = get_function(args);
+	f->setDimX(nX);
+	f->setDimY(nY);
+
+	// Load the function part from the file object
+	//f->load(file);
+
+	return f;
+}
+
 //! Get an instance of the function selected based on the name <em>n</em>.
 //! Return NULL if no one exist.
 function* plugins_manager::get_function(const arguments& args)
@@ -219,18 +277,30 @@ function* plugins_manager::get_function(const arguments& args)
             return NULL;
         }
 
-        //! \todo create a <em>compound</em> class to store multiple
+        //! create a <em>compound</em> class to store multiple
         //! functions in it.
-
+		  compound_function* compound = new compound_function();
+	
         //! For each args_vec element, create a function object and add
         //! it to the compound one.
+		  for(int i=0; i<args_vec.size(); ++i)
+		  {
+	        std::string n("--func ");
+	        n.append(args_vec[i]);
 
-        std::string n("--func ");
-        n.append(args_vec[0]);
-        func = get_function(arguments::create_arguments(n));
+			  function* f = get_function(arguments::create_arguments(n));
+			  if(dynamic_cast<nonlinear_function*>(f) == NULL)
+			  {
+				  std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
+			  }
+			  else
+			  {
+				  compound->push_back(dynamic_cast<nonlinear_function*>(f));
+			  }
+		  }
 
-        //! return the compound class
-
+		  //! return the compound class
+		  func = compound;
     }
     else
     {

@@ -81,7 +81,7 @@ ALTA library assumes that all functions are exported using the following convent
 
 Example of a .function file for a single Lafortune lobe without any diffuse:
 \verbatim
-   #ALTA_HEADER_START
+   #ALTA_HEADER_DATA
    #CMD lafortune --nb_lobes 1 --isotrope
    #DIM 2 1
    #PARAM_IN  ROMEIRO_TH_TD
@@ -98,7 +98,7 @@ For multiple BRDFs lobes (when you want to add a diffuse for example), you need 
 specify it into the command line. The different parameters are outputed sequentially
 into the file:
 \verbatim
-   #ALTA_HEADER_START
+   #ALTA_HEADER_FUNC
    #CMD [diffuse, lafortune --nb_lobes 1 --isotrope, phong --fresnel schlick]
    #DIM 2 3
    #PARAM_IN  ROMEIRO_TH_TD

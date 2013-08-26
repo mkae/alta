@@ -46,7 +46,13 @@ class plugins_manager
 #ifdef USING_STATIC
 		static
 #endif
-        function* get_function(const arguments& args) ;
+		function* get_function(const arguments& args) ;
+
+		//! \brief load a function from the ALTA input file.
+#ifdef USING_STATIC
+		static
+#endif
+		function* get_function(const std::string& filename);
 			
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
