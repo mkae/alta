@@ -1,37 +1,19 @@
 /*!
 \page format Format
 
-\todo Describe here the file format
+<h2>Common notations</h2>
 
-
-<h2>Input file format</h2>
-
-For a text data file with <em>n</em> data entries where the input domain has <em>N</em> dimensions and a <em>input_param</em> parametrization and the output domain has <em>P</em> dimensions and a <em>output_param</em> parametrization, our file format is the following:
-
-\verbatim
-#DIM N P 
-#PARAM_IN  %input_param%
-#PARAM_OUT %output_param%
-#VS [0|1|2] (P times)
-x_{1,1} ... x_{1,N}  y_{1,1} ... y_{1,P}
-...
-x_{i,1} ... x_{i,N}  y_{i,1} ... y_{i,P}
-...
-x_{n,1} ... x_{n,N}  y_{n,1} ... y_{n,P}
-\endverbatim
-
-Vertical segments are not defined if VS is 0. For a VS of 1, each sample as a radius associated for the associated dimension. If VS is 2, each sample has a min and max segment value for the associated dimension.
+Data and function files have the same format. They are text file very close to dump.
+Each file starts with a header containing :
 
 <h3> Parametrization format </h3>
-
- New Tokens
 
 <ul>
  <li> \verbatim #PARAM_IN   input_parametrization_name  \endverbatim </li>
  <li> \verbatim #PARAM_OUT  output_parametrization_name \endverbatim </li>
 </ul>
  
- 
+
 <h3>Input Parametrization</h3>
 
 Param toujours de la forme NOMDUTYPE_PARAM1_PARAM2_..._PARAMN ou N est le nombre
@@ -60,32 +42,97 @@ enum{
  ENERGY   ( as specified by the International Unit System i.e., Joule)
  LUMINANCE
 
+<h2>Input file format</h2>
+
+For a text data file with <em>n</em> data entries where the input domain has <em>N</em> dimensions and a <em>input_param</em> parametrization and the output domain has <em>P</em> dimensions and a <em>output_param</em> parametrization, our file format is the following:
+
+\verbatim
+#DIM N P 
+#PARAM_IN  %input_param%
+#PARAM_OUT %output_param%
+#VS [0|1|2] (P times)
+x_{1,1} ... x_{1,N}  y_{1,1} ... y_{1,P}
+...
+x_{i,1} ... x_{i,N}  y_{i,1} ... y_{i,P}
+...
+x_{n,1} ... x_{n,N}  y_{n,1} ... y_{n,P}
+\endverbatim
+
+Vertical segments are not defined if VS is 0. For a VS of 1, each sample as a radius associated for the associated dimension. If VS is 2, each sample has a min and max segment value for the associated dimension.
+
+ 
 
 
-<h2>Rational function file format (.rational)</h2>
 
-We advise to output all rational function into .rational file for consistency.
-ALTA library assumes that all rational polynomials are exported using the
-following convention:
+<h2>Function file format (.function_name)</h2>
+
+We advise to output function file into <em>.function</em> file for consistency.
+ALTA library assumes that all functions are exported using the following convention:
 
 <ul>
-	<li>The .rational file is outputed in plain text and not in binary.</li>
-	<li>The .rational file starts with a header. Each line of the header 
+	<li>The .function file is outputed in plain text and not in binary.</li>
+	<li>The .function file starts with a header. Each line of the header 
 	starts with the character '#'.</li>
-	<li>If there are multiple color channels to the rational function, they
+	<li>The header contains the command line used to create the function
+	in a <em>#CMD ...</em> line.
+	<li>If there are multiple color channels to the function, they
 	are enumerated in the file, one color channel by one.</li>
 </ul>
 
-Example of a .rational file:
+Example of a .function file for a single Lafortune lobe without any diffuse:
 \verbatim
-   #DIM N P 
-   #NP  (nombre de coeffs ou degré max au numerateur  )
-   #NQ  (nombre de coeffs ou degré min au denominateur )
-   #BASIS  "chaine_caract_decrivant_le_type_de_fonction_de_base"
-   Coeff_numerateur deg_1_fct_base deg_2_fct_base ... coeff_associe 
-   Coeff denominateur
-   #NP
-   #NQ
+   #ALTA_HEADER_START
+   #CMD lafortune --nb_lobes 1 --isotrope
+   #DIM 2 1
+   #PARAM_IN  ROMEIRO_TH_TD
+   #PARAM_OUT ENERGY
+   #ALTA_HEADER_END
+
+   #FUNC lafortune
+   Cx 1.0
+   Cz 1.0
+   N  10.0 
+\endverbatim
+
+For multiple BRDFs lobes (when you want to add a diffuse for example), you need to 
+specify it into the command line. The different parameters are outputed sequentially
+into the file:
+\verbatim
+   #ALTA_HEADER_START
+   #CMD [diffuse, lafortune --nb_lobes 1 --isotrope, phong --fresnel schlick]
+   #DIM 2 3
+   #PARAM_IN  ROMEIRO_TH_TD
+   #PARAM_OUT RGB_COLOR
+   #ALTA_HEADER_END
+
+   #FUNC diffuse 
+   kd 1.0
+   kd 0.02
+   kd 0.1
+
+   #FUNC lafortune
+   Cx 1.0
+   Cz 1.0
+   N  10.0 
+   Cx 1.0
+   Cz 1.0
+   N  10.0 
+   Cx 1.0
+   Cz 1.0
+   N  10.0 
+
+   #FUNC phong
+   ks 1.0
+   N  10.0 
+   ks 1.0
+   N  10.0 
+   ks 1.0
+   N  10.0 
+
+   #FUNC schlick
+   R 1.0
+   R 1.0
+   R 1.0
 \endverbatim
 
 \todo Right now the different color channels have the same length !

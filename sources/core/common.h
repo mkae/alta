@@ -245,7 +245,7 @@ template<typename T> T clamp(T x, T a, T b)
 }
 
 #define NOT_IMPLEMENTED() \
-std::cerr << "<<ERROR>> not implemented " << __FILE__ \
+std::cerr << "<<ERROR>> not implemented " << __PRETTY_FUNCTION__ << " in file " << __FILE__ \
           << ":" << __LINE__ << std::endl; \
 throw
 

@@ -138,9 +138,14 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 #ifndef DEBUG
 	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
 #endif
+	 if(nf->nbParameters() == 0)
+	 {
+		 return true;
+	 }
 
     /* the following starting values provide a rough fit. */
     vec nf_x = nf->parameters();
+
     int info;
     Eigen::VectorXd x(nf->nbParameters());
     for(int i=0; i<nf->nbParameters(); ++i)

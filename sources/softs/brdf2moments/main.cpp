@@ -15,29 +15,6 @@
 #include <cstdlib>
 #include <cmath>
 
-/*
-vec coord(vec V, vec L, vec X, vec Y, vec N)
-{
-	vec pV = V-dot(V,N)*N;
-	vec vCoord(2);
-	vCoord[0] = dot(pV,X);
-	vCoord[1] = dot(pV,Y);
-	vCoord /= (1.0+dot(V,N));
-
-	vec pL = L-dot(L,N)*N;
-	vec lCoord = vec2(dot(pL,X),dot(pL,Y));
-	lCoord /= (1.0+dot(L,N));
-
-	if (length(lCoord)>EPS)	
-	{	
-		vec2 lDir = normalize(lCoord);
-		mat2 lRot = mat2(lDir.x, lDir.y, -lDir.y, lDir.x);
-		vCoord *= lRot;
-	}
-
-	return vCoord;
-}
-*/
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv, false);
@@ -46,7 +23,7 @@ int main(int argc, char** argv)
     plugins_manager manager(args) ;
 
     if(args.is_defined("help")) {
-        std::cout << "<<HELP>> data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
+        std::cout << "<<HELP>> data2moments --input data.file --output gnuplot.file --function loader.so" << std::endl ;
         std::cout << " - input, output and data are mandatory parameters" << std::endl ;
         return 0 ;
     }
@@ -59,38 +36,33 @@ int main(int argc, char** argv)
         std::cerr << "<<ERROR>> the output filename is not defined" << std::endl ;
         return 1 ;
     }
-    if(! args.is_defined("data")) {
+    if(! args.is_defined("func")) {
         std::cerr << "<<ERROR>> the data loader is not defined" << std::endl ;
         return 1 ;
     }
 
     // Import data
-    data* d = NULL ;
-    d = manager.get_data(args["data"]) ;
-    d->load(args["input"]);
+    function* f = NULL ;
+    f = manager.get_function(args) ;
+    f->load(args["input"]);
 
     // Create output file
     std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 
-    if(d != NULL)
+    if(f != NULL)
     {
         // Data parametrization
-        params::input data_param = d->parametrization();
-        int d_size = params::dimension(data_param);
+        params::input func_param = f->parametrization();
+        int d_size = params::dimension(func_param);
 
         double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
 
         // Sample every degree
         double dtheta = 0.5*M_PI / 90.0;
 
-		  // Static data
-		  vec X(3); X[0] = 1; X[1] = 0; X[2] = 0;
-		  vec Y(3); Y[0] = 0; Y[1] = 1; Y[2] = 0;
-		  vec N(3); N[0] = 0; N[1] = 0; N[2] = 1;
-
         // Moments
-        vec rawm0(d->dimY());
-        vec rawm1(d->dimY());
+        vec rawm0(f->dimY());
+        vec rawm1(f->dimY());
 
         for(int theta_in=0; theta_in<90; theta_in++)
         {
@@ -105,12 +77,12 @@ int main(int argc, char** argv)
                     in_angle[3] = phi_out * 0.5*M_PI / 180.0;
 
                     vec in(d_size);
-                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
+                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, func_param, &in[0]);
 
                     // Copy the input vector
-                    vec x = d->value(in);
+                    vec x = f->value(in);
 
-                    for(int i=0; i<d->dimY(); ++i)
+                    for(int i=0; i<f->dimY(); ++i)
                     {
                         double val = x[i] * cos(in_angle[2]);
 
@@ -120,7 +92,7 @@ int main(int argc, char** argv)
                 }
             }
 
-            for(int i=0; i<d->dimY(); ++i)
+            for(int i=0; i<f->dimY(); ++i)
             {
                 rawm0[i] /= 180.0*90.0;
                 rawm1[i] /= 180.0*90.0 * rawm0[i];
@@ -144,6 +116,8 @@ int main(int argc, char** argv)
     {
         std::cerr << "<<ERROR>> load file \"" << args["input"] << "\"" << std::endl ;
     }
+
+	 delete f;
 
     return 0 ;
 }

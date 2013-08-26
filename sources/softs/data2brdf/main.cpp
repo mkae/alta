@@ -45,6 +45,7 @@ int main(int argc, char** argv)
 	}
 
 	//	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
+	if(fit != NULL)
 	{
 		fit->set_parameters(args) ;
 
@@ -176,11 +177,10 @@ int main(int argc, char** argv)
 		}
 
 	}	
-	/*	else
-		{
-		std::cout << "<<ERROR>> not enough plugin defined" << std::endl ;
-		}
-		*/
+	else
+	{
+		std::cout << "<<ERROR>> no fitter loaded, please check your command line arguments" << std::endl ;
+	}
 
 	return 0 ;
 }

@@ -288,6 +288,13 @@ class fresnel : public nonlinear_function
 			}
 		}
 		
+		//! \brief Provide a first rough fit of the function. 
+		virtual void bootstrap(const data* d, const arguments& args) 
+		{
+			fresnelBootstrap(d, args);
+			f->bootstrap(d, args);
+		}
+		
 		//! Save the Fresnel part along with the function
 		virtual void save(const std::string& filename, const arguments& args) const
 		{
@@ -455,6 +462,9 @@ class fresnel : public nonlinear_function
 		//! \brief Obtain the derivatives of the function with respect to the 
 		//! parameters.
 		virtual vec getFresnelParametersJacobian(const vec& x) const = 0;		
+
+		//! \brief Boostrap the function by defining the diffuse term
+		virtual void fresnelBootstrap(const data* d, const arguments& args) = 0;
 
 	protected: //data
 

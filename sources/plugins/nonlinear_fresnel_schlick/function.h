@@ -17,9 +17,6 @@ class schlick : public fresnel
 
 	public: // methods
 
-		//! \brief Boostrap the function by defining the diffuse term
-		virtual void bootstrap(const data* d, const arguments& args);
-
 		//! \brief Load function specific files
 		virtual void load(const std::string& filename) ;
 
@@ -41,6 +38,10 @@ class schlick : public fresnel
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
 		virtual vec getFresnelParametersJacobian(const vec& x) const ;
+		
+		//! \brief Boostrap the function by defining the diffuse term
+		virtual void fresnelBootstrap(const data* d, const arguments& args);
+
 
 	private: // data
 

@@ -23,10 +23,13 @@ void schlick::load(const std::string& filename)
 
 vec schlick::fresnelValue(const vec& x) const
 {
+	double xp[2];
+	params::convert(&x[0], input_parametrization(), params::COS_TH_TD, xp);
+
 	vec res(_nY);
 	for(int i=0; i<_nY; ++i)
 	{
-		res[i] = R + (1.0 - R) * pow(1.0 - clamp(x[0], 0.0, 1.0), 5.0);
+		res[i] = R + (1.0 - R) * pow(1.0 - clamp(xp[1], 0.0, 1.0), 5.0);
 	}
 
 	return res;
@@ -35,7 +38,7 @@ vec schlick::fresnelValue(const vec& x) const
 //! \brief Number of parameters to this non-linear function
 int schlick::nbFresnelParameters() const 
 {
-	return dimY();
+	return 1;
 }
 
 //! \brief Get the vector of parameters for the function
@@ -57,18 +60,20 @@ void schlick::setFresnelParameters(const vec& p)
 vec schlick::getFresnelParametersJacobian(const vec& x) const 
 {
 	const int nY = dimY();
+	double xp[2];
+	params::convert(&x[0], input_parametrization(), params::COS_TH_TD, xp);
 
 	vec jac(nY);
 	for(int i=0; i<nY; ++i)
 	{
-		jac[i] = 1.0 - pow(1.0 - clamp(x[0], 0.0, 1.0), 5.0);
+		jac[i] = 1.0 - pow(1.0 - clamp(xp[1], 0.0, 1.0), 5.0);
 	}
 
 	return jac;
 }
 
 
-void schlick::bootstrap(const data* d, const arguments& args)
+void schlick::fresnelBootstrap(const data* d, const arguments& args)
 {
 	R = 1.0;
 }

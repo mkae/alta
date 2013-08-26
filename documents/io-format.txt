@@ -14,7 +14,7 @@
   + Format texte d'entrée et de sortie
 
 
-  + Format en Entrée
+  <h2>Data file format</h2>
 
   #DIM N P 
   # COMMENTAIRE
@@ -24,7 +24,7 @@
   x1 .... xN  y1.....yP
 
 
-  + Format en Sortie
+  <h2>Function file format</h2>
 
    #DIM N P 
    #NP  (nombre de coeffs ou degré max au numerateur  )
