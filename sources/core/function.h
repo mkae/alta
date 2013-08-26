@@ -257,6 +257,196 @@ class nonlinear_function: public function
 		virtual vec parametersJacobian(const vec& x) const = 0;
 };
 
+
+class compound_function: public nonlinear_function, public std::vector<nonlinear_function*>
+{
+	public: // methods
+		
+		// Overload the function operator
+		virtual vec operator()(const vec& x) const
+		{
+			return value(x);
+		}
+		virtual vec value(const vec& x) const
+		{
+			vec res(_nY);
+			for(int i=0; i<this->size(); ++i)
+			{
+				res = res + this->at(i)->value(x);
+			}
+			return res;
+		}
+
+		//! Load function specific files
+		virtual void load(const std::string& filename)
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->load(filename);
+			}
+		}
+		
+		//! \brief Provide a first rough fit of the function. 
+		virtual void bootstrap(const ::data* d, const arguments& args) 
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->bootstrap(d, args);
+			}
+		}
+		
+		//! Save the Fresnel part along with the function
+		virtual void save(const std::string& filename, const arguments& args) const
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->save(filename, args);
+			}
+		}
+
+		//! Set the dimension of the input space of the function
+		virtual void setDimX(int nX) 
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->setDimX(nX);
+			}
+		}
+		//! Set the dimension of the output space of the function
+		virtual void setDimY(int nY)
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->setDimY(nY);
+			}
+		}
+
+		// Acces to the domain of definition of the function
+		virtual void setMin(const vec& min) 
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->setMin(min);
+			}
+		}
+		virtual void setMax(const vec& max) 
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->setMax(max);
+			}
+		}
+
+		//! Number of parameters to this non-linear function
+		virtual int nbParameters() const
+		{
+			int nb_params = 0;
+			for(int i=0; i<this->size(); ++i)
+			{
+				nb_params += this->at(i)->nbParameters();
+			}
+		}
+
+		//! Get the vector of parameters for the function
+		virtual vec parameters() const
+		{
+			vec params(nbParameters());
+			int current_i = 0;
+			for(int f=0; f<this->size(); ++f)
+			{
+				vec f_params = this->at(f)->parameters();
+				for(int i=0; i<f_params.size(); ++i)
+				{
+					params[i + current_i] = f_params[i];
+				}
+
+				current_i += f_params.size();
+			}
+
+			return params;
+		}
+
+		//! Update the vector of parameters for the function
+		virtual void setParameters(const vec& p) 
+		{
+			int current_i = 0;
+			for(int f=0; f<this->size(); ++f)
+			{
+				int f_size = this->at(f)->nbParameters();
+				vec f_params(f_size);
+				for(int i=0; i<f_params.size(); ++i)
+				{
+					f_params[i] = p[i + current_i];
+				}
+
+				this->at(f)->setParameters(f_params);
+				current_i += f_size;
+			}
+		}
+
+		//! \brief Obtain the derivatives of the function with respect to the 
+		//! parameters. 
+		//
+		// The x input of this function is the position in the input space and 
+		// has size dimX(), the resulting vector has the size of the parameters
+		// times the size of the output domain.
+		//
+		// The result vector should be orderer as res[i + dimY()*j], output
+		// dimension first, then parameters.
+		virtual vec parametersJacobian(const vec& x) const
+		{
+			int nb_params = this->nbParameters();
+			vec jac(nb_params*_nY);
+
+			jac.assign(nb_params*_nY, 0.0);
+
+			int start_i = 0;
+
+			// Export the sub-Jacobian for each function
+			for(int f=0; f<this->size(); ++f)
+			{
+				nonlinear_function* func = this->at(f);
+				int nb_f_params = func->nbParameters(); 
+
+				vec func_jac = func->parametersJacobian(x);
+
+				for(int i=0; i<nb_f_params; ++i)
+				{
+					for(int y=0; y<_nY; ++y)
+					{
+						jac[y + _nY*(i+start_i)] = func_jac[y + _nY*i];
+					}
+				}
+
+				start_i += nb_f_params;
+			}
+		}
+	
+		//! \brief can set the input parametrization of a non-parametrized
+		//! object. Print an error if it is already defined.
+		virtual void setParametrization(params::input new_param)
+		{
+			parametrized::setParametrization(new_param);
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->setParametrization(new_param);
+			}
+		}
+		
+		//! \brief can set the output parametrization of a non-parametrized
+		//! function. Throw an exception if it tries to erase a previously
+		//! defined one.
+		virtual void setParametrization(params::output new_param)
+		{
+			parametrized::setParametrization(new_param);
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->setParametrization(new_param);
+			}
+		}
+
+};
+
 /*! \brief A Fresnel interface
  *  \ingroup core
  */
