@@ -349,80 +349,42 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 
 
 //! Load function specific files
-void lafortune_function::load(const std::string& filename)
+void lafortune_function::load(std::istream& in)
 {
-	std::ifstream file(filename.c_str()) ;
-	if(!file.is_open())
-	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw ;
-	}
+	    // Parse line until the next comment
+    while(in.peek() != '#')
+    {
+        char line[256];
+        in.getline(line, 256);
+    }
 
-	_nX = 0 ; _nY = 0 ;
-	_n = 0;
+    // Checking for the comment line #FUNC nonlinear_diffuse
+    std::string token;
+    in >> token;
+    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
-	double x, y, dy ;
-	while(file.peek() == '#')
-	{
-		std::string line ;
-		std::getline(file, line) ;
-		std::stringstream linestream(line) ;
+    in >> token;
+    if(token != "nonlinear_lafortune") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
 
-		linestream.ignore(1) ;
-
-		std::string comment ;
-		linestream >> comment ;
-
-		if(comment == std::string("DIM"))
-		{
-			linestream >> _nX >> _nY ;
-		}
-		else if(comment == std::string("NB_LOBES"))
-		{
-			linestream >> _n ;
-		}
-	}
-
-	_kd = vec(_nY);
-	setNbLobes(_n);
-		
-	// Parse the diffuse
-	for(int i=0; i<_nY; ++i)
-	{
-		file >> _kd[i];
-	}
+	 // Shoudl have the #NB_LOBES [int]
+	 int nb_lobes;
+	 in >> token >> nb_lobes;
+	 setNbLobes(nb_lobes);
 
 	// Parse the lobe
 	for(int n=0; n<_n; ++n)
 	{
-		// TODO find a way to discard those lines
-		while(file.peek() == '#')
+		for(int i=0; i<_nY; ++i)
 		{
-			std::string line ;
-			std::getline(file, line) ;
-		}
 
-//		std::cout << (char)file.peek() << std::endl;
-		for(int i=0; i<_nY; ++i)
-		{
-			file >> _C[(n*_nY + i)*3 + 0] >> _C[(n*_nY + i)*3 + 1] >> _C[(n*_nY + i)*3 + 2];
-		}
-		
-		// TODO find a way to discard those lines
-		while(file.peek() == '#')
-		{
-			std::string line ;
-			std::getline(file, line) ;
-		}
-		
-		for(int i=0; i<_nY; ++i)
-		{
-			file >> _N[i];
+			in >> token >> _C[(n*_nY + i)*3 + 0];
+			in	>> token >> _C[(n*_nY + i)*3 + 1];
+			in >> token >> _C[(n*_nY + i)*3 + 2];
+			in >> token >> _N[i];
 		}
 
 	}
 	
-	std::cout << "<<INFO>> Kd = " << _kd << std::endl;
 	std::cout << "<<INFO>> Cd = " << _C << std::endl;
 	std::cout << "<<INFO>> N = " << _N << std::endl;
 }

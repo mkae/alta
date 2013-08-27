@@ -29,7 +29,7 @@ class function : public parametrized
 		virtual vec value(const vec& x) const = 0 ;
 
 		//! Load function specific files
-		virtual void load(const std::string& filename) = 0 ;
+        virtual void load(std::istream& in) = 0 ;
 
 		//! \brief Provide a first rough fit of the function. 
 		//!
@@ -278,11 +278,11 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		}
 
 		//! Load function specific files
-		virtual void load(const std::string& filename)
+        virtual void load(std::istream& in)
 		{
 			for(int i=0; i<this->size(); ++i)
 			{
-				this->at(i)->load(filename);
+                this->at(i)->load(in);
 			}
 		}
 		
@@ -466,11 +466,11 @@ class fresnel : public nonlinear_function
 		}
 
 		//! Load function specific files
-		virtual void load(const std::string& filename)
+        virtual void load(std::istream& in)
 		{
 			if(f != NULL)
 			{
-				f->load(filename);
+                f->load(in);
 			}
 			else
 			{

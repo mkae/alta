@@ -51,8 +51,7 @@ int main(int argc, char** argv)
 	d = manager.get_data(args["data"]) ;
 
 	function* f = NULL;
-    f = manager.get_function(args);
-	f->load(args["input"]);
+    f = manager.get_function(args["input"]);
 
 	// Modify function or data to provide coherent
 	// interfaces

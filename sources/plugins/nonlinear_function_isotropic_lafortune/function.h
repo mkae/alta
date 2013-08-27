@@ -44,7 +44,7 @@ class isotropic_lafortune_function : public nonlinear_function
 		virtual vec value(const vec& x, const vec& p) const;
 
 		//! \brief Load function specific files
-		virtual void load(const std::string& filename) ;
+		virtual void load(std::istream& in) ;
 
 		//! \brief Boostrap the function by defining the diffuse term
 		//!

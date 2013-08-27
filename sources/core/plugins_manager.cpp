@@ -247,7 +247,7 @@ function* plugins_manager::get_function(const std::string& filename)
 	f->setDimY(nY);
 
 	// Load the function part from the file object
-	//f->load(file);
+    f->load(file);
 
 	return f;
 }

@@ -24,7 +24,7 @@ rational_function_1d::rational_function_1d(const std::vector<double>& a,
 {
 }
 
-void rational_function_1d::load(const std::string& filename)
+void rational_function_1d::load(std::istream& in)
 {
 }
 
@@ -366,16 +366,8 @@ vec rational_function::value(const vec& x) const
 }
 
 // IO function to text files
-
-void rational_function::load(const std::string& filename)
+void rational_function::load(std::istream& file)
 {
-	std::ifstream file(filename.c_str()) ;
-	if(!file.is_open())
-	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw ;
-	}
-
 	int nX, nY ;
 	vec xmin, xmax ;
 	vec a, b;

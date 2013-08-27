@@ -43,8 +43,7 @@ int main(int argc, char** argv)
 
     // Import data
     function* f = NULL ;
-    f = manager.get_function(args) ;
-    f->load(args["input"]);
+    f = manager.get_function(args["input"]) ;
 
     // Create output file
     std::ofstream file(args["output"].c_str(), std::ios_base::trunc);

@@ -31,9 +31,29 @@ vec diffuse_function::value(const vec& x) const
 }
 
 //! Load function specific files
-void diffuse_function::load(const std::string& filename) 
+void diffuse_function::load(std::istream &in)
 {
-	NOT_IMPLEMENTED();
+    // Parse line until the next comment
+    while(in.peek() != '#')
+    {
+        char line[256];
+        in.getline(line, 256);
+    }
+
+    // Checking for the comment line #FUNC nonlinear_diffuse
+    std::string token;
+    in >> token;
+    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+
+    in >> token;
+    if(token != "nonlinear_diffuse") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+
+    // kd [double]
+    for(int i=0; i<dimY(); ++i)
+    {
+        in >> token >> _kd[i];
+    }
+
 }
 		
 void diffuse_function::save_alta(const std::string& filename, const arguments& args) const

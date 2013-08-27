@@ -306,82 +306,44 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 
 
 //! Load function specific files
-void isotropic_lafortune_function::load(const std::string& filename)
+void isotropic_lafortune_function::load(std::istream& in)
 {
-	std::ifstream file(filename.c_str()) ;
-	if(!file.is_open())
+	// Parse line until the next comment
+	while(in.peek() != '#')
 	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw ;
+		char line[256];
+		in.getline(line, 256);
 	}
 
-	_nX = 0 ; _nY = 0 ;
-	_n = 0;
+	// Checking for the comment line #FUNC nonlinear_diffuse
+	std::string token;
+	in >> token;
+	if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
-	double x, y, dy ;
-	while(file.peek() == '#')
-	{
-		std::string line ;
-		std::getline(file, line) ;
-		std::stringstream linestream(line) ;
+	in >> token;
+	if(token != "nonlinear_lafortune") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
 
-		linestream.ignore(1) ;
-
-		std::string comment ;
-		linestream >> comment ;
-
-		if(comment == std::string("DIM"))
-		{
-			linestream >> _nX >> _nY ;
-		}
-		else if(comment == std::string("NB_LOBES"))
-		{
-			linestream >> _n ;
-		}
-	}
-
-	_kd = vec(_nY);
-	setNbLobes(_n);
-		
-	// Parse the diffuse
-	for(int i=0; i<_nY; ++i)
-	{
-		file >> _kd[i];
-	}
+	// Shoudl have the #NB_LOBES [int]
+	int nb_lobes;
+	in >> token >> nb_lobes;
+	setNbLobes(nb_lobes);
 
 	// Parse the lobe
-	int n=0;
-	std::string line ;
-	while(n < _n)
+	for(int n=0; n<_n; ++n)
 	{
-		std::getline(file, line) ;
-
-		if(line.size() > 1)
+		for(int i=0; i<_nY; ++i)
 		{
-			std::string sub = line.substr(0,2);
 
-			if(sub == "#C")
-			{
-				for(int i=0; i<_nY; ++i)
-				{
-					file >> _C[(n*_nY + i)*2 + 0] >> _C[(n*_nY + i)*2 + 1];
-				}
-			}
-			else if(sub == "#N")
-			{
-				for(int i=0; i<_nY; ++i)
-				{
-					file >> _N[n*_nY+i];
-				}
-
-				++n;
-			}
+			in >> token >> _C[(n*_nY + i)*2 + 0];
+			in >> token >> _C[(n*_nY + i)*2 + 1];
+			in >> token >> _N[i];
 		}
+
 	}
-	
-	std::cout << "<<INFO>> Kd = " << _kd << std::endl;
+
 	std::cout << "<<INFO>> Cd = " << _C << std::endl;
 	std::cout << "<<INFO>> N = " << _N << std::endl;
+
 }
 
 void isotropic_lafortune_function::save(const std::string& filename) const

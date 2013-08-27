@@ -36,7 +36,7 @@ class rational_function_1d : public function
 		virtual double q(const vec& x, int j) const ;
 
 		// IO function to text files
-		virtual void load(const std::string& filename) ;
+        virtual void load(std::istream& in);
 
 		// Update the function
 		virtual void update(const std::vector<double>& in_a, 
@@ -89,7 +89,7 @@ class rational_function : public function
 		virtual vec operator()(const vec& x) const { return value(x) ; }
 
 		// IO function to text files
-		virtual void load(const std::string& filename) ;
+        virtual void load(std::istream& in) ;
 
 		// Update the function
 		virtual void update(int i, rational_function_1d* r) ;

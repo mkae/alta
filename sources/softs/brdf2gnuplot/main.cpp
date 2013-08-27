@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-    function* f = manager.get_function(args) ;
+    function* f = manager.get_function(args["input"]) ;
 
 	data* d = NULL ;
 	if(args.is_defined("data"))
@@ -56,9 +56,6 @@ int main(int argc, char** argv)
         std::cout << "<<INFO>> Exporting linear error plot" << std::endl;
         linear_plot = true;
     }
-
-	// Load the BRDF
-	f->load(args["input"]);
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
