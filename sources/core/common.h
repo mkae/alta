@@ -28,11 +28,8 @@ class vec : public std::vector<double>
 		{
 			assign(dim, 0.0) ;
 		}
-		virtual ~vec() 
-		{
-        }
-
-        //! \brief get a subpart of the vector
+        
+		//! \brief get a subpart of the vector
         vec subvector(int start, int n) const
         {
             vec res(n);

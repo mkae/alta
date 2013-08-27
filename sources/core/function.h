@@ -291,6 +291,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			{
 				nb_params += this->at(i)->nbParameters();
 			}
+			return nb_params;
 		}
 
 		//! Get the vector of parameters for the function
