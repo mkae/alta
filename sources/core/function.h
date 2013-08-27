@@ -24,12 +24,14 @@ class function : public parametrized
 {
 	public: // methods
 
+		/* INTERFACE */
+
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const = 0 ;
 		virtual vec value(const vec& x) const = 0 ;
 
 		//! Load function specific files
-        virtual void load(std::istream& in) = 0 ;
+		virtual void load(std::istream& in) = 0 ;
 
 		//! \brief Provide a first rough fit of the function. 
 		//!
@@ -37,41 +39,6 @@ class function : public parametrized
 		//! Can be used to set the diffuse component of the function for
 		//! example.
 		virtual void bootstrap(const data* d, const arguments& args) {}
-
-		//! \brief Save the current function to a specific file type, args can 
-		//! be used to differenciate the type of export.
-		//!
-		//! \see rational_function.cpp for an example
-		virtual void save(const std::string& filename, const arguments& args) const
-		{
-			std::cout << "<<DEBUG>> Exporting the function" << std::endl;
-			if(args.is_defined("export"))
-			{
-				if(args["export"].compare("c++") == 0)
-				{
-					std::cout << "<<INFO>> will export in C++ format" << std::endl;
-					save_cpp(filename, args);
-				}
-				else if(args["export"].compare("matlab") == 0)
-				{
-					std::cout << "<<INFO>> will export in matlab format" << std::endl;
-					save_matlab(filename, args);
-				}
-				else if(args["export"].compare("explorer") == 0)
-				{
-					std::cout << "<<INFO>> will export in BRDF explorer format" << std::endl;
-					save_brdfexplorer(filename, args);
-				}
-				else
-				{
-					std::cerr << "<<ERROR>> the export format is unknown" << std::endl ;
-				}
-			}
-			else
-			{
-				save_alta(filename, args) ;
-			}
-		}
 
 		//! Provide the dimension of the input space of the function
 		virtual int dimX() const { return _nX ; }
@@ -101,111 +68,32 @@ class function : public parametrized
 		virtual vec getMin() const { return _min ; }
 		virtual vec getMax() const { return _max ; }
 
-	protected: // function
 
-		//! \brief Standard saving function.
-		virtual void save_alta(const std::string& filename, const arguments& args) const 
-		{
-			NOT_IMPLEMENTED();
-		}
+		/* EXPORT FUNCTIONS */
 
-		//! \brief Output the function as a gnuplot file. It requires
-		//! the data object to output the function at the input location only.
-		virtual void save_gnuplot(const std::string& filename, const data* d, 
-				const arguments& args) const
-		{
-#ifndef OLD
-			std::ofstream file(filename.c_str(), std::ios_base::trunc);
-			for(int i=0; i<d->size(); ++i)
-			{
-				vec v = d->get(i) ;
-				//		vec y1 ; y1.assign(d->dimY(), 0.0) ;
-				//		for(int k=0; k<d->dimY(); ++k) { y1[k] = v[d->dimX() + k] ; }
+		//! \brief Save the current function to a specific file type, args can 
+		//! be used to differenciate the type of export.
+		//!
+		//! \see rational_function.cpp for an example
+		virtual void save(const std::string& filename, const arguments& args) const;
 
-				vec y2 = value(v) ;
-				for(int u=0; u<d->dimX(); ++u)
-					file << v[u] << "\t" ;
+		//! \brief save the header of the output function file. The header should
+		//! store general information about the fit such as the command line used
+		//! the dimension of the fit. L2 and L_inf distance could be added here.
+		virtual void save_header(std::ostream& out, const arguments& args) const ;
 
-				for(int u=0; u<d->dimY(); ++u)
-					file << y2[u] << "\t" ;
+		//! \brief save function specific data. This has no use for ALTA export
+		//! but allows to factorize the code in the C++ or matlab export by
+		//! defining function calls that are common to all the plugins.
+		virtual void save_body(std::ostream& out, const arguments& args) const ;
 
-				file << std::endl ;
-			}
-			file.close();
-#else
-			NOT_IMPLEMENTED();
-#endif
-		}
+		//! \brief save object specific information. For an ALTA export the
+		//! coefficients will be exported. For a C++ or matlab export, the call
+		//! to the associated function will be done.
+		virtual void save_call(std::ostream& out, const arguments& args) const ;
 
-		//! \brief Output the function using a C++ function formating.
-		virtual void save_cpp(const std::string& filename, const arguments& args) const 
 
-		{
-			NOT_IMPLEMENTED();
-		}
-
-		//! \brief Output the function using a C++ function formating.
-		virtual void save_matlab(const std::string& filename, const arguments& args) const 
-		{
-			NOT_IMPLEMENTED();
-		}
-
-		//! \brief Output the function using a BRDF Explorer formating.
-		virtual void save_brdfexplorer(const std::string& filename, const arguments& args) const
-		{
-			NOT_IMPLEMENTED();
-		}
-
-		//! \brief parse the header of the file and return the corresponding
-		//! arguments and associate stream
-		void load_header(const std::string& filename, arguments& args, std::ifstream& file)
-		{
-			file.open(filename.c_str()) ;
-			if(!file.is_open())
-			{
-				std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-				throw ;
-			}
-
-			while(file.peek() == '#')
-			{
-				std::string line ;
-				std::getline(file, line) ;
-				std::stringstream linestream(line) ;
-
-				linestream.ignore(1) ;
-
-				std::string comment ;
-				linestream >> comment ;
-
-				if(comment == std::string("DIM"))
-				{
-					linestream >> _nX >> _nY ;
-				}
-				else if(comment == std::string("CMD"))
-				{
-					args = arguments::create_arguments(line.substr(5, std::string::npos));
-				}
-			}
-		}
-		
-		void save_header(const std::string& filename, arguments& args, std::ofstream& file)
-		{
-			file.open(filename.c_str()) ;
-			if(!file.is_open())
-			{
-				std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-				throw ;
-			}
-
-			file << "#CMD " << args.get_cmd() << std::endl;
-			file << "#DIM " << _nX << " " << _nY << std::endl;
-			file << "#PARAM_IN  " << params::get_name(input_parametrization()) << std::endl;
-			//file << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
-			file << std::endl;
-		}
-
-	public: // methods
+		/* METRIC FUNCTIONS */
 
 		//! \brief L2 norm to data.
 		double L2_distance(const data* d) const ;
@@ -255,13 +143,64 @@ class nonlinear_function: public function
 		// The result vector should be orderer as res[i + dimY()*j], output
 		// dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const = 0;
+
+		//! \brief default non_linear import. Parse the parameters in order.
+		virtual void load(std::istream& in)
+		{
+			// Parse line until the next comment
+			while(in.peek() != '#')
+			{
+				char line[256];
+				in.getline(line, 256);
+			}
+
+			// Checking for the comment line #FUNC nonlinear_function_phong
+			std::string token;
+			in >> token;
+			if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+
+			in >> token;
+			if(token != "nonlinear_function")
+			{
+				std::cerr << "<<ERROR>> parsing the stream. A function name is defined." << std::endl;
+				std::cerr << "<<ERROR>> did you forget to specify the plugin used to expor?" << std::endl;
+			}
+
+			int nb_params = nbParameters();
+			vec p(nb_params);
+			for(int i=0; i<nb_params; ++i)
+			{
+				in >> token >> p[i];
+			}
+
+			setParameters(p);
+		}
+
+		//! \brief default non_linear export. It will dump the parameters in order
+		//! but won't assign names for the function nor parameters.
+		virtual void save_call(std::ostream& out, arguments& args) const
+		{
+			if(!args.is_defined("export"))
+			{
+				// Dump a #FUNC nonlinear
+				out << "#FUNC nonlinear_function" << std::endl;
+
+				// Dump the parameters in order
+				vec p = parameters();
+				for(int i=0; i<p.size(); ++i)
+				{
+					out << "param_" << i+1 << "\t" << p[i] << std::endl;
+				}
+				out << std::endl;
+			}
+		}
 };
 
 
 class compound_function: public nonlinear_function, public std::vector<nonlinear_function*>
 {
 	public: // methods
-		
+
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const
 		{
@@ -278,14 +217,14 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		}
 
 		//! Load function specific files
-        virtual void load(std::istream& in)
+		virtual void load(std::istream& in)
 		{
 			for(int i=0; i<this->size(); ++i)
 			{
-                this->at(i)->load(in);
+				this->at(i)->load(in);
 			}
 		}
-		
+
 		//! \brief Provide a first rough fit of the function. 
 		virtual void bootstrap(const ::data* d, const arguments& args) 
 		{
@@ -294,7 +233,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 				this->at(i)->bootstrap(d, args);
 			}
 		}
-		
+
 		//! Save the Fresnel part along with the function
 		virtual void save(const std::string& filename, const arguments& args) const
 		{
@@ -421,7 +360,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 				start_i += nb_f_params;
 			}
 		}
-	
+
 		//! \brief can set the input parametrization of a non-parametrized
 		//! object. Print an error if it is already defined.
 		virtual void setParametrization(params::input new_param)
@@ -432,7 +371,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 				this->at(i)->setParametrization(new_param);
 			}
 		}
-		
+
 		//! \brief can set the output parametrization of a non-parametrized
 		//! function. Throw an exception if it tries to erase a previously
 		//! defined one.
@@ -443,6 +382,53 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			{
 				this->at(i)->setParametrization(new_param);
 			}
+		}
+
+		//! \brief save function specific data. This has no use for ALTA export
+		//! but allows to factorize the code in the C++ or matlab export by
+		//! defining function calls that are common to all the plugins.
+		virtual void save_body(std::ostream& out, arguments& args) const
+		{
+			for(int i=0; i<this->size(); ++i)
+			{
+				this->at(i)->save_body(out, args);
+				out << std::endl;
+			}
+
+			function::save_body(out, args);
+		}
+
+		//! \brief save object specific information. For an ALTA export the
+		//! coefficients will be exported. For a C++ or matlab export, the call
+		//! to the associated function will be done.
+		virtual void save_call(std::ostream& out, arguments& args) const
+		{
+			bool is_cpp    = args["export"] == "C++";
+			bool is_shader = args["export"] == "shader";
+			bool is_matlab = args["export"] == "matlab";
+
+			// This part is export specific. For ALTA, the coefficients are just
+			// dumped as is with a #FUNC {plugin_name} header.
+			//
+			// For C++ export, the function call should be done before hand and
+			// the line should look like:
+			//   res += call_i(x);
+			for(int i=0; i<this->size(); ++i)
+			{
+				if(is_cpp || is_matlab || is_shader)
+				{
+					out << "res += ";
+				}
+
+				this->at(i)->save_call(out, args);
+
+				if(is_cpp || is_matlab || is_shader)
+				{
+					out << ";" << std::endl;
+				}
+			}
+
+			function::save_call(out, args);
 		}
 
 };
@@ -466,25 +452,25 @@ class fresnel : public nonlinear_function
 		}
 
 		//! Load function specific files
-        virtual void load(std::istream& in)
+		virtual void load(std::istream& in)
 		{
 			if(f != NULL)
 			{
-                f->load(in);
+				f->load(in);
 			}
 			else
 			{
 				std::cout << "<<ERROR>> trying to load a Fresnel object with no base class" << std::endl;
 			}
 		}
-		
+
 		//! \brief Provide a first rough fit of the function. 
 		virtual void bootstrap(const data* d, const arguments& args) 
 		{
 			fresnelBootstrap(d, args);
 			f->bootstrap(d, args);
 		}
-		
+
 		//! Save the Fresnel part along with the function
 		virtual void save(const std::string& filename, const arguments& args) const
 		{
@@ -558,7 +544,7 @@ class fresnel : public nonlinear_function
 				func_params[i] = p[i];
 			}
 			f->setParameters(func_params);
-			
+
 			vec fres_params(nb_fres_params);
 			for(int i=0; i<nb_fres_params; ++i)
 			{
@@ -605,19 +591,19 @@ class fresnel : public nonlinear_function
 		{
 			f = fin;
 		}
-		
+
 		//! \brief provide the input parametrization of the object.
 		virtual params::input input_parametrization() const
 		{
 			return f->input_parametrization();
 		}
-		
+
 		//! \brief provide the outout parametrization of the object.
 		virtual params::output output_parametrization() const
 		{
 			return f->output_parametrization();
 		}
-		
+
 		//! \brief can set the input parametrization of a non-parametrized
 		//! object. Print an error if it is already defined.
 		virtual void setParametrization(params::input new_param)
@@ -625,7 +611,7 @@ class fresnel : public nonlinear_function
 			function::setParametrization(new_param);
 			f->setParametrization(new_param);
 		}
-		
+
 		//! \brief can set the output parametrization of a non-parametrized
 		//! function. Throw an exception if it tries to erase a previously
 		//! defined one.
