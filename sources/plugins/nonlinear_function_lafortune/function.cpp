@@ -358,13 +358,13 @@ void lafortune_function::load(std::istream& in)
         in.getline(line, 256);
     }
 
-    // Checking for the comment line #FUNC nonlinear_diffuse
+    // Checking for the comment line #FUNC nonlinear_function_lafortune
     std::string token;
     in >> token;
     if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
     in >> token;
-    if(token != "nonlinear_lafortune") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+    if(token != "nonlinear_function_lafortune") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
 
 	 // Shoudl have the #NB_LOBES [int]
 	 int nb_lobes;

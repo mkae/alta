@@ -40,13 +40,13 @@ void phong_function::load(std::istream& in)
         in.getline(line, 256);
     }
 
-    // Checking for the comment line #FUNC nonlinear_diffuse
+    // Checking for the comment line #FUNC nonlinear_function_phong
     std::string token;
     in >> token;
     if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
     in >> token;
-    if(token != "nonlinear_phong") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+    if(token != "nonlinear_function_phong") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
 
     // ks [double]
 	 // N  [double]

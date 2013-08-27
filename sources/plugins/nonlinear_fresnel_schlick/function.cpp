@@ -15,10 +15,25 @@ ALTA_DLL_EXPORT function* provide_function()
 }
 
 //! Load function specific files
-void schlick::load(const std::string& filename) 
+void schlick::load(std::istream& in)
 {
-    std::cerr << "Cannot load a Schlick file." << std::endl;
-    throw;
+    // Parse line until the next comment
+    while(in.peek() != '#')
+    {
+        char line[256];
+        in.getline(line, 256);
+    }
+
+    // Checking for the comment line #FUNC nonlinear_fresnel_schlick
+    std::string token;
+    in >> token;
+    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+
+    in >> token;
+    if(token != "nonlinear_fresnel_schlick") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+
+    // R [double]
+    in >> token >> R;
 }
 
 vec schlick::fresnelValue(const vec& x) const
