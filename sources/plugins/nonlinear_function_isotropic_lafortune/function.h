@@ -46,6 +46,9 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! \brief Load function specific files
 		virtual void load(std::istream& in) ;
 
+		//! \brief Export function
+		virtual void save_call(std::ostream& out, const arguments& args) const;
+
 		//! \brief Boostrap the function by defining the diffuse term
 		//!
 		//! \details
@@ -75,15 +78,6 @@ class isotropic_lafortune_function : public nonlinear_function
 
 		//! \brief Set the number of lobes to be used in the fit
 		void setNbLobes(int N);
-
-	protected: // methods
-
-		virtual void save(const std::string& filename) const;
-
-
-		//! \brief Output the function using a BRDF Explorer formating.
-		virtual void save_brdfexplorer(const std::string& filename,
-		                               const arguments& args) const;
 
 	private: // methods
 

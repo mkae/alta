@@ -233,9 +233,13 @@ class arguments
 			  std::map<std::string, std::string>::const_iterator it = _map.begin();
 			  for(;it != _map.end(); it++)
 			  {
-					cmd.append(it->first);
-					cmd.append(" ");
-					cmd.append(it->second);
+				  if(!it->first.empty())
+				  {
+					  cmd.append(" --");
+					  cmd.append(it->first);
+					  cmd.append(" ");
+					  cmd.append(it->second);
+				  }
 			  }
 
 			  return cmd;

@@ -101,6 +101,7 @@ class function : public parametrized
 		//! \brief Linf norm to data.
 		double Linf_distance(const data* d) const ;
 
+
 	protected: // data
 
 		// Dimension of the function & domain of definition.
@@ -157,13 +158,19 @@ class nonlinear_function: public function
 			// Checking for the comment line #FUNC nonlinear_function_phong
 			std::string token;
 			in >> token;
-			if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+			if(token.compare("#FUNC") != 0) 
+			{ 
+				std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+#ifdef DEBUG
+				std::cout << "<<DEBUG>> got: \"" << token << "\"" << std::endl;
+#endif
+			}
 
 			in >> token;
-			if(token != "nonlinear_function")
+			if(token.compare("nonlinear_function") != 0)
 			{
 				std::cerr << "<<ERROR>> parsing the stream. A function name is defined." << std::endl;
-				std::cerr << "<<ERROR>> did you forget to specify the plugin used to expor?" << std::endl;
+				std::cerr << "<<ERROR>> did you forget to specify the plugin used to export?" << std::endl;
 			}
 
 			int nb_params = nbParameters();
@@ -178,7 +185,7 @@ class nonlinear_function: public function
 
 		//! \brief default non_linear export. It will dump the parameters in order
 		//! but won't assign names for the function nor parameters.
-		virtual void save_call(std::ostream& out, arguments& args) const
+		virtual void save_call(std::ostream& out, const arguments& args) const
 		{
 			if(!args.is_defined("export"))
 			{
@@ -401,7 +408,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		//! \brief save object specific information. For an ALTA export the
 		//! coefficients will be exported. For a C++ or matlab export, the call
 		//! to the associated function will be done.
-		virtual void save_call(std::ostream& out, arguments& args) const
+		virtual void save_call(std::ostream& out, const arguments& args) const
 		{
 			bool is_cpp    = args["export"] == "C++";
 			bool is_shader = args["export"] == "shader";

@@ -304,7 +304,6 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 	return out;
 }
 
-
 //! Load function specific files
 void isotropic_lafortune_function::load(std::istream& in)
 {
@@ -318,10 +317,16 @@ void isotropic_lafortune_function::load(std::istream& in)
     // Checking for the comment line #FUNC nonlinear_function_lafortune
 	std::string token;
 	in >> token;
-	if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+	if(token.compare("#FUNC") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+	}
 
 	in >> token;
-    if(token != "nonlinear_function_lafortune") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+   if(token.compare("nonlinear_function_lafortune") != 0) 
+	{
+		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+	}
 
 	// Shoudl have the #NB_LOBES [int]
 	int nb_lobes;
@@ -346,103 +351,21 @@ void isotropic_lafortune_function::load(std::istream& in)
 
 }
 
-void isotropic_lafortune_function::save(const std::string& filename) const
+
+void isotropic_lafortune_function::save_call(std::ostream& out, const arguments& args) const
 {
-	std::ofstream file(filename.c_str(), std::ios_base::trunc);
-	file << "#DIM " << _nX << " " << _nY << std::endl ;
-	file << "#NB_LOBES " << _n << std::endl ;
-		
-	for(int i=0; i<_nY; ++i)
-	{
-		file << _kd[i] << std::endl;
-	}
-	file << std::endl;
+	out << "#FUNC nonlinear_function_lafortune" << std::endl ;
+	out << "#NB_LOBES " << _n << std::endl ;
 
 	for(int n=0; n<_n; ++n)
 	{
-		file << "#Lobe number " << n << std::endl;
-		file << "#Cxy Cz" << std::endl;
 		for(int i=0; i<_nY; ++i)
 		{
-			file << _C[(n*_nY + i)*2 + 0] << " " << _C[(n*_nY + i)*2 + 1] << std::endl;
+			out << "Cxy " << _C[(n*_nY + i)*2 + 0] << std::endl;
+			out << "Cz  " << _C[(n*_nY + i)*2 + 1] << std::endl;
+			out << "N   " << _N[n*_nY + i] << std::endl;
 		}
-		file << std::endl;
-
-		file << "#N" << std::endl;
-		for(int i=0; i<_nY; ++i)
-		{
-			file << _N[n*_nY + i] << std::endl;
-		}
-		file << std::endl;
 	}
+	out << std::endl;
 
-}
-
-//! \brief Output the function using a BRDF Explorer formating.
-//! \todo Finish
-void isotropic_lafortune_function::save_brdfexplorer(const std::string& filename,
-                                       const arguments& args) const
-{
-    std::ofstream file(filename.c_str(), std::ios_base::trunc);
-    file << "analytic" << std::endl;
-
-    file << std::endl;
-//    file << "::begin parameters" << std::endl;
-//    file << "::end parameters" << std::endl;
-//    file << std::endl;
-    file << std::endl;
-    file << "::begin shader" << std::endl;
-	 
-    type_definition(file, _nY) << " n;" << std::endl;
-    type_definition(file, _nY) << " Cx;" << std::endl;
-    type_definition(file, _nY) << " Cy;" << std::endl;
-    type_definition(file, _nY) << " Cz;" << std::endl;
-    type_definition(file, _nY) << " ";
-    type_affectation(file, std::string("kd"), _kd, _nY);
-
-    file << std::endl;
-    file << std::endl;
-    file << "vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )" << std::endl;
-    file << "{" << std::endl;
-    if(_nY == 1)
-    {
-        file << "    ";
-        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
-
-        for(int n=0; n<_n; ++n)
-        {
-            file << "    // Lobe number " << n+1 << std::endl;
-            file << "    n  = " << _N[n] << "; " << std::endl;
-            file << "    Cx = " << _C[2*n + 0] << "; " << std::endl;
-            file << "    Cy = " << _C[2*n + 0] << "; " << std::endl;
-            file << "    Cz = " << _C[2*n + 1] << "; " << std::endl;
-            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
-            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
-            file << std::endl;
-        }
-    }
-    else
-    {
-        file << "    ";
-        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
-
-        for(int n=0; n<_n; ++n)
-        {
-            file << "    // Lobe number " << n+1 << std::endl;
-            file << "    "; type_affectation(file, std::string("n"), _N, _nY, n);
-            file << "    "; type_affectation(file, std::string("Cx"), _C, _nY, n, 0, 2);
-            file << "    "; type_affectation(file, std::string("Cy"), _C, _nY, n, 0, 2);
-            file << "    "; type_affectation(file, std::string("Cz"), _C, _nY, n, 1, 2);
-            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
-            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
-            file << std::endl;
-        }
-    }
-    file << "    return vec3(D);" << std::endl;
-//    file << "    if (normalized)" << std::endl;
-//    file << "        D *= (2+n) / (2*PI);" << std::endl;
-    file << "}" << std::endl;
-    file << std::endl;
-    file << "::end shader" << std::endl;
-    file.close();
 }
