@@ -216,6 +216,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual vec value(const vec& x) const
 		{
 			vec res(_nY);
+            res = vec::Zero(_nY);
 			for(int i=0; i<this->size(); ++i)
 			{
 				res = res + this->at(i)->value(x);
@@ -253,6 +254,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		//! Set the dimension of the input space of the function
 		virtual void setDimX(int nX) 
 		{
+			function::setDimX(nX);
 			for(int i=0; i<this->size(); ++i)
 			{
 				this->at(i)->setDimX(nX);
@@ -261,6 +263,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		//! Set the dimension of the output space of the function
 		virtual void setDimY(int nY)
 		{
+			function::setDimY(nY);
 			for(int i=0; i<this->size(); ++i)
 			{
 				this->at(i)->setDimY(nY);
@@ -270,6 +273,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min) 
 		{
+			function::setMin(min);
 			for(int i=0; i<this->size(); ++i)
 			{
 				this->at(i)->setMin(min);
@@ -277,6 +281,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		}
 		virtual void setMax(const vec& max) 
 		{
+			function::setMax(max);
 			for(int i=0; i<this->size(); ++i)
 			{
 				this->at(i)->setMax(max);
@@ -365,7 +370,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 				}
 
 				start_i += nb_f_params;
-			}
+            }
+
+            return jac;
 		}
 
 		//! \brief can set the input parametrization of a non-parametrized

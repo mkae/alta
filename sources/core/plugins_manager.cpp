@@ -44,8 +44,9 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 #else
     void* handle = dlopen(filename.c_str(), RTLD_LAZY);
     if(handle != NULL)
-    {
-        void* res = dlsym(handle, function);
+	 {
+		 void (*res)();
+		 *(void **)(&res) = dlsym(handle, function);
 
         if(dlerror() != NULL)
         {
