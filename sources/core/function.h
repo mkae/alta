@@ -242,15 +242,6 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			}
 		}
 
-		//! Save the Fresnel part along with the function
-		virtual void save(const std::string& filename, const arguments& args) const
-		{
-			for(int i=0; i<this->size(); ++i)
-			{
-				this->at(i)->save(filename, args);
-			}
-		}
-
 		//! Set the dimension of the input space of the function
 		virtual void setDimX(int nX) 
 		{
@@ -306,13 +297,19 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			int current_i = 0;
 			for(int f=0; f<this->size(); ++f)
 			{
-				vec f_params = this->at(f)->parameters();
-				for(int i=0; i<f_params.size(); ++i)
-				{
-					params[i + current_i] = f_params[i];
-				}
+				int f_size = this->at(f)->nbParameters();
 
-				current_i += f_params.size();
+				// Handle when there is no parameters to include
+				if(f_size > 0)
+				{
+					vec f_params = this->at(f)->parameters();
+					for(int i=0; i<f_size; ++i)
+					{
+						params[i + current_i] = f_params[i];
+					}
+
+					current_i += f_size;
+				}
 			}
 
 			return params;
@@ -325,14 +322,19 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			for(int f=0; f<this->size(); ++f)
 			{
 				int f_size = this->at(f)->nbParameters();
-				vec f_params(f_size);
-				for(int i=0; i<f_params.size(); ++i)
-				{
-					f_params[i] = p[i + current_i];
-				}
 
-				this->at(f)->setParameters(f_params);
-				current_i += f_size;
+				// Handle when there is no parameters to include
+				if(f_size > 0)
+				{
+					vec f_params(f_size);
+					for(int i=0; i<f_params.size(); ++i)
+					{
+						f_params[i] = p[i + current_i];
+					}
+
+					this->at(f)->setParameters(f_params);
+					current_i += f_size;
+				}
 			}
 		}
 
@@ -359,13 +361,18 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 				nonlinear_function* func = this->at(f);
 				int nb_f_params = func->nbParameters(); 
 
-				vec func_jac = func->parametersJacobian(x);
-
-				for(int i=0; i<nb_f_params; ++i)
+				// Only export Jacobian if there are non-linear parameters
+				if(nb_f_params > 0)
 				{
-					for(int y=0; y<_nY; ++y)
+
+					vec func_jac = func->parametersJacobian(x);
+
+					for(int i=0; i<nb_f_params; ++i)
 					{
-						jac[y + _nY*(i+start_i)] = func_jac[y + _nY*i];
+						for(int y=0; y<_nY; ++y)
+						{
+							jac[y + _nY*(i+start_i)] = func_jac[y + _nY*i];
+						}
 					}
 				}
 
@@ -401,7 +408,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		//! \brief save function specific data. This has no use for ALTA export
 		//! but allows to factorize the code in the C++ or matlab export by
 		//! defining function calls that are common to all the plugins.
-		virtual void save_body(std::ostream& out, arguments& args) const
+		virtual void save_body(std::ostream& out, const arguments& args) const
 		{
 			for(int i=0; i<this->size(); ++i)
 			{

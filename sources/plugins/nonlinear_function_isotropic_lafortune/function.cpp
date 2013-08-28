@@ -369,3 +369,4 @@ void isotropic_lafortune_function::save_call(std::ostream& out, const arguments&
 	out << std::endl;
 
 }
+
