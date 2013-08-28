@@ -43,7 +43,7 @@ void diffuse_function::load(std::istream &in)
     // Checking for the comment line #FUNC nonlinear_function_diffuse
     std::string token;
     in >> token;
-    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
     in >> token;
     if(token != "nonlinear_function_diffuse") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
@@ -55,12 +55,17 @@ void diffuse_function::load(std::istream &in)
     }
 
 }
-		
-void diffuse_function::save_alta(const std::string& filename, const arguments& args) const
-{
-	NOT_IMPLEMENTED();
-}
 
+void diffuse_function::save_call(std::ostream& out, const arguments& args) const
+{
+	out << "#FUNC nonlinear_function_diffuse" << std::endl ;
+	for(int i=0; i<dimY(); ++i)
+	{
+		out << "kd " << _kd[i] << std::endl;
+	}
+	out << std::endl;
+}
+		
 //! Number of parameters to this non-linear function
 int diffuse_function::nbParameters() const 
 {

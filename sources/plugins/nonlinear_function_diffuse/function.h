@@ -27,7 +27,8 @@ class diffuse_function : public nonlinear_function
 		virtual void bootstrap(const data* d, const arguments& args);
 
 		//! \brief Load function specific files
-        virtual void load(std::istream& in) ;
+		virtual void load(std::istream& in) ;
+		virtual void save_call(std::ostream& out, const arguments& args) const;
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const ;
@@ -47,10 +48,6 @@ class diffuse_function : public nonlinear_function
 			_nY = nY;
 			_kd.resize(nY);
 		}
-
-	protected: // methods
-
-		virtual void save_alta(const std::string& filename, const arguments& args) const;
 
 	private: // data
 
