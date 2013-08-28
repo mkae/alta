@@ -469,7 +469,9 @@ class fresnel : public nonlinear_function
 		virtual vec value(const vec& x) const
 		{
 			vec fres = fresnelValue(x);
-			return fres * f->value(x);
+			vec func = f->value(x);
+
+			return product(fres, func);
 		}
 
 		//! Load function specific files
@@ -490,12 +492,6 @@ class fresnel : public nonlinear_function
 		{
 			fresnelBootstrap(d, args);
 			f->bootstrap(d, args);
-		}
-
-		//! Save the Fresnel part along with the function
-		virtual void save(const std::string& filename, const arguments& args) const
-		{
-			f->save(filename, args);
 		}
 
 		//! Set the dimension of the input space of the function
@@ -545,9 +541,9 @@ class fresnel : public nonlinear_function
 			}
 
 			vec fres_params = getFresnelParameters();
-			for(int i=nb_func_params; i<nb_params; ++i)
+			for(int i=0; i<nb_fres_params; ++i)
 			{
-				params[i] = fres_params[i-nb_func_params];
+				params[i+nb_func_params] = fres_params[i];
 			}
 
 			return params;
@@ -600,7 +596,7 @@ class fresnel : public nonlinear_function
 
 				for(int i=0; i<nb_fres_params; ++i)
 				{
-					jac[y + _nY*(i+nb_func_params)] = fres_jacobian[y + _nY*i] * fres_value[y];
+					jac[y + _nY*(i+nb_func_params)] = fres_jacobian[y + _nY*i] * func_value[y];
 				}
 			}
 

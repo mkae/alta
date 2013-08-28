@@ -17,6 +17,8 @@ ALTA_DLL_EXPORT function* provide_function()
 //! Load function specific files
 void schlick::load(std::istream& in)
 {
+	fresnel::load(in);
+
     // Parse line until the next comment
     while(in.peek() != '#')
     {
@@ -27,13 +29,22 @@ void schlick::load(std::istream& in)
     // Checking for the comment line #FUNC nonlinear_fresnel_schlick
     std::string token;
     in >> token;
-    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
     in >> token;
     if(token != "nonlinear_fresnel_schlick") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
 
     // R [double]
     in >> token >> R;
+}
+		
+void schlick::save_call(std::ostream& out, const arguments& args) const
+{
+	f->save_call(out, args);
+
+	out << "#FUNC nonlinear_fresnel_schlick" << std::endl ;
+	out << "R " << R << std::endl;
+	out << std::endl;
 }
 
 vec schlick::fresnelValue(const vec& x) const

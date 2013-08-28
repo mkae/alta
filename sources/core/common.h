@@ -233,6 +233,8 @@ vec normalize(const vec& a);
 
 double dot(const vec& a, const vec& b);
 
+vec product(const vec& a, const vec& b);
+
 //! \brief locate the first index of value v in vector vec. Complexity in
 //! O(n) is the worst case.
 template<typename T> int is_in(std::vector<T> ve, T v)
