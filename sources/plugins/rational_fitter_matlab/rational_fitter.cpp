@@ -312,17 +312,17 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 
 			double  total = 0.0;
 			double* val = (double*)mxGetData(x) ;
-			std::vector<double> a, b;
+			vec a(np), b(nq);
 			for(int i=0; i<N; ++i)
 			{
 				total += val[i]*val[i] ;
 				if(i < np)
 				{
-					a.push_back(val[i]) ;
+					a[i] =val[i] ;
 				}
 				else
 				{
-					b.push_back(val[i]) ;
+					b[i] = val[i] ;
 				}
 			}
 			r->update(a, b) ;

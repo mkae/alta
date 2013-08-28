@@ -153,7 +153,6 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
         x[i] = nf_x[i];
     }
 
-
     EigenFunctor functor(nf, d);
     Eigen::LevenbergMarquardt<EigenFunctor> lm(functor);
 

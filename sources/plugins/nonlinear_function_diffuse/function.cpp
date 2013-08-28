@@ -81,9 +81,8 @@ vec diffuse_function::parameters() const
         res[i*3 + 0] = _kd[i];
     }
 #else
-    vec res(0);
+    vec res(1);
 #endif
-
     return res;
 }
 
@@ -119,7 +118,7 @@ vec diffuse_function::parametersJacobian(const vec& x) const
 			}
 		}
 #else
-	vec jac(0);
+	vec jac(1);
 #endif
 
     return jac;

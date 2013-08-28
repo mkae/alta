@@ -7,6 +7,7 @@
 #include <cstring>
 #include <algorithm>
 
+#ifdef OLD
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core
  *  \internal
@@ -221,6 +222,16 @@ class vec : public std::vector<double>
 
 
 } ;
+#endif 
+
+#include <Eigen/Core>
+typedef Eigen::VectorXd vec;
+
+double norm(const vec& a);
+
+vec normalize(const vec& a);
+
+double dot(const vec& a, const vec& b);
 
 //! \brief locate the first index of value v in vector vec. Complexity in
 //! O(n) is the worst case.

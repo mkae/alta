@@ -299,7 +299,7 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 	if(solves_qp)
 	{
 		// Recopy the vector d
-		std::vector<double> p, q;
+		vec p(np), q(nq);
 		double norm = 0.0 ;
 		for(int i=0; i<np+nq; ++i)
 		{
@@ -307,11 +307,11 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 			norm += v*v ;
 			if(i < np)
 			{
-				p.push_back(v) ;
+				p[i] = v ;
 			}
 			else
 			{
-				q.push_back(v) ;
+				q[i - np] = v ;
 			}
 		}
 

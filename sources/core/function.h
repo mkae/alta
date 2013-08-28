@@ -344,8 +344,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		{
 			int nb_params = this->nbParameters();
 			vec jac(nb_params*_nY);
-
-			jac.assign(nb_params*_nY, 0.0);
+			jac = vec::Zero(nb_params*_nY);
 
 			int start_i = 0;
 

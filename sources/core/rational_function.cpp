@@ -18,8 +18,8 @@ rational_function_1d::rational_function_1d(int np, int nq)
 	b.resize(nq);
 }
 
-rational_function_1d::rational_function_1d(const std::vector<double>& a, 
-                                           const std::vector<double>& b) :
+rational_function_1d::rational_function_1d(const vec& a, 
+                                           const vec& b) :
 	a(a), b(b)
 {
 }
@@ -28,11 +28,11 @@ void rational_function_1d::load(std::istream& in)
 {
 }
 
-void rational_function_1d::update(const std::vector<double>& in_a,
-                                  const std::vector<double>& in_b)
+void rational_function_1d::update(const vec& in_a,
+                                  const vec& in_b)
 {
-	a.reserve(in_a.size()) ;
-	b.reserve(in_b.size()) ;
+	a.resize(in_a.size()) ;
+	b.resize(in_b.size()) ;
 	a = in_a ;
 	b = in_b ;
 }
@@ -501,8 +501,8 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 	for(int j=0; j<dimY(); ++j)
 	{
 		rational_function_1d* rf = get(j);
-		std::vector<double> a = rf->getP();
-		std::vector<double> b = rf->getQ();
+		vec a = rf->getP();
+		vec b = rf->getQ();
 
 		// Export the numerator of the jth color channel
 		file << "\tp(" << j+1 << ",:) = ";
@@ -616,8 +616,8 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 	for(int j=0; j<dimY(); ++j)
 	{
 		rational_function_1d* rf = get(j);
-		std::vector<double> a = rf->getP();
-		std::vector<double> b = rf->getQ();
+		vec a = rf->getP();
+		vec b = rf->getQ();
 
 		// Export the numerator of the jth color channel
 		file << "\tp = ";
@@ -711,8 +711,8 @@ void rational_function::save(const std::string& filename) const
 	for(int k=0; k<_nY; ++k)
 	{
 		rational_function_1d* rf = get(k);
-		std::vector<double> a = rf->getP();
-		std::vector<double> b = rf->getQ();
+		vec a = rf->getP();
+		vec b = rf->getQ();
 
 		for(unsigned int i=0; i<np; ++i)
 		{

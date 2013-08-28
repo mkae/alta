@@ -1,6 +1,7 @@
 TEMPLATE        = lib
 CONFIG         *=  qt     \
-                   plugin
+                   plugin \
+						 eigen
 
 DESTDIR         = ../../build
 

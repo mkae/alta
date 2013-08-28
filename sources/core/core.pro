@@ -1,6 +1,7 @@
 TEMPLATE = lib
 CONFIG  *= static  \
-           console
+           console \
+			  eigen
 
 DESTDIR  = ../build
 
@@ -19,7 +20,8 @@ HEADERS  = args.h               \
 			  params.h             \
            clustering.h
 
-SOURCES  = plugins_manager.cpp   \
+SOURCES  = common.cpp            \
+           plugins_manager.cpp   \
            vertical_segment.cpp  \
 		     rational_function.cpp \
 		     params.cpp			   \
