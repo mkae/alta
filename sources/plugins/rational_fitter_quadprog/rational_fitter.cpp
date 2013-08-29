@@ -57,6 +57,7 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 		QTime time ;
 		time.start() ;
 		
+		r->setSize(temp_np, temp_nq);
 		if(fit_data(d, temp_np, temp_nq, r))
 		{
 			int msec = time.elapsed() ;

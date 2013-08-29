@@ -15,7 +15,8 @@
 #include <cstdlib>
 #include <cmath>
 
-/*
+#define  EPSILON 1.0E-5
+
 vec coord(vec V, vec L, vec X, vec Y, vec N)
 {
 	vec pV = V-dot(V,N)*N;
@@ -25,19 +26,24 @@ vec coord(vec V, vec L, vec X, vec Y, vec N)
 	vCoord /= (1.0+dot(V,N));
 
 	vec pL = L-dot(L,N)*N;
-	vec lCoord = vec2(dot(pL,X),dot(pL,Y));
+	vec lCoord(2);
+	lCoord[0] = dot(pL,X);
+	lCoord[1] = dot(pL,Y);
 	lCoord /= (1.0+dot(L,N));
 
-	if (length(lCoord)>EPS)	
+	if (norm(lCoord)>EPSILON)	
 	{	
-		vec2 lDir = normalize(lCoord);
-		mat2 lRot = mat2(lDir.x, lDir.y, -lDir.y, lDir.x);
-		vCoord *= lRot;
+		vec lDir = normalize(lCoord);
+
+		vec temp(2);
+		temp[0] = lDir[0]*vCoord[0] + lDir[1]*vCoord[1];
+		temp[1] = lDir[0]*vCoord[1] - lDir[1]*vCoord[0];
+		vCoord = temp;
 	}
 
 	return vCoord;
 }
-*/
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv, false);
@@ -104,18 +110,28 @@ int main(int argc, char** argv)
                 {
                     in_angle[3] = phi_out * 0.5*M_PI / 180.0;
 
-                    vec in(d_size);
+                    vec in(d_size), cart(6), L(3), V(3);
                     params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
+                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, params::CARTESIAN, &cart[0]);
+						  L[0] = cart[0];
+						  L[1] = cart[1];
+						  L[2] = cart[2];
+						  V[0] = cart[3];
+						  V[1] = cart[4];
+						  V[2] = cart[5];
 
                     // Copy the input vector
                     vec x = d->value(in);
+
+						  // Get the projected 2D coordinate
+						  vec xy = coord(V, L, X, Y, N);
 
                     for(int i=0; i<d->dimY(); ++i)
                     {
                         double val = x[i] * cos(in_angle[2]);
 
                         rawm0[i] += val;
-                        rawm1[i] += theta_out * val;
+                        rawm1[i] += val * xy[0];
                     }
                 }
             }

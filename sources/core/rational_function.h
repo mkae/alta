@@ -130,6 +130,27 @@ class rational_function : public function
 			rs.resize(_nY);
 		}
 
+		virtual void setMin(const vec& min)
+		{
+			function::setMin(min);
+			for(int i=0; i<dimY(); ++i)
+			{
+				get(i)->setMin(min);
+			}
+		}
+		
+		virtual void setMax(const vec& max)
+		{
+			function::setMax(max);
+			for(int i=0; i<dimY(); ++i)
+			{
+				get(i)->setMax(max);
+			}
+		}
+
+		//! \brief Save the rational function to the rational format (see \ref formating).
+		virtual void save_call(std::ostream& out, const arguments& args) const ;
+
 	protected: // functions
 
 		//! \brief Save the rational function to the rational format (see \ref formating).

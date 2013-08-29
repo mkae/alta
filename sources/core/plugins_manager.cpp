@@ -416,25 +416,33 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 void plugins_manager::check_compatibility(data*& d, function*& f,
                                           const arguments& args)
 {
-	if(d->input_parametrization() == params::UNKNOWN_INPUT)
+	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
+		f->input_parametrization() == params::UNKNOWN_INPUT)
 	{
-		std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
-	}
-
-	if(f->input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
-		f->setParametrization(d->input_parametrization());
-	}
-	else if(d->input_parametrization() != f->input_parametrization())
-	{
-		std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
-		data_params* dd = new data_params(d, f->input_parametrization());
-		d = dd ;
+		std::cout << "<<WARNING>> both function and data objects have no parametrization" << std::endl;
 	}
 	else
 	{
-		std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+		if(d->input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
+		}
+
+		if(f->input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
+			f->setParametrization(d->input_parametrization());
+		}
+		else if(d->input_parametrization() != f->input_parametrization())
+		{
+			std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+			data_params* dd = new data_params(d, f->input_parametrization());
+			d = dd ;
+		}
+		else
+		{
+			std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+		}
 	}
 
 	if(f->dimY() != d->dimY())

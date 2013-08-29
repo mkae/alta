@@ -57,6 +57,8 @@ bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const argu
 	{
 		QTime time ;
 		time.start() ;
+
+		r->setSize(temp_np, temp_nq);
 		
 		if(fit_data(d, temp_np, temp_nq, r))
 		{
