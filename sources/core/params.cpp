@@ -174,15 +174,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
             diff[2] = invec[2];
 
             rotate_normal(diff, -atan2(half[1], half[0]));
-#ifdef DEBUG
-				std::cout << "diff* = [ " << diff[0] << ", " << diff[1] << ", " << diff[2] << "]" << std::endl;
-#endif
             rotate_binormal(diff, -outvec[0]);
-#ifdef DEBUG
-				std::cout << "half  = [ " << half[0] << ", " << half[1] << ", " << half[2] << "]" << std::endl;
-				std::cout << "diff  = [ " << diff[0] << ", " << diff[1] << ", " << diff[2] << "]" << std::endl;
-#endif
-            outvec[1] = acos(diff[2]);
+            
+				outvec[1] = acos(diff[2]);
             outvec[2] = atan2(diff[1], diff[0]);
             break;
 		case params::ISOTROPIC_TV_TL_DPHI:
@@ -200,11 +194,11 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[0] = invec[0];
 			diff[1] = invec[1];
 			diff[2] = invec[2];
+			rotate_normal(diff, -atan2(half[1], half[0]));
 			rotate_binormal(diff, -outvec[0]);
-            rotate_normal(diff, -outvec[1]);
 
 			outvec[2] = acos(diff[2]);
-			outvec[3] = atan2(diff[0], diff[1]);
+			outvec[3] = atan2(diff[1], diff[0]);
 			break;
 
 		case params::SPHERICAL_TL_PL_TV_PV:
