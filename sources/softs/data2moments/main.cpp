@@ -85,6 +85,11 @@ int main(int argc, char** argv)
         const int nX = d->dimX();
         const int nY = d->dimY();
 
+		  // Normalisation factor for the integration
+		  const int nb_theta_int = 90;
+		  const int nb_phi_int   = 180;
+		  const double normalization = M_PI*M_PI / (double)(nb_phi_int*nb_theta_int);
+
         double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
 
 		  // Static data
@@ -105,12 +110,12 @@ int main(int argc, char** argv)
             vec m_yy(nY); m_0 = vec::Zero(nY);
 
             // Integrate over the light hemisphere
-            for(int theta_out=0; theta_out<90; theta_out++)
+            for(int theta_out=0; theta_out<nb_theta_int; theta_out++)
             {
-                in_angle[2] = theta_out * 0.5*M_PI / 90.0;
-                for(int phi_out=0; phi_out<360; phi_out++)
+                in_angle[2] = theta_out * 0.5*M_PI / (double)nb_theta_int;
+                for(int phi_out=0; phi_out<nb_phi_int; phi_out++)
                 {
-                    in_angle[3] = phi_out * 2.0*M_PI / 360.0;
+                    in_angle[3] = phi_out * 2.0*M_PI / nb_phi_int;
 
                     vec in(nX), cart(6), L(3), V(3);
                     params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
@@ -130,8 +135,7 @@ int main(int argc, char** argv)
 
                     for(int i=0; i<nY; ++i)
                     {
-                        const double normalization = 360.0*90.0;
-                        double val = x[i] * cos(in_angle[2]) / normalization;
+                        double val = x[i] /* cos(in_angle[2])*/ * normalization;
 
                         m_0[i]  += val;
                         m_x[i]  += val * xy[0];
