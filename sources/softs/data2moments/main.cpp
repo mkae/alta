@@ -21,7 +21,7 @@ vec coord(vec V, vec L, vec X, vec Y, vec N)
 {
 	vec pV = V-dot(V,N)*N;
 	vec vCoord(2);
-	vCoord[0] = dot(pV,X);
+    vCoord[0] = dot(pV,X);
 	vCoord[1] = dot(pV,Y);
 	vCoord /= (1.0+dot(V,N));
 
@@ -36,8 +36,8 @@ vec coord(vec V, vec L, vec X, vec Y, vec N)
 		vec lDir = normalize(lCoord);
 
 		vec temp(2);
-		temp[0] = lDir[0]*vCoord[0] + lDir[1]*vCoord[1];
-		temp[1] = lDir[0]*vCoord[1] - lDir[1]*vCoord[0];
+        temp[0] = lDir[0]*vCoord[0] + lDir[1]*vCoord[1];
+        temp[1] = lDir[0]*vCoord[1] - lDir[1]*vCoord[0];
 		vCoord = temp;
 	}
 
@@ -82,35 +82,37 @@ int main(int argc, char** argv)
     {
         // Data parametrization
         params::input data_param = d->parametrization();
-        int d_size = params::dimension(data_param);
+        const int nX = d->dimX();
+        const int nY = d->dimY();
 
         double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
-
-        // Sample every degree
-        double dtheta = 0.5*M_PI / 90.0;
 
 		  // Static data
 		  vec X(3); X[0] = 1; X[1] = 0; X[2] = 0;
 		  vec Y(3); Y[0] = 0; Y[1] = 1; Y[2] = 0;
 		  vec N(3); N[0] = 0; N[1] = 0; N[2] = 1;
 
-        // Moments
-        vec rawm0(d->dimY());
-        vec rawm1(d->dimY());
 
         for(int theta_in=0; theta_in<90; theta_in++)
         {
             in_angle[0] = theta_in * 0.5*M_PI / 90.0;
 
+            vec m_0(nY);  m_0 = vec::Zero(nY);
+            vec m_x(nY);  m_0 = vec::Zero(nY);
+            vec m_y(nY);  m_0 = vec::Zero(nY);
+            vec m_xx(nY); m_0 = vec::Zero(nY);
+            vec m_xy(nY); m_0 = vec::Zero(nY);
+            vec m_yy(nY); m_0 = vec::Zero(nY);
+
             // Integrate over the light hemisphere
             for(int theta_out=0; theta_out<90; theta_out++)
             {
                 in_angle[2] = theta_out * 0.5*M_PI / 90.0;
-                for(int phi_out=0; phi_out<180; phi_out++)
+                for(int phi_out=0; phi_out<360; phi_out++)
                 {
-                    in_angle[3] = phi_out * 0.5*M_PI / 180.0;
+                    in_angle[3] = phi_out * 2.0*M_PI / 360.0;
 
-                    vec in(d_size), cart(6), L(3), V(3);
+                    vec in(nX), cart(6), L(3), V(3);
                     params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
                     params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, params::CARTESIAN, &cart[0]);
 						  L[0] = cart[0];
@@ -123,33 +125,62 @@ int main(int argc, char** argv)
                     // Copy the input vector
                     vec x = d->value(in);
 
-						  // Get the projected 2D coordinate
-						  vec xy = coord(V, L, X, Y, N);
+                    // Get the projected 2D coordinate
+                    vec xy = coord(V, L, X, Y, N);
 
-                    for(int i=0; i<d->dimY(); ++i)
+                    for(int i=0; i<nY; ++i)
                     {
-                        double val = x[i] * cos(in_angle[2]);
+                        const double normalization = 360.0*90.0;
+                        double val = x[i] * cos(in_angle[2]) / normalization;
 
-                        rawm0[i] += val;
-                        rawm1[i] += val * xy[0];
+                        m_0[i]  += val;
+                        m_x[i]  += val * xy[0];
+                        m_y[i]  += val * xy[1];
+                        m_xx[i] += val * xy[0] * xy[0];
+                        m_xy[i] += val * xy[0] * xy[1];
+                        m_yy[i] += val * xy[1] * xy[1];
                     }
                 }
             }
 
-            for(int i=0; i<d->dimY(); ++i)
+/*
+            for(int i=0; i<nY; ++i)
             {
-                rawm0[i] /= 180.0*90.0;
-                rawm1[i] /= 180.0*90.0 * rawm0[i];
+                m_x[i]  /= m_0[i];
+                m_y[i]  /= m_0[i];
+                m_xx[i] /= m_0[i];
+                m_xy[i] /= m_0[i];
+                m_yy[i] /= m_0[i];
             }
+*/
+            // compute cumulants
+            vec k_x  = m_x;
+            vec k_y  = m_y;
+            vec k_xx = m_xx;// - product(m_x,m_x);
+            vec k_xy = m_xy;// - product(m_x,m_y);
+            vec k_yy = m_yy;// - product(m_y,m_y);
 
             // Output the value into the file
             file << in_angle[0] << "\t";
 
-            for(int i=0; i<rawm0.size(); ++i)
-                file << rawm0[i] << "\t";
+            for(int i=0; i<nY; ++i)
+                file << m_0[i] << "\t";
 
-            for(int i=0; i<rawm1.size(); ++i)
-                file << rawm1[i] << "\t";
+            for(int i=0; i<nY; ++i)
+                file << k_x[i] << "\t";
+
+            for(int i=0; i<nY; ++i)
+                file << k_y[i] << "\t";
+
+            for(int i=0; i<nY; ++i)
+                file << k_xx[i] << "\t";
+
+            for(int i=0; i<nY; ++i)
+                file << k_xy[i] << "\t";
+
+            for(int i=0; i<nY; ++i)
+                file << k_yy[i] << "\t";
+
             file << std::endl;
 
         }

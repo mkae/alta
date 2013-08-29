@@ -162,7 +162,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[1] = atan2(half[0], half[1]);
+            outvec[1] = atan2(half[1], half[0]);
 			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
         case params::RUSIN_TH_TD_PD:
@@ -172,11 +172,18 @@ void params::from_cartesian(const double* invec, params::input outtype,
             diff[0] = invec[0];
             diff[1] = invec[1];
             diff[2] = invec[2];
-            rotate_normal(diff, -outvec[1]);
-            rotate_binormal(diff, -outvec[0]);
 
+            rotate_normal(diff, -atan2(half[1], half[0]));
+#ifdef DEBUG
+				std::cout << "diff* = [ " << diff[0] << ", " << diff[1] << ", " << diff[2] << "]" << std::endl;
+#endif
+            rotate_binormal(diff, -outvec[0]);
+#ifdef DEBUG
+				std::cout << "half  = [ " << half[0] << ", " << half[1] << ", " << half[2] << "]" << std::endl;
+				std::cout << "diff  = [ " << diff[0] << ", " << diff[1] << ", " << diff[2] << "]" << std::endl;
+#endif
             outvec[1] = acos(diff[2]);
-            outvec[2] = atan2(diff[0], diff[1]);
+            outvec[2] = atan2(diff[1], diff[0]);
             break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
@@ -193,8 +200,8 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[0] = invec[0];
 			diff[1] = invec[1];
 			diff[2] = invec[2];
-			rotate_normal(diff, -outvec[1]);
 			rotate_binormal(diff, -outvec[0]);
+            rotate_normal(diff, -outvec[1]);
 
 			outvec[2] = acos(diff[2]);
 			outvec[3] = atan2(diff[0], diff[1]);
@@ -202,9 +209,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 
 		case params::SPHERICAL_TL_PL_TV_PV:
 			outvec[0] = acos(invec[2]);
-			outvec[1] = atan2(invec[0], invec[1]);
+			outvec[1] = atan2(invec[1], invec[0]);
 			outvec[2] = acos(invec[5]);
-			outvec[3] = atan2(invec[3], invec[4]);
+			outvec[3] = atan2(invec[4], invec[3]);
 #ifdef DEBUG
 			std::cout << invec[2] << " - acos -> " << outvec[0] << std::endl;
 #endif

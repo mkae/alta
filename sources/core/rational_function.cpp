@@ -219,7 +219,8 @@ double rational_function_1d::p(const vec& x, int i) const
 	{
 #ifdef POLYNOMIALS
 		res *= pow(x[k], deg[k]) ;
-#else // LEGENDRE
+//		res *= pow(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]) ;
+#else
 		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
 #endif
 	}
@@ -228,18 +229,7 @@ double rational_function_1d::p(const vec& x, int i) const
 }
 double rational_function_1d::q(const vec& x, int i) const 
 {
-	std::vector<int> deg = index2degree(i);
-	double res = 1.0; 
-	for(int k=0; k<dimX(); ++k)
-	{
-#ifdef POLYNOMIALS
-		res *= pow(x[k], deg[k]) ;
-#else // LEGENDRE
-		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
-#endif
-	}
-
-	return res ;
+	return p(x, i);
 }
 
 // Overload the function operator

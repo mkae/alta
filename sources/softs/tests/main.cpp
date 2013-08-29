@@ -99,17 +99,13 @@ int parametrization_tests()
 		std::cout << "<<DEBUG>> rusin 3d: " << rusi << std::endl;
 		std::cout << "<<DEBUG>> cartesian: " << spherical << std::endl;
 		nb_tests_failed++;
-	}
-	std::cout << "<<DEBUG>> rusin 3d: " << rusi << std::endl;
-	std::cout << "<<DEBUG>> cartesian: " << spherical << std::endl;
-	std::cout << std::endl;
+    }
 
 
 	// Convert issue #1
 	vec cart2(6);
 	spherical[0] = 0; spherical[1] = 0; spherical[2] = 1.51844; spherical[3] = -2.96706;
 	params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, params::CARTESIAN, &cart2[0]);
-	std::cout << "<<DEBUG>> spherical before: " << spherical << std::endl;
 	try
 	{
 		params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, params::RUSIN_TH_TD_PD, &rusi[0]);
@@ -122,16 +118,43 @@ int parametrization_tests()
 		std::cout << "<<DEBUG>> rusin 3d: " << rusi << std::endl;
 		std::cout << "<<DEBUG>> spherical: " << spherical << std::endl;
 		nb_tests_failed++;
-	}
-	std::cout << "<<DEBUG>> rusin after: " << rusi << std::endl;
-	std::cout << "<<DEBUG>> spherical after: " << spherical << std::endl;
-	std::cout << "<<DEBUG>> " << cart << " / " << cart2 << std::endl;
-	{
-	double dot  = cart[0]*cart[3] + cart[1]*cart[4] + cart[2]*cart[5];
-	double dot2 = cart2[0]*cart2[3] + cart2[1]*cart2[4] + cart2[2]*cart2[5];
-	std::cout << "<<DEBUG>> dot = " << dot << ", " << "dot2 = " << dot2 << std::endl;
-	}
-	std::cout << std::endl;
+    }
+
+
+
+	/// Test on a known couple of directions
+	/// in = [0, 0, 1] out = [1, 0, 0]
+
+	// Convert from Cartesian to spherical
+	cart[0] = 0; cart[1] = 0; cart[2] = 1; 
+	cart[3] = 1; cart[4] = 0; cart[5] = 0; 
+    params::convert(&cart[0], params::CARTESIAN, params::SPHERICAL_TL_PL_TV_PV, &spherical[0]);
+	 std::cout << "From cartesian to spherical" << std::endl;
+	 std::cout << spherical << std::endl << std::endl;
+    
+	 params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_TD_PD, &rusi[0]);
+	 std::cout << "From cartesian to rusi" << std::endl;
+    std::cout << rusi << std::endl << std::endl;
+    
+	 params::convert(&rusi[0], params::RUSIN_TH_TD_PD, params::CARTESIAN, &cart[0]);
+	 std::cout << "From rusi to cartesian" << std::endl;
+    std::cout << cart << std::endl << std::endl;
+
+    params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, params::RUSIN_TH_TD_PD, &rusi[0]);
+	 std::cout << "From spherical to rusi" << std::endl;
+    std::cout << rusi << std::endl << std::endl;
+
+    params::convert(&rusi[0], params::RUSIN_TH_TD_PD, params::SPHERICAL_TL_PL_TV_PV, &spherical[0]);
+	 std::cout << "From rusi to spherical" << std::endl;
+    std::cout << spherical << std::endl << std::endl;
+
+    params::convert(&rusi[0], params::RUSIN_TH_TD_PD, params::CARTESIAN, &cart[0]);
+	 std::cout << "From rusi to cartesian" << std::endl;
+    std::cout << cart << std::endl << std::endl;
+
+    params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, params::RUSIN_TH_TD_PD, &rusi[0]);
+	 std::cout << "From spherical to rusi" << std::endl;
+    std::cout << rusi << std::endl << std::endl;
 
 	return nb_tests_failed;
 }

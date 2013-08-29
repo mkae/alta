@@ -15,6 +15,12 @@
  *  \details
  *  Any \typedef function object or \typedef data object should have
  *  an associated parametrization.
+ *
+ *  We use the following convention to defined the tangent, normal and
+ *  bi-normal of the surface:
+ *   * The normal is the upper vector (0, 0, 1)
+ *   * The tangent direction is along x direction (1, 0, 0)
+ *   * The bi-normal is along the y direction (0, 1, 0)
  */
 class params
 {
@@ -194,37 +200,31 @@ class params
 			  out[5] = cos(theta_v);
 		  }
 
-        //! \brief rotate a cartesian vector with respect to the normal of
-        //! theta degrees.
-        static void rotate_normal(double* vec, double theta)
-        {
-            const double cost = cos(theta);
-            const double sint = sin(theta);
+		  //! \brief rotate a cartesian vector with respect to the normal of
+		  //! theta degrees.
+		  static void rotate_normal(double* vec, double theta)
+		  {
+			  const double cost = cos(theta);
+			  const double sint = sin(theta);
 
-			const double temp = cost * vec[0] + sint * vec[1];
+			  const double temp = cost * vec[0] + sint * vec[1];
 
-            vec[1] = cost * vec[1] - sint * vec[0];
-            vec[0] = temp;
-        }
+			  vec[1] = cost * vec[1] - sint * vec[0];
+			  vec[0] = temp;
+		  }
 
-        //! \brief rotate a cartesian vector with respect to the bi-normal of
-        //! theta degrees.
-        static void rotate_binormal(double* vec, double theta)
-        {
-            const double cost = cos(theta);
-            const double sint = sin(theta);
+		  //! \brief rotate a cartesian vector with respect to the bi-normal of
+		  //! theta degrees.
+		  static void rotate_binormal(double* vec, double theta)
+		  {
+			  const double cost = cos(theta);
+			  const double sint = sin(theta);
 
-			const double temp = cost * vec[1] + sint * vec[2];
+			  const double temp = cost * vec[0] + sint * vec[2];
 
-#ifdef DEBUG
-			std::cout << acos(vec[2]) << std::endl;
-#endif
-            vec[2] = cost * vec[2] - sint * vec[1];
-#ifdef DEBUG
-			std::cout << acos(vec[2]) << std::endl;
-#endif
-            vec[1] = temp;
-        }
+			  vec[2] = cost * vec[2] - sint * vec[0];
+			  vec[0] = temp;
+		  }
 
 		  static void print_input_params();
 
