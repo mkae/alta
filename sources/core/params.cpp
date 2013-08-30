@@ -13,9 +13,9 @@ struct param_info
 #ifdef WIN32
 std::map<params::input, const param_info> create_map()
 {
-	std::map<params::input, const param_info> _map;
-	/* 1D Params */
-	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TH, param_info("COS_TH", 1, "Cosine of the Half angle")));
+    std::map<params::input, const param_info> _map;
+    /* 1D Params */
+    _map.insert(std::make_pair<params::input, const param_info>(params::COS_TH, param_info("COS_TH", 1, "Cosine of the Half angle")));
 	
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
@@ -27,6 +27,7 @@ std::map<params::input, const param_info> create_map()
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::SPHERICAL_TL_PL_TV_PV, param_info("SPHERICAL_TL_PL_TV_PV", 4, "Complete classical parametrization")));
+    _map.insert(std::make_pair<params::input, const param_info>(params::STEREOGRAPHIC, param_info("STEREOGRAPHIC", 4, "Light/View vector in stereographic projection"))),
 
 	/* 6D Param */
 	_map.insert(std::make_pair<params::input, const param_info>(params::CARTESIAN, param_info("CARTESIAN", 6, "Complete vector parametrization")));
