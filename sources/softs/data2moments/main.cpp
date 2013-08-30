@@ -92,6 +92,10 @@ int main(int argc, char** argv)
 
         double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
 
+        // Options
+        bool with_cosine = args.is_defined("cosine");
+
+        // Raw moments
         vec m_0(nY);
         vec m_x(nY);
         vec m_y(nY);
@@ -99,12 +103,17 @@ int main(int argc, char** argv)
         vec m_xy(nY);
         vec m_yy(nY);
 
-        // compute cumulants
+        // Cumulants
         vec k_x(nY);
         vec k_y(nY);
         vec k_xx(nY);
         vec k_xy(nY);
         vec k_yy(nY);
+
+        // The X and Y directions to compute the moments. This is an argument of the command
+        // line. The different directions can be: using stereographic coordinates, using the
+        // theta of the classical parametrization (the second coordinate is then 0).
+        vec xy(2);
 
         for(int theta_in=0; theta_in<90; theta_in++)
         {
@@ -129,7 +138,18 @@ int main(int argc, char** argv)
 
                     vec in(nX), stereographics(4);
                     params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
-                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, params::STEREOGRAPHIC, &stereographics[0]);
+
+                    if(args["moments"] == "angular")
+                    {
+                        xy[0] = (std::abs(in_angle[3]) < 0.5*M_PI) ? in_angle[2] : -in_angle[2];
+                        xy[1] = 0.0;
+                    }
+                    else
+                    {
+                        params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, params::STEREOGRAPHIC, &stereographics[0]);
+                        xy[0] = stereographics[2];
+                        xy[1] = stereographics[3];
+                    }
 
                     // Copy the input vector
                     vec x = d->value(in);
@@ -137,14 +157,18 @@ int main(int argc, char** argv)
 
                     for(int i=0; i<nY; ++i)
                     {
-                        double val = x[i] * /* cos(in_angle[2]) */ normalization;
+                        double val = x[i] * normalization;
+                        if(with_cosine)
+                        {
+                            val *= cos(in_angle[2]);
+                        }
 
                         m_0[i]  += val ;
-                        m_x[i]  += val * stereographics[2];
-                        m_y[i]  += val * stereographics[3];
-                        m_xx[i] += val * stereographics[2] * stereographics[2];
-                        m_xy[i] += val * stereographics[2] * stereographics[3];
-                        m_yy[i] += val * stereographics[3] * stereographics[3];
+                        m_x[i]  += val * xy[0];
+                        m_y[i]  += val * xy[1];
+                        m_xx[i] += val * xy[0] * xy[0];
+                        m_xy[i] += val * xy[0] * xy[1];
+                        m_yy[i] += val * xy[1] * xy[1];
                     }
                 }
             }
