@@ -97,6 +97,7 @@ int main(int argc, char** argv)
             m_xy = vec::Zero(nY);
             m_yy = vec::Zero(nY);
 
+#ifndef INTEGRATE_ANGLES
             // Theta angle in [0 .. PI / 2]
             for(int theta_out=0; theta_out<nb_theta_int; theta_out++)
             {
@@ -121,14 +122,31 @@ int main(int argc, char** argv)
                         xy[0] = stereographics[2];
                         xy[1] = stereographics[3];
                     }
+#else
 
+            for(int x=0; x<100; ++x)
+            {
+                for(int y=0; y<100; ++y)
+                {
+                    vec in(nX), stereographics(4);
+                    stereographics[0] = 0;
+                    stereographics[1] = 0;
+                    stereographics[2] = 2.0 * (x/100.0) - 0.5;
+                    stereographics[3] = 2.0 * (y/100.0) - 0.5;
+
+                    params::convert(&stereographics[0], params::STEREOGRAPHIC, params::SPHERICAL_TL_PL_TV_PV, in_angle);
+                    in_angle[0] = theta_in * 0.5*M_PI / 90.0;
+                    in_angle[1] = 0.0;
+
+                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
+#endif
                     // Copy the input vector
                     vec x = d->value(in);
 
 
                     for(int i=0; i<nY; ++i)
                     {
-                        double val = x[i] * normalization;
+                        double val = x[i] * normalization * sin(in_angle[2]);
                         if(with_cosine)
                         {
                             val *= cos(in_angle[2]);
