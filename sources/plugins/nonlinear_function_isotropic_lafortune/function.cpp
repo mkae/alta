@@ -354,19 +354,65 @@ void isotropic_lafortune_function::load(std::istream& in)
 
 void isotropic_lafortune_function::save_call(std::ostream& out, const arguments& args) const
 {
-	out << "#FUNC nonlinear_function_lafortune" << std::endl ;
-	out << "#NB_LOBES " << _n << std::endl ;
+    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-	for(int n=0; n<_n; ++n)
-	{
-		for(int i=0; i<_nY; ++i)
-		{
-			out << "Cxy " << _C[(n*_nY + i)*2 + 0] << std::endl;
-			out << "Cz  " << _C[(n*_nY + i)*2 + 1] << std::endl;
-			out << "N   " << _N[n*_nY + i] << std::endl;
-		}
-	}
-	out << std::endl;
+    if(is_alta)
+    {
+        out << "#FUNC nonlinear_function_lafortune" << std::endl ;
+        out << "#NB_LOBES " << _n << std::endl ;
 
+        for(int n=0; n<_n; ++n)
+        {
+
+            for(int i=0; i<_nY; ++i)
+            {
+                out << "Cxy " << _C[(n*_nY + i)*2 + 0] << std::endl;
+                out << "Cz  " << _C[(n*_nY + i)*2 + 1] << std::endl;
+                out << "N   " << _N[n*_nY + i] << std::endl;
+
+            }
+
+
+            out << std::endl;
+        }
+    }
+    else
+    {
+        for(int n=0; n<_n; ++n)
+        {
+            out << "lafortune(L, V, N, X, Y, vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _C[(n*_nY + i)*2 + 0];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            out << "), vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _C[(n*_nY + i)*2 + 1];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            out << "), vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _N[n*_nY + i];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            // For multiple lobes, add a sum sign
+            out << "))";
+            if(n < _n-1) { out << " + "; }
+        }
+    }
 }
 
+void isotropic_lafortune_function::save_body(std::ostream& out, const arguments& args) const
+{
+    out << "vec3 lafortune(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 Cx, vec3 Cz, vec3 Nl)" << std::endl;
+    out << "{" << std::endl;
+    out << "\tvec3 ext_dot = Cx * (dot(L,X)*dot(V,X) + dot(L,Y)*dot(V,Y)) + Cz * dot(L,N)*dot(V,N);" << std::endl;
+    out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
+    out << "}" << std::endl;
+}

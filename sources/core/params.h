@@ -47,7 +47,7 @@ class params
 
              CARTESIAN,             /*!< Light and View vectors represented in cartesian coordinates */
 
-			 UNKNOWN_INPUT
+             UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data */
 		 };
 
 		 //! \brief list of all supported parametrization for the output space.

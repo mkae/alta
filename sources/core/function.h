@@ -200,6 +200,8 @@ class nonlinear_function: public function
 				}
 				out << std::endl;
 			}
+
+            function::save_call(out, args);
 		}
 };
 

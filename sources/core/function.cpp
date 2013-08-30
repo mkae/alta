@@ -4,6 +4,11 @@
 
 void function::save(const std::string& filename, const arguments& args) const
 {
+    bool is_cpp      = args["export"] == "C++";
+    bool is_explorer = args["export"] == "explorer";
+    bool is_shader   = args["export"] == "shader" || is_explorer;
+    bool is_matlab   = args["export"] == "matlab";
+
 	// Open the file
 	std::ofstream file(filename);
 	if(!file.is_open())
@@ -11,14 +16,62 @@ void function::save(const std::string& filename, const arguments& args) const
 		std::cerr << "<<ERROR>> unable to open output file for writing" << std::endl;
 	}
 
+    if(is_explorer)
+    {
+        file << "analytic" << std::endl;
+        file << std::endl;
+        file << "::begin shader" << std::endl;
+    }
+
 	// Save common header
 	save_header(file, args);
+    file << std::endl;
 
 	// Save function definition
 	save_body(file, args);
+    file << std::endl;
+
+    if(is_cpp)
+    {
+        file << "vec brdf(const vec& in, const vec& file)" << std::endl;
+        file << "{" << std::endl;
+        file << "\tvec res(" << dimY() << ");" << std::endl;
+        file << "\t";
+    }
+    else if(is_matlab)
+    {
+        file << "function res = brdf(in, file)" << std::endl;
+        file << "{" << std::endl;
+        file << "\tres = zeros(" << dimY() << ");" << std::endl;
+        file << "\t";
+    }
+    else if(is_shader)
+    {
+        file << "vec3 BRDF(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y)" << std::endl;
+        file << "{" << std::endl;
+        file << "\tvec3 res = ";
+    }
 
 	// Save fit data
-	save_call(file, args);
+    save_call(file, args);
+    if(is_cpp || is_shader)
+    {
+        file << ";" << std::endl;
+        file << "\treturn res;" << std::endl;
+        file << "}" << std::endl;
+    }
+    else if(is_matlab)
+    {
+        file << ";" << std::endl;
+        file << "\treturn res;" << std::endl;
+        file << "endfunction" << std::endl;
+    }
+    file << std::endl;
+
+    if(is_explorer)
+    {
+        file << "::end shader" << std::endl;
+    }
 }
 		
 //! \brief save the header of the output function file. The header should
@@ -43,26 +96,8 @@ void function::save_header(std::ostream& out, const arguments& args) const
 //! defining function calls that are common to all the plugins.
 void function::save_body(std::ostream& out, const arguments& args) const
 {
-	bool is_cpp    = args["export"] == "C++";
-	bool is_shader = args["export"] == "shader";
-	bool is_matlab = args["export"] == "matlab";
 
-	if(is_cpp)
-	{
-		out << "vec brdf(const vec& in, const vec& out)" << std::endl;
-		out << "{" << std::endl;
-		out << "\tvec res(" << dimY() << ");" << std::endl;
-	}
-	else if(is_matlab)
-	{
-		out << "function res = brdf(in, out)" << std::endl;
-		out << "\tres = zeros(" << dimY() << ");" << std::endl;
-	}
-	else if(is_shader)
-	{
-		out << "vec3 brdf(vec3 in, vec3 out)" << std::endl;
-		out << "\tvec3 res = vec3(0.0f);" << std::endl;
-	}
+
 }
 
 //! \brief save object specific information. For an ALTA export the
@@ -70,19 +105,7 @@ void function::save_body(std::ostream& out, const arguments& args) const
 //! to the associated function will be done.
 void function::save_call(std::ostream& out, const arguments& args) const
 {
-	bool is_cpp    = args["export"] == "C++";
-	bool is_shader = args["export"] == "shader";
-	bool is_matlab = args["export"] == "matlab";
 
-	if(is_cpp || is_shader)
-	{
-		out << "\treturn res;" << std::endl;
-		out << "}" << std::endl;
-	}
-	else if(is_matlab)
-	{
-		out << "endfunction" << std::endl;
-	}
 }
 
 //! \brief L2 norm to data.

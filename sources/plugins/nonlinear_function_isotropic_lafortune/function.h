@@ -48,6 +48,7 @@ class isotropic_lafortune_function : public nonlinear_function
 
 		//! \brief Export function
 		virtual void save_call(std::ostream& out, const arguments& args) const;
+        virtual void save_body(std::ostream& out, const arguments& args) const;
 
 		//! \brief Boostrap the function by defining the diffuse term
 		//!

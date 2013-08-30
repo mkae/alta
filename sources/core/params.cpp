@@ -3,7 +3,7 @@
 struct param_info
 {
 	param_info(std::string n, int d, std::string i) : 
-		name(n), dimension(d), info(i) { };
+        name(n), dimension(d), info(i) { }
 
 	std::string name;
 	int dimension;
