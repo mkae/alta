@@ -31,10 +31,30 @@ vec phong_function::value(const vec& x) const
 }
 
 //! Load function specific files
-void phong_function::load(const std::string& filename) 
+void phong_function::load(std::istream& in) 
 {
-    std::cerr << "Not implemented " << __FILE__ << ":" << __LINE__ << std::endl;
-    throw;
+	    // Parse line until the next comment
+    while(in.peek() != '#')
+    {
+        char line[256];
+        in.getline(line, 256);
+    }
+
+    // Checking for the comment line #FUNC nonlinear_function_phong
+    std::string token;
+    in >> token;
+    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+
+    in >> token;
+    if(token != "nonlinear_function_phong") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+
+    // ks [double]
+	 // N  [double]
+    for(int i=0; i<dimY(); ++i)
+    {
+        in >> token >> _ks[i];
+        in >> token >>  _N[i];
+    }
 }
 
 //! Number of parameters to this non-linear function

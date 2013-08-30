@@ -51,6 +51,7 @@ static const std::map<params::input, const param_info> input_map = {
 	/* 4D Params */
 	{params::RUSIN_TH_PH_TD_PD,     {"RUSIN_TH_PH_TD_PD",     4, "Complete Half angle parametrization"}},
 	{params::SPHERICAL_TL_PL_TV_PV, {"SPHERICAL_TL_PL_TV_PV", 4, "Complete classical parametrization"}},
+    {params::STEREOGRAPHIC,         {"STEREOGRAPHIC",         4, "Light/View vector in stereographic projection"}},
 
 	/* 6D Params */
 	{params::CARTESIAN,             {"CARTESIAN",             6, "Complete vector parametrization"}}
@@ -162,7 +163,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[1] = atan2(half[0], half[1]);
+            outvec[1] = atan2(half[1], half[0]);
 			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
         case params::RUSIN_TH_TD_PD:
@@ -172,11 +173,12 @@ void params::from_cartesian(const double* invec, params::input outtype,
             diff[0] = invec[0];
             diff[1] = invec[1];
             diff[2] = invec[2];
-            rotate_normal(diff, -outvec[1]);
-            rotate_binormal(diff, -outvec[0]);
 
-            outvec[1] = acos(diff[2]);
-            outvec[2] = atan2(diff[0], diff[1]);
+            rotate_normal(diff, -atan2(half[1], half[0]));
+            rotate_binormal(diff, -outvec[0]);
+            
+				outvec[1] = acos(diff[2]);
+            outvec[2] = atan2(diff[1], diff[0]);
             break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
@@ -193,22 +195,39 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[0] = invec[0];
 			diff[1] = invec[1];
 			diff[2] = invec[2];
-			rotate_normal(diff, -outvec[1]);
+			rotate_normal(diff, -atan2(half[1], half[0]));
 			rotate_binormal(diff, -outvec[0]);
 
 			outvec[2] = acos(diff[2]);
-			outvec[3] = atan2(diff[0], diff[1]);
+			outvec[3] = atan2(diff[1], diff[0]);
 			break;
 
 		case params::SPHERICAL_TL_PL_TV_PV:
 			outvec[0] = acos(invec[2]);
-			outvec[1] = atan2(invec[0], invec[1]);
+			outvec[1] = atan2(invec[1], invec[0]);
 			outvec[2] = acos(invec[5]);
-			outvec[3] = atan2(invec[3], invec[4]);
+			outvec[3] = atan2(invec[4], invec[3]);
 #ifdef DEBUG
 			std::cout << invec[2] << " - acos -> " << outvec[0] << std::endl;
 #endif
 			break;
+
+        case params::STEREOGRAPHIC:
+        {
+            // Project the View vector invec[0,1,2] on a 2D direction on the
+            // surface outvec[0,1]
+            double dotVN = invec[2];
+            outvec[0] = invec[0] / (1.0+dotVN);
+            outvec[1] = invec[1] / (1.0+dotVN);
+
+            // Project the Light vector invec[0,1,2] on a 2D direction on the
+            // surface outvec[2,3]
+            double dotLN = invec[5];
+            outvec[2] = invec[3] / (1.0+dotLN);
+            outvec[3] = invec[4] / (1.0+dotLN);
+
+            break;
+        }
 
 			// 6D Parametrization
 		case params::CARTESIAN:

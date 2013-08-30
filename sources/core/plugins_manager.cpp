@@ -44,8 +44,9 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 #else
     void* handle = dlopen(filename.c_str(), RTLD_LAZY);
     if(handle != NULL)
-    {
-        void* res = dlsym(handle, function);
+	 {
+		 void (*res)();
+		 *(void **)(&res) = dlsym(handle, function);
 
         if(dlerror() != NULL)
         {
@@ -194,36 +195,62 @@ fitter* plugins_manager::get_fitter()
 #endif
 }
 
-arguments create_arguments(const std::string& n)
+
+		
+//! \brief load a function from the ALTA input file.
+function* plugins_manager::get_function(const std::string& filename)
 {
-    std::vector<std::string> cmd_vec;
-    std::stringstream stream(n);
-#ifdef DEBUG_ARGS
-	 std::cout << "<<DEBUG>> create argument vector: [";
-#endif
-    while(stream.good())
-    {
-        std::string temp;
-        stream >> temp;
-#ifdef DEBUG_ARGS
-		  std::cout << temp << ", ";
-#endif
+	std::ifstream file;
+	file.open(filename.c_str()) ;
+	if(!file.is_open())
+	{
+		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+		throw ;
+	}
 
-        cmd_vec.push_back(temp);
-    }
-#ifdef DEBUG_ARGS
-	 std::cout << "]" << std::endl;
-#endif
+	// Parameters of the function object
+	int nX, nY;
+	arguments args;
 
-    int argc = cmd_vec.size();
-    char* argv[argc];
-    for(int i=0; i<argc; ++i)
-    {
-        argv[i] = &cmd_vec[i][0];
-    }
+	// Test for the first line of the file. Should be a ALTA FUNC HEADER
+	std::string line ;
+	std::getline(file, line) ;
+	if(line != "#ALTA FUNC HEADER")
+	{
+		std::cerr << "<<ERROR>> this is not a function file" << std::endl;
+	}
 
-    arguments current_args(argc, argv);
-    return current_args;
+	// Parse the header for the function command line and the dimension
+	// of the function
+	while(line != "#ALTA HEADER END")
+	{
+		std::getline(file, line) ;
+		std::stringstream linestream(line) ;
+
+		linestream.ignore(1) ;
+
+		std::string comment ;
+		linestream >> comment ;
+
+		if(comment == std::string("DIM"))
+		{
+			linestream >> nX >> nY ;
+		}
+		else if(comment == std::string("CMD"))
+		{
+			args = arguments::create_arguments(line.substr(4, std::string::npos));
+		}
+	}
+
+	// Create the function from the command line
+	function* f = get_function(args);
+	f->setDimX(nX);
+	f->setDimY(nY);
+
+	// Load the function part from the file object
+    f->load(file);
+
+	return f;
 }
 
 //! Get an instance of the function selected based on the name <em>n</em>.
@@ -251,18 +278,30 @@ function* plugins_manager::get_function(const arguments& args)
             return NULL;
         }
 
-        //! \todo create a <em>compound</em> class to store multiple
+        //! create a <em>compound</em> class to store multiple
         //! functions in it.
-
+		  compound_function* compound = new compound_function();
+	
         //! For each args_vec element, create a function object and add
         //! it to the compound one.
+		  for(int i=0; i<args_vec.size(); ++i)
+		  {
+	        std::string n("--func ");
+	        n.append(args_vec[i]);
 
-        std::string n("--func ");
-        n.append(args_vec[0]);
-        func = get_function(create_arguments(n));
+			  function* f = get_function(arguments::create_arguments(n));
+			  if(dynamic_cast<nonlinear_function*>(f) == NULL)
+			  {
+				  std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
+			  }
+			  else
+			  {
+				  compound->push_back(dynamic_cast<nonlinear_function*>(f));
+			  }
+		  }
 
-        //! return the compound class
-
+		  //! return the compound class
+		  func = compound;
     }
     else
     {
@@ -317,9 +356,10 @@ function* plugins_manager::get_function(const arguments& args)
 			 }
 		 }
 
-		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(create_arguments(n)));
+		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(arguments::create_arguments(n)));
 		 func_fres->setBase(nl_func);
-		 func = dynamic_cast<function*>(func_fres);
+		 return func_fres;
+
 	 }
 
     return func;
@@ -376,25 +416,33 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 void plugins_manager::check_compatibility(data*& d, function*& f,
                                           const arguments& args)
 {
-	if(d->parametrization() == params::UNKNOWN_INPUT)
+	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
+		f->input_parametrization() == params::UNKNOWN_INPUT)
 	{
-		std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
-	}
-
-	if(f->parametrization() == params::UNKNOWN_INPUT)
-	{
-		std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
-		f->setParametrization(d->parametrization());
-	}
-	else if(d->parametrization() != f->parametrization())
-	{
-		std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
-		data_params* dd = new data_params(d, f->parametrization());
-		d = dd ;
+		std::cout << "<<WARNING>> both function and data objects have no parametrization" << std::endl;
 	}
 	else
 	{
-		std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+		if(d->input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
+		}
+
+		if(f->input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
+			f->setParametrization(d->input_parametrization());
+		}
+		else if(d->input_parametrization() != f->input_parametrization())
+		{
+			std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+			data_params* dd = new data_params(d, f->input_parametrization());
+			d = dd ;
+		}
+		else
+		{
+			std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+		}
 	}
 
 	if(f->dimY() != d->dimY())

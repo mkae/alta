@@ -200,7 +200,7 @@ bool rational_fitter_leastsquare::fit_data(const vertical_segment* d, int np, in
     }
   } // iterations
   
-  std::vector<double> p(np), q(nq);
+  vec p(np), q(nq);
   Eigen::VectorXd::Map(&p[0], np) = pq.head(np);
   Eigen::VectorXd::Map(&q[0], nq) = pq.tail(nq);
   

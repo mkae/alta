@@ -32,8 +32,8 @@ rational_function_chebychev_1d::rational_function_chebychev_1d(int np, int nq) :
 {
 }
 
-rational_function_chebychev_1d::rational_function_chebychev_1d(const std::vector<double>& a,
-                                                               const std::vector<double>& b) :
+rational_function_chebychev_1d::rational_function_chebychev_1d(const vec& a,
+                                                               const vec& b) :
     rational_function_1d(a, b)
 {
 }
@@ -119,8 +119,8 @@ void rational_function_chebychev::save_matlab(const std::string& filename, const
     for(int j=0; j<dimY(); ++j)
     {
         rational_function_1d* rf = get(j);
-        std::vector<double> a = rf->getP();
-        std::vector<double> b = rf->getQ();
+        vec a = rf->getP();
+        vec b = rf->getQ();
 
         const unsigned int np = a.size();
         const unsigned int nq = b.size();
@@ -226,8 +226,8 @@ void rational_function_chebychev::save_cpp(const std::string& filename, const ar
     for(int j=0; j<dimY(); ++j)
     {
         rational_function_1d* rf = get(j);
-        std::vector<double> a = rf->getP();
-        std::vector<double> b = rf->getQ();
+        vec a = rf->getP();
+        vec b = rf->getQ();
 
         const unsigned int np = a.size();
         const unsigned int nq = b.size();
@@ -300,8 +300,8 @@ void rational_function_chebychev::save(const std::string& filename) const
     for(int k=0; k<_nY; ++k)
     {
         rational_function_1d* rf = get(k);
-        std::vector<double> a = rf->getP();
-        std::vector<double> b = rf->getQ();
+        vec a = rf->getP();
+        vec b = rf->getQ();
 
         const unsigned int np = a.size();
         const unsigned int nq = b.size();

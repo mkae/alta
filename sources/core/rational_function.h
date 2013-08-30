@@ -19,8 +19,8 @@ class rational_function_1d : public function
 
 		rational_function_1d() ;
 		rational_function_1d(int np, int nq) ;
-		rational_function_1d(const std::vector<double>& a,
-		                     const std::vector<double>& b) ;
+		rational_function_1d(const vec& a,
+		                     const vec& b) ;
 		virtual ~rational_function_1d() {}
 
 		// Overload the function operator
@@ -36,11 +36,11 @@ class rational_function_1d : public function
 		virtual double q(const vec& x, int j) const ;
 
 		// IO function to text files
-		virtual void load(const std::string& filename) ;
+        virtual void load(std::istream& in);
 
 		// Update the function
-		virtual void update(const std::vector<double>& in_a, 
-		                    const std::vector<double>& in_b) ;
+		virtual void update(const vec& in_a, 
+		                    const vec& in_b) ;
 
 		// Resize the polynomial
 		virtual void resize(int np, int nq);
@@ -49,8 +49,8 @@ class rational_function_1d : public function
 		virtual double getP(int i) const { return a[i]; }
 		virtual double getQ(int i) const { return b[i]; }
 
-		virtual std::vector<double> getP() const { return a; }
-		virtual std::vector<double> getQ() const { return b; }
+		virtual vec getP() const { return a; }
+		virtual vec getQ() const { return b; }
 
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out,
@@ -72,8 +72,7 @@ class rational_function_1d : public function
 
 		// Store the coefficients for the moment, I assume
 		// the functions to be polynomials.
-		std::vector<double> a ;
-		std::vector<double> b ;
+		vec a, b ;
 } ;
 
 class rational_function : public function
@@ -89,7 +88,7 @@ class rational_function : public function
 		virtual vec operator()(const vec& x) const { return value(x) ; }
 
 		// IO function to text files
-		virtual void load(const std::string& filename) ;
+        virtual void load(std::istream& in) ;
 
 		// Update the function
 		virtual void update(int i, rational_function_1d* r) ;
@@ -130,6 +129,27 @@ class rational_function : public function
 			rs.clear();
 			rs.resize(_nY);
 		}
+
+		virtual void setMin(const vec& min)
+		{
+			function::setMin(min);
+			for(int i=0; i<dimY(); ++i)
+			{
+				get(i)->setMin(min);
+			}
+		}
+		
+		virtual void setMax(const vec& max)
+		{
+			function::setMax(max);
+			for(int i=0; i<dimY(); ++i)
+			{
+				get(i)->setMax(max);
+			}
+		}
+
+		//! \brief Save the rational function to the rational format (see \ref formating).
+		virtual void save_call(std::ostream& out, const arguments& args) const ;
 
 	protected: // functions
 

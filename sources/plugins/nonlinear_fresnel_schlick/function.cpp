@@ -14,56 +14,92 @@ ALTA_DLL_EXPORT function* provide_function()
     return new schlick();
 }
 
-// Overload the function operator
-vec schlick::operator()(const vec& x) const 
+//! Load function specific files
+void schlick::load(std::istream& in)
 {
-	return value(x);
+	fresnel::load(in);
+
+    // Parse line until the next comment
+    while(in.peek() != '#')
+    {
+        char line[256];
+        in.getline(line, 256);
+    }
+
+    // Checking for the comment line #FUNC nonlinear_fresnel_schlick
+    std::string token;
+    in >> token;
+    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+
+    in >> token;
+    if(token != "nonlinear_fresnel_schlick") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+
+    // R [double]
+    in >> token >> R;
 }
-vec schlick::value(const vec& x) const 
+		
+void schlick::save_call(std::ostream& out, const arguments& args) const
 {
+	f->save_call(out, args);
+
+	out << "#FUNC nonlinear_fresnel_schlick" << std::endl ;
+	out << "R " << R << std::endl;
+	out << std::endl;
+}
+
+vec schlick::fresnelValue(const vec& x) const
+{
+	double xp[2];
+	params::convert(&x[0], input_parametrization(), params::COS_TH_TD, xp);
+
 	vec res(_nY);
 	for(int i=0; i<_nY; ++i)
 	{
-		res[i] = R + (1.0 - R) * pow(1.0 - clamp(x[0], 0.0, 1.0), 5.0);
+		res[i] = R + (1.0 - R) * pow(1.0 - clamp(xp[1], 0.0, 1.0), 5.0);
 	}
 
 	return res;
 }
 
-//! Load function specific files
-void schlick::load(const std::string& filename) 
+//! \brief Number of parameters to this non-linear function
+int schlick::nbFresnelParameters() const 
 {
-    std::cerr << "Cannot load a Schlick file." << std::endl;
-    throw;
+	return 1;
 }
 
-//! Number of parameters to this non-linear function
-int schlick::nbParameters() const 
+//! \brief Get the vector of parameters for the function
+vec schlick::getFresnelParameters() const 
 {
-	return 0;
+	vec p(1);
+	p[0] = R;
+	return p;
 }
 
-//! Get the vector of parameters for the function
-vec schlick::parameters() const 
+//! \brief Update the vector of parameters for the function
+void schlick::setFresnelParameters(const vec& p) 
 {
-	vec r(0);
-	return r;
+	R = p[0];
 }
 
-//! Update the vector of parameters for the function
-void schlick::setParameters(const vec& p) 
-{
-}
-
-//! Obtain the derivatives of the function with respect to the 
+//! \brief Obtain the derivatives of the function with respect to the
 //! parameters. 
-vec schlick::parametersJacobian(const vec& x) const 
+vec schlick::getFresnelParametersJacobian(const vec& x) const 
 {
-	vec r(0);
-	return r;
+	const int nY = dimY();
+	double xp[2];
+	params::convert(&x[0], input_parametrization(), params::COS_TH_TD, xp);
+
+	vec jac(nY);
+	for(int i=0; i<nY; ++i)
+	{
+		jac[i] = 1.0 - pow(1.0 - clamp(xp[1], 0.0, 1.0), 5.0);
+	}
+
+	return jac;
 }
 
 
-void schlick::bootstrap(const data* d, const arguments& args)
+void schlick::fresnelBootstrap(const data* d, const arguments& args)
 {
+	R = 1.0;
 }

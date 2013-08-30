@@ -219,6 +219,8 @@ void lookup_brdf_val(double* brdf, double theta_in, double fi_in,
 	   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
 	   fi_diff > M_PI)
 	{
+        std::cerr << "<<ERROR>> the input vec is incorrect: TL = " << theta_in << ", PL = " << fi_in << ", TV = " << theta_out << ", PV = " << fi_out << std::endl;
+        std::cerr << "<<ERROR>> the input vec is incorrect: TH = " << theta_half << ", TD = " << theta_diff << ", PD = " << fi_diff << std::endl;
 		throw; //! \todo Add exception list
 	}
 	// Find index.

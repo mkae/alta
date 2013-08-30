@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <map>
 #include <cstdlib>
 #include <iostream>
@@ -222,6 +223,62 @@ class arguments
 
             return res;
         }
+
+		  //! \brief get the reconstructed command line arguments (without
+		  //! the executable name
+		  std::string get_cmd() const
+		  {
+			  std::string cmd;
+
+			  std::map<std::string, std::string>::const_iterator it = _map.begin();
+			  for(;it != _map.end(); it++)
+			  {
+				  if(!it->first.empty())
+				  {
+					  cmd.append(" --");
+					  cmd.append(it->first);
+					  cmd.append(" ");
+					  cmd.append(it->second);
+				  }
+			  }
+
+			  return cmd;
+		  }
+
+		  //! \brief Create an argument object from a string describing a command
+		  //! line.
+		  static arguments create_arguments(const std::string& n)
+		  {
+			  std::vector<std::string> cmd_vec;
+			  std::stringstream stream(n);
+#ifdef DEBUG_ARGS
+			  std::cout << "<<DEBUG>> create argument vector: [";
+#endif
+			  while(stream.good())
+			  {
+				  std::string temp;
+				  stream >> temp;
+#ifdef DEBUG_ARGS
+				  std::cout << temp << ", ";
+#endif
+
+				  cmd_vec.push_back(temp);
+			  }
+#ifdef DEBUG_ARGS
+			  std::cout << "]" << std::endl;
+#endif
+
+			  int argc = cmd_vec.size();
+			  char* argv[argc];
+			  for(int i=0; i<argc; ++i)
+			  {
+				  argv[i] = &cmd_vec[i][0];
+			  }
+
+			  arguments current_args(argc, argv);
+			  return current_args;
+		  }
+
 
 	private: // data
 

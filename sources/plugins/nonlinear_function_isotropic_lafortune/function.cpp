@@ -304,183 +304,69 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 	return out;
 }
 
-
 //! Load function specific files
-void isotropic_lafortune_function::load(const std::string& filename)
+void isotropic_lafortune_function::load(std::istream& in)
 {
-	std::ifstream file(filename.c_str()) ;
-	if(!file.is_open())
+	// Parse line until the next comment
+	while(in.peek() != '#')
 	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw ;
+		char line[256];
+		in.getline(line, 256);
 	}
 
-	_nX = 0 ; _nY = 0 ;
-	_n = 0;
-
-	double x, y, dy ;
-	while(file.peek() == '#')
-	{
-		std::string line ;
-		std::getline(file, line) ;
-		std::stringstream linestream(line) ;
-
-		linestream.ignore(1) ;
-
-		std::string comment ;
-		linestream >> comment ;
-
-		if(comment == std::string("DIM"))
-		{
-			linestream >> _nX >> _nY ;
-		}
-		else if(comment == std::string("NB_LOBES"))
-		{
-			linestream >> _n ;
-		}
+    // Checking for the comment line #FUNC nonlinear_function_lafortune
+	std::string token;
+	in >> token;
+	if(token.compare("#FUNC") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
 	}
 
-	_kd = vec(_nY);
-	setNbLobes(_n);
-		
-	// Parse the diffuse
-	for(int i=0; i<_nY; ++i)
+	in >> token;
+   if(token.compare("nonlinear_function_lafortune") != 0) 
 	{
-		file >> _kd[i];
+		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
 	}
+
+	// Shoudl have the #NB_LOBES [int]
+	int nb_lobes;
+	in >> token >> nb_lobes;
+	setNbLobes(nb_lobes);
 
 	// Parse the lobe
-	int n=0;
-	std::string line ;
-	while(n < _n)
+	for(int n=0; n<_n; ++n)
 	{
-		std::getline(file, line) ;
-
-		if(line.size() > 1)
+		for(int i=0; i<_nY; ++i)
 		{
-			std::string sub = line.substr(0,2);
 
-			if(sub == "#C")
-			{
-				for(int i=0; i<_nY; ++i)
-				{
-					file >> _C[(n*_nY + i)*2 + 0] >> _C[(n*_nY + i)*2 + 1];
-				}
-			}
-			else if(sub == "#N")
-			{
-				for(int i=0; i<_nY; ++i)
-				{
-					file >> _N[n*_nY+i];
-				}
-
-				++n;
-			}
+			in >> token >> _C[(n*_nY + i)*2 + 0];
+			in >> token >> _C[(n*_nY + i)*2 + 1];
+			in >> token >> _N[i];
 		}
+
 	}
-	
-	std::cout << "<<INFO>> Kd = " << _kd << std::endl;
+
 	std::cout << "<<INFO>> Cd = " << _C << std::endl;
 	std::cout << "<<INFO>> N = " << _N << std::endl;
+
 }
 
-void isotropic_lafortune_function::save(const std::string& filename) const
+
+void isotropic_lafortune_function::save_call(std::ostream& out, const arguments& args) const
 {
-	std::ofstream file(filename.c_str(), std::ios_base::trunc);
-	file << "#DIM " << _nX << " " << _nY << std::endl ;
-	file << "#NB_LOBES " << _n << std::endl ;
-		
-	for(int i=0; i<_nY; ++i)
-	{
-		file << _kd[i] << std::endl;
-	}
-	file << std::endl;
+	out << "#FUNC nonlinear_function_lafortune" << std::endl ;
+	out << "#NB_LOBES " << _n << std::endl ;
 
 	for(int n=0; n<_n; ++n)
 	{
-		file << "#Lobe number " << n << std::endl;
-		file << "#Cxy Cz" << std::endl;
 		for(int i=0; i<_nY; ++i)
 		{
-			file << _C[(n*_nY + i)*2 + 0] << " " << _C[(n*_nY + i)*2 + 1] << std::endl;
+			out << "Cxy " << _C[(n*_nY + i)*2 + 0] << std::endl;
+			out << "Cz  " << _C[(n*_nY + i)*2 + 1] << std::endl;
+			out << "N   " << _N[n*_nY + i] << std::endl;
 		}
-		file << std::endl;
-
-		file << "#N" << std::endl;
-		for(int i=0; i<_nY; ++i)
-		{
-			file << _N[n*_nY + i] << std::endl;
-		}
-		file << std::endl;
 	}
+	out << std::endl;
 
 }
 
-//! \brief Output the function using a BRDF Explorer formating.
-//! \todo Finish
-void isotropic_lafortune_function::save_brdfexplorer(const std::string& filename,
-                                       const arguments& args) const
-{
-    std::ofstream file(filename.c_str(), std::ios_base::trunc);
-    file << "analytic" << std::endl;
-
-    file << std::endl;
-//    file << "::begin parameters" << std::endl;
-//    file << "::end parameters" << std::endl;
-//    file << std::endl;
-    file << std::endl;
-    file << "::begin shader" << std::endl;
-	 
-    type_definition(file, _nY) << " n;" << std::endl;
-    type_definition(file, _nY) << " Cx;" << std::endl;
-    type_definition(file, _nY) << " Cy;" << std::endl;
-    type_definition(file, _nY) << " Cz;" << std::endl;
-    type_definition(file, _nY) << " ";
-    type_affectation(file, std::string("kd"), _kd, _nY);
-
-    file << std::endl;
-    file << std::endl;
-    file << "vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )" << std::endl;
-    file << "{" << std::endl;
-    if(_nY == 1)
-    {
-        file << "    ";
-        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
-
-        for(int n=0; n<_n; ++n)
-        {
-            file << "    // Lobe number " << n+1 << std::endl;
-            file << "    n  = " << _N[n] << "; " << std::endl;
-            file << "    Cx = " << _C[2*n + 0] << "; " << std::endl;
-            file << "    Cy = " << _C[2*n + 0] << "; " << std::endl;
-            file << "    Cz = " << _C[2*n + 1] << "; " << std::endl;
-            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
-            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
-            file << std::endl;
-        }
-    }
-    else
-    {
-        file << "    ";
-        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
-
-        for(int n=0; n<_n; ++n)
-        {
-            file << "    // Lobe number " << n+1 << std::endl;
-            file << "    "; type_affectation(file, std::string("n"), _N, _nY, n);
-            file << "    "; type_affectation(file, std::string("Cx"), _C, _nY, n, 0, 2);
-            file << "    "; type_affectation(file, std::string("Cy"), _C, _nY, n, 0, 2);
-            file << "    "; type_affectation(file, std::string("Cz"), _C, _nY, n, 1, 2);
-            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
-            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
-            file << std::endl;
-        }
-    }
-    file << "    return vec3(D);" << std::endl;
-//    file << "    if (normalized)" << std::endl;
-//    file << "        D *= (2+n) / (2*PI);" << std::endl;
-    file << "}" << std::endl;
-    file << std::endl;
-    file << "::end shader" << std::endl;
-    file.close();
-}

@@ -20,22 +20,27 @@ int main(int argc, char** argv)
 
 	plugins_manager manager(args) ;
 
-	if(args.is_defined("help")) {
+	if(args.is_defined("help")) 
+	{
 		std::cout << "<<HELP>> brdf2gnuplot --input brdf.file --output gnuplot.file --func function.lib --data data.file" << std::endl ;
 		std::cout << " - input, output and data are mandatory parameters" << std::endl ;
 	}
 
-	if(! args.is_defined("input")) {
+	if(! args.is_defined("input")) 
+	{
 		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
 		return 1 ;
 	}
-	if(! args.is_defined("output")) {
+	if(! args.is_defined("output")) 
+	{
 		std::cerr << "<<ERROR>> the output filename is not defined" << std::endl ;
 		return 1 ;
 	}
 
-    function* f = manager.get_function(args) ;
+	// Load a function file
+	function* f = manager.get_function(args["input"]) ;
 
+	// Load a data file
 	data* d = NULL ;
 	if(args.is_defined("data"))
 	{
@@ -44,26 +49,30 @@ int main(int argc, char** argv)
 		d->load(args["data"]) ;
 	}
 
+	// If the function loaded has no parametrization (for example a diffuse
+	// function), the function will take the parametrization of the data
+	if(f->input_parametrization() == params::UNKNOWN_INPUT)
+	{
+		manager.check_compatibility(d, f, args);
+	}
+
 	bool plot_error = false ;
-    bool linear_plot = false;
+	bool linear_plot = false;
 	if(args.is_defined("error"))
 	{
 		std::cout << "<<INFO>> Exporting an error plot" << std::endl;
 		plot_error = true ;
 	}
-    else if(args.is_defined("linear_error"))
-    {
-        std::cout << "<<INFO>> Exporting linear error plot" << std::endl;
-        linear_plot = true;
-    }
-
-	// Load the BRDF
-	f->load(args["input"]);
+	else if(args.is_defined("linear_error"))
+	{
+		std::cout << "<<INFO>> Exporting linear error plot" << std::endl;
+		linear_plot = true;
+	}
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 
-    if(d != NULL)
+	if(d != NULL)
 	{
 		for(int i=0; i<d->size(); ++i)
 		{

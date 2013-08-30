@@ -296,8 +296,8 @@ bool rational_fitter_cgal::fit_data(const vertical_segment* d, int np, int nq, i
 	if(solves_qp)
 	{
 		// Recopy the vector d
-		std::vector<double> p, q;
-		p.assign(np, 0.0) ; q.assign(nq, 0.0) ;
+		vec p, q;
+		p = vec::Zero(np) ; q = vec::Zero(nq) ;
 		for(int i=0; i<np+nq; ++i)
 		{
 			const double v = CGAL::to_double(*(s.variable_numerators_begin()+i)) ;

@@ -18,7 +18,7 @@ public: // methods
 
     rational_function_chebychev_1d() ;
     rational_function_chebychev_1d(int np, int nq) ;
-    rational_function_chebychev_1d(const std::vector<double>& a, const std::vector<double>& b) ;
+    rational_function_chebychev_1d(const vec& a, const vec& b) ;
     virtual ~rational_function_chebychev_1d() {}
 
     // Get the p_i and q_j function

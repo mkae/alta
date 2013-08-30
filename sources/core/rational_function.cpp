@@ -18,21 +18,21 @@ rational_function_1d::rational_function_1d(int np, int nq)
 	b.resize(nq);
 }
 
-rational_function_1d::rational_function_1d(const std::vector<double>& a, 
-                                           const std::vector<double>& b) :
+rational_function_1d::rational_function_1d(const vec& a, 
+                                           const vec& b) :
 	a(a), b(b)
 {
 }
 
-void rational_function_1d::load(const std::string& filename)
+void rational_function_1d::load(std::istream& in)
 {
 }
 
-void rational_function_1d::update(const std::vector<double>& in_a,
-                                  const std::vector<double>& in_b)
+void rational_function_1d::update(const vec& in_a,
+                                  const vec& in_b)
 {
-	a.reserve(in_a.size()) ;
-	b.reserve(in_b.size()) ;
+	a.resize(in_a.size()) ;
+	b.resize(in_b.size()) ;
 	a = in_a ;
 	b = in_b ;
 }
@@ -219,7 +219,8 @@ double rational_function_1d::p(const vec& x, int i) const
 	{
 #ifdef POLYNOMIALS
 		res *= pow(x[k], deg[k]) ;
-#else // LEGENDRE
+//		res *= pow(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]) ;
+#else
 		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
 #endif
 	}
@@ -228,18 +229,7 @@ double rational_function_1d::p(const vec& x, int i) const
 }
 double rational_function_1d::q(const vec& x, int i) const 
 {
-	std::vector<int> deg = index2degree(i);
-	double res = 1.0; 
-	for(int k=0; k<dimX(); ++k)
-	{
-#ifdef POLYNOMIALS
-		res *= pow(x[k], deg[k]) ;
-#else // LEGENDRE
-		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
-#endif
-	}
-
-	return res ;
+	return p(x, i);
 }
 
 // Overload the function operator
@@ -366,113 +356,89 @@ vec rational_function::value(const vec& x) const
 }
 
 // IO function to text files
-
-void rational_function::load(const std::string& filename)
+void rational_function::load(std::istream& in)
 {
-	std::ifstream file(filename.c_str()) ;
-	if(!file.is_open())
+
+	// Parse line until the next comment
+	while(in.peek() != '#')
 	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw ;
+		char line[256];
+		in.getline(line, 256);
 	}
 
-	int nX, nY ;
-	vec xmin, xmax ;
-	vec a, b;
-	int i = 0, j = 0;
-	while(file.good())
+    // Checking for the comment line #FUNC nonlinear_function_lafortune
+	std::string token;
+	in >> token;
+	if(token.compare("#FUNC") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+	}
+
+	in >> token;
+   if(token.compare("rational_function") != 0) 
 	{
-		std::string line ;
-		std::getline(file, line) ;
-		std::stringstream linestream(line) ;
+		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+	}
 
-		// Discard incorrect lines
-		if(linestream.peek() == '#')
+	int _np, _nq;
+	// Shoudl have the #NP [int]
+	in >> token >> _np;
+	
+	// Shoudl have the #NQ [int]
+	in >> token >> _nq;
+	setSize(_np, _nq);
+
+	// Check for the MIN and MAX vector
+	vec min(dimX()), max(dimX());
+	in >> token;
+   if(token.compare("#MIN") != 0) 
+	{
+		std::cerr << "<<ERROR>> the min value for the input space is not defined." << std::endl; 
+	}
+	for(int k=0; k<dimX(); ++k) {in >> min[k];}
+	setMin(min);
+
+	in >> token;
+   if(token.compare("#MAX") != 0) 
+	{
+		std::cerr << "<<ERROR>> the max value for the input space is not defined." << std::endl; 
+	}
+	for(int k=0; k<dimX(); ++k) {in >> max[k]; }
+	setMax(max);
+
+
+	// Check for the polynomial basis type
+	in >> token;
+   if(token.compare("#BASIS") != 0) 
+	{
+		std::cerr << "<<ERROR>> the file is not specifying the polynomial basis." << std::endl; 
+	}
+	in >> token;
+   if(token.compare("LEGENDRE") != 0) 
+	{
+		std::cerr << "<<ERROR>> the basis is different than LEGENDRE." << std::endl; 
+	}
+
+	vec a(_np), b(_nq);
+	for(int i=0; i<_nY; ++i)
+	{
+		// Parse the p_i coefficients
+		for(int j=0; j<_np; ++j)
 		{
-			linestream.ignore(1) ;
-
-			std::string comment ;
-			linestream >> comment ;
-
-			if(comment == std::string("DIM"))
-			{
-				linestream >> nX >> nY ;
-				setDimX(nX) ;
-				setDimY(nY) ;
-
-				xmin.resize(nX) ;
-				xmax.resize(nX) ;
-				for(int k=0; k<nX; ++k)
-					xmax[k] = 1.0;
-
-				setMin(xmin) ;
-				setMax(xmax) ;
-			}
-			else if(comment == std::string("NP"))
-			{
-				linestream >> np ;
-				a.resize(np);
-				std::cout << "<<DEBUG>> loading RF with np = " << np << std::endl;
-			}
-			else if(comment == std::string("NQ"))
-			{
-				linestream >> nq ;
-				b.resize(nq);
-				std::cout << "<<DEBUG>> loading RF with nq = " << nq << std::endl;
-			}
-			else if(comment == std::string("INPUT_PARAM"))
-			{
-				std::string param;
-				linestream >> param ;
-
-				setParametrization(params::parse_input(param));
-			}
-			continue ;
+			in >> token >> a[j];
 		}
-		else if(line.empty())
+		
+		// Parse the q_i coefficients
+		for(int j=0; j<_nq; ++j)
 		{
-			continue ;
+			in >> token >> b[j];
 		}
-		else if(j < nY)
-		{
-			int index ; double val ;
 
-			// Accessing the index
-			for(int k=0; k<nX; ++k) {
-				linestream >> index ;
-			}
+		std::cout << a << std::endl;
+		std::cout << b << std::endl;
 
-			// Accessing the value
-			linestream >> val ;
-			if(i < np)
-			{
-				a[i] = val ;
-			}
-			else
-			{
-				b[i-np] = val ;
-			}
-
-
-			// Update the output dimension number
-			if(i == np+nq-1) 
-			{
-				i = 0 ;
-				get(j)->update(a, b);
-
-#ifdef DEBUG
-				std::cout << "<<DEBUG>> loading channel " << j << " with: " << std::endl;
-				std::cout << "          " << a << std::endl;
-				std::cout << "          " << b << std::endl;
-#endif
-
-				++j ;
-			} 
-			else 
-			{
-				++i ;
-			}
-		}
+		// Update the i_th color channel
+		get(i)->update(a, b);
 	}
 }
 
@@ -509,8 +475,8 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 	for(int j=0; j<dimY(); ++j)
 	{
 		rational_function_1d* rf = get(j);
-		std::vector<double> a = rf->getP();
-		std::vector<double> b = rf->getQ();
+		vec a = rf->getP();
+		vec b = rf->getQ();
 
 		// Export the numerator of the jth color channel
 		file << "\tp(" << j+1 << ",:) = ";
@@ -624,8 +590,8 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 	for(int j=0; j<dimY(); ++j)
 	{
 		rational_function_1d* rf = get(j);
-		std::vector<double> a = rf->getP();
-		std::vector<double> b = rf->getQ();
+		vec a = rf->getP();
+		vec b = rf->getQ();
 
 		// Export the numerator of the jth color channel
 		file << "\tp = ";
@@ -706,6 +672,42 @@ void rational_function::save_gnuplot(const std::string& filename, const data* d,
 	file.close();
 }
 
+void rational_function::save_call(std::ostream& out, const arguments& args) const
+{
+	out << "#FUNC rational_function" << std::endl;
+	out << "#NP " << np << std::endl ;
+	out << "#NQ " << nq << std::endl ;
+	out << "#MIN "; for(int k=0; k<_nX; ++k) { out << _min[k] << " "; } out << std::endl;
+	out << "#MAX "; for(int k=0; k<_nX; ++k) { out << _max[k] << " "; } out << std::endl; 
+	out << "#BASIS LEGENDRE" << std::endl ;
+
+	for(int k=0; k<_nY; ++k)
+	{
+		rational_function_1d* rf = get(k);
+		vec a = rf->getP();
+		vec b = rf->getQ();
+
+		for(unsigned int i=0; i<np; ++i)
+		{
+			std::vector<int> index = rf->index2degree(i) ;
+			for(unsigned int j=0; j<index.size(); ++j)
+			{
+				out << index[j] << "\t" ;
+			}
+			out << a[i] << std::endl ;
+		}
+
+		for(unsigned int i=0; i<nq; ++i)
+		{
+			std::vector<int> index = rf->index2degree(i) ;
+			for(unsigned int j=0; j<index.size(); ++j)
+			{
+				out << index[j] << "\t" ;
+			}
+			out << b[i] << std::endl ;
+		}
+	}
+}
 
 void rational_function::save(const std::string& filename) const
 {
@@ -719,8 +721,8 @@ void rational_function::save(const std::string& filename) const
 	for(int k=0; k<_nY; ++k)
 	{
 		rational_function_1d* rf = get(k);
-		std::vector<double> a = rf->getP();
-		std::vector<double> b = rf->getQ();
+		vec a = rf->getP();
+		vec b = rf->getQ();
 
 		for(unsigned int i=0; i<np; ++i)
 		{

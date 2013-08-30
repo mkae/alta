@@ -8,13 +8,19 @@
 #include <cassert>
 #include <iostream>
 
-/*! \brief a static class allowing to change from one parametrization
- *  to another.
+/*! \class params
  *  \ingroup core
+ *  \brief a static class allowing to change from one parametrization
+ *  to another.
  *
- *  \details
- *  Any \typedef function object or \typedef data object should have
- *  an associated parametrization.
+ *  Any function object or data object should have an associated
+ *  parametrization.
+ *
+ *  We use the following convention to defined the tangent, normal and
+ *  bi-normal of the surface:
+ *   * The normal is the upper vector (0, 0, 1)
+ *   * The tangent direction is along x direction (1, 0, 0)
+ *   * The bi-normal is along the y direction (0, 1, 0)
  */
 class params
 {
@@ -25,17 +31,22 @@ class params
 		 //! <em>unknown</em>.
 		 enum input
 		 {
-			 ROMEIRO_TH_TD,
-			 RUSIN_TH_TD,
-			 RUSIN_TH_PH_TD,
-			 RUSIN_TH_TD_PD,
-			 RUSIN_TH_PH_TD_PD,
-			 COS_TH,
-			 COS_TH_TD,
-			 ISOTROPIC_TV_TL_DPHI,
-			 ISOTROPIC_TD_PD, // Difference between two directions such as R and H
-			 CARTESIAN,
-			 SPHERICAL_TL_PL_TV_PV,
+             RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described in [Rusinkiewicz'98] */
+             RUSIN_TH_PH_TD,
+             RUSIN_TH_TD_PD,
+             RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
+             COS_TH_TD,
+             COS_TH,
+
+             STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
+
+             SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
+             ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
+                                         with the difference of azimutal coordinates in the last component  */
+             ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
+
+             CARTESIAN,             /*!< Light and View vectors represented in cartesian coordinates */
+
 			 UNKNOWN_INPUT
 		 };
 
@@ -101,14 +112,19 @@ class params
         static void convert(const double* invec, params::input intype,
                             params::input outtype, double* outvec)
         {
-            double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Temp CARTESIAN vectors
-            to_cartesian(invec, intype, temvec);
-#ifdef DEBUG
-            std::cout << "<<DEBUG>> temp vec = ["
-                      << temvec[0] << ", " << temvec[1] << ", " << temvec[2] << "] => ["
-                      << temvec[3] << ", " << temvec[4] << ", " << temvec[5] << "]" << std::endl;
-#endif
-            from_cartesian(temvec, outtype, outvec);
+            if(intype != outtype)
+            {
+                // temporary CARTESIAN vector
+                double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+                to_cartesian(invec, intype, temvec);
+                from_cartesian(temvec, outtype, outvec);
+            }
+            else
+            {
+                int dim = dimension(outtype);
+                for(int i=0; i<dim; ++i) { outvec[i] = invec[i]; }
+            }
         }
 
         //! \brief convert a input vector in a given parametrization to an
@@ -156,13 +172,13 @@ class params
         {
             // Calculate the half vector
             double half[3];
-            half[0] = sin(theta_h)*sin(phi_h);
-            half[1] = sin(theta_h)*cos(phi_h);
+            half[0] = sin(theta_h)*cos(phi_h);
+            half[1] = sin(theta_h)*sin(phi_h);
             half[2] = cos(theta_h);
 
             // Compute the light vector using the rotation formula.
-            out[0] = sin(theta_d)*sin(phi_d);
-            out[1] = sin(theta_d)*cos(phi_d);
+            out[0] = sin(theta_d)*cos(phi_d);
+            out[1] = sin(theta_d)*sin(phi_d);
             out[2] = cos(theta_d);
 
 				// Rotate the diff vector to get the output vector
@@ -194,37 +210,31 @@ class params
 			  out[5] = cos(theta_v);
 		  }
 
-        //! \brief rotate a cartesian vector with respect to the normal of
-        //! theta degrees.
-        static void rotate_normal(double* vec, double theta)
-        {
-            const double cost = cos(theta);
-            const double sint = sin(theta);
+		  //! \brief rotate a cartesian vector with respect to the normal of
+		  //! theta degrees.
+		  static void rotate_normal(double* vec, double theta)
+		  {
+			  const double cost = cos(theta);
+			  const double sint = sin(theta);
 
-			const double temp = cost * vec[0] + sint * vec[1];
+			  const double temp = cost * vec[0] + sint * vec[1];
 
-            vec[1] = cost * vec[1] - sint * vec[0];
-            vec[0] = temp;
-        }
+			  vec[1] = cost * vec[1] - sint * vec[0];
+			  vec[0] = temp;
+		  }
 
-        //! \brief rotate a cartesian vector with respect to the bi-normal of
-        //! theta degrees.
-        static void rotate_binormal(double* vec, double theta)
-        {
-            const double cost = cos(theta);
-            const double sint = sin(theta);
+		  //! \brief rotate a cartesian vector with respect to the bi-normal of
+		  //! theta degrees.
+		  static void rotate_binormal(double* vec, double theta)
+		  {
+			  const double cost = cos(theta);
+			  const double sint = sin(theta);
 
-			const double temp = cost * vec[1] + sint * vec[2];
+			  const double temp = cost * vec[0] + sint * vec[2];
 
-#ifdef DEBUG
-			std::cout << acos(vec[2]) << std::endl;
-#endif
-            vec[2] = cost * vec[2] - sint * vec[1];
-#ifdef DEBUG
-			std::cout << acos(vec[2]) << std::endl;
-#endif
-            vec[1] = temp;
-        }
+			  vec[2] = cost * vec[2] - sint * vec[0];
+			  vec[0] = temp;
+		  }
 
 		  static void print_input_params();
 

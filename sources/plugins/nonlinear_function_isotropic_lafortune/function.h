@@ -32,7 +32,11 @@ class isotropic_lafortune_function : public nonlinear_function
 
 	public: // methods
 
-		isotropic_lafortune_function() : _n(1) { }
+		isotropic_lafortune_function() : _n(1) 
+		{ 
+			setParametrization(params::CARTESIAN);
+			setDimX(6);
+		}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -40,7 +44,10 @@ class isotropic_lafortune_function : public nonlinear_function
 		virtual vec value(const vec& x, const vec& p) const;
 
 		//! \brief Load function specific files
-		virtual void load(const std::string& filename) ;
+		virtual void load(std::istream& in) ;
+
+		//! \brief Export function
+		virtual void save_call(std::ostream& out, const arguments& args) const;
 
 		//! \brief Boostrap the function by defining the diffuse term
 		//!
@@ -65,33 +72,12 @@ class isotropic_lafortune_function : public nonlinear_function
 		{
 			return 6;
 		}
-
-		//! \brief Provide the parametrization of the input space of the function.
-		//! For this one, we fix that the parametrization is in THETAD_PHID
-		virtual params::input parametrization() const
-		{
-			return params::CARTESIAN ;
-		}
-		virtual void setParametrization(params::input new_param)
-		{
-			std::cerr << "<<ERROR>> Cannot change the ouput parametrization " << __FILE__ << ":" << __LINE__ << std::endl;
-			throw;
-		}
-
+		
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);
 
 		//! \brief Set the number of lobes to be used in the fit
 		void setNbLobes(int N);
-
-	protected: // methods
-
-		virtual void save(const std::string& filename) const;
-
-
-		//! \brief Output the function using a BRDF Explorer formating.
-		virtual void save_brdfexplorer(const std::string& filename,
-		                               const arguments& args) const;
 
 	private: // methods
 

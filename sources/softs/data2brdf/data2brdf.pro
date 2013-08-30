@@ -1,5 +1,6 @@
 CONFIG         += qt      \
-                  console
+                  console \
+						eigen
 
 DESTDIR         = ../../build
 INCLUDEPATH    += ../../ ../../libs/rational_1d \

@@ -1,9 +1,10 @@
-CONFIG         += qt
+CONFIG         += qt console eigen
 
-INCLUDEPATH    += ../../
+INCLUDEPATH    += ../../ ../../plugins
 DESTDIR         = ../../build
 
-SOURCES        += main.cpp
+SOURCES        += main.cpp \
+						../../plugins/nonlinear_fresnel_schlick/function.cpp
 LIBS           += -L../../build -lcore
 
 unix{

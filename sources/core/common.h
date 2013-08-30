@@ -7,6 +7,7 @@
 #include <cstring>
 #include <algorithm>
 
+#ifdef OLD
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core
  *  \internal
@@ -28,11 +29,8 @@ class vec : public std::vector<double>
 		{
 			assign(dim, 0.0) ;
 		}
-		virtual ~vec() 
-		{
-        }
-
-        //! \brief get a subpart of the vector
+        
+		//! \brief get a subpart of the vector
         vec subvector(int start, int n) const
         {
             vec res(n);
@@ -224,6 +222,18 @@ class vec : public std::vector<double>
 
 
 } ;
+#endif 
+
+#include <Eigen/Core>
+typedef Eigen::VectorXd vec;
+
+double norm(const vec& a);
+
+vec normalize(const vec& a);
+
+double dot(const vec& a, const vec& b);
+
+vec product(const vec& a, const vec& b);
 
 //! \brief locate the first index of value v in vector vec. Complexity in
 //! O(n) is the worst case.
@@ -245,7 +255,7 @@ template<typename T> T clamp(T x, T a, T b)
 }
 
 #define NOT_IMPLEMENTED() \
-std::cerr << "<<ERROR>> not implemented " << __FILE__ \
+std::cerr << "<<ERROR>> not implemented " << __PRETTY_FUNCTION__ << " in file " << __FILE__ \
           << ":" << __LINE__ << std::endl; \
 throw
 
