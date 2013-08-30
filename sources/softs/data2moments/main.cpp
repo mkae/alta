@@ -15,35 +15,6 @@
 #include <cstdlib>
 #include <cmath>
 
-#define  EPSILON 1.0E-5
-
-vec coord(vec V, vec L, vec X, vec Y, vec N)
-{
-    vec pV = V-dot(V,N)*N;
-    vec vCoord(2);
-    vCoord[0] = dot(pV,X);
-    vCoord[1] = dot(pV,Y);
-    vCoord /= (1.0+dot(V,N));
-
-    vec pL = L-dot(L,N)*N;
-    vec lCoord(2);
-    lCoord[0] = dot(pL,X);
-    lCoord[1] = dot(pL,Y);
-    lCoord /= (1.0+dot(L,N));
-
-    if (norm(lCoord)>EPSILON)
-    {
-        vec lDir = normalize(lCoord);
-
-        vec temp(2);
-        temp[0] = lDir[0]*vCoord[0] + lDir[1]*vCoord[1];
-        temp[1] = lDir[0]*vCoord[1] - lDir[1]*vCoord[0];
-        vCoord = temp;
-    }
-
-    return vCoord;
-}
-
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv, false);

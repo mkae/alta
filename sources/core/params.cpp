@@ -114,6 +114,27 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[5] = cos(invec[2]);
 			break;
 
+        case params::STEREOGRAPHIC:
+        {
+            // Project the 2D direction on the surface invec[0,1] to the View
+            // vector outvec[0,1,2]
+            const double normL = invec[0]*invec[0] + invec[1]*invec[1];
+            const double alphL = (1.0 - normL) / (1.0 + normL);
+            outvec[0] = invec[0] + alphL;
+            outvec[1] = invec[1] + alphL;
+            outvec[2] = alphL;
+
+            // Project the 2D direction on the surface invec[2,3] to the Light
+            // vector outvec[3,4,5]
+            const double normV = invec[2]*invec[2] + invec[3]*invec[3];
+            const double alphV = (1.0 - normV) / (1.0 + normV);
+            outvec[3] = invec[2] + alphV;
+            outvec[4] = invec[3] + alphV;
+            outvec[5] = alphV;
+
+            break;
+        }
+
 			// 6D Parametrization
 		case params::CARTESIAN:
 			memcpy(outvec, invec, 6*sizeof(double));
