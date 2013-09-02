@@ -378,7 +378,7 @@ void lafortune_function::load(std::istream& in)
 		{
 
 			in >> token >> _C[(n*_nY + i)*3 + 0];
-			in	>> token >> _C[(n*_nY + i)*3 + 1];
+            in >> token >> _C[(n*_nY + i)*3 + 1];
 			in >> token >> _C[(n*_nY + i)*3 + 2];
 			in >> token >> _N[i];
 		}
@@ -389,105 +389,75 @@ void lafortune_function::load(std::istream& in)
 	std::cout << "<<INFO>> N = " << _N << std::endl;
 }
 
-void lafortune_function::save(const std::string& filename) const
+void lafortune_function::save_call(std::ostream& out, const arguments& args) const
 {
-	std::ofstream file(filename.c_str(), std::ios_base::trunc);
-	file << "#DIM " << _nX << " " << _nY << std::endl ;
-	file << "#NB_LOBES " << _n << std::endl ;
-		
-	for(int i=0; i<_nY; ++i)
-	{
-		file << _kd[i] << std::endl;
-	}
-	file << std::endl;
+    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-	for(int n=0; n<_n; ++n)
-	{
-		file << "#Lobe number " << n << std::endl;
-		file << "#Cx Cy Cz" << std::endl;
-		for(int i=0; i<_nY; ++i)
-		{
-			file << _C[(n*_nY + i)*3 + 0] << " " << _C[(n*_nY + i)*3 + 2] << " " << _C[(n*_nY + i)*3 + 1] << std::endl;
-		}
-		file << std::endl;
-
-		file << "#N" << std::endl;
-		for(int i=0; i<_nY; ++i)
-		{
-			file << _N[i] << std::endl;
-		}
-		file << std::endl;
-	}
-
-}
-
-//! \brief Output the function using a BRDF Explorer formating.
-//! \todo Finish
-void lafortune_function::save_brdfexplorer(const std::string& filename,
-                                       const arguments& args) const
-{
-    std::ofstream file(filename.c_str(), std::ios_base::trunc);
-    file << "analytic" << std::endl;
-
-    file << std::endl;
-//    file << "::begin parameters" << std::endl;
-//    file << "::end parameters" << std::endl;
-//    file << std::endl;
-    file << std::endl;
-    file << "::begin shader" << std::endl;
-	 
-    type_definition(file, _nY) << " n;" << std::endl;
-    type_definition(file, _nY) << " Cx;" << std::endl;
-    type_definition(file, _nY) << " Cy;" << std::endl;
-    type_definition(file, _nY) << " Cz;" << std::endl;
-    type_definition(file, _nY) << " ";
-    type_affectation(file, std::string("kd"), _kd, _nY);
-
-    file << std::endl;
-    file << std::endl;
-    file << "vec3 BRDF( vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y )" << std::endl;
-    file << "{" << std::endl;
-    if(_nY == 1)
+    if(is_alta)
     {
-        file << "    ";
-        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
+        out << "#FUNC nonlinear_function_lafortune" << std::endl ;
+        out << "#NB_LOBES " << _n << std::endl ;
 
         for(int n=0; n<_n; ++n)
         {
-            file << "    // Lobe number " << n+1 << std::endl;
-            file << "    n  = " << _N[n] << "; " << std::endl;
-            file << "    Cx = " << _C[0*_n + n] << "; " << std::endl;
-            file << "    Cy = " << _C[1*_n + n] << "; " << std::endl;
-            file << "    Cz = " << _C[2*_n + n] << "; " << std::endl;
-            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
-            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
-            file << std::endl;
+
+            for(int i=0; i<_nY; ++i)
+            {
+                out << "Cx " << _C[(n*_nY + i)*3 + 0] << std::endl;
+                out << "Cx " << _C[(n*_nY + i)*3 + 1] << std::endl;
+                out << "Cz " << _C[(n*_nY + i)*3 + 2] << std::endl;
+                out << "N  " << _N[n*_nY + i] << std::endl;
+
+            }
+
+
+            out << std::endl;
         }
     }
     else
     {
-        file << "    ";
-        type_definition(file, _nY) << " D = kd;" << std::endl << std::endl;
-
         for(int n=0; n<_n; ++n)
         {
-            file << "    // Lobe number " << n+1 << std::endl;
-            file << "    "; type_affectation(file, std::string("n"), _N, _nY, n);
-            file << "    "; type_affectation(file, std::string("Cx"), _C, _nY, n, 0, 3);
-            file << "    "; type_affectation(file, std::string("Cy"), _C, _nY, n, 1, 3);
-            file << "    "; type_affectation(file, std::string("Cz"), _C, _nY, n, 2, 3);
-            file << "    D += pow(max(Cx * L.x * V.x + Cy * L.y * V.y + Cz * L.z * V.z, ";
-            type_definition(file, _nY) << "(0.0)), n);" << std::endl;
-            file << std::endl;
+            out << "lafortune(L, V, N, X, Y, vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _C[(n*_nY + i)*3 + 0];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            out << "), vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _C[(n*_nY + i)*3 + 1];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            out << "), vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _C[(n*_nY + i)*3 + 2];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            out << "), vec3(";
+            for(int i=0; i<_nY; ++i)
+            {
+                out << _N[n*_nY + i];
+                if(i < _nY-1) { out << ", "; }
+            }
+
+            // For multiple lobes, add a sum sign
+            out << "))";
+            if(n < _n-1) { out << " + "; }
         }
     }
-    file << "    return vec3(D);" << std::endl;
-//    file << "    if (normalized)" << std::endl;
-//    file << "        D *= (2+n) / (2*PI);" << std::endl;
-    file << "}" << std::endl;
-    file << std::endl;
-    file << "::end shader" << std::endl;
-    file.close();
 }
 
-
+void lafortune_function::save_body(std::ostream& out, const arguments& args) const
+{
+    out << "vec3 lafortune(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 Cx, vec3 Cy, vec3 Cz, vec3 Nl)" << std::endl;
+    out << "{" << std::endl;
+    out << "\tvec3 ext_dot = Cx * dot(L,X)*dot(V,X + Cy * dot(L,Y)*dot(V,Y) + Cz * dot(L,N)*dot(V,N);" << std::endl;
+    out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
+    out << "}" << std::endl;
+}

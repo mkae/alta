@@ -58,12 +58,27 @@ void diffuse_function::load(std::istream &in)
 
 void diffuse_function::save_call(std::ostream& out, const arguments& args) const
 {
-	out << "#FUNC nonlinear_function_diffuse" << std::endl ;
-	for(int i=0; i<dimY(); ++i)
-	{
-		out << "kd " << _kd[i] << std::endl;
-	}
-	out << std::endl;
+    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
+
+    if(is_alta)
+    {
+        out << "#FUNC nonlinear_function_diffuse" << std::endl ;
+        for(int i=0; i<dimY(); ++i)
+        {
+            out << "kd " << _kd[i] << std::endl;
+        }
+        out << std::endl;
+    }
+    else
+    {
+        out << "vec3(";
+        for(int i=0; i<dimY(); ++i)
+        {
+            out << _kd[i]; if(i < dimY()-1) { out << ", "; }
+        }
+        out << ")";
+    }
+
 }
 		
 //! Number of parameters to this non-linear function

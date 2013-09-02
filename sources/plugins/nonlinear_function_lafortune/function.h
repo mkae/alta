@@ -28,15 +28,23 @@ class lafortune_function : public nonlinear_function
 
 	public: // methods
 
-        lafortune_function() : _n(1), _isotropic(false) { }
+        lafortune_function() : _n(1), _isotropic(false)
+        {
+            nonlinear_function::setParametrization(params::CARTESIAN);
+            nonlinear_function::setDimX(6);
+        }
 
-	// Overload the function operator
+        // Overload the function operator
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;
 		virtual vec value(const vec& x, const vec& p);
 
 		//! \brief Load function specific files
 		virtual void load(std::istream& in) ;
+
+        // Save functions
+        void save_body(std::ostream& out, const arguments& args) const;
+        void save_call(std::ostream& out, const arguments& args) const;
 
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void bootstrap(const data* d, const arguments& args);
@@ -89,15 +97,6 @@ class lafortune_function : public nonlinear_function
 
         //! \brief Set the number of lobes to be used in the fit
         void setNbLobes(int N);
-
-	protected: // methods
-
-		virtual void save(const std::string& filename) const;
-
-
-		//! \brief Output the function using a BRDF Explorer formating.
-		virtual void save_brdfexplorer(const std::string& filename,
-				const arguments& args) const;
 
 	private: // methods
 

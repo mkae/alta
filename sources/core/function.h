@@ -427,7 +427,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void save_call(std::ostream& out, const arguments& args) const
 		{
 			bool is_cpp    = args["export"] == "C++";
-			bool is_shader = args["export"] == "shader";
+            bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
 			bool is_matlab = args["export"] == "matlab";
 
 			// This part is export specific. For ALTA, the coefficients are just
@@ -438,9 +438,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			//   res += call_i(x);
 			for(int i=0; i<this->size(); ++i)
 			{
-				if(is_cpp || is_matlab || is_shader)
+                if(i != 0 && (is_cpp || is_matlab || is_shader))
 				{
-					out << "res += ";
+                    out << "\tres += ";
 				}
 
 				this->at(i)->save_call(out, args);
