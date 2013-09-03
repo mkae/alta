@@ -120,17 +120,11 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 
 	 // Create the problem
 	 ceres::Problem problem;
-
-
 	 for(int i=0; i<d->size(); ++i)
 	 {
 		 vec xi = d->get(i);
 		 problem.AddResidualBlock(new CeresFunctor(nf, xi), NULL, &p[0]);
 	 }
-
-	 std::cout << "<<INFO>> Nb parameters blocks = " << problem.NumParameterBlocks() << std::endl;
-	 std::cout << "<<INFO>> Nb residuals blocks = " << problem.NumResidualBlocks() << std::endl;
-	 std::cout << "<<INFO>> Nb residuals = " << problem.NumResiduals() << std::endl;
 
 	 // Solver's options
 	 ceres::Solver::Options options;

@@ -11,9 +11,41 @@
 #include <core/args.h>
 #include <core/vertical_segment.h>
 
-/*! \brief A fitter for non-linear BRDF models that uses Eigen's
- *  Levenberg-Marquardt solver.
+/*! \brief A non-linear fitter using the CERES solver
  *  \ingroup plugins
+ *
+ *  \details
+ *  <h3>Third party requirements</h3>
+ *  
+ *  You will need three external libraries to compile this plugin:
+ *  <ul>
+ *		<li><a href="https://ceres-solver.googlesource.com/ceres-solver">CERES</a> 
+ *		library, version 1.5.0</li>
+ *		<li><a href="http://code.google.com/p/google-glog">Google glog</a> library 
+ *		version 0.3.1</li>
+ *		<li><a href="http://eigen.tuxfamily.org/">Eigen library</a> version 3</li>
+ *  </ul>
+ *
+ *  The last two dependencies are required to compile CERES and this plugin
+ *  must be linked against Google glog to run.
+ *
+ *  You need to provide your own ceres.prf file for qmake to generate the correct
+ *  Makefile or Visual Studio solution. In particular this configuration file
+ *  should provide:
+ *
+ *  <pre>
+ *  INCLUDEPATH += [path-to-ceres-include]
+ *  LIBS += -L[path-to-ceres-lib] -lceres -L[path-to-glog-lib] -lglog -lgomp
+ *  </pre>
+ *
+ *
+ *  <h3>Plugin parameters</h3>
+ *
+ *  We provide the following command line arguments to manipulate this plugin:
+ *  <ul>
+ *		<li><b>--ceres-max-num-iterations</b> <em>[int]</em> to control the number
+ *		of iterations the non linear solver will take before returning a solution</li>
+ *  </ul>
  */
 class nonlinear_fitter_ceres: public fitter
 {
