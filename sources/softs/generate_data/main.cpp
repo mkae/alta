@@ -13,9 +13,9 @@ int main(int argc, char** argv)
 
 	std::cout.precision(10);
 
-	int nbx = 10000;
-	int nby = 100;
-	int nbz = 100;
+	int nbx = 10;
+	int nby = 10;
+	int nbz = 10;
 	if(args.is_defined("nbx"))
 		nbx = args.get_int("nbx", 100) ;
 	if(args.is_defined("nby"))

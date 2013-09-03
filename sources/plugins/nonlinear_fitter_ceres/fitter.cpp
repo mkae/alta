@@ -37,12 +37,16 @@ class CeresFunctor : public ceres::CostFunction
 
 			vec _di = vec(_f->dimY());
 			for(int i=0; i<_f->dimY(); ++i)
-				_di[i] = x[0][_f->dimX() + i];
+			{
+				_di[i] = _xi[_f->dimX() + i];
+			}
 
 			// Should add the resulting vector completely
 			vec _y = _di - (*_f)(_xi);
 			for(int i=0; i<_f->dimY(); ++i)
+			{
 				y[i] = _y[i];
+			}
 
 			if(dy != NULL)
 			{
@@ -54,7 +58,7 @@ class CeresFunctor : public ceres::CostFunction
 
 		// The parameter of the function _f should be set prior to this function
 		// call. If not it will produce undesirable results.
-		void df(double ** fjac) const
+		virtual void df(double ** fjac) const
 		{
 			// Get the jacobian of the function at position x_i for the current
 			// set of parameters (set prior to function call)
@@ -116,17 +120,29 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 
 	 // Create the problem
 	 ceres::Problem problem;
+
+
 	 for(int i=0; i<d->size(); ++i)
 	 {
 		 vec xi = d->get(i);
 		 problem.AddResidualBlock(new CeresFunctor(nf, xi), NULL, &p[0]);
 	 }
 
+	 std::cout << "<<INFO>> Nb parameters blocks = " << problem.NumParameterBlocks() << std::endl;
+	 std::cout << "<<INFO>> Nb residuals blocks = " << problem.NumResidualBlocks() << std::endl;
+	 std::cout << "<<INFO>> Nb residuals = " << problem.NumResiduals() << std::endl;
+
 	 // Solver's options
 	 ceres::Solver::Options options;
-	 options.max_num_iterations = 25;
+	 if(args.is_defined("ceres-max-num-iterations"))
+	 {
+		 options.max_num_iterations = args.get_int("ceres-max-num-iterations", 50); // Default value = 50
+	 }
 	 options.linear_solver_type = ceres::DENSE_QR;
-	 options.minimizer_progress_to_stdout = true;
+	 if(args.is_defined("ceres-debug"))
+	 {
+		 options.minimizer_progress_to_stdout = true; // Default value = false;
+	 }
 
 
 	 // Solves the NL problem
