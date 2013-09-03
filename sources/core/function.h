@@ -134,6 +134,16 @@ class nonlinear_function: public function
 		//! Update the vector of parameters for the function
 		virtual void setParameters(const vec& p) = 0;
 
+		//! \brief get the maximum value for all the parameters in a vector
+		//! format. The maximum vector and the parameter vector have the same
+		//! indexing.
+		virtual vec getParametersMax() const;
+
+		//! \brief get the minimum value for all the parameters in a vector
+		//! format. The minimum vector and the parameter vector have the same
+		//! indexing.
+		virtual vec getParametersMin() const;
+
 		//! \brief Obtain the derivatives of the function with respect to the 
 		//! parameters. 
 		//
@@ -201,12 +211,12 @@ class nonlinear_function: public function
 				out << std::endl;
 			}
 
-            function::save_call(out, args);
+			function::save_call(out, args);
 		}
 };
 
 
-class compound_function: public nonlinear_function, public std::vector<nonlinear_function*>
+class compound_function: public nonlinear_function
 {
 	public: // methods
 
@@ -218,29 +228,76 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual vec value(const vec& x) const
 		{
 			vec res(_nY);
-            res = vec::Zero(_nY);
-			for(int i=0; i<this->size(); ++i)
+			res = vec::Zero(_nY);
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				res = res + this->at(i)->value(x);
+				if(fs[i]->input_parametrization() != input_parametrization())
+				{
+					vec temp_x(fs[i]->dimX());
+					params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
+					res = res + fs[i]->value(temp_x);
+				}
+				else
+				{
+					res = res + fs[i]->value(x);
+				}
 			}
 			return res;
+		}
+
+		//! Provide a vector like interface
+		virtual void push_back(nonlinear_function* f)
+		{
+			fs.push_back(f);
+
+			// Update the input param
+			if(input_parametrization() == params::UNKNOWN_INPUT)
+			{
+				setParametrization(f->input_parametrization());
+			}
+			
+			// Update the output param
+			if(output_parametrization() == params::UNKNOWN_OUTPUT)
+			{
+				setParametrization(f->output_parametrization());
+			}
+			else if(output_parametrization() != f->output_parametrization())
+			{
+				std::cerr << "Creating a compound function with different output dimensions, this is not allowed" << std::endl;
+				throw;
+			}
+		}
+
+		//! \brief Access to the i-th function of the compound
+		nonlinear_function* operator[](int i) const
+		{
+#ifdef DEBUG
+			assert(i >= 0 && i < fs.size());
+#endif
+			return fs[i];
+		}
+
+		//! \brief Access to the number of elements in the compound object.
+		unsigned int size() const
+		{
+			return fs.size();
 		}
 
 		//! Load function specific files
 		virtual void load(std::istream& in)
 		{
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->load(in);
+				fs[i]->load(in);
 			}
 		}
 
 		//! \brief Provide a first rough fit of the function. 
 		virtual void bootstrap(const ::data* d, const arguments& args) 
 		{
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->bootstrap(d, args);
+				fs[i]->bootstrap(d, args);
 			}
 		}
 
@@ -248,18 +305,18 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void setDimX(int nX) 
 		{
 			function::setDimX(nX);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->setDimX(nX);
+				fs[i]->setDimX(nX);
 			}
 		}
 		//! Set the dimension of the output space of the function
 		virtual void setDimY(int nY)
 		{
 			function::setDimY(nY);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->setDimY(nY);
+				fs[i]->setDimY(nY);
 			}
 		}
 
@@ -267,17 +324,17 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void setMin(const vec& min) 
 		{
 			function::setMin(min);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->setMin(min);
+				fs[i]->setMin(min);
 			}
 		}
 		virtual void setMax(const vec& max) 
 		{
 			function::setMax(max);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->setMax(max);
+				fs[i]->setMax(max);
 			}
 		}
 
@@ -285,9 +342,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual int nbParameters() const
 		{
 			int nb_params = 0;
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				nb_params += this->at(i)->nbParameters();
+				nb_params += fs[i]->nbParameters();
 			}
 			return nb_params;
 		}
@@ -297,14 +354,64 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		{
 			vec params(nbParameters());
 			int current_i = 0;
-			for(int f=0; f<this->size(); ++f)
+			for(unsigned int f=0; f<fs.size(); ++f)
 			{
-				int f_size = this->at(f)->nbParameters();
+				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
 				if(f_size > 0)
 				{
-					vec f_params = this->at(f)->parameters();
+					vec f_params = fs[f]->parameters();
+					for(int i=0; i<f_size; ++i)
+					{
+						params[i + current_i] = f_params[i];
+					}
+
+					current_i += f_size;
+				}
+			}
+
+			return params;
+		}
+		
+		//! Get the vector of min parameters for the function
+		virtual vec getParametersMin() const
+		{
+			vec params(nbParameters());
+			int current_i = 0;
+			for(unsigned int f=0; f<fs.size(); ++f)
+			{
+				int f_size = fs[f]->nbParameters();
+
+				// Handle when there is no parameters to include
+				if(f_size > 0)
+				{
+					vec f_params = fs[f]->getParametersMin();
+					for(int i=0; i<f_size; ++i)
+					{
+						params[i + current_i] = f_params[i];
+					}
+
+					current_i += f_size;
+				}
+			}
+
+			return params;
+		}
+		
+		//! Get the vector of min parameters for the function
+		virtual vec getParametersMax() const
+		{
+			vec params(nbParameters());
+			int current_i = 0;
+			for(unsigned int f=0; f<fs.size(); ++f)
+			{
+				int f_size = fs[f]->nbParameters();
+
+				// Handle when there is no parameters to include
+				if(f_size > 0)
+				{
+					vec f_params = fs[f]->getParametersMax();
 					for(int i=0; i<f_size; ++i)
 					{
 						params[i + current_i] = f_params[i];
@@ -321,9 +428,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void setParameters(const vec& p) 
 		{
 			int current_i = 0;
-			for(int f=0; f<this->size(); ++f)
+			for(unsigned int f=0; f<fs.size(); ++f)
 			{
-				int f_size = this->at(f)->nbParameters();
+				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
 				if(f_size > 0)
@@ -334,7 +441,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 						f_params[i] = p[i + current_i];
 					}
 
-					this->at(f)->setParameters(f_params);
+					fs[f]->setParameters(f_params);
 					current_i += f_size;
 				}
 			}
@@ -351,16 +458,16 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		// dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const
 		{
-			int nb_params = this->nbParameters();
+			int nb_params = nbParameters();
 			vec jac(nb_params*_nY);
 			jac = vec::Zero(nb_params*_nY);
 
 			int start_i = 0;
 
 			// Export the sub-Jacobian for each function
-			for(int f=0; f<this->size(); ++f)
+			for(unsigned int f=0; f<fs.size(); ++f)
 			{
-				nonlinear_function* func = this->at(f);
+				nonlinear_function* func = fs[f];
 				int nb_f_params = func->nbParameters(); 
 
 				// Only export Jacobian if there are non-linear parameters
@@ -379,9 +486,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 				}
 
 				start_i += nb_f_params;
-            }
+			}
 
-            return jac;
+			return jac;
 		}
 
 		//! \brief can set the input parametrization of a non-parametrized
@@ -389,9 +496,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void setParametrization(params::input new_param)
 		{
 			parametrized::setParametrization(new_param);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->setParametrization(new_param);
+				fs[i]->setParametrization(new_param);
 			}
 		}
 
@@ -401,9 +508,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void setParametrization(params::output new_param)
 		{
 			parametrized::setParametrization(new_param);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->setParametrization(new_param);
+				fs[i]->setParametrization(new_param);
 			}
 		}
 
@@ -412,9 +519,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		//! defining function calls that are common to all the plugins.
 		virtual void save_body(std::ostream& out, const arguments& args) const
 		{
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				this->at(i)->save_body(out, args);
+				fs[i]->save_body(out, args);
 				out << std::endl;
 			}
 
@@ -427,7 +534,7 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 		virtual void save_call(std::ostream& out, const arguments& args) const
 		{
 			bool is_cpp    = args["export"] == "C++";
-            bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
+			bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
 			bool is_matlab = args["export"] == "matlab";
 
 			// This part is export specific. For ALTA, the coefficients are just
@@ -436,14 +543,14 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 			// For C++ export, the function call should be done before hand and
 			// the line should look like:
 			//   res += call_i(x);
-			for(int i=0; i<this->size(); ++i)
+			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-                if(i != 0 && (is_cpp || is_matlab || is_shader))
+				if(i != 0 && (is_cpp || is_matlab || is_shader))
 				{
-                    out << "\tres += ";
+					out << "\tres += ";
 				}
 
-				this->at(i)->save_call(out, args);
+				fs[i]->save_call(out, args);
 
 				if(is_cpp || is_matlab || is_shader)
 				{
@@ -453,6 +560,9 @@ class compound_function: public nonlinear_function, public std::vector<nonlinear
 
 			function::save_call(out, args);
 		}
+
+	protected:
+		std::vector<nonlinear_function*> fs;
 
 };
 
@@ -543,6 +653,54 @@ class fresnel : public nonlinear_function
 			}
 
 			vec fres_params = getFresnelParameters();
+			for(int i=0; i<nb_fres_params; ++i)
+			{
+				params[i+nb_func_params] = fres_params[i];
+			}
+
+			return params;
+		}
+		
+		//! Get the vector of min parameters for the function
+		virtual vec getParametersMax() const
+		{
+			int nb_func_params = f->nbParameters();
+			int nb_fres_params = nbFresnelParameters();
+			int nb_params = nb_func_params + nb_fres_params;
+
+			vec params(nb_params);
+
+			vec func_params = f->getParametersMax();
+			for(int i=0; i<nb_func_params; ++i)
+			{
+				params[i] = func_params[i];
+			}
+
+			vec fres_params = getFresnelParametersMax();
+			for(int i=0; i<nb_fres_params; ++i)
+			{
+				params[i+nb_func_params] = fres_params[i];
+			}
+
+			return params;
+		}
+		
+		//! Get the vector of min parameters for the function
+		virtual vec getParametersMin() const
+		{
+			int nb_func_params = f->nbParameters();
+			int nb_fres_params = nbFresnelParameters();
+			int nb_params = nb_func_params + nb_fres_params;
+
+			vec params(nb_params);
+
+			vec func_params = f->getParametersMin();
+			for(int i=0; i<nb_func_params; ++i)
+			{
+				params[i] = func_params[i];
+			}
+
+			vec fres_params = getFresnelParametersMin();
 			for(int i=0; i<nb_fres_params; ++i)
 			{
 				params[i+nb_func_params] = fres_params[i];
@@ -650,6 +808,28 @@ class fresnel : public nonlinear_function
 
 		//! Get the vector of parameters for the function
 		virtual vec getFresnelParameters() const = 0;
+
+		//! Get the vector of min parameters for the function
+		virtual vec getFresnelParametersMin() const
+		{
+			vec m(nbFresnelParameters());
+			for(int i=0; i<nbFresnelParameters(); ++i)
+			{
+				m[i] = -std::numeric_limits<double>::max();
+			}
+			return m;
+		}
+
+		//! Get the vector of min parameters for the function
+		virtual vec getFresnelParametersMax() const
+		{
+			vec M(nbFresnelParameters());
+			for(int i=0; i<nbFresnelParameters(); ++i)
+			{
+				M[i] = std::numeric_limits<double>::max();
+			}
+			return M;
+		}
 
 		//! Update the vector of parameters for the function
 		virtual void setFresnelParameters(const vec& p) = 0;

@@ -480,7 +480,7 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 
 		// Export the numerator of the jth color channel
 		file << "\tp(" << j+1 << ",:) = ";
-		for(unsigned int i=0; i<np; ++i)
+		for(int i=0; i<np; ++i)
 		{
 			if(i > 0 && a[i] >= 0.0)
 			{
@@ -503,7 +503,7 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 
 		// Export the denominator of the jth color channel
 		file << "\tq(" << j+1 << ",:) = ";
-		for(unsigned int i=0; i<nq; ++i)
+		for(int i=0; i<nq; ++i)
 		{
 			if(i > 0 && b[i] >= 0.0)
 			{
@@ -595,7 +595,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 
 		// Export the numerator of the jth color channel
 		file << "\tp = ";
-		for(unsigned int i=0; i<np; ++i)
+		for(int i=0; i<np; ++i)
 		{
 			if(i > 0 && a[i] >= 0.0)
 			{
@@ -617,7 +617,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 
 		// Export the denominator of the jth color channel
 		file << "\tq = ";
-		for(unsigned int i=0; i<nq; ++i)
+		for(int i=0; i<nq; ++i)
 		{
 			if(i > 0 && b[i] >= 0.0)
 			{
@@ -687,7 +687,7 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 		vec a = rf->getP();
 		vec b = rf->getQ();
 
-		for(unsigned int i=0; i<np; ++i)
+		for(int i=0; i<np; ++i)
 		{
 			std::vector<int> index = rf->index2degree(i) ;
 			for(unsigned int j=0; j<index.size(); ++j)
@@ -697,7 +697,7 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 			out << a[i] << std::endl ;
 		}
 
-		for(unsigned int i=0; i<nq; ++i)
+		for(int i=0; i<nq; ++i)
 		{
 			std::vector<int> index = rf->index2degree(i) ;
 			for(unsigned int j=0; j<index.size(); ++j)
@@ -724,7 +724,7 @@ void rational_function::save(const std::string& filename) const
 		vec a = rf->getP();
 		vec b = rf->getQ();
 
-		for(unsigned int i=0; i<np; ++i)
+		for(int i=0; i<np; ++i)
 		{
 			std::vector<int> index = rf->index2degree(i) ;
 			for(unsigned int j=0; j<index.size(); ++j)
@@ -734,7 +734,7 @@ void rational_function::save(const std::string& filename) const
 			file << a[i] << std::endl ;
 		}
 
-		for(unsigned int i=0; i<nq; ++i)
+		for(int i=0; i<nq; ++i)
 		{
 			std::vector<int> index = rf->index2degree(i) ;
 			for(unsigned int j=0; j<index.size(); ++j)

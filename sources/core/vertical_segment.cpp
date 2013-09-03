@@ -30,8 +30,6 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 	_nX = 0 ; _nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
-
-	double x, y, dy ;
 	while(file.good())
 	{
 		std::string line ;

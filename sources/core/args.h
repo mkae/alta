@@ -269,13 +269,15 @@ class arguments
 #endif
 
 			  int argc = cmd_vec.size();
-			  char* argv[argc];
+			  char** argv;
+			  argv = new char*[argc];
 			  for(int i=0; i<argc; ++i)
 			  {
 				  argv[i] = &cmd_vec[i][0];
 			  }
 
 			  arguments current_args(argc, argv);
+			  delete argv;
 			  return current_args;
 		  }
 

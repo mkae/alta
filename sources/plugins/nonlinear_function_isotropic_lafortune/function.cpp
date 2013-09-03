@@ -143,6 +143,21 @@ vec isotropic_lafortune_function::parameters() const
     return res;
 }
 
+//! \brief get the min values for the parameters
+vec isotropic_lafortune_function::getParametersMin() const
+{
+    vec res((3*_n)*dimY());
+    for(int n=0; n<_n; ++n)
+	    for(int i=0; i<dimY(); ++i)
+		 {
+			  res[(n*dimY() + i)*3 + 0] = -std::numeric_limits<double>::max();
+			  res[(n*dimY() + i)*3 + 1] = -std::numeric_limits<double>::max();
+			  res[(n*dimY() + i)*3 + 2] = 0.0;
+		 }
+
+    return res;
+}
+
 //! Update the vector of parameters for the function
 void isotropic_lafortune_function::setParameters(const vec& p) 
 {

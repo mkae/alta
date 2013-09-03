@@ -284,7 +284,7 @@ function* plugins_manager::get_function(const arguments& args)
 	
         //! For each args_vec element, create a function object and add
         //! it to the compound one.
-		  for(int i=0; i<args_vec.size(); ++i)
+		  for(unsigned int i=0; i<args_vec.size(); ++i)
 		  {
 	        std::string n("--func ");
 	        n.append(args_vec[i]);

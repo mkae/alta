@@ -143,3 +143,29 @@ double function::Linf_distance(const data* d) const
 
 	return linf_dist;
 }
+		
+//! \brief get the maximum value for all the parameters in a vector
+//! format. The maximum vector and the parameter vector have the same
+//! indexing.
+vec nonlinear_function::getParametersMax() const
+{
+	vec M(nbParameters());
+	for(int i=0; i<nbParameters(); ++i) 
+	{
+		M[i] = std::numeric_limits<double>::max();
+	}
+	return M;
+}
+
+//! \brief get the minimum value for all the parameters in a vector
+//! format. The minimum vector and the parameter vector have the same
+//! indexing.
+vec nonlinear_function::getParametersMin() const
+{
+	vec m(nbParameters());
+	for(int i=0; i<nbParameters(); ++i) 
+	{
+		m[i] = -std::numeric_limits<double>::max();
+	}
+	return m;
+}

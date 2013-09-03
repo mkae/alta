@@ -18,7 +18,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 	return new nonlinear_fitter_nlopt();
 }
 
-void print_nlopt_error(nlopt_result res, char* string)
+void print_nlopt_error(nlopt_result res, const std::string& string)
 {
 	if(res == NLOPT_FAILURE)
 	{
@@ -150,6 +150,7 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 
 	// Check the optimizer to use 
 	nlopt_algorithm algorithm;
+	nlopt_result res;
 	std::string optimizerName = args["nlopt-optimizer"];
 	if(optimizerName == "COBYLA")
 	{
@@ -189,16 +190,12 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 		return false;
 	}
 
-	// Create the problem
-	void* dat[2];
-	dat[0] = (void*)nf;
-	dat[1] = (void*)d;
-	nlopt_result res = nlopt_set_min_objective(opt, f, dat);
-	if(res < 0)
-	{
-		print_nlopt_error(res, "nlopt_set_min_objective");
-		return false;
-	}
+
+	// Set the bounds to the parameters
+	vec p_min = nf->getParametersMin();
+	vec p_max = nf->getParametersMax();
+	nlopt_set_lower_bounds(opt, &p_min[0]);
+	nlopt_set_upper_bounds(opt, &p_max[0]);
 
 	// Set the stopping criterion to a maximum number of evaluation
 	if(args.is_defined("nlop-max-num-iterations"))
@@ -207,6 +204,17 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 		if(res < 0) { print_nlopt_error(res, "nlopt_set_maxeval"); }
 	}
 	nlopt_set_xtol_rel(opt, 1e-4);
+
+	// Create the problem
+	void* dat[2];
+	dat[0] = (void*)nf;
+	dat[1] = (void*)d;
+	res = nlopt_set_min_objective(opt, f, dat);
+	if(res < 0)
+	{
+		print_nlopt_error(res, "nlopt_set_min_objective");
+		return false;
+	}
 
 
 	// Launch minimization
