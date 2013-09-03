@@ -15,7 +15,7 @@
 
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
-    return new nonlinear_fitter_nlopt();
+	return new nonlinear_fitter_nlopt();
 }
 
 void print_nlopt_error(nlopt_result res, char* string)
@@ -49,7 +49,7 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		// Get the jacobian of the function at position x_i for the current
 		// set of parameters (set prior to function call)
 		vec _jac = f->parametersJacobian(xi);
-		
+
 		vec _di = vec(f->dimY());
 		for(int i=0; i<f->dimY(); ++i)
 		{
@@ -120,74 +120,112 @@ nonlinear_fitter_nlopt::~nonlinear_fitter_nlopt()
 
 bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const arguments &args)
 {
-    // I need to set the dimension of the resulting function to be equal
-    // to the dimension of my fitting problem
-    fit->setDimX(d->dimX()) ;
-    fit->setDimY(d->dimY()) ;
-    fit->setMin(d->min()) ;
-    fit->setMax(d->max()) ;
+	// I need to set the dimension of the resulting function to be equal
+	// to the dimension of my fitting problem
+	fit->setDimX(d->dimX()) ;
+	fit->setDimY(d->dimY()) ;
+	fit->setMin(d->min()) ;
+	fit->setMax(d->max()) ;
 
-	 // Convert the function and bootstrap it with the data
-    if(dynamic_cast<nonlinear_function*>(fit) == NULL)
-    {
-        std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
-        return false;
-    }
-    nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
-	 nf->bootstrap(d, args);
+	// Convert the function and bootstrap it with the data
+	if(dynamic_cast<nonlinear_function*>(fit) == NULL)
+	{
+		std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
+		return false;
+	}
+	nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
+	nf->bootstrap(d, args);
 
 #ifndef DEBUG
-	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
+	std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
 #endif
-	 if(nf->nbParameters() == 0)
-	 {
-		 return true;
-	 }
+	if(nf->nbParameters() == 0)
+	{
+		return true;
+	}
 
-    // the following starting values provide a rough fit is the bootstrap flag is
-	 // enabled
-    vec p = nf->parameters();
+	// the following starting values provide a rough fit is the bootstrap flag is
+	// enabled
+	vec p = nf->parameters();
 
-	 // Create the optimizer
-	 nlopt_opt opt = nlopt_create(NLOPT_LD_MMA, nf->nbParameters());
-	 if(opt == NULL)
-	 {
-		 std::cerr << "<<ERROR>> unable to create the optimizer" << std::endl;
-		 return false;
-	 }
+	// Check the optimizer to use 
+	nlopt_algorithm algorithm;
+	std::string optimizerName = args["nlopt-optimizer"];
+	if(optimizerName == "COBYLA")
+	{
+		algorithm = NLOPT_LN_COBYLA;
+	}
+	else if(optimizerName == "BOBYQA")
+	{
+		algorithm = NLOPT_LN_BOBYQA;
+	}
+	else if(optimizerName == "NEWUOA")
+	{
+		algorithm = NLOPT_LN_NEWUOA_BOUND;
+	}
+	else if(optimizerName == "PRAXIS")
+	{
+		algorithm = NLOPT_LN_PRAXIS;
+	}
+	else if(optimizerName == "Nelder-Mead Simplex")
+	{
+		algorithm = NLOPT_LN_NELDERMEAD;
+	}
+	else if(optimizerName == "Sbplx")
+	{
+		algorithm = NLOPT_LN_SBPLX;
+	}
+	else
+	{
+		// The default option one can find in the NLOpt documentation
+		algorithm = NLOPT_LD_MMA; 
+	}
 
-	 // Create the problem
-	 void* dat[2];
-	 dat[0] = (void*)nf;
-	 dat[1] = (void*)d;
-	 nlopt_result res = nlopt_set_min_objective(opt, f, dat);
-	 if(res < 0)
-	 {
-		 print_nlopt_error(res, "nlopt_set_min_objective");
-		 return false;
-	 }
+	// Create the optimizer
+	nlopt_opt opt = nlopt_create(algorithm, nf->nbParameters());
+	if(opt == NULL)
+	{
+		std::cerr << "<<ERROR>> unable to create the optimizer" << std::endl;
+		return false;
+	}
 
-	 // Set the stopping criterion to a maximum number of evaluation
-	 res = nlopt_set_maxeval(opt, 50);
-	 if(res < 0) { print_nlopt_error(res, "nlopt_set_maxeval"); }
+	// Create the problem
+	void* dat[2];
+	dat[0] = (void*)nf;
+	dat[1] = (void*)d;
+	nlopt_result res = nlopt_set_min_objective(opt, f, dat);
+	if(res < 0)
+	{
+		print_nlopt_error(res, "nlopt_set_min_objective");
+		return false;
+	}
 
-	 // Launch minimization
-	 double f_end;
-	 res = nlopt_optimize(opt, &p[0], &f_end);
+	// Set the stopping criterion to a maximum number of evaluation
+	if(args.is_defined("nlop-max-num-iterations"))
+	{
+		res = nlopt_set_maxeval(opt, args.get_int("nlop-max-num-iterations", 10));
+		if(res < 0) { print_nlopt_error(res, "nlopt_set_maxeval"); }
+	}
+	nlopt_set_xtol_rel(opt, 1e-4);
 
-	 if(res > 0)
-	 {
-		 std::cout << "<<INFO>> optimized distance: " << f_end << std::endl;
-		 std::cout << "<<INFO>> found parameters: " << p << std::endl;
-	    nf->setParameters(p);
-	 }
-	 else
-	 {
-		 print_nlopt_error(res, "nlopt_optimize");
-	 }
 
-	 nlopt_destroy(opt);
-	 return res > 0;
+	// Launch minimization
+	double f_end;
+	res = nlopt_optimize(opt, &p[0], &f_end);
+
+	if(res > 0)
+	{
+		std::cout << "<<INFO>> optimized distance: " << f_end << std::endl;
+		std::cout << "<<INFO>> found parameters: " << p << std::endl;
+		nf->setParameters(p);
+	}
+	else
+	{
+		print_nlopt_error(res, "nlopt_optimize");
+	}
+
+	nlopt_destroy(opt);
+	return res > 0;
 }
 
 void nonlinear_fitter_nlopt::set_parameters(const arguments& args)
