@@ -132,7 +132,16 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 	 {
 		 options.max_num_iterations = args.get_int("ceres-max-num-iterations", 50); // Default value = 50
 	 }
-	 options.linear_solver_type = ceres::DENSE_QR;
+	 
+	 if(args["ceres-factorization"] == "normal-cholesky")
+	 {
+		 options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+	 }
+	 else
+	 {
+		 options.linear_solver_type = ceres::DENSE_QR;
+	 }
+
 	 if(args.is_defined("ceres-debug"))
 	 {
 		 options.minimizer_progress_to_stdout = true; // Default value = false;

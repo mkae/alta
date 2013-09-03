@@ -45,6 +45,8 @@
  *  <ul>
  *		<li><b>--ceres-max-num-iterations</b> <em>[int]</em> to control the number
  *		of iterations the non linear solver will take before returning a solution</li>
+ *		<li><b>--ceres-factorizer</b> <em>[string]</em> to control the type of dense
+ *		factorization method used to solve the <a href="http://homes.cs.washington.edu/~sagarwal/ceres-solver/stable/solving.html?highlight=dense_qr#equation-normal">normal equations</a></li>
  *  </ul>
  */
 class nonlinear_fitter_ceres: public fitter
