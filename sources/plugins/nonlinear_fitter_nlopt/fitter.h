@@ -20,7 +20,8 @@
  *  You will need three external libraries to compile this plugin:
  *  <ul>
  *		<li><a href="http://ab-initio.mit.edu/wiki/index.php/NLopt">NLopt</a> 
- *		library, version 2.3</li>
+ *		library, version 2.3. On some linux distributions, you can install 
+ *		libnlopt-dev using the package manager.</li>
  *  </ul>
  *
  *  You need to provide your own nlopt.prf file for qmake to generate the correct
