@@ -38,6 +38,9 @@ void print_nlopt_error(nlopt_result res, char* string)
 // call. If not it will produce undesirable results.
 void df(double* fjac, const nonlinear_function* f, const data* d)
 {
+	// Clean memory
+	memset(fjac, 0.0, f->nbParameters()*sizeof(double));
+
 	// Each constraint is of the form data point * color channel
 	for(int s=0; s<d->size(); ++s)
 	{
@@ -63,7 +66,7 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 			// Fill the columns of the matrix
 			for(int j=0; j<f->nbParameters(); ++j)
 			{
-				fjac[j] -= 2 * _y[i] * _jac[i*f->nbParameters() + j];
+				fjac[j] = 2 * _y[i] * _jac[i*f->nbParameters() + j];
 			}
 		}
 	}
@@ -146,7 +149,7 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
     vec p = nf->parameters();
 
 	 // Create the optimizer
-	 nlopt_opt opt = nlopt_create(NLOPT_GD_STOGO, nf->nbParameters());
+	 nlopt_opt opt = nlopt_create(NLOPT_LD_MMA, nf->nbParameters());
 	 if(opt == NULL)
 	 {
 		 std::cerr << "<<ERROR>> unable to create the optimizer" << std::endl;
@@ -174,6 +177,7 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 
 	 if(res > 0)
 	 {
+		 std::cout << "<<INFO>> optimized distance: " << f_end << std::endl;
 		 std::cout << "<<INFO>> found parameters: " << p << std::endl;
 	    nf->setParameters(p);
 	 }
