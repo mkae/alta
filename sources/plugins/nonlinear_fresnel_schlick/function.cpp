@@ -40,12 +40,38 @@ void schlick::load(std::istream& in)
 		
 void schlick::save_call(std::ostream& out, const arguments& args) const
 {
-	f->save_call(out, args);
+    out << "(";	f->save_call(out, args); out << ")";
+    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-	out << "#FUNC nonlinear_fresnel_schlick" << std::endl ;
-	out << "R " << R << std::endl;
-	out << std::endl;
+    if(is_alta)
+    {
+        out << "#FUNC nonlinear_fresnel_schlick" << std::endl ;
+        out << "R " << R << std::endl;
+        out << std::endl;
+    }
+    else
+    {
+        out << " * schlick_fresnel(L, V, N, X, Y, " << R << ")";
+    }
 }
+
+void schlick::save_body(std::ostream& out, const arguments& args) const
+{
+    f->save_body(out, args);
+    bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
+
+    if(is_shader)
+    {
+        out << std::endl;
+        out << "vec3 schlick_fresnel(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, float R)" << std::endl;
+        out << "{" << std::endl;
+        out << "\tvec3 H = normalize(L + V);" << std::endl;
+        out << "\treturn vec3(R + (1.0f - R) * pow(1.0f - clamp(dot(H,L), 0.0f, 1.0f), 5));" << std::endl;
+        out << "}" << std::endl;
+    }
+
+}
+
 
 vec schlick::fresnelValue(const vec& x) const
 {
@@ -101,5 +127,5 @@ vec schlick::getFresnelParametersJacobian(const vec& x) const
 
 void schlick::fresnelBootstrap(const data* d, const arguments& args)
 {
-	R = 1.0;
+    R = 0.1;
 }

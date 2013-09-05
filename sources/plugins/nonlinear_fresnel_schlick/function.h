@@ -21,7 +21,7 @@ class schlick : public fresnel
 		virtual void load(std::istream& in) ;
 
 		virtual void save_call(std::ostream& out, const arguments& args) const;
-
+        virtual void save_body(std::ostream& out, const arguments& args) const
 
 	protected: // methods
 

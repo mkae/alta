@@ -100,6 +100,8 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! \brief The isotropic_lafortune lobe data
 		int _n; // Number of lobes
 		vec _N, _C; // Lobes data
+#ifdef WITH_DIFFUSE
 		vec _kd; // Diffuse term
+#endif
 } ;
 

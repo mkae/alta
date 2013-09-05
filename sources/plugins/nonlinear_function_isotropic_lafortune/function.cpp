@@ -33,7 +33,11 @@ vec isotropic_lafortune_function::value(const vec& x) const
 	// For each color channel
 	for(int i=0; i<dimY(); ++i)
 	{
+#ifdef WITH_DIFFUSE
 		res[i] = _kd[i];
+#else
+        res[i] = 0.0;
+#endif
 
 		// For each lobe
 		for(int n=0; n<_n; ++n)
@@ -52,6 +56,7 @@ vec isotropic_lafortune_function::value(const vec& x) const
 		if(isnan(res[i]) || res[i] == std::numeric_limits<double>::infinity())
 		{
 			std::cout << "<<ERROR>> invalid value for input: " << x << std::endl;
+            std::cout << "          invalid value for parameter: " << parameters() << std::endl;
 		}
 #endif	
 	}
@@ -76,7 +81,11 @@ vec isotropic_lafortune_function::value(const vec& x, const vec& p) const
 	for(int i=0; i<dimY(); ++i)
 	{
 		// Start with the diffuse term
-		res[i] = _kd[i];
+#ifdef WITH_DIFFUSE
+        res[i] = _kd[i];
+#else
+        res[i] = 0.0;
+#endif
 
 		// For each lobe
 		for(int n=0; n<_n; ++n)
@@ -116,10 +125,12 @@ void isotropic_lafortune_function::setDimY(int nY)
     // Update the length of the vectors
     _C.resize(_n*_nY*2) ;
     _N.resize(_n*_nY) ;
+#ifdef USE_DIFFUSE
     _kd.resize(_nY);
 
     for(int i=0; i<nY; ++i)
         _kd[i] = 0.0;
+#endif
 }
 
 //! Number of parameters to this non-linear function
@@ -227,6 +238,7 @@ void isotropic_lafortune_function::bootstrap(const data* d, const arguments& arg
     // Check the arguments for the number of lobes
     this->setNbLobes(args.get_int("lobes", 1));
 
+#ifdef USE_DIFFUSE
     // Set the diffuse component
 	vec x0 = d->get(0);
 	for(int i=0; i<d->dimY(); ++i)
@@ -239,7 +251,7 @@ void isotropic_lafortune_function::bootstrap(const data* d, const arguments& arg
 			_kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
 	}
 	std::cout << "<<INFO>> found diffuse: " << _kd << std::endl;
-
+#endif
 	// Upon user request, the starting position of the lobe can be either load
 	// from a file, a distribution beetwen forward backward and dot directions,
 	// etc.
@@ -425,9 +437,14 @@ void isotropic_lafortune_function::save_call(std::ostream& out, const arguments&
 
 void isotropic_lafortune_function::save_body(std::ostream& out, const arguments& args) const
 {
-    out << "vec3 lafortune(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 Cx, vec3 Cz, vec3 Nl)" << std::endl;
-    out << "{" << std::endl;
-    out << "\tvec3 ext_dot = Cx * (dot(L,X)*dot(V,X) + dot(L,Y)*dot(V,Y)) + Cz * dot(L,N)*dot(V,N);" << std::endl;
-    out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
-    out << "}" << std::endl;
+    bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
+
+    if(is_shader)
+    {
+        out << "vec3 lafortune(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 Cx, vec3 Cz, vec3 Nl)" << std::endl;
+        out << "{" << std::endl;
+        out << "\tvec3 ext_dot = Cx * (dot(L,X)*dot(V,X) + dot(L,Y)*dot(V,Y)) + Cz * dot(L,N)*dot(V,N);" << std::endl;
+        out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
+        out << "}" << std::endl;
+    }
 }

@@ -168,7 +168,7 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 	{
 		algorithm = NLOPT_LN_PRAXIS;
 	}
-	else if(optimizerName == "Nelder-Mead Simplex")
+    else if(optimizerName == "Nelder-Mead")
 	{
 		algorithm = NLOPT_LN_NELDERMEAD;
 	}
