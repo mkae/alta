@@ -26,52 +26,59 @@ class arguments
 		{
 		}
 		arguments(int argc, char** const argv)
-		{
-			for(int i=0; i<argc; ++i)
-			{
-				std::string temp(argv[i]) ;
-				std::string key, data ;
+        {
+            for(int i=0; i<argc; ++i)
+            {
+                std::string temp(argv[i]) ;
+                std::string key, data ;
 
-				if(temp.compare(0, 2, "--") == 0)
-				{
-					key = temp.substr(2, temp.size()-2) ;
+                if(temp.compare(0, 2, "--") == 0)
+                {
+//#define DEBUG_ARGS
+                    key = temp.substr(2, temp.size()-2) ;
 #ifdef DEBUG_ARGS
-					std::cout << "<<DEBUG>> (" << i << ")" << key << " -> [ ";
+                    std::cout << "<<DEBUG>> (" << i << ")" << key << " -> [ ";
 #endif
-					int k = i+1;
-					int j = k;
-					while(j < argc) 
-					{
+                    if(++i < argc)
+                    {
 
-						std::string next(argv[j]) ;
-						if(next[0] == '[' || next[next.size()-1] == ']' || next.compare(0, 2, "--") != 0)
-						{
-							if(j != k)
-							{
-								data.append(" ");
+                        std::string next(argv[i]) ;
+                        if(next[0] == '[' && next[next.size()-1] != ']')
+                        {
+                            data.append(next);
+
+                            ++i;
+                            while(i < argc && next[next.size()-1] != ']')
+                            {
+                                next = argv[i] ;
+                                data.append(" ");
 #ifdef DEBUG_ARGS
-								std::cout << " ";
+                                std::cout << " ";
 #endif
-							}
-							data.append(next);
+                                data.append(next);
 #ifdef DEBUG_ARGS
-							std::cout << "(" << j << ")" << next;
+                                std::cout << "(" << i << ")" << next;
 #endif
-						}
-						else
-						{
-							break ;
-						}
-						++j;
-						++i;
-					}
+
+                                ++i;
+                            }
+                            --i;
+                        }
+                        else
+                        {
 #ifdef DEBUG_ARGS
-					std::cout << "]" << std::endl;
+                            std::cout << next;
 #endif
-				}
-				_map.insert(std::pair<std::string, std::string>(key, data)) ;
-			}
-		}
+                            data.append(next);
+                        }
+                    }
+#ifdef DEBUG_ARGS
+                    std::cout << "]" << std::endl;
+#endif
+                }
+                _map.insert(std::pair<std::string, std::string>(key, data)) ;
+            }
+        }
 		~arguments()
 		{
 		}

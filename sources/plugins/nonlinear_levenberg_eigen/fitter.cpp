@@ -22,8 +22,8 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 
 struct EigenFunctor: Eigen::DenseFunctor<double>
 {
-    EigenFunctor(nonlinear_function* f, const data* d) : 
-		 DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d)
+    EigenFunctor(nonlinear_function* f, const data* d, bool use_cosine) :
+        DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
@@ -45,12 +45,21 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 		{
 			vec _x  = _d->get(s);
 
+            // Compute the cosine factor. Only update the constant if the flag
+            // is set in the object.
+            double cos = 1.0;
+            if(_cosine)
+            {
+                double cart[6]; params::convert(&_x[0], _d->input_parametrization(), params::CARTESIAN, cart);
+                cos = cart[5];
+            }
+
 			vec _di = vec(_f->dimY());
 			for(int i=0; i<_f->dimY(); ++i)
 				_di[i] = _x[_f->dimX() + i];
 
 			// Should add the resulting vector completely
-			vec _y = _di - (*_f)(_x);
+            vec _y = _di - cos*(*_f)(_x);
 			for(int i=0; i<_f->dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
 
@@ -75,6 +84,15 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			// Get the position
 			vec xi = _d->get(s);
 
+            // Compute the cosine factor. Only update the constant if the flag
+            // is set in the object.
+            double cos = 1.0;
+            if(_cosine)
+            {
+                double cart[6]; params::convert(&xi[0], _d->input_parametrization(), params::CARTESIAN, cart);
+                cos = cart[5];
+            }
+
 			// Get the associated jacobian
 			vec _jac = _f->parametersJacobian(xi);
 			
@@ -88,7 +106,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 				// vector row
 				for(int i=0; i<_f->dimY(); ++i)
 				{
-					fjac(i*_d->size() + s, j) = -_jac[i*_f->nbParameters() + j];
+                    fjac(i*_d->size() + s, j) = - cos * _jac[i*_f->nbParameters() + j];
 #ifdef DEBUG
 					temp(i, j) = _jac[i*_f->nbParameters() + j];
 #endif
@@ -108,6 +126,9 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 	nonlinear_function* _f;
     const data* _d;
+
+    // Flags
+    bool _cosine;
 };
 
 nonlinear_fitter_eigen::nonlinear_fitter_eigen() 
@@ -153,7 +174,7 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
         x[i] = nf_x[i];
     }
 
-    EigenFunctor functor(nf, d);
+    EigenFunctor functor(nf, d, args.is_defined("fit-with-cosine"));
     Eigen::LevenbergMarquardt<EigenFunctor> lm(functor);
 
 	 info = lm.minimize(x);

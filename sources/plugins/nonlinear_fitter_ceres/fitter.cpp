@@ -148,14 +148,18 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 	 }
 
 
-	 // Solves the NL problem
-	 ceres::Solver::Summary summary;
-	 ceres::Solve(options, &problem, &summary);
+     // Solves the NL problem
+     ceres::Solver::Summary summary;
+     ceres::Solve(options, &problem, &summary);
 
-	 std::cout << summary.BriefReport() << std::endl;
-    std::cout << "<<INFO>> found parameters: " << p << std::endl;
-    nf->setParameters(p);
-    return true;
+
+#ifdef DEBUG
+     std::cout << summary.BriefReport() << std::endl;
+#endif
+     std::cout << "<<INFO>> found parameters: " << p << std::endl;
+
+     nf->setParameters(p);
+     return true;
 }
 
 void nonlinear_fitter_ceres::set_parameters(const arguments& args)

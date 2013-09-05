@@ -282,23 +282,23 @@ function* plugins_manager::get_function(const arguments& args)
         //! functions in it.
 		  compound_function* compound = new compound_function();
 	
-        //! For each args_vec element, create a function object and add
-        //! it to the compound one.
-		  for(unsigned int i=0; i<args_vec.size(); ++i)
-		  {
-	        std::string n("--func ");
-	        n.append(args_vec[i]);
-
-			  function* f = get_function(arguments::create_arguments(n));
-			  if(dynamic_cast<nonlinear_function*>(f) == NULL)
-			  {
-				  std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
-			  }
-			  else
-			  {
-				  compound->push_back(dynamic_cast<nonlinear_function*>(f));
-			  }
-		  }
+          //! For each args_vec element, create a function object and add
+          //! it to the compound one.
+          for(unsigned int i=0; i<args_vec.size(); ++i)
+          {
+              std::string n("--func ");
+              n.append(args_vec[i]);
+              arguments temp_args = arguments::create_arguments(n);
+              function* f = get_function(temp_args);
+              if(dynamic_cast<nonlinear_function*>(f) == NULL)
+              {
+                  std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
+              }
+              else
+              {
+                  compound->push_back(dynamic_cast<nonlinear_function*>(f));
+              }
+          }
 
 		  //! return the compound class
 		  func = compound;
