@@ -71,25 +71,26 @@ class function : public parametrized
 
 		/* EXPORT FUNCTIONS */
 
-		//! \brief Save the current function to a specific file type, args can 
-		//! be used to differenciate the type of export.
-		//!
+		//! \brief Save the current function to a specific file type, args 
+		//! can be used to differenciate the type of export.
 		//! \see rational_function.cpp for an example
 		virtual void save(const std::string& filename, const arguments& args) const;
 
-		//! \brief save the header of the output function file. The header should
-		//! store general information about the fit such as the command line used
-		//! the dimension of the fit. L2 and L_inf distance could be added here.
+		//! \brief save the header of the output function file. The header 
+		//! should store general information about the fit such as the 
+		//! command line used the dimension of the fit. L2 and L_inf distance
+		//! could be added here.
 		virtual void save_header(std::ostream& out, const arguments& args) const ;
 
-		//! \brief save function specific data. This has no use for ALTA export
-		//! but allows to factorize the code in the C++ or matlab export by
-		//! defining function calls that are common to all the plugins.
+		//! \brief save function specific data. This has no use for ALTA 
+		//! exportbut allows to factorize the code in the C++ or matlab 
+		//! export by defining function calls that are common to all the 
+		//! plugins.
 		virtual void save_body(std::ostream& out, const arguments& args) const ;
 
 		//! \brief save object specific information. For an ALTA export the
-		//! coefficients will be exported. For a C++ or matlab export, the call
-		//! to the associated function will be done.
+		//! coefficients will be exported. For a C++ or matlab export, the 
+		//! call to the associated function will be done.
 		virtual void save_call(std::ostream& out, const arguments& args) const ;
 
 
@@ -248,8 +249,6 @@ class compound_function: public nonlinear_function
 		//! Provide a vector like interface
 		virtual void push_back(nonlinear_function* f)
 		{
-			fs.push_back(f);
-
 			// Update the input param
 			if(input_parametrization() == params::UNKNOWN_INPUT)
 			{
@@ -266,6 +265,8 @@ class compound_function: public nonlinear_function
 				std::cerr << "Creating a compound function with different output dimensions, this is not allowed" << std::endl;
 				throw;
 			}
+			
+			fs.push_back(f);
 		}
 
 		//! \brief Access to the i-th function of the compound
@@ -474,7 +475,9 @@ class compound_function: public nonlinear_function
 				if(nb_f_params > 0)
 				{
 
-					vec func_jac = func->parametersJacobian(x);
+					vec temp_x(func->dimX());
+					params::convert(&x[0], input_parametrization(), func->input_parametrization(), &temp_x[0]);
+					vec func_jac = func->parametersJacobian(temp_x);
 
 					for(int i=0; i<nb_f_params; ++i)
 					{
@@ -495,10 +498,16 @@ class compound_function: public nonlinear_function
 		//! object. Print an error if it is already defined.
 		virtual void setParametrization(params::input new_param)
 		{
+			if(new_param == params::UNKNOWN_INPUT)
+				return;
+
 			parametrized::setParametrization(new_param);
 			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				fs[i]->setParametrization(new_param);
+				if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
+				{
+					fs[i]->setParametrization(new_param);
+				}
 			}
 		}
 

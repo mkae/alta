@@ -55,13 +55,13 @@ class retroblinn_function : public nonlinear_function
 		 }
 
 		 //! \brief Provide the parametrization of the input space of the function.
-		 virtual params::input parametrization() const
+		 virtual params::input input_parametrization() const
 		 {
 			 return params::COS_TH ;
 		 }
 		 virtual void setParametrization(params::input new_param)
 		 {
-			 std::cerr << "Cannot change the ouput parametrization " 
+			 std::cerr << "Cannot change the input parametrization " 
 			           << __FILE__ << ":" << __LINE__ << std::endl;
 			 throw;
 		 }

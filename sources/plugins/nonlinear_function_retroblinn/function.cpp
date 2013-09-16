@@ -165,12 +165,11 @@ void retroblinn_function::save_body(std::ostream& out,
 
     if(is_shader)
     {
-        out << "vec3 retroblinn(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec ks, vec3 N)" << std::endl;
+        out << "vec3 retroblinn(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 ks, vec3 Nl)" << std::endl;
         out << "{" << std::endl;
 		  out << "\tvec3 Vp = 2.0f*N*(dot(N,V)) - V;" << std::endl;
-		  out << "\tvec3 K  = L + Vp;" << std::endl;
-		  out << "\tvec3 K /= norm(K);" << std::endl;
-        out << "\tvec3 ext_dot = dot(K,N);" << std::endl;
+		  out << "\tvec3 K  = normalize(L + Vp);" << std::endl;
+        out << "\tvec3 ext_dot = vec3(dot(K,N));" << std::endl;
         out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
         out << "}" << std::endl;
     }
