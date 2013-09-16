@@ -240,12 +240,23 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* dat, int np, int
 			std::cout << "]" << std::endl ;
 	}
 #endif
+/*		
+	QTime time ;
+	time.start() ;
+*/
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
 	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(eCI);
 	const double sigma_m = svd.singularValues()(std::min(2*d->size(), np+nq)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
 
+/*
+	int msec = time.elapsed() ;
+	int sec  = (msec / 1000) % 60 ;
+	int min  = (msec / 60000) % 60 ;
+	int hour = (msec / 3600000) ;
+	std::cout << "<<INFO>> delta took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+*/
 #ifdef DEBUG
 	std::cout << "<<DEBUG>> SVD = [ " ;
 	for(int i=0; i<std::min(2*d->size(), np+nq); ++i)

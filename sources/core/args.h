@@ -43,6 +43,12 @@ class arguments
                     {
 
                         std::string next(argv[i]) ;
+                        if(next[0] == '-')
+                        {
+                            --i;
+                            continue;
+                        }
+
                         if(next[0] == '[' && next[next.size()-1] != ']')
                         {
                             data.append(next);
