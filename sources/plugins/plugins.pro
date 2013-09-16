@@ -15,6 +15,7 @@ SUBDIRS  = \
 				nonlinear_fresnel_schlick					\
 				nonlinear_function_diffuse					\
 				nonlinear_function_phong					\
+				nonlinear_function_retroblinn				\
 				nonlinear_function_lafortune				\
 				nonlinear_function_isotropic_lafortune	\
 				data_merl										\
