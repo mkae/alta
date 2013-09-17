@@ -115,19 +115,34 @@ class params
         static void convert(const double* invec, params::input intype,
                             params::input outtype, double* outvec)
         {
-            if(intype != outtype)
-            {
-                // temporary CARTESIAN vector
-                double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			  // The convertion is done using the cartesian parametrization as
+			  // an intermediate one. If the two parametrizations are equals
+			  // there is no need to perform the conversion.
+			  if(intype == outtype)
+			  {
+				  int dim = dimension(outtype);
+				  for(int i=0; i<dim; ++i) { outvec[i] = invec[i]; }
+			  }
+			  // If the input parametrization is the CARTESIAN param, then 
+			  // there is no need to transform the input data.
+			  if(intype == params::CARTESIAN)
+			  {
+				  from_cartesian(invec, outtype, outvec);
+			  }
+			  // If the output parametrization is the CARTESIAN param, then
+			  // there is no need to convert back to another param.
+			  else if(outtype == params::CARTESIAN)
+			  {
+				  to_cartesian(invec, intype, outvec);
+			  }
+			  else
+			  {
+				  // temporary CARTESIAN vector
+				  double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-                to_cartesian(invec, intype, temvec);
-                from_cartesian(temvec, outtype, outvec);
-            }
-            else
-            {
-                int dim = dimension(outtype);
-                for(int i=0; i<dim; ++i) { outvec[i] = invec[i]; }
-            }
+				  to_cartesian(invec, intype, temvec);
+				  from_cartesian(temvec, outtype, outvec);
+			  }
         }
 
         //! \brief convert a input vector in a given parametrization to an
