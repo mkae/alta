@@ -39,6 +39,14 @@ class blinn_function : public nonlinear_function
 
 		//! \brief Get the vector of parameters for the function
 		virtual vec parameters() const ;
+		
+		//! \brief The minimum parameter vector for this BRDF is the zero
+		//! vector. The specular intensity cannot be negative and the
+		//! exponent should not be either.
+		virtual vec getParametersMin() const
+		{
+			return vec::Zero(dimY()*2);
+		}
 
 		//! \brief Update the vector of parameters for the function
 		virtual void setParameters(const vec& p) ;
