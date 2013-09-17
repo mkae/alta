@@ -9,7 +9,7 @@ SUBDIRS  = \
 				rational_function_chebychev				\
 				rational_fitter_matlab						\
 #				rational_fitter_dca							\
-				nonlinear_levenberg_eigen					\
+				nonlinear_fitter_eigen                 \
 				nonlinear_fitter_ceres						\
 				nonlinear_fitter_nlopt						\
 				nonlinear_fresnel_schlick					\
