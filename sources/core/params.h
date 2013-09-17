@@ -38,6 +38,9 @@ class params
              COS_TH_TD,
              COS_TH,
 
+				 SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
+				 COS_TK,                /*!< Schlick's back vector dot product with the normal */
+
              STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
 
              SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */

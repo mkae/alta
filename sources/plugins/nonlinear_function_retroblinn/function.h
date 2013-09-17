@@ -57,7 +57,7 @@ class retroblinn_function : public nonlinear_function
 		 //! \brief Provide the parametrization of the input space of the function.
 		 virtual params::input input_parametrization() const
 		 {
-			 return params::COS_TH ;
+			 return params::COS_TK ;
 		 }
 		 virtual void setParametrization(params::input new_param)
 		 {
