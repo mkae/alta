@@ -55,7 +55,7 @@ class blinn_function : public nonlinear_function
 
 		//! \brief Provide the parametrization of the input space of the 
 		//! function.
-		virtual params::input parametrization() const
+		virtual params::input input_parametrization() const
 		{
 			return params::COS_TH ;
 		}
