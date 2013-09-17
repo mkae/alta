@@ -108,7 +108,7 @@ class data_params : public data
 		//! \brief contructor requires the definition of a base class that
 		//! has a parametrization, and a new parametrization.
 		data_params(const data* d, params::input new_param,
-				data_params::clustrering method = data_params::NONE) :
+		            data_params::clustrering method = data_params::NONE) :
 			_clustering_method(method)
 		{
 			setParametrization(new_param);
@@ -128,10 +128,10 @@ class data_params : public data
 		{
 			NOT_IMPLEMENTED();
 		}
-        virtual vec value(vec in) const
-        {
-            NOT_IMPLEMENTED();
-        }
+		virtual vec value(vec in) const
+		{
+			NOT_IMPLEMENTED();
+		}
 
 		// Load data from a file
 		virtual void load(const std::string& filename)
@@ -149,13 +149,13 @@ class data_params : public data
 		// Acces to data
 		virtual vec get(int i) const
 		{
-            return _data[i];
+			return _data[i];
 		}
 		virtual vec operator[](int i) const
 		{
 			return this->get(i);
 		}
-		
+
 		//! \todo This should crash at execution.
 		virtual void set(vec x)
 		{
@@ -165,24 +165,24 @@ class data_params : public data
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const
 		{
-            return _data.size();
+			return _data.size();
 		}
 
 		// Get min and max input space values
 		virtual vec min() const
 		{
-            return _min;
+			return _min;
 		}
 		virtual vec max() const
 		{
-            return _max;
+			return _max;
 		}
 
 	protected: // data
 
 		data_params::clustrering _clustering_method;
 
-        std::vector<vec> _data;
+		std::vector<vec> _data;
 
-        vec _min, _max;
+		vec _min, _max;
 };

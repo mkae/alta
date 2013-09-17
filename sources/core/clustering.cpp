@@ -24,7 +24,7 @@ template<class T> void clustering(const T* in_data, int _nY, params::input in_pa
 
 		 // Fill the input part of the vector
 		 params::convert(&p[0], in_param, out_param, &e[0]);
-
+/*
 		 // Search for duplicates only when the reparametrization is compressing
 		 // the space.
 		 if(out_nX < in_nX)
@@ -59,6 +59,7 @@ template<class T> void clustering(const T* in_data, int _nY, params::input in_pa
 			 }
 		 }
 		 else
+*/
 		 {
 			 // Fill the output part of the vector
 			 for(int j=0; j<_nY; ++j)

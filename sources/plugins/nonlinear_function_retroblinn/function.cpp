@@ -118,6 +118,11 @@ vec retroblinn_function::parametersJacobian(const vec& x) const
 
 void retroblinn_function::bootstrap(const data* d, const arguments& args)
 {
+    for(int i=0; i<dimY(); ++i)
+    {
+        _ks[i] = 1.0;
+        _N[i]  = 1.0;
+    }
 }
 
 void retroblinn_function::save_call(std::ostream& out, 
