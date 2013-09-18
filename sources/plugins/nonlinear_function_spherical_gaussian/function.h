@@ -31,7 +31,16 @@ class spherical_gaussian_function : public nonlinear_function
 
 	public: // methods
 
-		spherical_gaussian_function() : _n(1) 
+		enum type
+		{
+			Mirror,
+			Half,
+			Retro,
+			Back,
+			Moment
+		};
+
+		spherical_gaussian_function() : _a(1), _type(Mirror)
 		{ 
 			setParametrization(params::CARTESIAN);
 			setDimX(6);
@@ -78,14 +87,18 @@ class spherical_gaussian_function : public nonlinear_function
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);
 
-		//! \brief Set the number of lobes to be used in the fit
-		void setNbLobes(int N);
-
 	private: // methods
 
+		//! \brief Compute the cosine for inside the lobe function. 
+		//! Depending on the lobe type, the dot product can have 
+		//! different evaluations.
+		double compute_dot(const vec& in) const;
 
 	private: // data
 
 		vec _n, _ks; // Lobes data
+		double _a;   // Scaling factor for the moment based SG
+
+		type _type;  // Lobe type
 } ;
 
