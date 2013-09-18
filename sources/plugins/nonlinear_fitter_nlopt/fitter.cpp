@@ -180,14 +180,17 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 	{
 		algorithm = NLOPT_GN_CRS2_LM;
 	}
+	else if(optimizerName == "MMA")
+	{
+		algorithm = NLOPT_LD_MMA; 
+	}
 	else if(optimizerName == "SQP")
 	{
 		algorithm = NLOPT_LD_SLSQP;
 	}
 	else
 	{
-		// The default option one can find in the NLOpt documentation
-		algorithm = NLOPT_LD_MMA; 
+		algorithm = NLOPT_LD_SLSQP;
 	}
 
 	// Create the optimizer
