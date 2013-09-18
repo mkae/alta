@@ -59,14 +59,14 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		// Should add the resulting vector completely
 		vec _y = (*f)(xi) - _di;
 
-		// For each output channel, update the subpart of the
-		// vector row
-		for(int i=0; i<f->dimY(); ++i)
+		// Fill the columns of the matrix
+		for(int j=0; j<f->nbParameters(); ++j)
 		{
-			// Fill the columns of the matrix
-			for(int j=0; j<f->nbParameters(); ++j)
+			// For each output channel, update the subpart of the
+			// vector row
+			for(int i=0; i<f->dimY(); ++i)
 			{
-				fjac[j] = 2 * _y[i] * _jac[i*f->nbParameters() + j];
+				fjac[j] += 2 * _y[i] * _jac[i*f->nbParameters() + j];
 			}
 		}
 	}
@@ -175,6 +175,14 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 	else if(optimizerName == "Sbplx")
 	{
 		algorithm = NLOPT_LN_SBPLX;
+	}
+	else if(optimizerName == "controlled-random-search")
+	{
+		algorithm = NLOPT_GN_CRS2_LM;
+	}
+	else if(optimizerName == "SQP")
+	{
+		algorithm = NLOPT_LD_SLSQP;
 	}
 	else
 	{
