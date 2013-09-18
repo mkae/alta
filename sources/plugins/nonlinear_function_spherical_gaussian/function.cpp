@@ -200,7 +200,7 @@ vec spherical_gaussian_function::parametersJacobian(const vec& x) const
 			 double cart[6];
 			 params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, params::CARTESIAN, &cart[0]);
 			 double dot2 = cart[0]*cart[3] + cart[1]*cart[4] + cart[2]*cart[5];
-			 jac[i*nbParameters()] = _ks[i] * _n[i] * exp(_n[i] * (dot - 1)) * _a * dot2;
+			 jac[i*nbParameters() + nbParameters()-1] = _ks[i] * _n[i] * exp(_n[i] * (dot - 1)) * _a * dot2;
 
 		 }
 	 }
