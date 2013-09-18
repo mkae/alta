@@ -121,6 +121,11 @@ class altaNLP : public Ipopt::TNLP
 		virtual bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, 
 		                         bool new_x, Ipopt::Number* grad_f)
 		{
+			// Update the parameters vector
+			vec _p(n);
+			for(int i=0; i<n; ++i) { _p[i] = x[i]; }
+			_f->setParameters(_p);
+
 			// Clean the value
 			for(int i=0; i<n; ++i) { grad_f[i] = 0.0; }
 
@@ -128,6 +133,17 @@ class altaNLP : public Ipopt::TNLP
 			for(int s=0; s<_d->size(); ++s)
 			{
 				vec _x  = _d->get(s);
+				
+				// Extract the objective from the current vector
+				vec _di = vec(_f->dimY());
+				for(int i=0; i<_f->dimY(); ++i)
+				{
+					_di[i] = _x[_f->dimX() + i];
+				}
+
+				// Compute the difference vector and add its
+				// components to the obj_value
+				vec _y = _di - (*_f)(_x);
 
 				// Get the jacobian of the function at position x_i for the current
 				// set of parameters (set prior to function call)
@@ -140,7 +156,14 @@ class altaNLP : public Ipopt::TNLP
 					// vector row
 					for(int i=0; i<_f->dimY(); ++i)
 					{
-						grad_f[j] += -_jac[i*_f->nbParameters() + j];
+						if(_y[i] > 0.0)
+						{
+							grad_f[j] += -_jac[i*_f->nbParameters() + j];
+						}
+						else
+						{
+							grad_f[j] += _jac[i*_f->nbParameters() + j];
+						}
 					}
 				}
 			}
@@ -179,7 +202,12 @@ class altaNLP : public Ipopt::TNLP
                                      Ipopt::Number obj_value, const Ipopt::IpoptData* ip_data,
 		                               Ipopt::IpoptCalculatedQuantities* ip_cq)
 		{
+			// Update the parameters vector
+			vec _p(n);
+			for(int i=0; i<n; ++i) { _p[i] = x[i]; }
+			_f->setParameters(_p);
 		}
+
 	protected:
 
 		const data* _d;
@@ -248,11 +276,21 @@ bool nonlinear_fitter_ipopt::fit_data(const data* d, function* fit, const argume
 	{
 #ifdef DEBUG
 		Ipopt::Index iter_count = app->Statistics()->IterationCount();
-		std::cout << "<<DEBUG>> number of iterations: " << iter_count << std::endl
+		std::cout << "<<DEBUG>> number of iterations: " << iter_count << std::endl;
 #endif
-			std::cout << "<<INFO>> found parameters: " << p << std::endl;
+			std::cout << "<<INFO>> found parameters: " << nf->parameters() << std::endl;
 
-		nf->setParameters(p);
+		return true;
+	}
+	else if(status == Ipopt::Maximum_Iterations_Exceeded)
+	{
+		std::cout << "<<INFO>> the maximum number of iteration has been reached" << std::endl;
+#ifdef DEBUG
+		Ipopt::Index iter_count = app->Statistics()->IterationCount();
+		std::cout << "<<DEBUG>> number of iterations: " << iter_count << std::endl;
+#endif
+		std::cout << "<<INFO>> found parameters: " << nf->parameters() << std::endl;
+
 		return true;
 	}
 	else
