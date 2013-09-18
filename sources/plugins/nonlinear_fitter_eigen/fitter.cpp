@@ -161,7 +161,18 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 			vec _fy = vec::Zero(f->dimY());
 			for(int i=0; i<_index+1; ++i)
 			{
-				_fy += (*(*_f)[i])(_x);
+                const nonlinear_function* f = (*_f)[i];
+                if(f->input_parametrization() != _d->input_parametrization())
+                {
+                    vec x(f->dimX());
+                    params::convert(&_x[0], _d->input_parametrization(), f->input_parametrization(), &x[0]);
+
+                    _fy += (*f)(x);
+                }
+                else
+                {
+                    _fy += (*f)(_x);
+                }
 			}
 
 			// Should add the resulting vector completely
@@ -202,7 +213,19 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 			}
 
 			// Get the associated jacobian
-			vec _jac = f->parametersJacobian(xi);
+            vec _jac;
+            if(f->input_parametrization() != _d->input_parametrization())
+            {
+                vec x(f->dimX());
+                params::convert(&xi[0], _d->input_parametrization(), f->input_parametrization(), &x[0]);
+
+                _jac = f->parametersJacobian(x);
+            }
+            else
+            {
+                _jac = f->parametersJacobian(xi);
+            }
+
 
 			// Fill the columns of the matrix
 			for(int j=0; j<f->nbParameters(); ++j)
