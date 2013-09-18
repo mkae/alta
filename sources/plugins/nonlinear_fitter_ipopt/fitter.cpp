@@ -265,9 +265,15 @@ bool nonlinear_fitter_ipopt::fit_data(const data* d, function* fit, const argume
 
 	// Static parameters for the Solver
 	app->Options()->SetStringValue("hessian_approximation", "limited-memory");
+#ifdef DEBUG
+	app->Options()->SetIntegerValue("print_level", 5);
+#else
+	app->Options()->SetIntegerValue("print_level", 0);
+#endif
 
 	// Solver's options
 	app->Options()->SetIntegerValue("max_iter", args.get_int("ipopt-max-iter", 10));
+	app->Options()->SetStringValue("linear_solver", args.get_string("ipopt-solver", "mumps"));
 	
 
 	// Solves the NL problem

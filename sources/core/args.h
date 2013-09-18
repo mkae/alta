@@ -131,6 +131,18 @@ class arguments
 				return std::string() ;
 			}
         }
+		//! \brief acces to the string value associated with the parameter
+		//! \a key.
+		//!
+		//! The \a default_value argument will be returned if the \a key
+		//! has no associated value.
+		std::string get_string(const std::string& key, std::string default_value = "") const
+		{
+			if(_map.count(key) > 0)
+				return _map.find(key)->second.c_str() ;
+			else
+				return default_value ;
+		}
 		//! \brief acces to the float value associated with the parameter
 		//! \a key.
 		//!

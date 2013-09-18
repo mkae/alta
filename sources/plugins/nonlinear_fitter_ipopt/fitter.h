@@ -28,11 +28,21 @@
  *
  *  <pre>
  *  INCLUDEPATH += [path-to-ipopt-include]
- *  LIBS += -L[path-to-ipopt-lib] -lipopt
+ *  LIBS += -L[path-to-ipopt-lib] -lipopt -lipoptamplinterface 
+ *  -lcoinmumps -lcoinmetis -lcoinlapack -lcoinblas -lcoinasl 
  *  </pre>
  *
  *
  *  <h3>Plugin parameters</h3>
+ *  <ul>
+ *		<li><b>--ipopt-max-iter</b> <em>[int]</em> to control the number
+ *		of iterations the non linear solver will take before returning a 
+ *		solution. <em>Note that this solution might incorrect.</em></li>
+ *		<li><b>--ceres-solverr</b> <em>[string]</em> to control the type 
+ *		linear solver that will be used during matrix operations. See
+ *		<a href="http://www.coin-or.org/Ipopt/documentation/node50.html">
+ *		here</a> for the list of possible choices.</li>
+ *  </ul>
  *
  */
 class nonlinear_fitter_ipopt: public fitter
