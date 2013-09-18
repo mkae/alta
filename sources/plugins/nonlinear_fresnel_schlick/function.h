@@ -36,10 +36,26 @@ class schlick : public fresnel
 		//! \brief Update the vector of parameters for the function
 		virtual void setFresnelParameters(const vec& p) ;
 
+		//! Get the vector of min parameters for the function
+		virtual vec getFresnelParametersMin() const
+		{
+			vec m(1);
+			m[0] = 0.0;
+			return m;
+		}
+
+		//! Get the vector of min parameters for the function
+		virtual vec getFresnelParametersMax() const
+		{
+			vec M(1);
+			M[0] = 1.0;
+			return M;
+		}
+
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
 		virtual vec getFresnelParametersJacobian(const vec& x) const ;
-		
+
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void fresnelBootstrap(const data* d, const arguments& args);
 

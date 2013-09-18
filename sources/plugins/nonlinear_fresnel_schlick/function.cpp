@@ -11,7 +11,7 @@
 
 ALTA_DLL_EXPORT function* provide_function()
 {
-    return new schlick();
+	return new schlick();
 }
 
 //! Load function specific files
@@ -19,56 +19,64 @@ void schlick::load(std::istream& in)
 {
 	fresnel::load(in);
 
-    // Parse line until the next comment
-    while(in.peek() != '#')
-    {
-        char line[256];
-        in.getline(line, 256);
-    }
+	// Parse line until the next comment
+	while(in.peek() != '#')
+	{
+		char line[256];
+		in.getline(line, 256);
+	}
 
-    // Checking for the comment line #FUNC nonlinear_fresnel_schlick
-    std::string token;
-    in >> token;
-    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+	// Checking for the comment line #FUNC nonlinear_fresnel_schlick
+	std::string token;
+	in >> token;
+	if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
-    in >> token;
-    if(token != "nonlinear_fresnel_schlick") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+	in >> token;
+	if(token != "nonlinear_fresnel_schlick") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
 
-    // R [double]
-    in >> token >> R;
+	// R [double]
+	in >> token >> R;
 }
-		
+
 void schlick::save_call(std::ostream& out, const arguments& args) const
 {
-    out << "(";	f->save_call(out, args); out << ")";
-    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
+	bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-    if(is_alta)
-    {
-        out << "#FUNC nonlinear_fresnel_schlick" << std::endl ;
-        out << "R " << R << std::endl;
-        out << std::endl;
-    }
-    else
-    {
-        out << " * schlick_fresnel(L, V, N, X, Y, " << R << ")";
-    }
+	if(is_alta)
+	{
+		out << "(";	f->save_call(out, args); out << ")";
+	}
+	else
+	{
+		f->save_call(out, args);
+	}
+
+	if(is_alta)
+	{
+		out << "#FUNC nonlinear_fresnel_schlick" << std::endl ;
+		out << "R " << R << std::endl;
+		out << std::endl;
+	}
+	else
+	{
+		out << " * schlick_fresnel(L, V, N, X, Y, " << R << ")";
+	}
 }
 
 void schlick::save_body(std::ostream& out, const arguments& args) const
 {
-    f->save_body(out, args);
-    bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
+	f->save_body(out, args);
+	bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
 
-    if(is_shader)
-    {
-        out << std::endl;
-        out << "vec3 schlick_fresnel(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, float R)" << std::endl;
-        out << "{" << std::endl;
-        out << "\tvec3 H = normalize(L + V);" << std::endl;
-        out << "\treturn vec3(R + (1.0f - R) * pow(1.0f - clamp(dot(H,L), 0.0f, 1.0f), 5));" << std::endl;
-        out << "}" << std::endl;
-    }
+	if(is_shader)
+	{
+		out << std::endl;
+		out << "vec3 schlick_fresnel(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, float R)" << std::endl;
+		out << "{" << std::endl;
+		out << "\tvec3 H = normalize(L + V);" << std::endl;
+		out << "\treturn vec3(R + (1.0f - R) * pow(1.0f - clamp(dot(H,L), 0.0f, 1.0f), 5));" << std::endl;
+		out << "}" << std::endl;
+	}
 
 }
 
@@ -127,5 +135,5 @@ vec schlick::getFresnelParametersJacobian(const vec& x) const
 
 void schlick::fresnelBootstrap(const data* d, const arguments& args)
 {
-    R = 0.5;
+	R = 0.5;
 }
