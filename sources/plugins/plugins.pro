@@ -11,6 +11,7 @@ SUBDIRS  = \
 #				rational_fitter_dca							\
 				nonlinear_fitter_eigen                 \
 				nonlinear_fitter_ceres						\
+				nonlinear_fitter_ipopt						\
 				nonlinear_fitter_nlopt						\
 				nonlinear_fresnel_schlick					\
 				nonlinear_function_diffuse					\
