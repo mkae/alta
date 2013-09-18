@@ -17,6 +17,7 @@ SUBDIRS  = \
 				nonlinear_function_diffuse					\
 				nonlinear_function_blinn					\
 				nonlinear_function_retroblinn				\
+				nonlinear_function_spherical_gaussian  \
 				nonlinear_function_lafortune				\
 				nonlinear_function_isotropic_lafortune	\
 				data_merl										\

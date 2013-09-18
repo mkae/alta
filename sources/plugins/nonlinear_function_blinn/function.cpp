@@ -175,7 +175,7 @@ void blinn_function::save_body(std::ostream& out,
         out << "{" << std::endl;
 		  out << "\tvec3 H = normalize(L + V);" << std::endl;
         out << "\tvec3 ext_dot = vec3(dot(H,N));" << std::endl;
-        out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
+        out << "\treturn ks * pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
         out << "}" << std::endl;
     }
 
