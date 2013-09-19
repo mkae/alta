@@ -10,7 +10,7 @@ void function::save(const std::string& filename, const arguments& args) const
     bool is_matlab   = args["export"] == "matlab";
 
 	// Open the file
-	std::ofstream file(filename);
+	std::ofstream file(filename.c_str());
 	if(!file.is_open())
 	{
 		std::cerr << "<<ERROR>> unable to open output file for writing" << std::endl;

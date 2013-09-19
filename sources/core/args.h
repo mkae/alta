@@ -151,7 +151,7 @@ class arguments
 		float get_float(const std::string& key, float default_value = 0.0f) const
 		{
 			if(_map.count(key) > 0)
-				return atof(_map.find(key)->second.c_str()) ;
+				return (float)atof(_map.find(key)->second.c_str()) ;
 			else
 				return default_value ;
 		}

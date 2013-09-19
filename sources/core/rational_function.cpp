@@ -261,7 +261,7 @@ vec rational_function_1d::value(const vec& x) const
 std::ostream& operator<< (std::ostream& out, const rational_function_1d& r) 
 {
 	std::cout << "p = [" ;
-	for(unsigned int i=0; i<r.a.size(); ++i)
+	for(int i=0; i<r.a.size(); ++i)
 	{
 		if(i != 0)
 		{
@@ -272,7 +272,7 @@ std::ostream& operator<< (std::ostream& out, const rational_function_1d& r)
 	std::cout << "]" << std::endl ;
 
 	std::cout << "q = [" ;
-	for(unsigned int i=0; i<r.b.size(); ++i)
+	for(int i=0; i<r.b.size(); ++i)
 	{
 		if(i != 0)
 		{

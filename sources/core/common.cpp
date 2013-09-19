@@ -3,7 +3,7 @@
 double norm(const vec& a)
 {
 	double norm = 0.0 ;
-	for(unsigned int i=0; i<a.size(); ++i)
+	for(int i=0; i<a.size(); ++i)
 	{
 		norm += a[i]*a[i];
 	}
@@ -14,13 +14,13 @@ vec normalize(const vec& a)
 {
 	vec b(a.size());
 	double norm = 0.0 ;
-	for(unsigned int i=0; i<a.size(); ++i)
+	for(int i=0; i<a.size(); ++i)
 	{
 		norm += a[i]*a[i];
 	}
 	norm = sqrt(norm);
 
-	for(unsigned int i=0; i<a.size(); ++i)
+	for(int i=0; i<a.size(); ++i)
 	{
 		b[i] = a[i]/norm;
 	}
@@ -33,7 +33,7 @@ double dot(const vec& a, const vec& b)
 	assert(a.size() == b.size());
 #endif
 	double res = 0.0;
-	for(unsigned int i=0; i<a.size(); ++i)
+	for(int i=0; i<a.size(); ++i)
 	{
 		res += a[i]*b[i];
 	}
@@ -48,7 +48,7 @@ vec product(const vec& a, const vec& b)
 #endif
 	vec res(a.size());
 
-	for(unsigned int i=0; i<a.size(); ++i)
+	for(int i=0; i<a.size(); ++i)
 	{
 		res[i] = a[i]*b[i];
 	}
