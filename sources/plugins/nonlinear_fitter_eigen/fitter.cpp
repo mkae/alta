@@ -35,6 +35,18 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 #ifdef DEBUG
 		std::cout << "parameters:" << std::endl << x << std::endl << std::endl ;
 #endif
+		// Check that the parameters used are within the bounds defined
+		// by the function
+		vec p_min = _f->getParametersMin();
+		vec p_max = _f->getParametersMax();
+		for(int i=0; i<_f->nbParameters(); ++i)
+		{
+			if(x[i] < p_min[i] || x[i] > p_max[i])
+			{
+				return -1;
+			}
+		}
+
 
 		// Update the parameters vector
 		vec _p(inputs());
@@ -324,6 +336,11 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 				 std::cerr << "<<ERROR>> incorrect parameters" << std::endl;
 				 return false;
 			 }
+			else if(info == Eigen::LevenbergMarquardtSpace::UserAsked)
+			 {
+				 std::cerr << "<<ERROR>> the search is using improper parameters: stopping" << std::endl;
+				 return false;
+			 }
 
 			 // Update the vector of parameters
 			 for(int i=0; i<f->nbParameters(); ++i)
@@ -355,6 +372,11 @@ bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const argume
 		 if(info == Eigen::LevenbergMarquardtSpace::ImproperInputParameters)
 		 {
 			 std::cerr << "<<ERROR>> incorrect parameters" << std::endl;
+			 return false;
+		 }
+		 else if(info == Eigen::LevenbergMarquardtSpace::UserAsked)
+		 {
+			 std::cerr << "<<ERROR>> the search is using improper parameters: stopping" << std::endl;
 			 return false;
 		 }
 

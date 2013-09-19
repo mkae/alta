@@ -30,6 +30,18 @@ class CeresFunctor : public ceres::CostFunction
 
 		virtual bool Evaluate(double const* const* x, double* y, double** dy) const 
 		{
+			// Check that the parameters used are within the bounds defined
+			// by the function
+			vec p_min = _f->getParametersMin();
+			vec p_max = _f->getParametersMax();
+			for(int i=0; i<_f->nbParameters(); ++i)
+			{
+				if(x[0][i] < p_min[i] || x[0][i] > p_max[i])
+				{
+					return false;
+				}
+			}
+
 			// Update the parameters vector
 			vec _p(_f->nbParameters());
 			for(int i=0; i<_f->nbParameters(); ++i) { _p[i] = x[0][i]; }
