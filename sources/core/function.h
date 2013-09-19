@@ -145,15 +145,16 @@ class nonlinear_function: public function
 		//! indexing.
 		virtual vec getParametersMin() const;
 
-		//! \brief Obtain the derivatives of the function with respect to the 
+		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
-		//
-		// The x input of this function is the position in the input space and 
-		// has size dimX(), the resulting vector has the size of the parameters
-		// times the size of the output domain.
-		//
-		// The result vector should be orderer as res[i + dimY()*j], output
-		// dimension first, then parameters.
+		//!
+		//! \details
+		//! The \a x input of this function is the position in the 
+		//! input space and  has size dimX(), the resulting vector has the 
+		//! size of the parameters times the size of the output domain.
+		//!
+		//! The result vector should be orderer as res[i + dimY()*j], output
+		//! dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const = 0;
 
 		//! \brief default non_linear import. Parse the parameters in order.
@@ -194,8 +195,8 @@ class nonlinear_function: public function
 			setParameters(p);
 		}
 
-		//! \brief default non_linear export. It will dump the parameters in order
-		//! but won't assign names for the function nor parameters.
+		//! \brief default non_linear export. It will dump the parameters in 
+		//! order but won't assign names for the function nor parameters.
 		virtual void save_call(std::ostream& out, const arguments& args) const
 		{
 			if(!args.is_defined("export"))

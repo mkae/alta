@@ -13,12 +13,11 @@
 #include <core/common.h>
 
 
-/*! \brief A retroblinn lobe class. It is provided for testing with the nonlinear
- *  fitting algorithms.
+/*! \brief A retroblinn lobe class. It is provided for testing with the 
+ *  nonlinear fitting algorithms.
  *
  *  \details
- *  A retroblinn lobe is defined as \f$k_d + k_s |N.H|^a\f$
- *  \todo Finish implementation
+ *  A retroblinn lobe is defined as \f$k_d + k_s |L.V|^a\f$
  */
 class retroblinn_function : public nonlinear_function
 {
@@ -29,7 +28,8 @@ class retroblinn_function : public nonlinear_function
 		 virtual vec operator()(const vec& x) const ;
 		 virtual vec value(const vec& x) const ;
 
-		 //! \brief Boostrap the function by defining the diffuse term
+		 //! \brief Boostrap the function. This initialize the lobe width
+		 //! and the specular coefficient to one.
 		 virtual void bootstrap(const data* d, const arguments& args);
 
 		 //! \brief Load function specific files
@@ -62,7 +62,8 @@ class retroblinn_function : public nonlinear_function
 			 return 1 ;
 		 }
 
-		 //! \brief Provide the parametrization of the input space of the function.
+		 //! \brief Provide the parametrization of the input space of the 
+		 //! function.
 		 virtual params::input input_parametrization() const
 		 {
 			 return params::COS_TK ;
@@ -84,10 +85,10 @@ class retroblinn_function : public nonlinear_function
 		 }
 
  		 //! \brief Export function
-		virtual void save_call(std::ostream& out, const arguments& args) const;
-      virtual void save_body(std::ostream& out, const arguments& args) const;
-
-
+		virtual void save_call(std::ostream& out, 
+		                       const arguments& args) const;
+      virtual void save_body(std::ostream& out, 
+		                       const arguments& args) const;
 
  private: // data
 
