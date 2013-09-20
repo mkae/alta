@@ -98,8 +98,6 @@ void ward_function::setParameters(const vec& p)
 //! \todo finish. 
 vec ward_function::parametersJacobian(const vec& x) const 
 {
-	double dot = compute_dot(x);
-
     vec jac(dimY()*nbParameters());
 	 for(int i=0; i<dimY(); ++i)
 	 {
@@ -229,7 +227,7 @@ void ward_function::save_body(std::ostream& out, const arguments& args) const
 		  out << "\tvec3  hax = dot(H,X) / ax;" << std::endl;
 		  out << "\tvec3  hay = dot(H,Y) / ay;" << std::endl;
 		  out << "\tfloat hn  = dot(H,N);" << std::endl;
-        out << "\treturn (ks / (4 * M_PI * ax*ay * sqrt(dot(L,N)*dot(V,N))) * exp(-(hax*hax + hay*hay)/(hn*hn));" << std::endl;
+        out << "\treturn (ks / (4 * " << M_PI << " * ax*ay * sqrt(dot(L,N)*dot(V,N)))) * exp(-(hax*hax + hay*hay)/(hn*hn));" << std::endl;
         out << "}" << std::endl;
     }
 }

@@ -77,13 +77,6 @@ class ward_function : public nonlinear_function
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);
 
-	private: // methods
-
-		//! \brief Compute the cosine for inside the lobe function. 
-		//! Depending on the lobe type, the dot product can have 
-		//! different evaluations.
-		double compute_dot(const vec& in) const;
-
 	private: // data
 
 		vec _ks, _ax, _ay; // Lobes data
