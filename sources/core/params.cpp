@@ -24,6 +24,7 @@ std::map<params::input, const param_info> create_map()
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_TL_DPHI, param_info("ISOTROPIC_TV_TL_DPHI", 3, "Isotropic Light/View angle parametrization")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_VH, param_info("RUSIN_VH", 3, "Vector representation of the Half angle only")));
 
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
@@ -99,6 +100,9 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			classical_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
+			break;
+		case params::RUSIN_VH:
+         half_to_cartesian(acos(invec[2]), atan2(invec[1], invec[0]), 0.0, 0.0, outvec);
 			break;
 
 			// 4D Parametrization
@@ -214,6 +218,11 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[0] = acos(invec[2]);
 			outvec[1] = acos(invec[5]);
 			outvec[2] = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			break;
+		case params::RUSIN_VH:
+			outvec[0] = half[0];  
+			outvec[1] = half[1];  
+			outvec[2] = half[2];  
 			break;
 
 			// 4D Parametrization

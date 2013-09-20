@@ -35,6 +35,10 @@ class params
              RUSIN_TH_PH_TD,
              RUSIN_TH_TD_PD,
              RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
+             RUSIN_VH_VD,           /*!< Half-angle parametrization with no azimutal information in
+				                             vector format */
+             RUSIN_VH,              /*!< Half-angle parametrization with no azimutal information
+				                             and no difference direction in vector format */
              COS_TH_TD,
              COS_TH,
 
