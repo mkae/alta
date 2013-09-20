@@ -25,7 +25,7 @@ vec ward_function::value(const vec& x) const
 	vec res(dimY());
 
 	double h[3];
-	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, h);
+	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, &h[0]);
 
 	for(int i=0; i<dimY(); ++i)
 	{
@@ -98,6 +98,9 @@ void ward_function::setParameters(const vec& p)
 //! \todo finish. 
 vec ward_function::parametersJacobian(const vec& x) const 
 {
+	double h[3];
+	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, h);
+
     vec jac(dimY()*nbParameters());
 	 for(int i=0; i<dimY(); ++i)
 	 {
@@ -105,18 +108,25 @@ vec ward_function::parametersJacobian(const vec& x) const
 		 {
 			 if(i == j)
 			 {
-/*
-				 // df / dk_s
-				 jac[i*nbParameters() + j*2+0] = exp(_n[j] * (dot - 1));
+				 const double hx_ax = h[0]/_ax[i];
+				 const double hy_ay = h[1]/_ay[i];
+				 const double gauss = exp(-(hx_ax*hx_ax + hy_ay*hy_ay) / (h[2]*h[2]));
+				 const double fact  = 1.0 / (4.0*M_PI*_ax[i]*_ay[i]*sqrt(x[2]*x[5])); 
 
-				 // df / dN
-				 jac[i*nbParameters() + j*2+1] = _ks[j] * (dot-1) * exp(_n[j]*(dot - 1));
-*/
+				 // df / dk_s
+				 jac[i*nbParameters() + j*3+0] = fact * gauss;
+
+				 // df / da_x
+				 jac[i*nbParameters() + j*3+1] = _ks[i] * fact * (1.0/_ax[i]) * (((2.0*h[0]*hx_ax) / h[2]) * gauss - 1);
+
+				 // df / da_y
+				 jac[i*nbParameters() + j*3+2] = _ks[i] * fact * (1.0/_ay[i]) * (((2.0*h[1]*hy_ay) / h[2]) * gauss - 1);
 			 }
 			 else
 			 {
-				 jac[i*nbParameters() + j*2+0] = 0.0;
-				 jac[i*nbParameters() + j*2+1] = 0.0;
+				 jac[i*nbParameters() + j*3+0] = 0.0;
+				 jac[i*nbParameters() + j*3+1] = 0.0;
+				 jac[i*nbParameters() + j*3+2] = 0.0;
 			 }
 		 }
 	 }
