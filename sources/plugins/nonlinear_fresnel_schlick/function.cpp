@@ -42,14 +42,14 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
 {
 	bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-	if(is_alta)
-	{
-		out << "(";	f->save_call(out, args); out << ")";
-	}
-	else
-	{
-		f->save_call(out, args);
-	}
+    if(is_alta)
+    {
+       f->save_call(out, args);
+    }
+    else
+    {
+        out << "(";	f->save_call(out, args); out << ")";
+    }
 
 	if(is_alta)
 	{
@@ -80,19 +80,21 @@ void schlick::save_body(std::ostream& out, const arguments& args) const
 
 }
 
-
 vec schlick::fresnelValue(const vec& x) const
 {
-	double xp[2];
-	params::convert(&x[0], input_parametrization(), params::COS_TH_TD, xp);
+    double xp[3], cart[6];
+    params::convert(&x[0], input_parametrization(), params::RUSIN_VH, xp);
+    params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
 
-	vec res(_nY);
-	for(int i=0; i<_nY; ++i)
-	{
-		res[i] = R + (1.0 - R) * pow(1.0 - clamp(xp[1], 0.0, 1.0), 5.0);
-	}
+    const double dotVH = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
 
-	return res;
+    vec res(_nY);
+    for(int i=0; i<_nY; ++i)
+    {
+        res[i] = R + (1.0 - R) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
+    }
+
+    return res;
 }
 
 //! \brief Number of parameters to this non-linear function
@@ -120,13 +122,16 @@ void schlick::setFresnelParameters(const vec& p)
 vec schlick::getFresnelParametersJacobian(const vec& x) const 
 {
 	const int nY = dimY();
-	double xp[2];
-	params::convert(&x[0], input_parametrization(), params::COS_TH_TD, xp);
+    double xp[3], cart[6];
+    params::convert(&x[0], input_parametrization(), params::RUSIN_VH, xp);
+    params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
+
+    const double dotVH = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
 
 	vec jac(nY);
 	for(int i=0; i<nY; ++i)
 	{
-		jac[i] = 1.0 - pow(1.0 - clamp(xp[1], 0.0, 1.0), 5.0);
+        jac[i] = 1.0 - pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
 	}
 
 	return jac;

@@ -42,8 +42,9 @@ class params
              COS_TH_TD,
              COS_TH,
 
-				 SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
-				 COS_TK,                /*!< Schlick's back vector dot product with the normal */
+             SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
+             SCHLICK_VK,            /*!< Schlick's back vector */
+             COS_TK,                /*!< Schlick's back vector dot product with the normal */
 
              STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
 

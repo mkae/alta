@@ -25,6 +25,7 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_TL_DPHI, param_info("ISOTROPIC_TV_TL_DPHI", 3, "Isotropic Light/View angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_VH, param_info("RUSIN_VH", 3, "Vector representation of the Half angle only")));
+    _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
 
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
@@ -102,8 +103,17 @@ void params::to_cartesian(const double* invec, params::input intype,
 			classical_to_cartesian(invec[0], 0.0, invec[1], invec[2], outvec);
 			break;
 		case params::RUSIN_VH:
-         half_to_cartesian(acos(invec[2]), atan2(invec[1], invec[0]), 0.0, 0.0, outvec);
+            half_to_cartesian(acos(invec[2]), atan2(invec[1], invec[0]), 0.0, 0.0, outvec);
 			break;
+        // \todo I should handle the phi_k in the conversion to CARTESIAN
+        case params::SCHLICK_VK:
+            outvec[0] = invec[2]*invec[2]-1.0;
+            outvec[1] = 0.0;
+            outvec[2] = invec[2];
+            outvec[3] = 1.0-invec[2]*invec[2];
+            outvec[4] = 0.0;
+            outvec[5] = invec[2];
+            break;
 
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:
@@ -224,6 +234,18 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[1] = half[1];  
 			outvec[2] = half[2];  
 			break;
+        case params::SCHLICK_VK:
+            {
+                const double Kx = invec[0]-invec[3];
+                const double Ky = invec[1]-invec[4];
+                const double Kz = invec[2]-invec[5];
+
+                const double norm =  sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
+                outvec[0] = Kx / norm;
+                outvec[1] = Ky / norm;
+                outvec[2] = Kz / norm;
+            }
+            break;
 
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:

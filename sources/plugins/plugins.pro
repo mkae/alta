@@ -14,6 +14,7 @@ SUBDIRS  = \
 #				nonlinear_fitter_ipopt						\
 #				nonlinear_fitter_nlopt						\
 				nonlinear_fresnel_schlick					\
+				nonlinear_fresnel_retroschlick			\
 				nonlinear_function_diffuse					\
 				nonlinear_function_blinn					\
 				nonlinear_function_retroblinn				\
