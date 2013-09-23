@@ -7,6 +7,7 @@ DESTDIR  = ../build
 
 unix{
 	QMAKE_CXXFLAGS += -std=c++0x -Wall -pedantic
+	LIBS += -ldl
 }
 
 HEADERS  = args.h               \

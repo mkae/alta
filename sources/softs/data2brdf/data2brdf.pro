@@ -10,4 +10,5 @@ LIBS           += -L../../build -lcore
 
 unix{
    PRE_TARGETDEPS += ../../build/libcore.a
+	LIBS += -ldl
 }

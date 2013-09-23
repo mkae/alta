@@ -12,3 +12,4 @@ SOURCES += main.cpp															\
 QMAKE_CXXFLAGS += -std=c++11 -frounding-math 
 
 LIBS += -lCGAL -lboost_regex
+LIBS += -ldl
