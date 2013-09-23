@@ -85,7 +85,10 @@ void function::save_header(std::ostream& out, const arguments& args) const
 		out << "#CMD " << args.get_cmd() << std::endl;
 		out << "#DIM " << _nX << " " << _nY << std::endl;
 		out << "#PARAM_IN  " << params::get_name(input_parametrization()) << std::endl;
-		//out << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
+        //out << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;*
+        if(args.is_defined("export-append")) {
+            out << args["export-append"] << std::endl;
+        }
 		out << "#ALTA HEADER END" << std::endl;
 		out << std::endl;
 	}

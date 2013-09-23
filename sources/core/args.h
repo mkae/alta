@@ -131,6 +131,11 @@ class arguments
 				return std::string() ;
 			}
         }
+        //! \brief update the value \a val stored under key \a key
+        bool update(const std::string& key, const std::string& val)
+        {
+            _map[key] = val;
+        }
 		//! \brief acces to the string value associated with the parameter
 		//! \a key.
 		//!
