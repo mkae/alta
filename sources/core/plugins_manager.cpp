@@ -237,7 +237,7 @@ function* plugins_manager::get_function(const std::string& filename)
 			linestream >> nX >> nY ;
 		}
 		else if(comment == std::string("CMD"))
-		{
+        {
 			args = arguments::create_arguments(line.substr(4, std::string::npos));
 		}
 	}

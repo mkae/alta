@@ -56,7 +56,9 @@ void blinn_function::load(std::istream& in)
         in >> token >>  _N[i];
     }
 
+#ifdef DEBUG
     std::cout << "<<DEBUG>> load parameters " << parameters() << std::endl;
+#endif
 }
 
 //! Number of parameters to this non-linear function
