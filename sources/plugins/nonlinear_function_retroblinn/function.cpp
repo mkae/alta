@@ -24,7 +24,14 @@ vec retroblinn_function::value(const vec& x) const
     vec res(dimY());
     for(int i=0; i<dimY(); ++i)
     {
-        res[i] = _ks[i] * std::pow(x[0], _N[i]);
+        if(x[0] >= 0.0)
+        {
+            res[i] = _ks[i] * std::pow(x[0], _N[i]);
+        }
+        else
+        {
+            res[i] = 0.0;
+        }
     }
 
     return res;
@@ -100,10 +107,14 @@ vec retroblinn_function::parametersJacobian(const vec& x) const
 				jac[i*nbParameters() + j*2+0] = std::pow(x[0], _N[j]);
 
 				// df / dN
-				if(x[0] == 0.0)
+                if(x[0] <= 0.0)
+                {
 					jac[i*nbParameters() + j*2+1] = 0.0;
+                }
 				else
+                {
 					jac[i*nbParameters() + j*2+1] = _ks[j] * std::log(x[0]) * std::pow(x[0], _N[j]);
+                }
 			}
 			else
 			{

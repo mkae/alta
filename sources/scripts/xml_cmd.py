@@ -61,6 +61,11 @@ def parseFunction(xmlNode):
 		cmd += ' --' + param.attrib['name'] + ' ' + param.attrib['value'];
 	#end
 
+	fresnel = xmlNode.find('fresnel');
+	if not (fresnel is None):
+		cmd += ' --fresnel ' + lib_dir + '/' + libName(fresnel.attrib['name']);
+	#end
+
 	return cmd;
 #end
 
