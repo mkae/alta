@@ -23,6 +23,16 @@ def libName(name):
 	#endif
 #end
 
+## Relative directories
+lib_dir = "";
+dat_dir = "";
+
+## Parse the configuration part of the XML file, this will set the global
+## parameters such as the relative directories.
+##
+def parseConfiguration(xmlNode):
+#end
+
 def parseFit(xmlNode):
 
 	cmd = "";
@@ -51,6 +61,10 @@ def parseFit(xmlNode):
 for child in root:
 
 	cmd = "";
+
+   if(child.tag == "cofiguration"):
+      parseConfiguration(child);
+   #end
 
 	if(child.tag == "fit"):
 		cmd += "./build/data2brdf";
