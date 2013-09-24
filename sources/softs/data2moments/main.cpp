@@ -56,15 +56,17 @@ int main(int argc, char** argv)
         const int nX = d->dimX();
         const int nY = d->dimY();
 
+        // Options
+        bool with_cosine = args.is_defined("cosine");
+        bool use_angular = args.is_defined("angular-moments");
+
         // Normalisation factor for the integration
         const int nb_theta_int = 90;
-        const int nb_phi_int   = 360;
-        const double normalization = M_PI*M_PI / (double)(nb_phi_int*nb_theta_int);
+        const int nb_phi_int   = (use_angular) ? 2 : 360;
+        const double normalization = ((use_angular) ? M_PI : M_PI*M_PI) / (double)(nb_phi_int*nb_theta_int);
 
         double in_angle[4] = {0.0, 0.0, 0.0, 0.0} ;
 
-        // Options
-        bool with_cosine = args.is_defined("cosine");
 
         // Raw moments
         vec m_0(nY);
@@ -97,7 +99,6 @@ int main(int argc, char** argv)
             m_xy = vec::Zero(nY);
             m_yy = vec::Zero(nY);
 
-#ifndef INTEGRATE_ANGLES
             // Theta angle in [0 .. PI / 2]
             for(int theta_out=0; theta_out<nb_theta_int; theta_out++)
             {
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
                     vec in(nX), stereographics(4);
                     params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
 
-                    if(args["moments"] == "angular")
+                    if(use_angular)
                     {
                         xy[0] = (std::abs(in_angle[3]) < 0.5*M_PI) ? in_angle[2] : -in_angle[2];
                         xy[1] = 0.0;
@@ -122,31 +123,17 @@ int main(int argc, char** argv)
                         xy[0] = stereographics[2];
                         xy[1] = stereographics[3];
                     }
-#else
 
-            for(int x=0; x<100; ++x)
-            {
-                for(int y=0; y<100; ++y)
-                {
-                    vec in(nX), stereographics(4);
-                    stereographics[0] = 0;
-                    stereographics[1] = 0;
-                    stereographics[2] = 2.0 * (x/100.0) - 0.5;
-                    stereographics[3] = 2.0 * (y/100.0) - 0.5;
-
-                    params::convert(&stereographics[0], params::STEREOGRAPHIC, params::SPHERICAL_TL_PL_TV_PV, in_angle);
-                    in_angle[0] = theta_in * 0.5*M_PI / 90.0;
-                    in_angle[1] = 0.0;
-
-                    params::convert(in_angle, params::SPHERICAL_TL_PL_TV_PV, data_param, &in[0]);
-#endif
                     // Copy the input vector
                     vec x = d->value(in);
 
 
                     for(int i=0; i<nY; ++i)
                     {
-                        double val = x[i] * normalization * sin(in_angle[2]);
+                        double val = x[i] * normalization;
+                        if(!use_angular) {
+                            val *= sin(in_angle[2]);
+                        }
                         if(with_cosine)
                         {
                             val *= cos(in_angle[2]);
@@ -188,18 +175,24 @@ int main(int argc, char** argv)
             for(int i=0; i<nY; ++i)
                 file << k_x[i] << "\t";
 
-            for(int i=0; i<nY; ++i)
-                file << k_y[i] << "\t";
+            if(!use_angular) {
+                for(int i=0; i<nY; ++i) {
+                    file << k_y[i] << "\t";
+                }
+            }
 
             for(int i=0; i<nY; ++i)
                 file << k_xx[i] << "\t";
 
-            for(int i=0; i<nY; ++i)
-                file << k_xy[i] << "\t";
+            if(!use_angular) {
+                for(int i=0; i<nY; ++i) {
+                    file << k_xy[i] << "\t";
+                }
 
-            for(int i=0; i<nY; ++i)
-                file << k_yy[i] << "\t";
-
+                for(int i=0; i<nY; ++i) {
+                    file << k_yy[i] << "\t";
+                }
+            }
             file << std::endl;
 
         }
