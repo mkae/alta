@@ -43,7 +43,7 @@ void retroblinn_function::load(std::istream& in)
     // Checking for the comment line #FUNC nonlinear_function_retroblinn
     std::string token;
     in >> token;
-    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
     in >> token;
     if(token != "nonlinear_function_retroblinn") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
