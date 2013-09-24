@@ -50,6 +50,39 @@ def parseConfiguration(xmlNode):
 	#end
 #end
 
+def parseFunction(xmlNode):
+	global lib_dir;
+
+	cmd = '';
+	cmd += lib_dir + '/' + libName(xmlNode.attrib['name']);
+
+	# Parse the parameters of the function
+	for param in xmlNode.findall('parameter'):
+		cmd += ' --' + param.attrib['name'] + ' ' + param.attrib['value'];
+	#end
+
+	return cmd;
+#end
+
+def parseFunctions(xmlNodes):
+
+	list_len = len(xmlNodes);
+	if(list_len == 0):
+		return '';
+	elif(list_len == 1):
+		return ' --func ' + parseFunction(xmlNodes[0]);
+	else:
+		cmd = ' --func [';
+		for index in range(0,list_len):
+			cmd += parseFunction(xmlNodes[index]);
+			if(index != list_len-1):
+				cmd += ', ';
+			#end
+		#end
+		cmd += ']';
+		return cmd;
+	#end
+#end
 
 def parseAction(xmlNode):
 	global lib_dir, dat_dir, out_dir;
@@ -64,6 +97,8 @@ def parseAction(xmlNode):
 	if not(outputNode is None):
 		cmd += ' --output ' + outputNode.attrib['name'];
 	#end
+
+	cmd += parseFunctions(xmlNode.findall('function'));
 
 	for plugin in xmlNode.findall('plugin'):
 		cmd += ' --' + plugin.attrib['type'];
@@ -99,7 +134,7 @@ for child in root.findall('action'):
 	# Parse the action
 	cmd += parseAction(child);
 
-	#print cmd;
+	print '\n' + cmd;
 	ret = os.system(cmd);
 	if(ret != 0):
 		print '<<PYTHON>> the action was not performed';

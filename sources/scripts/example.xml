@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<alta>
+	<configuration>
+		<parameter name="lib-dir" value="./build" />
+	</configuration>
+
+	<action name="data2brdf">
+		<!-- Input and output arguments of the action -->
+		<input name="../data/2d/matusik_merl/blue-metallic-paint-double-mean-romeiro-80deg.dat" />
+		<output name="blue-metallic-paint.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_isotropic_lafortune" />
+		<function name="nonlinear_function_isotropic_lafortune">
+		</function>
+		<!-- You can put as many function as you want, they will be
+			  treated as a compound -->
+		<!-- <function name="nonlinear_function_isotropic_lafortune" />-->
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_nlopt" />
+		<!--<plugin type="fitter" name="nonlinear_fitter_ceres" />-->
+		<!--<plugin type="fitter" name="nonlinear_fitter_eigen" />-->
+		<!--<plugin type="fitter" name="nonlinear_fitter_ipopt" />-->
+
+		<parameter name="max" value="[0.8, 0.8]" />
+	</action>
+	
+	<action name="brdf2gnuplot">
+		
+		<input name="blue-metallic-paint.brdf" />
+		<output name="blue-metallic-paint.dat" />
+
+		<parameter name="data" value="../data/2d/matusik_merl/blue-metallic-paint-double-mean-romeiro-80deg.dat" />
+	</action>
+
+</alta>

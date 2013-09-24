@@ -288,6 +288,9 @@ function* plugins_manager::get_function(const arguments& args)
           {
               std::string n("--func ");
               n.append(args_vec[i]);
+#ifdef DEBUG
+              std::cout << "<<DEBUG>> load function with args: " << n << std::endl;
+#endif
               arguments temp_args = arguments::create_arguments(n);
               function* f = get_function(temp_args);
               if(dynamic_cast<nonlinear_function*>(f) == NULL)
