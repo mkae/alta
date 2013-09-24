@@ -43,7 +43,7 @@ void blinn_function::load(std::istream& in)
     // Checking for the comment line #FUNC nonlinear_function_blinn
     std::string token;
     in >> token;
-    if(token != "FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
 
     in >> token;
     if(token != "nonlinear_function_blinn") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
@@ -55,6 +55,8 @@ void blinn_function::load(std::istream& in)
         in >> token >> _ks[i];
         in >> token >>  _N[i];
     }
+
+    std::cout << "<<DEBUG>> load parameters " << parameters() << std::endl;
 }
 
 //! Number of parameters to this non-linear function

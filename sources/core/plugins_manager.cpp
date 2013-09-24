@@ -447,7 +447,7 @@ void plugins_manager::check_compatibility(data*& d, function*& f,
 
 	if(f->dimY() != d->dimY())
 	{
-		std::cout << "<<WARNING>> the data and the function have different Y dimensions" << std::endl;
+        f->setDimY(d->dimY());
 	}
 
 	/*

@@ -49,13 +49,16 @@ int main(int argc, char** argv)
 		d->load(args["data"]) ;
 	}
 
-	// If the function loaded has no parametrization (for example a diffuse
-	// function), the function will take the parametrization of the data
-	if(f->input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		manager.check_compatibility(d, f, args);
-	}
+    /*
+    // Print the distance to the data to check if it correspond to the value
+    // computed prior.
+    double L2   = f->L2_distance(d);
+    double Linf = f->Linf_distance(d);
+    std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
+    std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
+    */
 
+    // Check the kind of plot to do
 	bool plot_error = false ;
 	bool linear_plot = false;
 	if(args.is_defined("error"))
@@ -78,7 +81,10 @@ int main(int argc, char** argv)
 		{
 			vec v = d->get(i) ;
 
-			vec y2 = f->value(v) ;
+            vec x(f->dimX());
+            params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+
+            vec y2 = f->value(x) ;
 			if(!linear_plot)
 			{
 				for(int u=0; u<d->dimX(); ++u)

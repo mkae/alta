@@ -87,6 +87,7 @@ int main(int argc, char** argv)
             std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
             std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
 
+            /*
             std::stringstream append; // Append informations to the export
             if(args.is_defined("export-append")) {
                 append << args["export-append"];
@@ -94,6 +95,7 @@ int main(int argc, char** argv)
             append << "#L2   " << L2   << std::endl;
             append << "#LINF " << Linf ;
             args.update("export-append", append.str());
+            */
 
             f->save(args["output"], args) ;
             return 0;

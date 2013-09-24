@@ -62,7 +62,7 @@ def parseAction(xmlNode):
 	
 	outputNode = xmlNode.find('output');
 	if not(outputNode is None):
-		cmd += ' --output ' + inputNode.attrib['name'];
+		cmd += ' --output ' + outputNode.attrib['name'];
 	#end
 
 	for plugin in xmlNode.findall('plugin'):
@@ -99,6 +99,7 @@ for child in root.findall('action'):
 	# Parse the action
 	cmd += parseAction(child);
 
+	#print cmd;
 	ret = os.system(cmd);
 	if(ret != 0):
 		print '<<PYTHON>> the action was not performed';
