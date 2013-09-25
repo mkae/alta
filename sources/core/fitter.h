@@ -8,6 +8,7 @@
 /*! \brief Fitting interface for generic fitting algorithms
  *  \ingroup core
  *
+ *  \details
  */
 class fitter
 {

@@ -30,7 +30,8 @@ class arguments
             for(int i=0; i<argc; ++i)
             {
                 std::string temp(argv[i]) ;
-                std::string key, data ;
+                std::string key;
+                std::string data;
 
                 if(temp.compare(0, 2, "--") == 0)
                 {
@@ -46,10 +47,8 @@ class arguments
                         if(next[0] == '-')
                         {
                             --i;
-                            continue;
                         }
-
-                        if(next[0] == '[' && next[next.size()-1] != ']')
+                        else if(next[0] == '[' && next[next.size()-1] != ']')
                         {
                             data.append(next);
 
@@ -81,8 +80,9 @@ class arguments
 #ifdef DEBUG_ARGS
                     std::cout << "]" << std::endl;
 #endif
+                    _map.insert(std::pair<std::string, std::string>(key, data)) ;
                 }
-                _map.insert(std::pair<std::string, std::string>(key, data)) ;
+
             }
         }
 		~arguments()
@@ -132,7 +132,7 @@ class arguments
 			}
         }
         //! \brief update the value \a val stored under key \a key
-        bool update(const std::string& key, const std::string& val)
+        void update(const std::string& key, const std::string& val)
         {
             _map[key] = val;
         }
@@ -310,6 +310,16 @@ class arguments
 			  delete argv;
 			  return current_args;
 		  }
+
+          friend std::ostream& operator<<(std::ostream& out, const arguments& args)
+          {
+              std::map<std::string, std::string>::const_iterator it;
+              for(it=args._map.begin(); it!=args._map.end(); ++it)
+              {
+                  out<< "[" << it->first << "] -> " << it->second << std::endl;
+              }
+              return out;
+          }
 
 
 	private: // data

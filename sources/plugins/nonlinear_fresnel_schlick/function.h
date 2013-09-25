@@ -37,20 +37,10 @@ class schlick : public fresnel
 		virtual void setFresnelParameters(const vec& p) ;
 
 		//! Get the vector of min parameters for the function
-		virtual vec getFresnelParametersMin() const
-		{
-			vec m(1);
-			m[0] = 0.0;
-			return m;
-		}
+        virtual vec getFresnelParametersMin() const;
 
 		//! Get the vector of min parameters for the function
-		virtual vec getFresnelParametersMax() const
-		{
-			vec M(1);
-			M[0] = 1.0;
-			return M;
-		}
+        virtual vec getFresnelParametersMax() const;
 
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
@@ -59,10 +49,16 @@ class schlick : public fresnel
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void fresnelBootstrap(const data* d, const arguments& args);
 
+        //! \brief resize the parameter vector
+        virtual void setDimY(int nY)
+        {
+            fresnel::setDimY(nY);
+            R.resize(nY);
+        }
 
 	private: // data
 
 		//! Unidimensional Fresnel reflectance at theta = 0
-		double R;
+        vec R;
 } ;
 

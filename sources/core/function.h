@@ -761,12 +761,12 @@ class fresnel : public nonlinear_function
 			{
 				for(int i=0; i<nb_func_params; ++i)
 				{
-					jac[y + _nY*i] = func_jacobian[y + _nY*i] * fres_value[y];
+                    jac[y*nb_params + _nY*i] = func_jacobian[y*nb_func_params + _nY*i] * fres_value[y];
 				}
 
 				for(int i=0; i<nb_fres_params; ++i)
 				{
-					jac[y + _nY*(i+nb_func_params)] = fres_jacobian[y + _nY*i] * func_value[y];
+                    jac[y*nb_params + _nY*(i+nb_func_params)] = fres_jacobian[y*nb_fres_params + _nY*i] * func_value[y];
 				}
 			}
 
