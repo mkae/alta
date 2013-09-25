@@ -484,7 +484,7 @@ class compound_function: public nonlinear_function
 					{
 						for(int y=0; y<_nY; ++y)
 						{
-							jac[y + _nY*(i+start_i)] = func_jac[y + _nY*i];
+                            jac[y*nb_params + (i+start_i)] = func_jac[y*nb_f_params + i];
 						}
 					}
 				}
@@ -761,12 +761,12 @@ class fresnel : public nonlinear_function
 			{
 				for(int i=0; i<nb_func_params; ++i)
 				{
-                    jac[y*nb_params + _nY*i] = func_jacobian[y*nb_func_params + _nY*i] * fres_value[y];
+                    jac[y*nb_params + i] = func_jacobian[y*nb_func_params + i] * fres_value[y];
 				}
 
 				for(int i=0; i<nb_fres_params; ++i)
 				{
-                    jac[y*nb_params + _nY*(i+nb_func_params)] = fres_jacobian[y*nb_fres_params + _nY*i] * func_value[y];
+                    jac[y*nb_params + (i+nb_func_params)] = fres_jacobian[y*nb_fres_params + i] * func_value[y];
 				}
 			}
 
