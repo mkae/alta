@@ -18,6 +18,13 @@ class diffuse_function : public nonlinear_function
 
 	public: // methods
 
+        // Set the input parametrization to CARTESIAN to reduce the number
+        // of transformations in a compound object.
+        diffuse_function()
+        {
+            setParametrization(params::CARTESIAN);
+        }
+
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;

@@ -255,6 +255,10 @@ class compound_function: public nonlinear_function
 			{
 				setParametrization(f->input_parametrization());
 			}
+            else if(input_parametrization() != f->input_parametrization())
+            {
+                setParametrization(params::CARTESIAN);
+            }
 			
 			// Update the output param
 			if(output_parametrization() == params::UNKNOWN_OUTPUT)
@@ -591,7 +595,11 @@ class fresnel : public nonlinear_function
 		virtual vec value(const vec& x) const
 		{
 			vec fres = fresnelValue(x);
-			vec func = f->value(x);
+
+            // Convert input space to the function
+            vec xf(f->dimX());
+            params::convert(&x[0], params::CARTESIAN, f->input_parametrization(), &xf[0]);
+            vec func = f->value(xf);
 
 			return product(fres, func);
 		}
@@ -748,10 +756,14 @@ class fresnel : public nonlinear_function
 			int nb_fres_params = nbFresnelParameters();
 			int nb_params = nb_func_params + nb_fres_params;
 
-			vec func_jacobian = f->parametersJacobian(x);
+            // Convert the input value x to the input space of the function
+            vec xf(f->dimX());
+            params::convert(&x[0], params::CARTESIAN, f->input_parametrization(), &xf[0]);
+
+            vec func_jacobian = f->parametersJacobian(xf);
 			vec fres_jacobian = getFresnelParametersJacobian(x);
 
-			vec func_value = f->value(x);
+            vec func_value = f->value(xf);
 			vec fres_value = fresnelValue(x);
 
 			// F = fresnel; f = function
@@ -782,7 +794,7 @@ class fresnel : public nonlinear_function
 		//! \brief provide the input parametrization of the object.
 		virtual params::input input_parametrization() const
 		{
-			return f->input_parametrization();
+            return params::CARTESIAN;
 		}
 
 		//! \brief provide the outout parametrization of the object.

@@ -83,9 +83,9 @@ class CeresFunctor : public ceres::CostFunction
 				// Fill the columns of the matrix
 				for(int j=0; j<_f->nbParameters(); ++j)
 				{
-					fjac[0][i*_f->nbParameters() + j] = -_jac[i*_f->nbParameters() + j];
-				}
-			}
+                    fjac[0][i*_f->nbParameters() + j] = -_jac[i*_f->nbParameters() + j];
+                }
+            }
 		}
 
 	protected:

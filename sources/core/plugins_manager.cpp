@@ -439,6 +439,7 @@ void plugins_manager::check_compatibility(data*& d, function*& f,
 		else if(d->input_parametrization() != f->input_parametrization())
 		{
 			std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+            std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
 			data_params* dd = new data_params(d, f->input_parametrization());
 			d = dd ;
 		}
