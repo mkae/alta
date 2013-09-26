@@ -96,10 +96,18 @@ class function : public parametrized
 
 		/* METRIC FUNCTIONS */
 
-		//! \brief L2 norm to data.
+        //! \brief L2 norm to data.
+        //! \note This distance is only valid with respect to the data sampling.
+        //! If the measurement points are not uniformly distributed, then the
+        //! metric does not represent the real difference integrated over the
+        //! hemisphere.
 		double L2_distance(const data* d) const ;
 
 		//! \brief Linf norm to data.
+        //! \note This distance is only valid with respect to the data sampling.
+        //! If the measurement points are not uniformly distributed, then the
+        //! metric does not represent the real difference integrated over the
+        //! hemisphere.
 		double Linf_distance(const data* d) const ;
 
 
@@ -120,7 +128,8 @@ class function : public parametrized
  * da_i}\f$. 
  *
  * \note It is not necessary to have an analytical formulation
- * of the derivative and a numerical evaluation of it can be provided.
+ * of the derivative but at least a numerical evaluation of it has to be
+ * provided.
  */
 class nonlinear_function: public function
 {
@@ -217,7 +226,10 @@ class nonlinear_function: public function
 		}
 };
 
-
+/*! \brief A compound (sum) of multiple nonlinear functions. This allows to
+ *  perform the fit of multiple lobes at once.
+ *  \ingroup core
+ */
 class compound_function: public nonlinear_function
 {
 	public: // methods
@@ -582,6 +594,7 @@ class compound_function: public nonlinear_function
 
 /*! \brief A Fresnel interface
  *  \ingroup core
+ *  \todo Change it to a product_function instead
  */
 class fresnel : public nonlinear_function
 {

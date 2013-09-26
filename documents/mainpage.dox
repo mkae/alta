@@ -1,33 +1,48 @@
 /**
 \mainpage A BRDF analysis library 
 
-This package provide C++ code to analyze BRDF, fit measured data to analytical
-formulation, etc. It is decomposed in three components:
+<h2>Description</h2>
+ALTA is a software library to analyse, fit and understand BRDFs. It
+provides a set of command line softwares to fit measured data to analytical
+forms, new tools to understand models and data.
+
+This package provide C++ code to analyze BRDF, fit measured data to 
+analytical formulation, etc. It is decomposed in three components:
 <ul>
-	<li><em>\ref core</em>: a set of classes providing interfaces to BRDFs, data type 
-	and fitting algorithms. All the code using this library should rely on this
-	part.</li>
+	<li><em>\ref core</em>: a set of classes providing interfaces to BRDFs, 
+	data type and fitting algorithms. All the code using this library should 
+	rely on this part.</li>
 	<li><em>\ref plugins</em>: a set of plugins providing fitting algorithms
 	for rational BRDFs, non-linear BRDFs, etc.</li>
-	<li><em>\ref softs</em>: a set of tools to fit data, convert data, export fitting to 
-	plots, etc.</li>
+	<li><em>\ref softs</em>: a set of tools to fit data, convert data, 
+	export fitting to plots, etc.</li>
 </ul>
 
-This library rely on Qt's lower level 
-<a href="http://qt-project.org/doc/qt-4.8/plugins-howto.html">plugins mechanism</a>.
 Three types of plugins are availables:
 <ul>
-	<li><em>\ref data</em> plugins allow to load BRDF measurements files.</li>
+	<li><em>\ref data</em> plugins allow to load BRDF measurements files.
+	</li>
 	<li><em>\ref function</em> plugins provide BRDF representations.</li>
 	<li><em>\ref fitter</em> plugins provide fitting algorithms.</li>
 </ul>
+
+
+<h2>Obtain sources</h2>
+
+To access the sources of ALTA, you can clone the mercurial repository:
+\verbatim
+	hg clone https://manao.inria.fr/mercurial/alta
+\endverbatim
+
+
+<h2>Install and use ALTA</h2>
 
 Documentation to \ref install
 
 Documentation to \ref contribute
 
-The \ref plugins_manager class will load all the Qt plugins and will provide access to
-the requested elements. See the documentation of this class.
+The \ref plugins_manager class allows to load plugins and provide access 
+to requested elements. See the documentation of this class.
 
 \defgroup core
 \defgroup plugins
