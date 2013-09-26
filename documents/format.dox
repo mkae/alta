@@ -64,7 +64,7 @@ Vertical segments are not defined if VS is 0. For a VS of 1, each sample as a ra
 
 
 
-<h2>Function file format (.function_name)</h2>
+<h2>Function file format (.function)</h2>
 
 We advise to output function file into <em>.function</em> file for consistency.
 ALTA library assumes that all functions are exported using the following convention:
@@ -137,4 +137,63 @@ into the file:
 
 \todo Right now the different color channels have the same length !
 
+
+<h2>XML scripts</h2>
+
+You can create XML formated files to run ALTA complex commands. A python
+script <em>xml_cmd.py</em> is available in the directory <em>scripts</em>.
+You can use it with the following command: <em>./scripts/xml_cmd.py 
+file.xml</em>
+
+We provide an example XML file that is self describing:
+\verbatim
+<?xml version="1.0"?>
+<alta>
+	<!-- In the configuration you can setup the relative directories -->
+	<configuration>
+		<parameter name="lib-dir" value="./build" />
+	</configuration>
+
+	<!-- Fit the data to a BRDF model -->
+	<!-- You can chain as many action as you want to perform fit. Convert
+        data, output to matlab/gnuplot/BRDFExplorer format -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="/home/belcour/Projects/alta/data/2d/matusik_merl/blue-metallic-paint-double-mean-romeiro-80deg.dat" />
+		<output name="./results/blue-metallic-paint-2lafortune.brdf" />
+
+		<!-- Define the function to use -->
+		<!-- You can chain multiple functions here to create a compound -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_isotropic_lafortune" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+		<!-- Fitting parameters -->
+		<parameter name="max" value="[0.8, 0.8]" />
+	</action>
+	
+	<!-- Convert the fit to BRDF explorer format -->
+	<action name="brdf2brdf">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/blue-metallic-paint-2lafortune.brdf" />
+		<output name="./results/blue-metallic-paint-2lafortune_explorer.brdf" />
+
+		<parameter name="export" value="explorer" />
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/blue-metallic-paint-2lafortune.brdf" />
+		<output name="./results/blue-metallic-paint-2lafortune.dat" />
+
+		<parameter name="data" value="/home/belcour/Projects/alta/data/2d/matusik_merl/blue-metallic-paint-double-mean-romeiro-80deg.dat" />
+	</action>
+</alta>
+\endverbatim
 */
