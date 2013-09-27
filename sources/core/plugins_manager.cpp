@@ -299,7 +299,8 @@ function* plugins_manager::get_function(const arguments& args)
               }
               else
               {
-                  compound->push_back(dynamic_cast<nonlinear_function*>(f));
+					  const bool is_fixed = temp_args.is_defined("fixed");
+                  compound->push_back(dynamic_cast<nonlinear_function*>(f), is_fixed);
               }
           }
 

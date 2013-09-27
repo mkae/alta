@@ -248,7 +248,10 @@ class compound_function: public nonlinear_function
 		}
 
 		//! Provide a vector like interface
-		virtual void push_back(nonlinear_function* f)
+		//! This function allows to put a new nonlinear function \a f in the 
+		//! compound object. This function will be processed for nonlinear
+		//! optimisation only if \a fixed equals true.
+		virtual void push_back(nonlinear_function* f, bool fixed = false)
 		{
 			// Update the input param
 			if(input_parametrization() == params::UNKNOWN_INPUT)
@@ -268,6 +271,7 @@ class compound_function: public nonlinear_function
 			}
 			
 			fs.push_back(f);
+			is_fixed.push_back(fixed);
 		}
 
 		//! \brief Access to the i-th function of the compound
@@ -346,7 +350,9 @@ class compound_function: public nonlinear_function
 			int nb_params = 0;
 			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				nb_params += fs[i]->nbParameters();
+				if(!is_fixed[i]) {
+					nb_params += fs[i]->nbParameters();
+				}
 			}
 			return nb_params;
 		}
@@ -361,7 +367,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params = fs[f]->parameters();
 					for(int i=0; i<f_size; ++i)
@@ -386,7 +392,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params = fs[f]->getParametersMin();
 					for(int i=0; i<f_size; ++i)
@@ -411,7 +417,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params = fs[f]->getParametersMax();
 					for(int i=0; i<f_size; ++i)
@@ -435,7 +441,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params(f_size);
 					for(int i=0; i<f_params.size(); ++i)
@@ -473,7 +479,7 @@ class compound_function: public nonlinear_function
 				int nb_f_params = func->nbParameters(); 
 
 				// Only export Jacobian if there are non-linear parameters
-				if(nb_f_params > 0)
+				if(nb_f_params > 0 && !is_fixed[f])
 				{
 
 					vec temp_x(func->dimX());
@@ -487,9 +493,9 @@ class compound_function: public nonlinear_function
 							jac[y + _nY*(i+start_i)] = func_jac[y + _nY*i];
 						}
 					}
-				}
 
-				start_i += nb_f_params;
+					start_i += nb_f_params;
+				}
 			}
 
 			return jac;
@@ -573,6 +579,7 @@ class compound_function: public nonlinear_function
 
 	protected:
 		std::vector<nonlinear_function*> fs;
+		std::vector<bool> is_fixed;
 
 };
 
