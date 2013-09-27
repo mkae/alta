@@ -69,7 +69,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 
 
 // Create the object, parse the argument and load all the plugins
-plugins_manager::plugins_manager(const arguments& args) 
+plugins_manager::plugins_manager(const arguments&) 
 {
 /*
 	QDir pluginsDir;
@@ -418,7 +418,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 }
 
 void plugins_manager::check_compatibility(data*& d, function*& f,
-                                          const arguments& args)
+                                          const arguments&)
 {
 	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
 		f->input_parametrization() == params::UNKNOWN_INPUT)

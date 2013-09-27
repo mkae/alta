@@ -97,7 +97,7 @@ void function::save_header(std::ostream& out, const arguments& args) const
 //! \brief save function specific data. This has no use for ALTA export
 //! but allows to factorize the code in the C++ or matlab export by
 //! defining function calls that are common to all the plugins.
-void function::save_body(std::ostream& out, const arguments& args) const
+void function::save_body(std::ostream&, const arguments&) const
 {
 
 
@@ -106,7 +106,7 @@ void function::save_body(std::ostream& out, const arguments& args) const
 //! \brief save object specific information. For an ALTA export the
 //! coefficients will be exported. For a C++ or matlab export, the call
 //! to the associated function will be done.
-void function::save_call(std::ostream& out, const arguments& args) const
+void function::save_call(std::ostream&, const arguments&) const
 {
 
 }

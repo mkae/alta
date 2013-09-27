@@ -33,11 +33,11 @@ class vertical_segment : public data
 		// Acces to data
 		virtual vec get(int i) const ;		
 		virtual vec operator[](int i) const ;
-		virtual vec value(vec in, vec out) const 
+		virtual vec value(vec, vec) const 
 		{
 			NOT_IMPLEMENTED();
 		}
-        virtual vec value(vec in) const
+        virtual vec value(vec) const
         {
             NOT_IMPLEMENTED();
         }

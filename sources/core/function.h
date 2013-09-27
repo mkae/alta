@@ -38,7 +38,7 @@ class function : public parametrized
 		//! \details
 		//! Can be used to set the diffuse component of the function for
 		//! example.
-		virtual void bootstrap(const data* d, const arguments& args) {}
+		virtual void bootstrap(const data*, const arguments&) {}
 
 		//! Provide the dimension of the input space of the function
 		virtual int dimX() const { return _nX ; }

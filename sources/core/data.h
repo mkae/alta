@@ -124,23 +124,23 @@ class data_params : public data
 			save(std::string("cluster.gnuplot"));
 		}
 
-		virtual vec value(vec in, vec out) const 
+		virtual vec value(vec, vec) const 
 		{
 			NOT_IMPLEMENTED();
 		}
-		virtual vec value(vec in) const
+		virtual vec value(vec) const
 		{
 			NOT_IMPLEMENTED();
 		}
 
 		// Load data from a file
-		virtual void load(const std::string& filename)
+		virtual void load(const std::string&)
 		{
 			std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
 			throw;
 		}
 
-		virtual void load(const std::string& filename, const arguments& args)
+		virtual void load(const std::string&, const arguments&)
 		{
 			std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
 			throw;
