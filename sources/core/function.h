@@ -132,6 +132,14 @@ class nonlinear_function: public function
 {
 	public: // methods
 
+        //! \brief Provide a first rough fit of the function.
+        //!
+        //! \details
+        //! The nonllinear_function overload the function bootstrap call to
+        //! allows for loading the parameters vector directly from the command
+        //! line: --bootstrap [p1, p2, ..., pn]
+        virtual void bootstrap(const data*, const arguments& args);
+
 		//! Number of parameters to this non-linear function
 		virtual int nbParameters() const = 0;
 

@@ -184,6 +184,20 @@ double function::Linf_distance(const data* d) const
 
 	return linf_dist;
 }
+
+
+void nonlinear_function::bootstrap(const data* d, const arguments& args)
+{
+    if(args.is_vec("bootstrap"))
+    {
+        vec p = args.get_vec("bootstrap", nbParameters());
+        setParameters(p);
+    }
+    else
+    {
+        function::bootstrap(d, args);
+    }
+}
 		
 //! \brief get the maximum value for all the parameters in a vector
 //! format. The maximum vector and the parameter vector have the same
