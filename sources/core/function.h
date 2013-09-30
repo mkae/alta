@@ -37,8 +37,8 @@ class function : public parametrized
 		//!
 		//! \details
 		//! Can be used to set the diffuse component of the function for
-		//! example.
-		virtual void bootstrap(const data* d, const arguments& args) {}
+        //! example. The default behaviour is to load a function file.
+        virtual void bootstrap(const data*, const arguments& args);
 
 		//! Provide the dimension of the input space of the function
 		virtual int dimX() const { return _nX ; }
@@ -50,23 +50,20 @@ class function : public parametrized
 		//! Set the dimension of the output space of the function
 		virtual void setDimY(int nY) { _nY = nY ; }
 
-		// Acces to the domain of definition of the function
-		virtual void setMin(const vec& min) 
-		{
-#ifdef DEBUG
-			assert(min.size() == _nX) ;
-#endif
-			_min = min ; 
-		}
-		virtual void setMax(const vec& max) 
-		{
-#ifdef DEBUG
-			assert(max.size() == _nX) ;
-#endif
-			_max = max ; 
-		}
-		virtual vec getMin() const { return _min ; }
-		virtual vec getMax() const { return _max ; }
+
+        /* DEFINITION DOMAIN OF THE FUNCTION */
+
+        //! \brief Set the minimum value the input can take
+        virtual void setMin(const vec& min) ;
+
+        //! \brief Set the maximum value the input can take
+        virtual void setMax(const vec& max) ;
+
+        //! \brief Get the minimum value the input can take
+        virtual vec getMin() const ;
+
+        //! \brief Get the maximum value the input can take
+        virtual vec getMax() const ;
 
 
 		/* EXPORT FUNCTIONS */
@@ -260,7 +257,10 @@ class compound_function: public nonlinear_function
 		}
 
 		//! Provide a vector like interface
-		virtual void push_back(nonlinear_function* f)
+		//! This function allows to put a new nonlinear function \a f in the 
+		//! compound object. This function will be processed for nonlinear
+		//! optimisation only if \a fixed equals true.
+        virtual void push_back(nonlinear_function* f, const arguments& f_args)
 		{
 			// Update the input param
 			if(input_parametrization() == params::UNKNOWN_INPUT)
@@ -284,6 +284,8 @@ class compound_function: public nonlinear_function
 			}
 			
 			fs.push_back(f);
+            fs_args.push_back(f_args);
+            is_fixed.push_back(f_args.is_defined("fixed"));
 		}
 
 		//! \brief Access to the i-th function of the compound
@@ -311,13 +313,26 @@ class compound_function: public nonlinear_function
 		}
 
 		//! \brief Provide a first rough fit of the function. 
-		virtual void bootstrap(const ::data* d, const arguments& args) 
-		{
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->bootstrap(d, args);
-			}
-		}
+        //! For compound object, you can define the first guess using the
+        //! either the global function or using the individual command per
+        //! function. <br />
+        //!
+        //! <u>Examples:</u><br />
+        //! \verbatim
+        //! --func [libfunc1.so, libfunc2.so] --bootstrap first_guess.brdf
+        //! \endverbatim
+        //! Will load the file <em>first_guess.brdf</em> as the initial value
+        //! <br />
+        //! \verbatim
+        //! --func [libfunc1.so --boostrap [val1, val2], libfunc2.so --bootstrap first_guess1.brdf]
+        //! \endverbatim
+        //! Will load the vector of parameters <em>[val1, val2]</em> for the
+        //! first function and the file <em>first_guess1.brdf</em> for the
+        //! second one. <br />
+        //!
+        //! <u>Local/Global policy:</u></br />
+        //! Local bootstrap can not overload the global bootstrap.
+        virtual void bootstrap(const ::data* d, const arguments& args);
 
 		//! Set the dimension of the input space of the function
 		virtual void setDimX(int nX) 
@@ -362,7 +377,9 @@ class compound_function: public nonlinear_function
 			int nb_params = 0;
 			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				nb_params += fs[i]->nbParameters();
+				if(!is_fixed[i]) {
+					nb_params += fs[i]->nbParameters();
+				}
 			}
 			return nb_params;
 		}
@@ -377,7 +394,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params = fs[f]->parameters();
 					for(int i=0; i<f_size; ++i)
@@ -402,7 +419,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params = fs[f]->getParametersMin();
 					for(int i=0; i<f_size; ++i)
@@ -427,7 +444,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params = fs[f]->getParametersMax();
 					for(int i=0; i<f_size; ++i)
@@ -451,7 +468,7 @@ class compound_function: public nonlinear_function
 				int f_size = fs[f]->nbParameters();
 
 				// Handle when there is no parameters to include
-				if(f_size > 0)
+				if(f_size > 0 && !is_fixed[f])
 				{
 					vec f_params(f_size);
 					for(int i=0; i<f_params.size(); ++i)
@@ -489,7 +506,7 @@ class compound_function: public nonlinear_function
 				int nb_f_params = func->nbParameters(); 
 
 				// Only export Jacobian if there are non-linear parameters
-				if(nb_f_params > 0)
+				if(nb_f_params > 0 && !is_fixed[f])
 				{
 
 					vec temp_x(func->dimX());
@@ -503,9 +520,9 @@ class compound_function: public nonlinear_function
                             jac[y*nb_params + (i+start_i)] = func_jac[y*nb_f_params + i];
 						}
 					}
-				}
 
-				start_i += nb_f_params;
+					start_i += nb_f_params;
+				}
 			}
 
 			return jac;
@@ -589,6 +606,8 @@ class compound_function: public nonlinear_function
 
 	protected:
 		std::vector<nonlinear_function*> fs;
+        std::vector<arguments> fs_args;
+		std::vector<bool> is_fixed;
 
 };
 

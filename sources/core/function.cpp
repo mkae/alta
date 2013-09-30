@@ -1,6 +1,44 @@
 #include "function.h"		
 
 #include "common.h"
+#include "plugins_manager.h"
+
+void function::bootstrap(const data*, const arguments& args)
+{
+    // If the bootstrap option contains a filename, load it
+    if(args.is_defined("bootstrap") && !args["bootstrap"].empty())
+    {
+        std::ifstream in(args["bootstrap"].c_str());
+        if(in.is_open())
+        {
+            load(in);
+        }
+    }
+}
+
+// Acces to the domain of definition of the function
+void function::setMin(const vec& min)
+{
+#ifdef DEBUG
+    assert(min.size() == _nX) ;
+#endif
+    _min = min ;
+}
+void function::setMax(const vec& max)
+{
+#ifdef DEBUG
+    assert(max.size() == _nX) ;
+#endif
+    _max = max ;
+}
+vec function::getMin() const
+{
+    return _min ;
+}
+vec function::getMax() const
+{
+    return _max ;
+}
 
 void function::save(const std::string& filename, const arguments& args) const
 {
@@ -97,7 +135,7 @@ void function::save_header(std::ostream& out, const arguments& args) const
 //! \brief save function specific data. This has no use for ALTA export
 //! but allows to factorize the code in the C++ or matlab export by
 //! defining function calls that are common to all the plugins.
-void function::save_body(std::ostream& out, const arguments& args) const
+void function::save_body(std::ostream&, const arguments&) const
 {
 
 
@@ -106,7 +144,7 @@ void function::save_body(std::ostream& out, const arguments& args) const
 //! \brief save object specific information. For an ALTA export the
 //! coefficients will be exported. For a C++ or matlab export, the call
 //! to the associated function will be done.
-void function::save_call(std::ostream& out, const arguments& args) const
+void function::save_call(std::ostream&, const arguments&) const
 {
 
 }
@@ -171,4 +209,50 @@ vec nonlinear_function::getParametersMin() const
 		m[i] = -std::numeric_limits<double>::max();
 	}
 	return m;
+}
+
+void compound_function::bootstrap(const ::data* d, const arguments& args)
+{
+    const bool global_bootstrap = args.is_defined("bootstrap");
+
+    // Check if the bootstrap is global
+    if(global_bootstrap)
+    {
+        if(args.is_vec("bootstrap"))
+        {
+            vec p = args.get_vec("bootstrap", nbParameters());
+            setParameters(p);
+        }
+        else
+        {
+            std::ifstream file;
+            file.open(args["bootstrap"].c_str()) ;
+            if(file.is_open())
+            {
+                // Skip the header
+                std::string line ;
+                do
+                {
+                    std::getline(file, line) ;
+                }
+                while(line != "#ALTA HEADER END");
+
+                // Load the file
+                this->load(file);
+            }
+            else
+            {
+                std::cerr << "<<ERROR>> you must provide a vector of parameters or a file to load with the bootstrap" << std::endl;
+            }
+        }
+    }
+
+    // Per function bootstrap
+    for(unsigned int i=0; i<fs.size(); ++i)
+    {
+        if(!global_bootstrap)
+        {
+            fs[i]->bootstrap(d, fs_args[i]);
+        }
+    }
 }

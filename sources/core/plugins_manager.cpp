@@ -69,7 +69,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 
 
 // Create the object, parse the argument and load all the plugins
-plugins_manager::plugins_manager(const arguments& args) 
+plugins_manager::plugins_manager(const arguments&) 
 {
 /*
 	QDir pluginsDir;
@@ -299,7 +299,7 @@ function* plugins_manager::get_function(const arguments& args)
               }
               else
               {
-                  compound->push_back(dynamic_cast<nonlinear_function*>(f));
+                  compound->push_back(dynamic_cast<nonlinear_function*>(f), temp_args);
               }
           }
 
@@ -417,7 +417,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 }
 
 void plugins_manager::check_compatibility(data*& d, function*& f,
-                                          const arguments& args)
+                                          const arguments&)
 {
 	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
 		f->input_parametrization() == params::UNKNOWN_INPUT)

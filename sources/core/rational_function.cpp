@@ -24,7 +24,7 @@ rational_function_1d::rational_function_1d(const vec& a,
 {
 }
 
-void rational_function_1d::load(std::istream& in)
+void rational_function_1d::load(std::istream&)
 {
 }
 
@@ -443,7 +443,7 @@ void rational_function::load(std::istream& in)
 }
 
 //! \todo it should handle parametrization
-void rational_function::save_matlab(const std::string& filename, const arguments& args) const
+void rational_function::save_matlab(const std::string& filename, const arguments&) const
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 
@@ -538,7 +538,7 @@ void rational_function::save_matlab(const std::string& filename, const arguments
 }
 
 //! \todo it should handle parametrization
-void rational_function::save_cpp(const std::string& filename, const arguments& args) const
+void rational_function::save_cpp(const std::string& filename, const arguments&) const
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 
@@ -651,7 +651,7 @@ void rational_function::save_cpp(const std::string& filename, const arguments& a
 }
 
 
-void rational_function::save_gnuplot(const std::string& filename, const data* d, const arguments& args) const
+void rational_function::save_gnuplot(const std::string& filename, const data* d, const arguments&) const
 {
 	std::ofstream file(filename.c_str(), std::ios_base::trunc);
 	for(int i=0; i<d->size(); ++i)
@@ -672,7 +672,7 @@ void rational_function::save_gnuplot(const std::string& filename, const data* d,
 	file.close();
 }
 
-void rational_function::save_call(std::ostream& out, const arguments& args) const
+void rational_function::save_call(std::ostream& out, const arguments&) const
 {
 	out << "#FUNC rational_function" << std::endl;
 	out << "#NP " << np << std::endl ;
