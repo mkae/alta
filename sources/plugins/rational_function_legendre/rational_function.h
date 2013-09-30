@@ -36,32 +36,46 @@ class rational_function_chebychev : public rational_function
 		rational_function_chebychev() ;
 		virtual ~rational_function_chebychev() ;
 
-        //! Update the y-1D function for the ith dimension.
-        //! \note It will test if the 1D function provided is of the dynamic type
-        //! \name rational_function_chebychev_1d
-        virtual void update(int i, rational_function_1d* r)
-        {
-            if(dynamic_cast<rational_function_chebychev_1d*>(r) != NULL)
-            {
-                rational_function::update(i, r);
-            }
-            else
-            {
+		//! Get the 1D function associated with color channel i. If no one exist, 
+		//! this function allocates a new element. If i > nY, it returns NULL.
+		virtual rational_function_1d* get(int i)
+		{
+			// Check for consistency in the index of color channel
+			if(i < _nY)
+			{
+				if(rs[i] == NULL)
+				{
+					rs[i] = new rational_function_chebychev_1d(np, nq);
+					rs[i]->setDimX(dimX());
+					rs[i]->setDimY(dimY());
+					rs[i]->setMin(getMin()) ;
+					rs[i]->setMax(getMax()) ;
+				}
+				return rs[i];
+			}
+			else
+			{
+				std::cout << "<<ERROR>> tried to access out of bound 1D RF" 
+				          << std::endl;
+				return NULL;
+			}
+		}
+
+		//! Update the y-1D function for the ith dimension.
+		//! \note It will test if the 1D function provided is of the dynamic type
+		//! \name rational_function_chebychev_1d
+		virtual void update(int i, rational_function_1d* r)
+		{
+			if(dynamic_cast<rational_function_chebychev_1d*>(r) != NULL)
+			{
+				rational_function::update(i, r);
+			}
+			else
+			{
 #ifdef DEBUG
-                std::cerr << "<<ERROR>> the function provided is not of type \"rational_function_chebychev\"" << std::endl;
+				std::cerr << "<<ERROR>> the function provided is not of type \"rational_function_chebychev\"" << std::endl;
 #endif
-            }
-        }
-
-    protected:  // methods
-
-        //! \brief Save the rational function to the rational format (see \ref formating).
-        virtual void save(const std::string& filename) const ;
-
-        //! \brief Output the rational function using a C++ function formating.
-        virtual void save_cpp(const std::string& filename, const arguments& args) const ;
-
-        //! \brief Output the rational function using a C++ function formating.
-        virtual void save_matlab(const std::string& filename, const arguments& args) const ;
+			}
+		}
 } ;
 
