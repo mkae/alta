@@ -151,7 +151,8 @@ void retro_schlick::save_body(std::ostream& out, const arguments& args) const
 		out << "\tvec3 K = normalize(L + R);" << std::endl;
 		out << "\treturn vec3(R + (1.0f - R) * pow(1.0f - clamp(dot(K,R), 0.0f, 1.0f), 5));" << std::endl;
 		out << "}" << std::endl;
-	}
+        out << std::endl;
+    }
 
 }
 

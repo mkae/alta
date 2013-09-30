@@ -151,7 +151,7 @@ void params::to_cartesian(const double* invec, params::input intype,
         }
 
 			// 6D Parametrization
-		case params::CARTESIAN:
+        case params::CARTESIAN:
 			memcpy(outvec, invec, 6*sizeof(double));
 			break;
 

@@ -88,6 +88,7 @@ void schlick::save_body(std::ostream& out, const arguments& args) const
         out << "\tvec3 H = normalize(L + V);" << std::endl;
         out << "\treturn R + (vec3(1.0) - R) * pow(1.0f - clamp(dot(H,V), 0.0f, 1.0f), 5);" << std::endl;
         out << "}" << std::endl;
+        out << std::endl;
     }
 
 }

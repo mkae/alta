@@ -82,7 +82,14 @@ int main(int argc, char** argv)
 			vec v = d->get(i) ;
 
             vec x(f->dimX());
-            params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+            if(d->input_parametrization() != params::UNKNOWN_INPUT)
+            {
+                params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+            }
+            else
+            {
+                memcpy(&x[0], &v[0], d->dimX()*sizeof(double));
+            }
 
             vec y2 = f->value(x) ;
 			if(!linear_plot)

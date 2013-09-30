@@ -62,12 +62,10 @@ void function::save(const std::string& filename, const arguments& args) const
     }
 
 	// Save common header
-	save_header(file, args);
-    file << std::endl;
+    save_header(file, args);
 
 	// Save function definition
-	save_body(file, args);
-    file << std::endl;
+    save_body(file, args);
 
     if(is_cpp)
     {

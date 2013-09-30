@@ -188,6 +188,7 @@ void retroblinn_function::save_body(std::ostream& out,
         out << "\tvec3 ext_dot = vec3(dot(K,N));" << std::endl;
         out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
         out << "}" << std::endl;
+        out << std::endl;
     }
 
 }

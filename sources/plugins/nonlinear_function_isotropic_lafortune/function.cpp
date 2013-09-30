@@ -446,5 +446,6 @@ void isotropic_lafortune_function::save_body(std::ostream& out, const arguments&
         out << "\tvec3 ext_dot = Cx * (dot(L,X)*dot(V,X) + dot(L,Y)*dot(V,Y)) + Cz * dot(L,N)*dot(V,N);" << std::endl;
         out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
         out << "}" << std::endl;
+        out << std::endl;
     }
 }

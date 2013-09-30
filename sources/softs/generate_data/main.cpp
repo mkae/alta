@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 
 	std::cout.precision(10);
 
-	int nbx = 10;
+	int nbx = 1000;
 	int nby = 10;
 	int nbz = 10;
 	if(args.is_defined("nbx"))
@@ -30,10 +30,10 @@ int main(int argc, char** argv)
 		//f << "#VS 2" << std::endl;
 		for(int i=0; i<nbx; ++i)
 		{
-			const float x  = 10.0 * i / (float)nbx ;
-			const float xp = (x - 9);
-			const float y  = 1000.0f * exp(- x*x) * x*x + 00.1 * exp(-100.0 * xp*xp)  *x*x*x + 0.1 ;
-			//const float y = (1.0) / (1.0E-10 + x);
+			const float x  = i / (float)nbx ;
+			//const float xp = (x - 9);
+			//const float y  = 1000.0f * exp(- x*x) * x*x + 00.1 * exp(-100.0 * xp*xp)  *x*x*x + 0.1 ;
+			const float y = (1.0) / (1.0E-10 + x);
 
 			f << x << "\t" << y << /*"\t" << y*0.9f << "\t" << y*1.1f <<*/ std::endl ;
 		}
