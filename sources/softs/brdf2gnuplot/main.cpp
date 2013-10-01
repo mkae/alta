@@ -80,18 +80,18 @@ int main(int argc, char** argv)
 		for(int i=0; i<d->size(); ++i)
 		{
 			vec v = d->get(i) ;
+         vec x(f->dimX());
 
-            vec x(f->dimX());
-            if(d->input_parametrization() != params::UNKNOWN_INPUT)
-            {
-                params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
-            }
-            else
-            {
-                memcpy(&x[0], &v[0], d->dimX()*sizeof(double));
-            }
+			if(f->input_parametrization() == params::UNKNOWN_INPUT)
+			{
+				memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
+			}
+			else
+			{
+            params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+			}
 
-            vec y2 = f->value(x) ;
+			vec y2 = f->value(x) ;
 			if(!linear_plot)
 			{
 				for(int u=0; u<d->dimX(); ++u)

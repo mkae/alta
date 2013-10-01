@@ -44,7 +44,7 @@ bool rational_fitter_eigen::fit_data(const data* dat, function* fit, const argum
 	r->setMax(d->max()) ;
 
 	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
-
+	r->setSize(_np, _nq);
 
 	QTime time ;
 	time.start() ;
@@ -81,8 +81,6 @@ bool rational_fitter_eigen::fit_data(const vertical_segment* d, int np, int nq, 
     for(int j=0; j<d->dimY(); ++j)
     {
         rational_function_1d* rs = r->get(j);
-        rs->resize(np, nq);
-
         if(!fit_data(d, np, nq, j, rs))
         {
             return false ;
