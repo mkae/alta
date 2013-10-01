@@ -4,8 +4,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QCoreApplication>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -15,10 +13,7 @@
 
 int main(int argc, char** argv)
 {
-	QCoreApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
-
-	plugins_manager manager(args) ;
 
 	if(args.is_defined("help")) 
 	{
@@ -38,14 +33,14 @@ int main(int argc, char** argv)
 	}
 
 	// Load a function file
-	function* f = manager.get_function(args["input"]) ;
+    function* f = plugins_manager::get_function(args["input"]) ;
 
 	// Load a data file
 	data* d = NULL ;
 	if(args.is_defined("data"))
 	{
 		std::cout << "<<INFO>> Using data \"" << args["data"] << "\"" << std::endl ;
-		d = manager.get_data() ;
+        d = plugins_manager::get_data() ;
 		d->load(args["data"]) ;
 	}
 

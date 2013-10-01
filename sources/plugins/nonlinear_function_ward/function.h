@@ -31,7 +31,8 @@ class ward_function : public nonlinear_function
 	public: // methods
 
 		ward_function()
-		{ 
+        {
+            isotropic = false;
 			setParametrization(params::CARTESIAN);
 			setDimX(6);
 		}
@@ -80,5 +81,8 @@ class ward_function : public nonlinear_function
 	private: // data
 
 		vec _ks, _ax, _ay; // Lobes data
+
+        //! Allows to set the lobe to be isotropic or not
+        bool isotropic;
 } ;
 

@@ -4,8 +4,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QApplication>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -16,10 +14,7 @@
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
-
-	plugins_manager manager(args) ;
 
 	if(args.is_defined("help")) {
 		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --loader loader.so" << std::endl ;
@@ -37,7 +32,7 @@ int main(int argc, char** argv)
 	}
 
 	data* d = NULL ;
-	d = manager.get_data(args["loader"]) ;
+    d = plugins_manager::get_data(args["loader"]) ;
 	d->load(args["input"]);
 
 	// Create output file

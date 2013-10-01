@@ -2,10 +2,6 @@
 #include <core/function.h>
 #include <core/plugins_manager.h>
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QTime>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -15,7 +11,6 @@
 
 int main(int argc, char** argv)
 {
-	QCoreApplication app(argc, argv);
 	arguments args(argc, argv) ;
 
 	if(! args.is_defined("input")) {

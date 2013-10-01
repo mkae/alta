@@ -4,10 +4,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QPluginLoader>
-#include <QtPlugin>
-#include <QCoreApplication>
-#include <QDir>
 #include <QTime>
 
 #include <iostream>
@@ -19,14 +15,12 @@
 
 int main(int argc, char** argv)
 {
-    QCoreApplication app(argc, argv);
     arguments args(argc, argv) ;
 
-    plugins_manager manager(args) ;
-    fitter* fit = manager.get_fitter(args["fitter"]) ;
+    fitter* fit = plugins_manager::get_fitter(args["fitter"]) ;
     if(fit == NULL)
     {
-        fit = manager.get_fitter() ;
+        fit = plugins_manager::get_fitter() ;
     }
 
     if(args.is_defined("available_params"))
@@ -87,15 +81,11 @@ int main(int argc, char** argv)
             std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
             std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
 
-            /*
-            std::stringstream append; // Append informations to the export
-            if(args.is_defined("export-append")) {
-                append << args["export-append"];
-            }
-            append << "#L2   " << L2   << std::endl;
-            append << "#LINF " << Linf ;
-            args.update("export-append", append.str());
-            */
+            // Export the L2 and Linf values to the command line
+            std::stringstream L2string, Linfstring;
+            L2string << L2; Linfstring << Linf;
+            args.update("L2",   L2string.str());
+            args.update("Linf", Linfstring.str());
 
             f->save(args["output"], args) ;
             return 0;

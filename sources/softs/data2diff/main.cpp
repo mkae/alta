@@ -5,8 +5,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QCoreApplication>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -17,10 +15,7 @@
 
 int main(int argc, char** argv)
 {
-	QCoreApplication app(argc, argv, false);
-	arguments args(argc, argv) ;
-
-	plugins_manager manager(args) ;
+    arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
 		std::cout << "<<HELP>> data2diff --input data.file --output gnuplot.file --data loader.so --param RUSIN_TH_PH_TD_PD --partial 0" << std::endl ;
@@ -49,7 +44,7 @@ int main(int argc, char** argv)
 
 	// Import data
 	data* d = NULL ;
-	d = manager.get_data(args["data"]) ;
+    d = plugins_manager::get_data(args["data"]) ;
 	d->load(args["input"]);
 
 	// Create output file
@@ -67,7 +62,7 @@ int main(int argc, char** argv)
 	}	
 
 	// Get the output data object
-	data* out_d = manager.get_data(args["data"]);
+    data* out_d = plugins_manager::get_data(args["data"]);
 
 	if(d != NULL)
 	{

@@ -5,8 +5,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QApplication>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -17,10 +15,7 @@
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv, false);
 	arguments args(argc, argv) ;
-
-	plugins_manager manager(args) ;
 
 	if(args.is_defined("help")) {
 		std::cout << "<<HELP>> brdf2data --input brdf.file --func importer.so --output data.file --data exporter.so" << std::endl ;
@@ -48,10 +43,10 @@ int main(int argc, char** argv)
 */
 	// Import data
 	data* d = NULL ;
-	d = manager.get_data(args["data"]) ;
+    d = plugins_manager::get_data(args["data"]) ;
 
 	function* f = NULL;
-    f = manager.get_function(args["input"]);
+    f = plugins_manager::get_function(args["input"]);
 
 	// Modify function or data to provide coherent
 	// interfaces

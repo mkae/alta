@@ -4,12 +4,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QPluginLoader>
-#include <QtPlugin>
-#include <QCoreApplication>
-#include <QDir>
-#include <QTime>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -28,10 +22,6 @@ int parametrization_tests();
 
 int main(int argc, char** argv)
 {
-	QCoreApplication app(argc, argv, false);
-	arguments args(argc, argv) ;
-
-	plugins_manager manager(args) ;
 
 	int nb_tests_failed = 0;
 

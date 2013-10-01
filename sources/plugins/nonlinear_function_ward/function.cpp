@@ -29,13 +29,17 @@ vec ward_function::value(const vec& x) const
 
 	for(int i=0; i<dimY(); ++i)
 	{
-		const double hx_ax = h[0]/_ax[i];
-		const double hy_ay = h[1]/_ay[i];
+        const double ax = _ax[i];
+        const double ay = _ay[i];
+
+        const double hx_ax = h[0]/ax;
+        const double hy_ay = h[1]/ay;
+
 		const double exponent = (hx_ax*hx_ax + hy_ay*hy_ay) / (h[2]*h[2]);
 
         if(x[2]*x[5] > 0.0)
         {
-            res[i] = (_ks[i] / (4.0 * M_PI * _ax[i] * _ay[i] * sqrt(x[2]*x[5]))) * std::exp(- exponent);
+            res[i] = (_ks[i] / (4.0 * M_PI * ax * ay * sqrt(x[2]*x[5]))) * std::exp(- exponent);
         }
         else
         {
@@ -71,7 +75,7 @@ vec ward_function::parameters() const
 	{
 		res[i*3 + 0] = _ks[i];
 		res[i*3 + 1] = _ax[i];
-		res[i*3 + 2] = _ay[i];
+        res[i*3 + 2] = _ay[i];
 	}
 	return res;
 }
@@ -97,7 +101,7 @@ void ward_function::setParameters(const vec& p)
 	{
 		_ks[i] = p[i*3 + 0];
 		_ax[i] = p[i*3 + 1];
-		_ay[i] = p[i*3 + 2];
+        _ay[i] = p[i*3 + 2];
 	}
 }
 
@@ -116,19 +120,22 @@ vec ward_function::parametersJacobian(const vec& x) const
 		 {
              if(i == j && x[2]*x[5]>0.0)
 			 {
-				 const double hx_ax = h[0]/_ax[i];
-				 const double hy_ay = h[1]/_ay[i];
+                 const double ax = _ax[i];
+                 const double ay = _ay[i];
+
+                 const double hx_ax = h[0]/ax;
+                 const double hy_ay = h[1]/ay;
 				 const double gauss = exp(-(hx_ax*hx_ax + hy_ay*hy_ay) / (h[2]*h[2]));
-				 const double fact  = 1.0 / (4.0*M_PI*_ax[i]*_ay[i]*sqrt(x[2]*x[5])); 
+                 const double fact  = 1.0 / (4.0*M_PI*ax*ay*sqrt(x[2]*x[5]));
 
 				 // df / dk_s
 				 jac[i*nbParameters() + j*3+0] = fact * gauss;
 
 				 // df / da_x
-				 jac[i*nbParameters() + j*3+1] = _ks[i] * fact * (1.0/_ax[i]) * (((2.0*h[0]*hx_ax) / h[2]) * gauss - 1);
+                 jac[i*nbParameters() + j*3+1] = _ks[i] * fact * (1.0/ax) * (((2.0*h[0]*hx_ax) / h[2]) * gauss - 1);
 
 				 // df / da_y
-				 jac[i*nbParameters() + j*3+2] = _ks[i] * fact * (1.0/_ay[i]) * (((2.0*h[1]*hy_ay) / h[2]) * gauss - 1);
+                 jac[i*nbParameters() + j*3+2] = _ks[i] * fact * (1.0/ay) * (((2.0*h[1]*hy_ay) / h[2]) * gauss - 1);
 			 }
 			 else
 			 {
@@ -150,6 +157,12 @@ void ward_function::bootstrap(const data* d, const arguments& args)
 		_ax[i] = 1.0;
 		_ay[i] = 1.0;
 	}
+
+    // Check if the fit should be done on an istropic lobe or not.
+    if(args.is_defined("isotropic"))
+    {
+        isotropic = true;
+    }
 }
 
 //! Load function specific files
@@ -199,7 +212,7 @@ void ward_function::save_call(std::ostream& out, const arguments& args) const
 		 {
 			 out << "Ks " << _ks[i] << std::endl;
 			 out << "ax " << _ax[i] << std::endl;
-			 out << "ay " << _ay[i] << std::endl;
+             out << "ay " << _ay[i] << std::endl;
 		 }
 	
 		 out << std::endl;
@@ -240,11 +253,10 @@ void ward_function::save_body(std::ostream& out, const arguments& args) const
     {
         out << "vec3 ward(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 ks, vec3 ax, vec3 ay)" << std::endl;
         out << "{" << std::endl;
-
-		  out << "\tvec3  H   = normalize(L + V);" << std::endl;
-		  out << "\tvec3  hax = dot(H,X) / ax;" << std::endl;
-		  out << "\tvec3  hay = dot(H,Y) / ay;" << std::endl;
-		  out << "\tfloat hn  = dot(H,N);" << std::endl;
+        out << "\tvec3  H   = normalize(L + V);" << std::endl;
+        out << "\tvec3  hax = dot(H,X) / ax;" << std::endl;
+        out << "\tvec3  hay = dot(H,Y) / ay;" << std::endl;
+        out << "\tfloat hn  = dot(H,N);" << std::endl;
         out << "\treturn (ks / (4 * " << M_PI << " * ax*ay * sqrt(dot(L,N)*dot(V,N)))) * exp(-(hax*hax + hay*hay)/(hn*hn));" << std::endl;
         out << "}" << std::endl;
     }
