@@ -76,6 +76,11 @@ def libName(name):
 
 #end
 
+##Directory delimiter
+dd = '/'
+if os.name == 'nt':
+	dd = '\\'
+
 ## Relative directories
 lib_dir = ''
 dat_dir = ''
@@ -108,7 +113,7 @@ def parseFunction(xmlNode):
 	global lib_dir
 
 	cmd = ''
-	cmd += lib_dir + '/' + libName(xmlNode.attrib['name'])
+	cmd += lib_dir + dd + libName(xmlNode.attrib['name'])
 
 	# Parse the parameters of the function
 	for param in xmlNode.findall('parameter'):
@@ -117,7 +122,7 @@ def parseFunction(xmlNode):
 
 	fresnel = xmlNode.find('fresnel')
 	if not (fresnel is None):
-		cmd += ' --fresnel ' + lib_dir + '/' + libName(fresnel.attrib['name'])
+		cmd += ' --fresnel ' + lib_dir + dd + libName(fresnel.attrib['name'])
 	#end
 
 	return cmd
@@ -162,7 +167,7 @@ def parseAction(xmlNode):
 
 	for plugin in xmlNode.findall('plugin'):
 		cmd += ' --' + plugin.attrib['type']
-		cmd += ' ' + lib_dir + '/' + libName(plugin.attrib['name'])
+		cmd += ' ' + lib_dir + dd + libName(plugin.attrib['name'])
 	#end
 
 	for param in xmlNode.findall('parameter'):
@@ -190,7 +195,7 @@ else:
 for child in root.findall('action'):
 
 	# Create the cmd string with the command name
-	cmd = lib_dir + '/' + child.attrib['name']
+	cmd = lib_dir + dd + child.attrib['name']
 
 	# Parse the action
 	cmd += parseAction(child)
