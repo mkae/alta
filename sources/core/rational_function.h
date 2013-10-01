@@ -13,14 +13,16 @@
 #include "common.h"
 
 
+/*! \brief A one dimensional rational function class. A rational function has
+ *  the form \f$r(x) = \dfrac{\sum_{i} a_i p_i(x)}{b_i q_i(x)}$\f.
+ */
 class rational_function_1d : public function
 {
 	public: // methods
 
 		rational_function_1d() ;
 		rational_function_1d(int np, int nq) ;
-		rational_function_1d(const vec& a,
-		                     const vec& b) ;
+        rational_function_1d(const vec& a, const vec& b) ;
 		virtual ~rational_function_1d() {}
 
 		// Overload the function operator

@@ -33,8 +33,11 @@ void rational_function_1d::update(const vec& in_a,
 {
 	a.resize(in_a.size()) ;
 	b.resize(in_b.size()) ;
-	a = in_a ;
-	b = in_b ;
+
+    const double b0 = in_b[0];
+
+    for(int i=0; i<a.size(); ++i) { a[i] = in_a[i] / b0; }
+    for(int i=0; i<b.size(); ++i) { b[i] = in_b[i] / b0; }
 }
 
 void rational_function_1d::resize(int np, int nq)

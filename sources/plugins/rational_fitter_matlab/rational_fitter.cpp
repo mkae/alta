@@ -123,11 +123,11 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 	// Size of the problem
 	int N = np+nq ;
 	int M = d->size() ;
-	
+/*
 	// Get the maximum value in data to scale the input parameter space
 	// so that it reduces the values of the polynomial
 	vec dmax = d->max() ;
-	
+*/
 	// Matrices of the problem
 	Eigen::MatrixXd G (N, N) ;
 	Eigen::VectorXd g (N) ;
