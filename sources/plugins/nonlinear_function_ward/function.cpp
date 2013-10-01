@@ -32,7 +32,15 @@ vec ward_function::value(const vec& x) const
 		const double hx_ax = h[0]/_ax[i];
 		const double hy_ay = h[1]/_ay[i];
 		const double exponent = (hx_ax*hx_ax + hy_ay*hy_ay) / (h[2]*h[2]);
-		res[i] = (_ks[i] / (4.0 * M_PI * _ax[i] * _ay[i] * sqrt(x[2]*x[5]))) * std::exp(- exponent);
+
+        if(x[2]*x[5] > 0.0)
+        {
+            res[i] = (_ks[i] / (4.0 * M_PI * _ax[i] * _ay[i] * sqrt(x[2]*x[5]))) * std::exp(- exponent);
+        }
+        else
+        {
+            res[i] = 0.0;
+        }
 	}
 
 	return res;
@@ -106,7 +114,7 @@ vec ward_function::parametersJacobian(const vec& x) const
 	 {
 		 for(int j=0; j<dimY(); ++j)
 		 {
-			 if(i == j)
+             if(i == j && x[2]*x[5]>0.0)
 			 {
 				 const double hx_ax = h[0]/_ax[i];
 				 const double hy_ay = h[1]/_ay[i];
