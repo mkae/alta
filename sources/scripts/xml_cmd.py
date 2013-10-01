@@ -8,9 +8,45 @@ files. The documentation of the XML format can be found in the Format
 page.
 """
 
+import sys
 from sys import argv
 from xml.etree.ElementTree import parse
 import os
+
+
+""" Color capable outputing
+"""
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+
+#following from Python cookbook, #475186
+def has_colours(stream):
+	if not hasattr(stream, "isatty"):
+		return False
+	if not stream.isatty():
+		return False # auto color only on TTYs
+	try:
+		import curses
+
+		curses.setupterm()
+		return curses.tigetnum("colors") > 2
+	except:
+		# guess false in case of error
+		return False
+
+
+has_colours = has_colours(sys.stdout)
+
+
+def printout(text, colour=WHITE):
+	if has_colours:
+		seq = "\x1b[1;%dm" % (30 + colour) + text + "\x1b[0m"
+		sys.stdout.write(seq)
+	else:
+		sys.stdout.write(text)
+	sys.stdout.flush()
+
+
+
 
 
 # Test if file argv[1] exists
@@ -36,7 +72,7 @@ def libName(name):
 		return 'lib' + name + '.so'
 	elif os.name == 'nt':
 		return name + ".dll"
-		#endif
+	#endif
 
 #end
 
@@ -64,7 +100,8 @@ def parseConfiguration(xmlNode):
 			dat_dir = param.attrib["value"]
 
 		#end
-	#end
+		#end
+
 #end
 
 def parseFunction(xmlNode):
@@ -104,6 +141,7 @@ def parseFunctions(xmlNodes):
 		cmd += ']'
 		return cmd
 	#end
+
 #end
 
 def parseAction(xmlNode):
@@ -133,6 +171,7 @@ def parseAction(xmlNode):
 	#end
 
 	return cmd
+
 #end
 
 
@@ -156,9 +195,12 @@ for child in root.findall('action'):
 	# Parse the action
 	cmd += parseAction(child)
 
-	print '\n' + cmd
+	printout(cmd, GREEN)
+	print
+
 	ret = os.system(cmd)
 	if ret != 0:
-		print '<<PYTHON>> the action was not performed'
+		printout('<<PYTHON>> the action was not performed', RED)
 	#end
+	print '\n'
 #end

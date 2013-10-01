@@ -192,24 +192,6 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 
 }
 
-double legendre(double x, int i)
-{
-	if(i == 0)
-	{
-		return 1;
-	}
-	else if(i == 1)
-	{
-		return x;
-	}
-	else
-	{
-		return ((2*i-1)*x*legendre(x, i-1) - (i-1)*legendre(x, i-2)) / (double)i ;
-	}
-}
-
-//#define POLYNOMIALS
-
 // Get the p_i and q_j function
 double rational_function_1d::p(const vec& x, int i) const
 {
@@ -217,12 +199,8 @@ double rational_function_1d::p(const vec& x, int i) const
 	double res = 1.0;
 	for(int k=0; k<dimX(); ++k)
 	{
-#ifdef POLYNOMIALS
-		res *= pow(x[k], deg[k]) ;
-//		res *= pow(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]) ;
-#else
-		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
-#endif
+//		res *= pow(x[k], deg[k]) ;
+        res *= pow(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]) ;
 	}
 
 	return res ;
