@@ -1,7 +1,6 @@
 TARGET          = nonlinear_fitter_nlopt
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
+CONFIG         *= plugin  \
 						nlopt   \
 						eigen
 

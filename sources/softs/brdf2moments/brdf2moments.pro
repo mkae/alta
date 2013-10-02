@@ -1,5 +1,4 @@
 CONFIG         += console \
-                  qt      \
 						eigen
 
 INCLUDEPATH    += ../../

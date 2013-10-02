@@ -130,10 +130,10 @@ void timer::print(std::ostream& out) const
     unsigned int sec  = tsec % 60 ;
     unsigned int min  = (tsec / 60) % 60 ;
     unsigned int hour = (tsec / 360) ;
-    out << hour << "h " << min << "m " << sec << "s" << std::endl ;
+    out << hour << "h " << min << "m " << sec << "s" ;
 }
 
-std::ostream& operator<<(const timer& t, std::ostream& out)
+std::ostream& operator<<(std::ostream& out, const timer& t)
 {
     t.print(out);
     return out;

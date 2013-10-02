@@ -1,7 +1,6 @@
 TARGET          = rational_fitter_matlab
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
+CONFIG         *= plugin  \
 						eigen   \
 						matlab  
 

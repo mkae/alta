@@ -320,7 +320,7 @@ class timer
         void print(std::ostream& out) const;
 
         //! \brief ostream compliant operator
-        friend std::ostream& operator<<(const timer& t, std::ostream& out);
+        friend std::ostream& operator<<(std::ostream& out, const timer& t);
 
     private:
 

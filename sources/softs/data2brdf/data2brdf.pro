@@ -1,5 +1,4 @@
-CONFIG         += qt      \
-                  console \
+CONFIG         += console \
 						eigen
 
 DESTDIR         = ../../build

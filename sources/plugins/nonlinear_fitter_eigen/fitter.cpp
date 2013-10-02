@@ -11,8 +11,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include <QTime>
-
 #include <core/common.h>
 
 ALTA_DLL_EXPORT fitter* provide_fitter()

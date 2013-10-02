@@ -1,4 +1,4 @@
-CONFIG         += qt	eigen
+CONFIG         += eigen
 
 INCLUDEPATH    += ../../
 DESTDIR         = ../../build

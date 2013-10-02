@@ -10,8 +10,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include <QTime>
-
 #include <core/common.h>
 
 ALTA_DLL_EXPORT fitter* provide_fitter()
@@ -57,18 +55,15 @@ bool rational_fitter_leastsquare::fit_data(const data* dat, function* fit, const
 	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
 
 
-	QTime time ;
+    timer time ;
 	time.start() ;
 
 
 	if(fit_data(d, _np, _nq, r))
 	{
-		int msec = time.elapsed() ;
-		int sec  = (msec / 1000) % 60 ;
-		int min  = (msec / 60000) % 60 ;
-		int hour = (msec / 3600000) ;
+        time.stop();
 		std::cout << "<<INFO>> got a fit" << std::endl ;
-		std::cout << "<<INFO>> it took " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+        std::cout << "<<INFO>> it took " << time << std::endl ;
 		return true ;
 	}
 

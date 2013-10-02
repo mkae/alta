@@ -1,7 +1,6 @@
 TARGET          = rational_fitter_quadprog
 TEMPLATE        = lib
-CONFIG         *= qt         \
-                  plugin     \
+CONFIG         *= plugin     \
 						eigen      \
 						quadprog 
 

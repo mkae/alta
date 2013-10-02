@@ -1,7 +1,6 @@
 TARGET          = nonlinear_fitter_ceres
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
+CONFIG         *= plugin  \
 						ceres   \
                   eigen
 

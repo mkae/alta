@@ -1,7 +1,6 @@
 TARGET          = rational_fitter_eigen
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
+CONFIG         *= plugin  \
                   eigen
 
 DESTDIR         = ../../build

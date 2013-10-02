@@ -4,8 +4,6 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-#include <QTime>
-
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -58,23 +56,19 @@ int main(int argc, char** argv)
 
 
         // Start a timer
-        QTime time ;
+        timer time ;
         time.start() ;
 
         // Fit the data
         bool is_fitted = fit->fit_data(d, f, args) ;
 
         // Get the fitting duration
-        int msec = time.elapsed() ;
-        int sec  = (msec / 1000) % 60 ;
-        int min  = (msec / 60000) % 60 ;
-        int hour = (msec / 3600000) ;
-
+        time.stop();
 
         // Display the result
         if(is_fitted)
         {
-            std::cout << "<<INFO>> total time: " << hour << "h " << min << "m " << sec << "s" << std::endl ;
+            std::cout << "<<INFO>> total time: " << time << std::endl ;
 
             double L2   = f->L2_distance(d);
             double Linf = f->Linf_distance(d);

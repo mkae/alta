@@ -1,7 +1,6 @@
 TARGET          = nonlinear_fitter_ipopt
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
+CONFIG         *= plugin  \
 						ipopt   \
                   eigen
 
