@@ -293,3 +293,42 @@ template<typename T> bool isnan(T x)
 #else
 #define ALTA_DLL_EXPORT extern "C"
 #endif
+
+/*! \brief The timer class: a cross plateform timing solution
+ */
+class timer
+{
+    public:
+
+        //! \brief Constructor
+        timer();
+
+        //! \brief Start the timer
+        void start();
+
+        //! \brief Stop the timer
+        void stop();
+
+        //! \brief Reset the timer
+        void reset();
+
+        //! \brief Compute the time taken since the start, accounting for
+        //! all pauses.
+        int elapsed() const;
+
+        //! \brief Print the time to the standard output
+        void print(std::ostream& out) const;
+
+        //! \brief ostream compliant operator
+        friend std::ostream& operator<<(const timer& t, std::ostream& out);
+
+    private:
+
+        //! \brief get the current time in seconds. This is a system dependant
+        //! function.
+        //! \internal
+        unsigned int current_time() const;
+
+        unsigned int _start, _stop;
+        unsigned int _elapsed;
+};

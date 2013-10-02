@@ -87,3 +87,67 @@ std::ostream& operator<<(std::ostream& out, const vec& v)
     return out;
 }
 
+
+
+
+
+
+
+
+/* ---- Timer implementation ---- */
+
+timer::timer()
+{
+    reset();
+}
+
+void timer::start()
+{
+    _elapsed += _stop-_start;
+    _start = current_time();
+}
+
+void timer::stop()
+{
+    _stop = current_time();
+}
+
+void timer::reset()
+{
+    _elapsed = 0;
+    _start   = 0;
+    _stop    = 0;
+}
+
+int timer::elapsed() const
+{
+    return _elapsed;
+}
+
+void timer::print(std::ostream& out) const
+{
+    unsigned int tsec = elapsed() ;
+    unsigned int sec  = tsec % 60 ;
+    unsigned int min  = (tsec / 60) % 60 ;
+    unsigned int hour = (tsec / 360) ;
+    out << hour << "h " << min << "m " << sec << "s" << std::endl ;
+}
+
+std::ostream& operator<<(const timer& t, std::ostream& out)
+{
+    t.print(out);
+    return out;
+}
+
+unsigned int timer::current_time() const
+{
+#ifdef WIN32
+    timeBeginPeriod(1);
+    unsigned long res = timeGetTime();
+    return dynamic_cast<unsigned int>(res / 1000);
+#else
+    struct timespec res;
+    clock_gettime(CLOCK_MONOTONIC, &res);
+    return static_cast<unsigned int>(res.tv_sec);
+#endif
+}
