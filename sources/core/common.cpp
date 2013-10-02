@@ -1,5 +1,15 @@
 #include "common.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <winbase.h>
+#else
+#include <sys/times.h>
+#include <sys/types.h>
+#include <limits.h>
+#include <unistd.h>
+#endif
+
 double norm(const vec& a)
 {
 	double norm = 0.0 ;
@@ -142,9 +152,9 @@ std::ostream& operator<<(std::ostream& out, const timer& t)
 unsigned int timer::current_time() const
 {
 #ifdef WIN32
-    timeBeginPeriod(1);
-    unsigned long res = timeGetTime();
-    return dynamic_cast<unsigned int>(res / 1000);
+	SYSTEMTIME res;
+	GetSystemTime(&res);
+	return (unsigned int)(res.wSecond + res.wMinute*60 + res.wHour*360);
 #else
     struct timespec res;
     clock_gettime(CLOCK_MONOTONIC, &res);

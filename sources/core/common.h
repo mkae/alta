@@ -7,16 +7,6 @@
 #include <cstring>
 #include <algorithm>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <mmsystem.h>
-#else
-#include <sys/times.h>
-#include <sys/types.h>
-#include <limits.h>
-#include <unistd.h>
-#endif
-
 #ifdef OLD
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core
