@@ -34,7 +34,7 @@ void rational_function_1d::update(const vec& in_a,
 	a.resize(in_a.size()) ;
 	b.resize(in_b.size()) ;
 
-    const double b0 = in_b[0];
+    const double b0 = 1.0;//in_b[0];
 
     for(int i=0; i<a.size(); ++i) { a[i] = in_a[i] / b0; }
     for(int i=0; i<b.size(); ++i) { b[i] = in_b[i] / b0; }
@@ -201,9 +201,9 @@ double rational_function_1d::p(const vec& x, int i) const
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0;
 	for(int k=0; k<dimX(); ++k)
-	{
-//		res *= pow(x[k], deg[k]) ;
+    {
         res *= pow(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]) ;
+        //res *= pow(x[k], deg[k]) ;
 	}
 
 	return res ;
@@ -388,19 +388,6 @@ void rational_function::load(std::istream& in)
 	for(int k=0; k<dimX(); ++k) {in >> max[k]; }
 	setMax(max);
 
-
-	// Check for the polynomial basis type
-	in >> token;
-   if(token.compare("#BASIS") != 0) 
-	{
-		std::cerr << "<<ERROR>> the file is not specifying the polynomial basis." << std::endl; 
-	}
-	in >> token;
-   if(token.compare("LEGENDRE") != 0) 
-	{
-		std::cerr << "<<ERROR>> the basis is different than LEGENDRE." << std::endl; 
-	}
-
 	vec a(_np), b(_nq);
 	for(int i=0; i<_nY; ++i)
 	{
@@ -432,7 +419,6 @@ void rational_function::save_call(std::ostream& out, const arguments&) const
 	out << "#NQ " << nq << std::endl ;
 	out << "#MIN "; for(int k=0; k<_nX; ++k) { out << _min[k] << " "; } out << std::endl;
 	out << "#MAX "; for(int k=0; k<_nX; ++k) { out << _max[k] << " "; } out << std::endl; 
-	out << "#BASIS LEGENDRE" << std::endl ;
 
 	for(int k=0; k<_nY; ++k)
 	{

@@ -13,6 +13,9 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
+//#define USE_MATLAB
+#define DEBUG
+
 class rational_fitter_matlab : public fitter
 {
 	public: // methods
@@ -42,5 +45,8 @@ class rational_fitter_matlab : public fitter
 		int _max_np, _max_nq ;
 		int _min_np, _min_nq ;
 		Engine *ep;
+
+        // Decide which quadratic solver to use. Matlab's or the QPAS solver
+        bool _use_matlab;
 } ;
 

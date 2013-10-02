@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 
 	std::cout.precision(10);
 
-	int nbx = 1000;
+    int nbx = 1000;
 	int nby = 10;
 	int nbz = 10;
 	if(args.is_defined("nbx"))
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	{
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN UNKNOWN" << std::endl;
-		//f << "#VS 2" << std::endl;
+        f << "#VS 2" << std::endl;
 		for(int i=0; i<nbx; ++i)
 		{
 			const float x  = i / (float)nbx ;
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 			//const float y  = 1000.0f * exp(- x*x) * x*x + 00.1 * exp(-100.0 * xp*xp)  *x*x*x + 0.1 ;
 			const float y = (1.0) / (1.0E-10 + x);
 
-			f << x << "\t" << y << /*"\t" << y*0.9f << "\t" << y*1.1f <<*/ std::endl ;
+            f << x << "\t" << y << "\t" << y*0.9f << "\t" << y*1.1f << std::endl ;
 		}
 	}
 	else if(k == K++)
@@ -43,13 +43,14 @@ int main(int argc, char** argv)
 		std::cout << "<<INFO>> output 1.0E4 x^2 e^{- x^2) + 0.1 x^3 e^{-100.0 (x - 9.0)^2} + 0.1" << std::endl;
 		f << "#DIM 1 1" << std::endl ;
 		f << "#PARAM_IN UNKNOWN" << std::endl;
+        f << "#VS 2" << std::endl;
 		for(int i=0; i<nbx; ++i)
 		{
 			const float x = 10.0 * i / (float)nbx ;
 			const float xp = (x - 9);
 			const float y  = 1000.0f * exp(- x*x) * x*x + 00.1 * exp(-100.0 * xp*xp)  *x*x*x + 0.1 ;
 
-			f << x << "\t" << y << std::endl ;
+            f << x << "\t" << y << "\t" << y*(0.9) << "\t" << y*(1.1)<< std::endl ;
 		}
 	}
 	else if(k == K++)

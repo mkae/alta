@@ -100,26 +100,29 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 		for(int i=0; i<dimY(); ++i)
 			linestream >> v[dimX() + i] ;
 
-		for(int i=0; i<dimY(); ++i)
+        // Check if the data containt a vertical segment around the mean
+        // value.
+        for(int i=0; i<dimY(); ++i)
         {
             double min_dt = 0.0;
             double max_dt = 0.0;
 
-			if(vs[i] == 2) 
-			{
+
+            if(vs[i] == 2)
+            {
                 linestream >> min_dt ;
                 linestream >> max_dt ;
                 min_dt = min_dt-v[dimX()+i];
                 max_dt = max_dt-v[dimX()+i];
-			} 
-			else if(vs[i] == 1)
-			{
-				double dt ;
-				linestream >> dt ;
+            }
+            else if(vs[i] == 1)
+            {
+                double dt ;
+                linestream >> dt ;
                 min_dt = -dt;
                 max_dt =  dt;
-			}
-			else 
+            }
+            else
             {
                 double dt = args.get_float("dt", 0.1f);
                 min_dt = -dt;
@@ -127,16 +130,16 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
             }
 
             if(args.is_defined("dt-relative"))
-               {
-                    v[dimX() + dimY()+i] = v[dimX() + i] * (1.0 + min_dt) ;
-                    v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
-                }
-                else
-                {
-                    v[dimX() + dimY()+i] = v[dimX() + i] + min_dt ;
-                    v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
-                }
-		}
+            {
+                v[dimX() + dimY()+i]   = v[dimX() + i] * (1.0 + min_dt) ;
+                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
+            }
+            else
+            {
+                v[dimX() + dimY()+i]   = v[dimX() + i] + min_dt ;
+                v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
+            }
+        }
 
 		// If data is not in the interval of fit
 		bool is_in = true ;

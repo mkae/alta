@@ -74,7 +74,7 @@ class rational_function_1d : public function
 
 		// Store the coefficients for the moment, I assume
 		// the functions to be polynomials.
-		vec a, b ;
+        vec a, b ;
 } ;
 
 #ifdef TODO

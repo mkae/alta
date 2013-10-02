@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 			{
 				if(plot_error)
 				{
-					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+                    file << (v[d->dimX() + u] - y2[u]) << "\t" ;
 				}
 				else if(linear_plot)
 				{

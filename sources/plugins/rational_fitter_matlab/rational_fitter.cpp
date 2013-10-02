@@ -20,7 +20,11 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 rational_fitter_matlab::rational_fitter_matlab() 
 {
 	// Create matlab engine
-	if (!(ep = engOpen(""))) 
+#ifdef WIN32
+    if (!(ep = engOpen(NULL)))
+#else
+    if (!(ep = engOpen("matlab -nosplash")))
+#endif
 	{
 		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
 	}
@@ -89,6 +93,8 @@ void rational_fitter_matlab::set_parameters(const arguments& args)
 	_max_nq = args.get_float("nq", 10) ;
 	_min_np = args.get_float("min-np", _max_np) ;
 	_min_nq = args.get_float("min-nq", _max_nq) ;	
+
+    _use_matlab = !args.is_defined("use-qpas");
 }
 		
 bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq, rational_function* r) 
@@ -207,7 +213,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 
 	if(std::isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
-#ifdef DEBUG
+#ifdef DEBUG_MATRICES
 		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
 #endif
 		return false ;
@@ -217,7 +223,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		delta = 1.0 ;
 	}
 
-#ifdef DEBUG
+#ifdef DEBUG_MATRICES
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	
@@ -226,7 +232,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		ci(i) = ci(i) * delta ; 
 	}
 	
-#ifdef DEBUG
+#ifdef DEBUG_MATRICES
 	std::cout << "CI = " << CI << std::endl << std::endl ;
 #endif
 
@@ -253,7 +259,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 	char* output = new char[BUFFER_SIZE+1];
 	output[BUFFER_SIZE] = '\0';
 	engOutputBuffer(ep, output, BUFFER_SIZE) ;
-#ifdef DEBUG
+#ifdef DEBUG_MATRICES
 	engEvalString(ep, "display(H)");
 	std::cout << output << std::endl ;
 	engEvalString(ep, "display(f)");
@@ -264,21 +270,27 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 	std::cout << output << std::endl ;
 #endif
 
-#ifdef USE_MATLAB
-	engEvalString(ep, "[x, fval, flag] = quadprog(H,f,A,b);");
+    // Use Matlab quadratic programming solver
+    if(_use_matlab)
+    {
+        engEvalString(ep, "options = optimset('Algorithm', 'interior-point-convex')");
+        engEvalString(ep, "[x, fval, flag] = quadprog(H, f, A, b, [], [], [], [], [], options);");
 #ifdef DEBUG
-	std::cout << output << std::endl ;
+        std::cout << output << std::endl ;
 #endif
-#else
-    engEvalString(ep, "cd matlab;");
-    engEvalString(ep, "[x, err] = qpas(H,f,A,b);");
+    }
+    else // Use QPAS solver
+    {
+        engEvalString(ep, "cd matlab;");
+        engEvalString(ep, "[x, err] = qpas(H,f,A,b);");
 #ifdef DEBUG
-	std::cout << output << std::endl ;
+        std::cout << output << std::endl ;
 #endif
-    engEvalString(ep, "flag = err == 0.0;");
-    engEvalString(ep, "cd ..;");
-#endif
-#ifdef DEBUG
+        engEvalString(ep, "flag = err == 0.0;");
+        engEvalString(ep, "cd ..;");
+    }
+
+#ifdef DEBUG_MATRICES
 	engEvalString(ep, "display(x)");
 	std::cout << output << std::endl ;
 	engEvalString(ep, "display(flag)");
@@ -307,26 +319,24 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 				return false ;
 			}
 
-			double  total = 0.0;
 			double* val = (double*)mxGetData(x) ;
 			vec a(np), b(nq);
 			for(int i=0; i<N; ++i)
 			{
-				total += val[i]*val[i] ;
 				if(i < np)
 				{
-					a[i] =val[i] ;
+                    a[i] = val[i] ;
 				}
 				else
 				{
-					b[i] = val[i] ;
+                    b[i-np] = val[i] ;
 				}
 			}
 			r->update(a, b) ;
 
 			mxDestroyArray(x);
 			mxDestroyArray(flag);
-			return total > 0.0 ;
+            return true ;
 		}
 		else
 		{
