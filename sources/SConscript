@@ -1,0 +1,3 @@
+SConscript('core/SConscript')
+#SConscript('plugins/SConscript')
+#SConscript('softs/SConscript')

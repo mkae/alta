@@ -1,0 +1,13 @@
+env = Environment()
+env.Append(CPPPATH = '/home/belcour/Sources/eigen')
+
+# Library sources
+sources = ['common.cpp', 
+           'function.cpp', 
+           'params.cpp', 
+           'plugins_manager.cpp', 
+           'rational_function.cpp', 
+           'vertical_segment.cpp']
+
+
+env.StaticLibrary('../build/core', sources)
