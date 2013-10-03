@@ -7,7 +7,8 @@ CONFIG  -= qt
 DESTDIR  = ../build
 
 unix{
-	QMAKE_CXXFLAGS += -std=c++0x -Wall -pedantic
+#	QMAKE_CXXFLAGS += -std=c++0x
+	QMAKE_CXXFLAGS += -Wall -pedantic
 	LIBS += -ldl
 }
 
