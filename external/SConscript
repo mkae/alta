@@ -1,1 +1,3 @@
 env = Environment()
+
+execfile('obtain_ceres.py')
