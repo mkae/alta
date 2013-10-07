@@ -166,7 +166,7 @@ void ward_function::bootstrap(const data* d, const arguments& args)
 }
 
 //! Load function specific files
-void ward_function::load(std::istream& in)
+bool ward_function::load(std::istream& in)
 {
 	// Parse line until the next comment
 	while(in.peek() != '#')
@@ -181,12 +181,14 @@ void ward_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+        return false;
 	}
 
 	in >> token;
    if(token.compare("nonlinear_function_ward") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+        return false;
 	}
 
 	// Parse the lobe
@@ -197,6 +199,7 @@ void ward_function::load(std::istream& in)
 		in >> token >> _ax[i];
 		in >> token >> _ay[i];
 	}
+    return true;
 }
 
 

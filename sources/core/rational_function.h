@@ -38,7 +38,7 @@ class rational_function_1d : public function
 		virtual double q(const vec& x, int j) const ;
 
 		// IO function to text files
-		virtual void load(std::istream& in);
+		virtual bool load(std::istream& in);
 
 		// Update the function
 		virtual void update(const vec& in_a, 
@@ -100,7 +100,7 @@ template<class T> class rational_function_t : public function
 		virtual vec operator()(const vec& x) const { return value(x) ; }
 
 		// IO function to text files
-		virtual void load(std::istream& in) 
+		virtual bool load(std::istream& in) 
 		{
 
 			// Parse line until the next comment
@@ -116,12 +116,14 @@ template<class T> class rational_function_t : public function
 			if(token.compare("#FUNC") != 0) 
 			{ 
 				std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+				return false;
 			}
 
 			in >> token;
 			if(token.compare("rational_function") != 0) 
 			{
 				std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+				return false;
 			}
 
 			int _np, _nq;
@@ -138,6 +140,7 @@ template<class T> class rational_function_t : public function
 			if(token.compare("#MIN") != 0) 
 			{
 				std::cerr << "<<ERROR>> the min value for the input space is not defined." << std::endl; 
+				return false;
 			}
 			for(int k=0; k<dimX(); ++k) {in >> min[k];}
 			setMin(min);
@@ -146,6 +149,7 @@ template<class T> class rational_function_t : public function
 			if(token.compare("#MAX") != 0) 
 			{
 				std::cerr << "<<ERROR>> the max value for the input space is not defined." << std::endl; 
+				return false;
 			}
 			for(int k=0; k<dimX(); ++k) {in >> max[k]; }
 			setMax(max);
@@ -156,6 +160,7 @@ template<class T> class rational_function_t : public function
 			if(token.compare("#BASIS") != 0) 
 			{
 				std::cerr << "<<ERROR>> the file is not specifying the polynomial basis." << std::endl; 
+				return false;
 			}
 			in >> token;
 			if(token.compare("LEGENDRE") != 0) 
@@ -184,6 +189,7 @@ template<class T> class rational_function_t : public function
 				// Update the i_th color channel
 				get(i)->update(a, b);
 			}
+			return true;
 		}
 
 #ifdef OLD
@@ -363,7 +369,7 @@ class rational_function : public function
 		virtual vec operator()(const vec& x) const { return value(x) ; }
 
 		// IO function to text files
-		virtual void load(std::istream& in) ;
+		virtual bool load(std::istream& in) ;
 
 		// Update the function
 		virtual void update(int i, rational_function_1d* r) ;

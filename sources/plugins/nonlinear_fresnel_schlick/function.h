@@ -18,7 +18,7 @@ class schlick : public fresnel
 	public: // methods
 
 		//! \brief Load function specific files
-		virtual void load(std::istream& in) ;
+        virtual bool load(std::istream& in) ;
 
 		virtual void save_call(std::ostream& out, const arguments& args) const;
 		virtual void save_body(std::ostream& out, const arguments& args) const;

@@ -42,7 +42,7 @@ class ward_function : public nonlinear_function
 		virtual vec value(const vec& x) const ;
 
 		//! \brief Load function specific files
-		virtual void load(std::istream& in) ;
+        virtual bool load(std::istream& in) ;
 
 		//! \brief Export function
 		virtual void save_call(std::ostream& out, const arguments& args) const;

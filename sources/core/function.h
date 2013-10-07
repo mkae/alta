@@ -31,7 +31,7 @@ class function : public parametrized
 		virtual vec value(const vec& x) const = 0 ;
 
 		//! Load function specific files
-		virtual void load(std::istream& in) = 0 ;
+		virtual bool load(std::istream& in) = 0 ;
 
 		//! \brief Provide a first rough fit of the function. 
 		//!
@@ -172,7 +172,7 @@ class nonlinear_function: public function
 		virtual vec parametersJacobian(const vec& x) const = 0;
 
 		//! \brief default non_linear import. Parse the parameters in order.
-		virtual void load(std::istream& in)
+		virtual bool load(std::istream& in)
 		{
 			// Parse line until the next comment
 			while(in.peek() != '#')
@@ -190,6 +190,7 @@ class nonlinear_function: public function
 #ifdef DEBUG
 				std::cout << "<<DEBUG>> got: \"" << token << "\"" << std::endl;
 #endif
+				return false;
 			}
 
 			in >> token;
@@ -197,6 +198,7 @@ class nonlinear_function: public function
 			{
 				std::cerr << "<<ERROR>> parsing the stream. A function name is defined." << std::endl;
 				std::cerr << "<<ERROR>> did you forget to specify the plugin used to export?" << std::endl;
+				return false;
 			}
 
 			int nb_params = nbParameters();
@@ -207,6 +209,7 @@ class nonlinear_function: public function
 			}
 
 			setParameters(p);
+			return true;
 		}
 
 		//! \brief default non_linear export. It will dump the parameters in 
@@ -312,12 +315,22 @@ class compound_function: public nonlinear_function
 		}
 
 		//! Load function specific files
-		virtual void load(std::istream& in)
+		virtual bool load(std::istream& in)
 		{
+			int nb_good = 0; // Number of correctly openned functions
 			for(unsigned int i=0; i<fs.size(); ++i)
 			{
-				fs[i]->load(in);
+				std::streampos pos = in.tellg();
+				if(!fs[i]->load(in))
+				{
+					in.seekg(pos);
+				}
+				else
+				{
+					nb_good++;
+				}
 			}
+			return nb_good > 0;
 		}
 
 		//! \brief Provide a first rough fit of the function. 
@@ -645,15 +658,16 @@ class fresnel : public nonlinear_function
 		}
 
 		//! Load function specific files
-		virtual void load(std::istream& in)
+		virtual bool load(std::istream& in)
 		{
 			if(f != NULL)
 			{
-				f->load(in);
+				return f->load(in);
 			}
 			else
 			{
 				std::cout << "<<ERROR>> trying to load a Fresnel object with no base class" << std::endl;
+				return false;
 			}
 		}
 

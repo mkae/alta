@@ -11,7 +11,10 @@ void function::bootstrap(const data*, const arguments& args)
         std::ifstream in(args["bootstrap"].c_str());
         if(in.is_open())
         {
-            load(in);
+            if(!load(in))
+				{
+					std::cerr << "<<ERROR>> cannot bootstrap from file \"" << args["bootstrap"] << "\"" << std::endl;
+				}
         }
     }
 }
@@ -225,46 +228,57 @@ vec nonlinear_function::getParametersMin() const
 
 void compound_function::bootstrap(const ::data* d, const arguments& args)
 {
-    const bool global_bootstrap = args.is_defined("bootstrap");
+	const bool global_bootstrap = args.is_defined("bootstrap");
 
-    // Check if the bootstrap is global
-    if(global_bootstrap)
-    {
-        if(args.is_vec("bootstrap"))
-        {
-            vec p = args.get_vec("bootstrap", nbParameters());
-            setParameters(p);
-        }
-        else
-        {
-            std::ifstream file;
-            file.open(args["bootstrap"].c_str()) ;
-            if(file.is_open())
-            {
-                // Skip the header
-                std::string line ;
-                do
-                {
-                    std::getline(file, line) ;
-                }
-                while(line != "#ALTA HEADER END");
+	// Check if the bootstrap is global
+	if(global_bootstrap)
+	{
+		if(args.is_vec("bootstrap"))
+		{
+			vec p = args.get_vec("bootstrap", nbParameters());
+			setParameters(p);
+		}
+		else
+		{
+			std::ifstream file;
+			file.open(args["bootstrap"].c_str()) ;
+			if(file.is_open())
+			{
+				// Skip the header
+				std::string line ;
+				do
+				{
+					std::getline(file, line) ;
+				}
+				while(line != "#ALTA HEADER END");
 
-                // Load the file
-                this->load(file);
-            }
-            else
-            {
-                std::cerr << "<<ERROR>> you must provide a vector of parameters or a file to load with the bootstrap" << std::endl;
-            }
-        }
-    }
+				// Load the file
+				// For each individual element, the input file is parsed
+				// in order. if the function cannot parse it, the file is
+				// restored to the previous state and the loading continues
+				for(unsigned int i=0; i<fs.size(); ++i)
+				{
+					std::streampos pos = file.tellg();
 
-    // Per function bootstrap
-    for(unsigned int i=0; i<fs.size(); ++i)
-    {
-        if(!global_bootstrap)
-        {
-            fs[i]->bootstrap(d, fs_args[i]);
-        }
-    }
+					if(!fs[i]->load(file))
+					{
+						file.seekg(pos);
+					}
+				}
+			}
+			else
+			{
+				std::cerr << "<<ERROR>> you must provide a vector of parameters or a file to load with the bootstrap" << std::endl;
+			}
+		}
+	}
+
+	// Per function bootstrap
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		if(!global_bootstrap)
+		{
+			fs[i]->bootstrap(d, fs_args[i]);
+		}
+	}
 }

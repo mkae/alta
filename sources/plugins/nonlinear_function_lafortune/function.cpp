@@ -349,7 +349,7 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 
 
 //! Load function specific files
-void lafortune_function::load(std::istream& in)
+bool lafortune_function::load(std::istream& in)
 {
 	    // Parse line until the next comment
     while(in.peek() != '#')
@@ -361,10 +361,18 @@ void lafortune_function::load(std::istream& in)
     // Checking for the comment line #FUNC nonlinear_function_lafortune
     std::string token;
     in >> token;
-    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC")
+    {
+        std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl;
+        return false;
+    }
 
     in >> token;
-    if(token != "nonlinear_function_lafortune") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+    if(token != "nonlinear_function_lafortune")
+    {
+        std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl;
+        return false;
+    }
 
 	 // Shoudl have the #NB_LOBES [int]
 	 int nb_lobes;
@@ -387,6 +395,7 @@ void lafortune_function::load(std::istream& in)
 	
 	std::cout << "<<INFO>> Cd = " << _C << std::endl;
 	std::cout << "<<INFO>> N = " << _N << std::endl;
+    return true;
 }
 
 void lafortune_function::save_call(std::ostream& out, const arguments& args) const

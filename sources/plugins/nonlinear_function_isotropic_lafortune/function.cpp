@@ -332,7 +332,7 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 }
 
 //! Load function specific files
-void isotropic_lafortune_function::load(std::istream& in)
+bool isotropic_lafortune_function::load(std::istream& in)
 {
 	// Parse line until the next comment
 	while(in.peek() != '#')
@@ -347,12 +347,14 @@ void isotropic_lafortune_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+        return false;
 	}
 
 	in >> token;
    if(token.compare("nonlinear_function_lafortune") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+        return false;
 	}
 
 	// Shoudl have the #NB_LOBES [int]
@@ -361,6 +363,7 @@ void isotropic_lafortune_function::load(std::istream& in)
 	if(token.compare("#NB_LOBES") != 0)
 	{
 		std::cerr << "<<ERROR>> cannot access to the number of lobes" << std::endl;
+        return false;
 	}
 	in >> nb_lobes;
 	setNbLobes(nb_lobes);
@@ -379,8 +382,8 @@ void isotropic_lafortune_function::load(std::istream& in)
 	}
 
 	std::cout << "<<INFO>> Cd = " << _C << std::endl;
-	std::cout << "<<INFO>> N = " << _N << std::endl;
-
+	std::cout << "<<INFO>> N = "  << _N << std::endl;
+    return true;
 }
 
 
