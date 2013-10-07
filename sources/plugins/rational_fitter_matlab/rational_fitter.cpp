@@ -223,7 +223,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		delta = 1.0 ;
 	}
 
-#ifdef DEBUG_MATRICES
+#ifndef DEBUG_MATRICES
 	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 	

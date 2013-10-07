@@ -357,7 +357,12 @@ void isotropic_lafortune_function::load(std::istream& in)
 
 	// Shoudl have the #NB_LOBES [int]
 	int nb_lobes;
-	in >> token >> nb_lobes;
+	in >> token;
+	if(token.compare("#NB_LOBES") != 0)
+	{
+		std::cerr << "<<ERROR>> cannot access to the number of lobes" << std::endl;
+	}
+	in >> nb_lobes;
 	setNbLobes(nb_lobes);
 
 	// Parse the lobe
@@ -368,7 +373,7 @@ void isotropic_lafortune_function::load(std::istream& in)
 
 			in >> token >> _C[(n*_nY + i)*2 + 0];
 			in >> token >> _C[(n*_nY + i)*2 + 1];
-			in >> token >> _N[i];
+			in >> token >> _N[n*_nY + i];
 		}
 
 	}

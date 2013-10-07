@@ -2,6 +2,9 @@ import os
 
 env = Environment()
 
+##
+#   CERES dependancies
+##
 execfile('obtain_ceres.py')
 
 
