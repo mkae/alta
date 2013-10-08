@@ -258,12 +258,12 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 				// restored to the previous state and the loading continues
 				for(unsigned int i=0; i<fs.size(); ++i)
 				{
-					std::cout << "<<DEBUG>> parsing function " << i+1 << " / " << fs.size() << std::endl;
 					std::streampos pos = file.tellg();
 
+					// If the function cannot be loaded, put the input stream
+					// in the previous state and bootstrap normaly this function.
 					if(!fs[i]->load(file))
 					{
-						std::cout << "<<DEBUG>> no data found, continuing with the next one" << std::endl;
 						file.seekg(pos);
 
 						// Bootstrap the function as if it was not loaded
@@ -277,9 +277,7 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 			}
 		}
 	}
-
-	// Per function bootstrap
-	if(!global_bootstrap)
+	else
 	{
 		for(unsigned int i=0; i<fs.size(); ++i)
 		{

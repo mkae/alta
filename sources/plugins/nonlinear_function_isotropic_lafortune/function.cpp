@@ -292,8 +292,8 @@ void isotropic_lafortune_function::bootstrap(const data* d, const arguments& arg
 		for(int n=0; n<_n; ++n)
 			for(int i=0; i<dimY(); ++i)
 			{
-				_C[(n*dimY() + i)*2 + 0] = 0.0;
-				_C[(n*dimY() + i)*2 + 1] = 1.0;
+				_C[(n*dimY() + i)*2 + 0] = -1.0;
+				_C[(n*dimY() + i)*2 + 1] =  1.0;
 				_N[n*dimY()  + i]        = (double)_n;
 			}
 	}
