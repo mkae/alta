@@ -1,5 +1,5 @@
 env = Environment()
-env.Append(CPPPATH = '/home/belcour/Sources/eigen')
+env.Append(CPPPATH = '../../external/eigen-eigen-ffa86ffb5570')
 
 # Library sources
 sources = ['common.cpp', 
