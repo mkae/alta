@@ -356,6 +356,11 @@ bool lafortune_function::load(std::istream& in)
     {
         char line[256];
         in.getline(line, 256);
+
+		  // If we cross the end of the file, or the badbit is
+		  // set, the file cannot be loaded
+		  if(!in.good())
+			  return false;
     }
 
     // Checking for the comment line #FUNC nonlinear_function_lafortune
