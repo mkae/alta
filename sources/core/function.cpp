@@ -1,6 +1,7 @@
 #include "function.h"		
 
 #include "common.h"
+#include "params.h"
 #include "plugins_manager.h"
 
 /*--- Functions implementation ----*/
@@ -411,4 +412,178 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 			fs[i]->bootstrap(d, fs_args[i]);
 		}
 	}
+}
+
+
+
+/*--- Product functions implementation ----*/
+
+
+product_function::product_function() 
+{
+}
+
+product_function::product_function(nonlinear_function* g1, nonlinear_function* g2) 
+{
+	this->f1 = g1;
+	this->f2 = g2;
+}
+
+vec product_function::operator()(const vec& x) const
+{
+	return value(x);
+}
+vec product_function::value(const vec& x) const
+{
+	// Get the first function value
+	vec f1res = f1->value(x);
+
+	// Convert input space to the 2nd function parametreization
+	vec xf2(f2->dimX());
+	params::convert(&x[0], f1->input_parametrization(), f2->input_parametrization(), &xf2[0]);
+	vec f2res = f2->value(xf2);
+
+	return product(f1res, f2res);
+}
+		
+bool product_function::load(std::istream& in)
+{
+	bool loaded_f1,loaded_f2;
+	std::streampos pos = in.tellg();
+
+	// Load the first function
+	if(f1 != NULL)
+	{
+		loaded_f1 = f1->load(in);
+		if(! loaded_f1)
+		{
+			in.seekg(pos);
+		}
+	}
+
+	pos = in.tellg();
+	// Load the second function
+	if(f2 != NULL)
+	{
+		loaded_f2 = f2->load(in);
+		if(! loaded_f2)
+		{
+			in.seekg(pos);
+		}
+	}
+
+	return loaded_f1 || loaded_f2;
+}
+
+void product_function::bootstrap(const data* d, const arguments& args)
+{
+	const bool global_bootstrap = args.is_defined("bootstrap");
+
+	// Check if the bootstrap is global
+	if(global_bootstrap)
+	{
+		if(args.is_vec("bootstrap"))
+		{
+			vec p = args.get_vec("bootstrap", nbParameters());
+			setParameters(p);
+		}
+		else
+		{
+			std::ifstream file;
+			file.open(args["bootstrap"].c_str()) ;
+			if(file.is_open())
+			{
+				// Skip the header
+				std::string line ;
+				do
+				{
+					std::getline(file, line) ;
+				}
+				while(line != "#ALTA HEADER END");
+
+				std::streampos pos = file.tellg();
+
+				// If the first function cannot be loaded, put the input stream
+				// in the previous state and bootstrap normaly this function.
+				if(!f1->load(file))
+				{
+					file.seekg(pos);
+
+					// Bootstrap the function as if it was not loaded
+					f1->bootstrap(d, args);
+				}
+				
+				// If the second function cannot be loaded, put the input stream
+				// in the previous state and bootstrap normaly this function.
+				if(!f2->load(file))
+				{
+					file.seekg(pos);
+
+					// Bootstrap the function as if it was not loaded
+					f2->bootstrap(d, args);
+				}
+			}
+			else
+			{
+				std::cerr << "<<ERROR>> you must provide a vector of parameters or a file to load with the bootstrap" << std::endl;
+			}
+		}
+	}
+	else
+	{
+		f1->bootstrap(d, args);
+		f2->bootstrap(d, args);
+	}
+}
+		
+void product_function::setDimX(int nX) 
+{
+	f1->setDimX(nX);
+	f2->setDimX(nX);
+}
+
+void product_function::setDimY(int nY)
+{
+	f1->setDimY(nY);
+	f2->setDimY(nY);
+}
+
+void product_function::setMin(const vec& min) 
+{
+	f1->setMin(min);
+	f2->setMin(min);
+}
+
+void product_function::setMax(const vec& max) 
+{
+	f1->setMax(max);
+	f2->setMax(max);
+}
+
+int product_function::nbParameters() const
+{
+	return f1->nbParameters() + f2->nbParameters();
+}
+
+vec product_function::parameters() const
+{
+	int nb_f1_params = f1->nbParameters();
+	int nb_f2_params = f2->nbParameters();
+	int nb_params = nb_f1_params + nb_f2_params;
+
+	vec params(nb_params);
+
+	vec f1_params = f1->parameters();
+	for(int i=0; i<nb_f1_params; ++i)
+	{
+		params[i] = f1_params[i];
+	}
+
+	vec f2_params = parameters();
+	for(int i=0; i<nb_f2_params; ++i)
+	{
+		params[i+nb_f1_params] = f2_params[i];
+	}
+
+	return params;
 }

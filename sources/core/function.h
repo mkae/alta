@@ -524,6 +524,58 @@ class compound_function: public nonlinear_function
 
 };
 
+/*! \brief A product of nonlinear functions. This class aims to simplify the
+ *  fitting and progressive fitting of Fresnel effects that can be separated
+ *  from the main lobe.
+ *  \ingroup core
+ */
+class product_function : public nonlinear_function
+{
+	public: // methods
+
+		//! \brief Empty constructor of the product function
+		product_function();
+		
+		//! \brief Constructor of the product function, affect the two function
+		//! to already created nonlinear_function objects.
+		product_function(nonlinear_function* g1, nonlinear_function* g2);
+
+		//! \brief Overload the function operator, directly call the value function.
+		virtual vec operator()(const vec& x) const;
+
+		//! \brief Return the product between the value of function f1 and function
+		//! f2. The input parameter x should be in the parametrization of f1. This
+		//! function will do the conversion before getting f2's value.
+		virtual vec value(const vec& x) const;
+		
+		//! \brief Load the two functions in order f1, then f2. If one of the 
+		//! function cannot be loaded, this function will continue. It will only
+		//! return false if both functions cannot be loaded.
+		virtual bool load(std::istream& in);
+		
+		//! \brief Provide a first rough fit of the function. 
+		virtual void bootstrap(const data* d, const arguments& args);
+
+		// Set the dimension of the input/output space of the function
+		virtual void setDimX(int nX);
+		virtual void setDimY(int nY);
+
+		// Acces to the domain of definition of the function
+		virtual void setMin(const vec& min);
+		virtual void setMax(const vec& max);
+
+		//! \brief Number of parameters to this non-linear function
+		virtual int nbParameters() const;
+		
+		//! \biref Get the vector of parameters for the function
+		virtual vec parameters() const;
+
+	private: // data
+
+		// Function composing the product
+		nonlinear_function *f1, *f2;
+};
+
 /*! \brief A Fresnel interface
  *  \ingroup core
  *  \todo Change it to a product_function instead
@@ -541,10 +593,10 @@ class fresnel : public nonlinear_function
 		{
 			vec fres = fresnelValue(x);
 
-            // Convert input space to the function
-            vec xf(f->dimX());
-            params::convert(&x[0], params::CARTESIAN, f->input_parametrization(), &xf[0]);
-            vec func = f->value(xf);
+			// Convert input space to the function
+			vec xf(f->dimX());
+			params::convert(&x[0], params::CARTESIAN, f->input_parametrization(), &xf[0]);
+			vec func = f->value(xf);
 
 			return product(fres, func);
 		}
