@@ -587,3 +587,69 @@ vec product_function::parameters() const
 
 	return params;
 }
+
+void product_function::setParameters(const vec& p)
+{
+	int nb_f1_params = f1->nbParameters();
+	int nb_f2_params = f2->nbParameters();
+
+	vec f1_params(nb_f1_params);
+	for(int i=0; i<nb_f1_params; ++i)
+	{
+		f1_params[i] = p[i];
+	}
+	f1->setParameters(f1_params);
+
+	vec f2_params(nb_f2_params);
+	for(int i=0; i<nb_f2_params; ++i)
+	{
+		f2_params[i] = p[i+nb_f2_params];
+	}
+	f2->setParameters(f2_params);
+}
+
+vec product_function::parametersJacobian(const vec& x) const
+{
+	int nb_f1_params = f1->nbParameters();
+	int nb_f2_params = f2->nbParameters();
+	int nb_params = nb_f1_params + nb_f2_params;
+
+	// Convert the input value x to the input space of the f1tion
+	vec xf(f2->dimX());
+	params::convert(&x[0], f1->input_parametrization(), f2->input_parametrization(), &xf[0]);
+
+	vec f1_jacobian = f1->parametersJacobian(xf);
+	vec f2_jacobian = f2->parametersJacobian(x);
+
+	vec f1_value = f1->value(x);
+	vec f2_value = f2->value(xf);
+
+	// F = f2nel; f = f1tion
+	// d(F * f)(x) /dp = F(x) df(x) /dp + f(x) dF(x) / dp
+	vec jac(nb_params*_nY);
+	for(int y=0; y<_nY; ++y)
+	{
+		for(int i=0; i<nb_f1_params; ++i)
+		{
+			jac[y*nb_params + i] = f1_jacobian[y*nb_f1_params + i] * f2_value[y];
+		}
+
+		for(int i=0; i<nb_f2_params; ++i)
+		{
+			jac[y*nb_params + (i+nb_f1_params)] = f2_jacobian[y*nb_f2_params + i] * f1_value[y];
+		}
+	}
+
+	return jac;
+}
+		
+params::input product_function::input_parametrization() const
+{
+	return f1->input_parametrization();
+}
+
+//! \brief provide the outout parametrization of the object.
+params::output product_function::output_parametrization() const
+{
+	return f1->output_parametrization();
+}

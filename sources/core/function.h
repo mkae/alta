@@ -563,12 +563,23 @@ class product_function : public nonlinear_function
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min);
 		virtual void setMax(const vec& max);
+		
+		//! Provide the input/output parametrization of the object.
+		virtual params::input  input_parametrization() const;
+		virtual params::output output_parametrization() const;
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const;
 		
 		//! \biref Get the vector of parameters for the function
 		virtual vec parameters() const;
+
+		//! Update the vector of parameters for the function
+		virtual void setParameters(const vec& p);
+
+		//! \brief Obtain the derivatives of the function with respect to the 
+		//! parameters.
+		virtual vec parametersJacobian(const vec& x) const;
 
 	private: // data
 
