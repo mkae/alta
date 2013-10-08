@@ -359,9 +359,10 @@ function* plugins_manager::get_function(const arguments& args)
 			 }
 		 }
 
-		 fresnel* func_fres = dynamic_cast<fresnel*>(get_function(arguments::create_arguments(n)));
-		 func_fres->setBase(nl_func);
-		 return func_fres;
+		 nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
+//		 func_fres->setBase(nl_func);		 
+//		 return func_fres;
+		 return new product_function(nl_func, func_fres);
 
 	 }
 

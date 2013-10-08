@@ -535,22 +535,28 @@ void product_function::setDimX(int nX)
 {
 	f1->setDimX(nX);
 	f2->setDimX(nX);
+	
+	function::setDimX(f1->dimX());
 }
 
 void product_function::setDimY(int nY)
 {
 	f1->setDimY(nY);
 	f2->setDimY(nY);
+	
+	function::setDimY(f1->dimY());
 }
 
 void product_function::setMin(const vec& min) 
 {
+	function::setMin(min);
 	f1->setMin(min);
 	f2->setMin(min);
 }
 
 void product_function::setMax(const vec& max) 
 {
+	function::setMax(max);
 	f1->setMax(max);
 	f2->setMax(max);
 }
@@ -574,7 +580,7 @@ vec product_function::parameters() const
 		params[i] = f1_params[i];
 	}
 
-	vec f2_params = parameters();
+	vec f2_params = f2->parameters();
 	for(int i=0; i<nb_f2_params; ++i)
 	{
 		params[i+nb_f1_params] = f2_params[i];
