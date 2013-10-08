@@ -533,9 +533,6 @@ class product_function : public nonlinear_function
 {
 	public: // methods
 
-		//! \brief Empty constructor of the product function
-		product_function();
-		
 		//! \brief Constructor of the product function, affect the two function
 		//! to already created nonlinear_function objects.
 		product_function(nonlinear_function* g1, nonlinear_function* g2);
@@ -567,6 +564,11 @@ class product_function : public nonlinear_function
 		//! Provide the input/output parametrization of the object.
 		virtual params::input  input_parametrization() const;
 		virtual params::output output_parametrization() const;
+		
+		//! Set the input/output parametrization of a non-parametrized
+		//! object. Print an error if it is already defined.
+		virtual void setParametrization(params::input  new_param);
+		virtual void setParametrization(params::output new_param);
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const;
@@ -576,6 +578,10 @@ class product_function : public nonlinear_function
 
 		//! Update the vector of parameters for the function
 		virtual void setParameters(const vec& p);
+
+		// Get the vector of min/max parameters for the function
+		virtual vec getParametersMax() const;
+		virtual vec getParametersMin() const;
 
 		//! \brief Obtain the derivatives of the function with respect to the 
 		//! parameters.

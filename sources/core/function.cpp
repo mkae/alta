@@ -418,11 +418,6 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 
 /*--- Product functions implementation ----*/
 
-
-product_function::product_function() 
-{
-}
-
 product_function::product_function(nonlinear_function* g1, nonlinear_function* g2) 
 {
 	this->f1 = g1;
@@ -608,6 +603,54 @@ void product_function::setParameters(const vec& p)
 	f2->setParameters(f2_params);
 }
 
+//! Get the vector of min parameters for the function
+vec product_function::getParametersMax() const
+{
+	int nb_f1_params = f1->nbParameters();
+	int nb_f2_params = f2->nbParameters();
+	int nb_params = nb_f1_params + nb_f2_params;
+
+	vec params(nb_params);
+
+	vec f1_params = f1->getParametersMax();
+	for(int i=0; i<nb_f1_params; ++i)
+	{
+		params[i] = f1_params[i];
+	}
+
+	vec f2_params = f2->getParametersMax();
+	for(int i=0; i<nb_f2_params; ++i)
+	{
+		params[i+nb_f1_params] = f2_params[i];
+	}
+
+	return params;
+}
+
+//! Get the vector of min parameters for the f1tion
+vec product_function::getParametersMin() const
+{
+	int nb_f1_params = f1->nbParameters();
+	int nb_f2_params = f2->nbParameters();
+	int nb_params = nb_f1_params + nb_f2_params;
+
+	vec params(nb_params);
+
+	vec f1_params = f1->getParametersMin();
+	for(int i=0; i<nb_f1_params; ++i)
+	{
+		params[i] = f1_params[i];
+	}
+
+	vec f2_params = f2->getParametersMin();
+	for(int i=0; i<nb_f2_params; ++i)
+	{
+		params[i+nb_f1_params] = f2_params[i];
+	}
+
+	return params;
+}
+
 vec product_function::parametersJacobian(const vec& x) const
 {
 	int nb_f1_params = f1->nbParameters();
@@ -652,4 +695,16 @@ params::input product_function::input_parametrization() const
 params::output product_function::output_parametrization() const
 {
 	return f1->output_parametrization();
+}
+		
+void product_function::setParametrization(params::input new_param)
+{
+	f1->setParametrization(new_param);
+	f2->setParametrization(new_param);
+}
+
+void product_function::setParametrization(params::output new_param)
+{
+	f1->setParametrization(new_param);
+	f2->setParametrization(new_param);
 }
