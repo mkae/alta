@@ -37,8 +37,8 @@ class function : public parametrized
 		//!
 		//! \details
 		//! Can be used to set the diffuse component of the function for
-        //! example. The default behaviour is to load a function file.
-        virtual void bootstrap(const data*, const arguments& args);
+		//! example. The default behaviour is to load a function file.
+		virtual void bootstrap(const data*, const arguments& args);
 
 		//! Provide the dimension of the input space of the function
 		virtual int dimX() const { return _nX ; }
@@ -51,19 +51,19 @@ class function : public parametrized
 		virtual void setDimY(int nY) { _nY = nY ; }
 
 
-        /* DEFINITION DOMAIN OF THE FUNCTION */
+		/* DEFINITION DOMAIN OF THE FUNCTION */
 
-        //! \brief Set the minimum value the input can take
-        virtual void setMin(const vec& min) ;
+		//! \brief Set the minimum value the input can take
+		virtual void setMin(const vec& min) ;
 
-        //! \brief Set the maximum value the input can take
-        virtual void setMax(const vec& max) ;
+		//! \brief Set the maximum value the input can take
+		virtual void setMax(const vec& max) ;
 
-        //! \brief Get the minimum value the input can take
-        virtual vec getMin() const ;
+		//! \brief Get the minimum value the input can take
+		virtual vec getMin() const ;
 
-        //! \brief Get the maximum value the input can take
-        virtual vec getMax() const ;
+		//! \brief Get the maximum value the input can take
+		virtual vec getMax() const ;
 
 
 		/* EXPORT FUNCTIONS */
@@ -93,18 +93,18 @@ class function : public parametrized
 
 		/* METRIC FUNCTIONS */
 
-        //! \brief L2 norm to data.
-        //! \note This distance is only valid with respect to the data sampling.
-        //! If the measurement points are not uniformly distributed, then the
-        //! metric does not represent the real difference integrated over the
-        //! hemisphere.
+		//! \brief L2 norm to data.
+		//! \note This distance is only valid with respect to the data sampling.
+		//! If the measurement points are not uniformly distributed, then the
+		//! metric does not represent the real difference integrated over the
+		//! hemisphere.
 		double L2_distance(const data* d) const ;
 
 		//! \brief Linf norm to data.
-        //! \note This distance is only valid with respect to the data sampling.
-        //! If the measurement points are not uniformly distributed, then the
-        //! metric does not represent the real difference integrated over the
-        //! hemisphere.
+		//! \note This distance is only valid with respect to the data sampling.
+		//! If the measurement points are not uniformly distributed, then the
+		//! metric does not represent the real difference integrated over the
+		//! hemisphere.
 		double Linf_distance(const data* d) const ;
 
 
@@ -132,13 +132,13 @@ class nonlinear_function: public function
 {
 	public: // methods
 
-        //! \brief Provide a first rough fit of the function.
-        //!
-        //! \details
-        //! The nonllinear_function overload the function bootstrap call to
-        //! allows for loading the parameters vector directly from the command
-        //! line: --bootstrap [p1, p2, ..., pn]
-        virtual void bootstrap(const data*, const arguments& args);
+		//! \brief Provide a first rough fit of the function.
+		//!
+		//! \details
+		//! The nonllinear_function overload the function bootstrap call to
+		//! allows for loading the parameters vector directly from the command
+		//! line: --bootstrap [p1, p2, ..., pn]
+		virtual void bootstrap(const data*, const arguments& args);
 
 		//! Number of parameters to this non-linear function
 		virtual int nbParameters() const = 0;
@@ -172,71 +172,11 @@ class nonlinear_function: public function
 		virtual vec parametersJacobian(const vec& x) const = 0;
 
 		//! \brief default non_linear import. Parse the parameters in order.
-		virtual bool load(std::istream& in)
-		{
-			// Parse line until the next comment
-			while(in.peek() != '#')
-			{
-				char line[256];
-				in.getline(line, 256);
-
-				// If we cross the end of the file, or the badbit is
-				// set, the file cannot be loaded
-				if(!in.good())
-					return false;
-			}
-
-			// Checking for the comment line #FUNC nonlinear_function_phong
-			std::string token;
-			in >> token;
-			if(token.compare("#FUNC") != 0) 
-			{ 
-				std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
-#ifdef DEBUG
-				std::cout << "<<DEBUG>> got: \"" << token << "\"" << std::endl;
-#endif
-				return false;
-			}
-
-			in >> token;
-			if(token.compare("nonlinear_function") != 0)
-			{
-				std::cerr << "<<ERROR>> parsing the stream. A function name is defined." << std::endl;
-				std::cerr << "<<ERROR>> did you forget to specify the plugin used to export?" << std::endl;
-				return false;
-			}
-
-			int nb_params = nbParameters();
-			vec p(nb_params);
-			for(int i=0; i<nb_params; ++i)
-			{
-				in >> token >> p[i];
-			}
-
-			setParameters(p);
-			return true;
-		}
+		virtual bool load(std::istream& in);
 
 		//! \brief default non_linear export. It will dump the parameters in 
 		//! order but won't assign names for the function nor parameters.
-		virtual void save_call(std::ostream& out, const arguments& args) const
-		{
-			if(!args.is_defined("export"))
-			{
-				// Dump a #FUNC nonlinear
-				out << "#FUNC nonlinear_function" << std::endl;
-
-				// Dump the parameters in order
-				vec p = parameters();
-				for(int i=0; i<p.size(); ++i)
-				{
-					out << "param_" << i+1 << "\t" << p[i] << std::endl;
-				}
-				out << std::endl;
-			}
-
-			function::save_call(out, args);
-		}
+		virtual void save_call(std::ostream& out, const arguments& args) const;
 };
 
 /*! \brief A compound (sum) of multiple nonlinear functions. This allows to
@@ -248,70 +188,17 @@ class compound_function: public nonlinear_function
 	public: // methods
 
 		// Overload the function operator
-		virtual vec operator()(const vec& x) const
-		{
-			return value(x);
-		}
-		virtual vec value(const vec& x) const
-		{
-			vec res(_nY);
-			res = vec::Zero(_nY);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				if(fs[i]->input_parametrization() != input_parametrization())
-				{
-					vec temp_x(fs[i]->dimX());
-					params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
-					res = res + fs[i]->value(temp_x);
-				}
-				else
-				{
-					res = res + fs[i]->value(x);
-				}
-			}
-			return res;
-		}
+		virtual vec operator()(const vec& x) const;
+		virtual vec value(const vec& x) const;
 
 		//! Provide a vector like interface
 		//! This function allows to put a new nonlinear function \a f in the 
 		//! compound object. This function will be processed for nonlinear
 		//! optimisation only if \a fixed equals true.
-        virtual void push_back(nonlinear_function* f, const arguments& f_args)
-		{
-			// Update the input param
-			if(input_parametrization() == params::UNKNOWN_INPUT)
-			{
-				setParametrization(f->input_parametrization());
-			}
-            else if(input_parametrization() != f->input_parametrization())
-            {
-                setParametrization(params::CARTESIAN);
-            }
-			
-			// Update the output param
-			if(output_parametrization() == params::UNKNOWN_OUTPUT)
-			{
-				setParametrization(f->output_parametrization());
-			}
-			else if(output_parametrization() != f->output_parametrization())
-			{
-				std::cerr << "Creating a compound function with different output dimensions, this is not allowed" << std::endl;
-				throw;
-			}
-			
-			fs.push_back(f);
-            fs_args.push_back(f_args);
-            is_fixed.push_back(f_args.is_defined("fixed"));
-		}
+		virtual void push_back(nonlinear_function* f, const arguments& f_args);
 
 		//! \brief Access to the i-th function of the compound
-		nonlinear_function* operator[](int i) const
-		{
-#ifdef DEBUG
-			assert(i >= 0 && i < fs.size());
-#endif
-			return fs[i];
-		}
+		nonlinear_function* operator[](int i) const;
 
 		//! \brief Access to the number of elements in the compound object.
 		unsigned int size() const
@@ -339,26 +226,26 @@ class compound_function: public nonlinear_function
 		}
 
 		//! \brief Provide a first rough fit of the function. 
-        //! For compound object, you can define the first guess using the
-        //! either the global function or using the individual command per
-        //! function. <br />
-        //!
-        //! <u>Examples:</u><br />
-        //! \verbatim
-        //! --func [libfunc1.so, libfunc2.so] --bootstrap first_guess.brdf
-        //! \endverbatim
-        //! Will load the file <em>first_guess.brdf</em> as the initial value
-        //! <br />
-        //! \verbatim
-        //! --func [libfunc1.so --boostrap [val1, val2], libfunc2.so --bootstrap first_guess1.brdf]
-        //! \endverbatim
-        //! Will load the vector of parameters <em>[val1, val2]</em> for the
-        //! first function and the file <em>first_guess1.brdf</em> for the
-        //! second one. <br />
-        //!
-        //! <u>Local/Global policy:</u></br />
-        //! Local bootstrap can not overload the global bootstrap.
-        virtual void bootstrap(const ::data* d, const arguments& args);
+		//! For compound object, you can define the first guess using the
+		//! either the global function or using the individual command per
+		//! function. <br />
+		//!
+		//! <u>Examples:</u><br />
+		//! \verbatim
+		//! --func [libfunc1.so, libfunc2.so] --bootstrap first_guess.brdf
+		//! \endverbatim
+		//! Will load the file <em>first_guess.brdf</em> as the initial value
+		//! <br />
+		//! \verbatim
+		//! --func [libfunc1.so --boostrap [val1, val2], libfunc2.so --bootstrap first_guess1.brdf]
+		//! \endverbatim
+		//! Will load the vector of parameters <em>[val1, val2]</em> for the
+		//! first function and the file <em>first_guess1.brdf</em> for the
+		//! second one. <br />
+		//!
+		//! <u>Local/Global policy:</u></br />
+		//! Local bootstrap can not overload the global bootstrap.
+		virtual void bootstrap(const ::data* d, const arguments& args);
 
 		//! Set the dimension of the input space of the function
 		virtual void setDimX(int nX) 
@@ -632,7 +519,7 @@ class compound_function: public nonlinear_function
 
 	protected:
 		std::vector<nonlinear_function*> fs;
-        std::vector<arguments> fs_args;
+		std::vector<arguments> fs_args;
 		std::vector<bool> is_fixed;
 
 };

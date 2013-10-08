@@ -3,6 +3,8 @@
 #include "common.h"
 #include "plugins_manager.h"
 
+/*--- Functions implementation ----*/
+
 void function::bootstrap(const data*, const arguments& args)
 {
     // If the bootstrap option contains a filename, load it
@@ -124,7 +126,7 @@ void function::save_header(std::ostream& out, const arguments& args) const
 		out << "#CMD " << args.get_cmd() << std::endl;
 		out << "#DIM " << _nX << " " << _nY << std::endl;
 		out << "#PARAM_IN  " << params::get_name(input_parametrization()) << std::endl;
-        //out << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;*
+		//out << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;*
         if(args.is_defined("export-append")) {
             out << args["export-append"] << std::endl;
         }
@@ -187,6 +189,73 @@ double function::Linf_distance(const data* d) const
 }
 
 
+
+/*--- Non-linear functions implementation ----*/
+		
+bool nonlinear_function::load(std::istream& in)
+{
+	// Parse line until the next comment
+	while(in.peek() != '#')
+	{
+		char line[256];
+		in.getline(line, 256);
+
+		// If we cross the end of the file, or the badbit is
+		// set, the file cannot be loaded
+		if(!in.good())
+			return false;
+	}
+
+	// Checking for the comment line #FUNC nonlinear_function_phong
+	std::string token;
+	in >> token;
+	if(token.compare("#FUNC") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+#ifdef DEBUG
+		std::cout << "<<DEBUG>> got: \"" << token << "\"" << std::endl;
+#endif
+		return false;
+	}
+
+	in >> token;
+	if(token.compare("nonlinear_function") != 0)
+	{
+		std::cerr << "<<ERROR>> parsing the stream. A function name is defined." << std::endl;
+		std::cerr << "<<ERROR>> did you forget to specify the plugin used to export?" << std::endl;
+		return false;
+	}
+
+	int nb_params = nbParameters();
+	vec p(nb_params);
+	for(int i=0; i<nb_params; ++i)
+	{
+		in >> token >> p[i];
+	}
+
+	setParameters(p);
+	return true;
+}
+
+void nonlinear_function::save_call(std::ostream& out, const arguments& args) const
+{
+	if(!args.is_defined("export"))
+	{
+		// Dump a #FUNC nonlinear
+		out << "#FUNC nonlinear_function" << std::endl;
+
+		// Dump the parameters in order
+		vec p = parameters();
+		for(int i=0; i<p.size(); ++i)
+		{
+			out << "param_" << i+1 << "\t" << p[i] << std::endl;
+		}
+		out << std::endl;
+	}
+
+	function::save_call(out, args);
+}
+
 void nonlinear_function::bootstrap(const data* d, const arguments& args)
 {
     if(args.is_vec("bootstrap"))
@@ -200,9 +269,6 @@ void nonlinear_function::bootstrap(const data* d, const arguments& args)
     }
 }
 		
-//! \brief get the maximum value for all the parameters in a vector
-//! format. The maximum vector and the parameter vector have the same
-//! indexing.
 vec nonlinear_function::getParametersMax() const
 {
 	vec M(nbParameters());
@@ -213,9 +279,6 @@ vec nonlinear_function::getParametersMax() const
 	return M;
 }
 
-//! \brief get the minimum value for all the parameters in a vector
-//! format. The minimum vector and the parameter vector have the same
-//! indexing.
 vec nonlinear_function::getParametersMin() const
 {
 	vec m(nbParameters());
@@ -224,6 +287,70 @@ vec nonlinear_function::getParametersMin() const
 		m[i] = -std::numeric_limits<double>::max();
 	}
 	return m;
+}
+
+
+
+/*--- Compound functions implementation ----*/
+
+vec compound_function::operator()(const vec& x) const
+{
+	return value(x);
+}
+vec compound_function::value(const vec& x) const
+{
+	vec res(_nY);
+	res = vec::Zero(_nY);
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		if(fs[i]->input_parametrization() != input_parametrization())
+		{
+			vec temp_x(fs[i]->dimX());
+			params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
+			res = res + fs[i]->value(temp_x);
+		}
+		else
+		{
+			res = res + fs[i]->value(x);
+		}
+	}
+	return res;
+}
+
+void compound_function::push_back(nonlinear_function* f, const arguments& f_args)
+{
+	// Update the input param
+	if(input_parametrization() == params::UNKNOWN_INPUT)
+	{
+		setParametrization(f->input_parametrization());
+	}
+	else if(input_parametrization() != f->input_parametrization())
+	{
+		setParametrization(params::CARTESIAN);
+	}
+
+	// Update the output param
+	if(output_parametrization() == params::UNKNOWN_OUTPUT)
+	{
+		setParametrization(f->output_parametrization());
+	}
+	else if(output_parametrization() != f->output_parametrization())
+	{
+		std::cerr << "Creating a compound function with different output dimensions, this is not allowed" << std::endl;
+		throw;
+	}
+
+	fs.push_back(f);
+	fs_args.push_back(f_args);
+	is_fixed.push_back(f_args.is_defined("fixed"));
+}
+
+nonlinear_function* compound_function::operator[](int i) const
+{
+#ifdef DEBUG
+	assert(i >= 0 && i < fs.size());
+#endif
+	return fs[i];
 }
 
 void compound_function::bootstrap(const ::data* d, const arguments& args)
