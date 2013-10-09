@@ -1,0 +1,14 @@
+import os
+
+env = Environment()
+env.Append(CPPPATH = ['../../', '../../../external/build/include'])
+
+# Soft Sources
+sources = ['main.cpp']
+
+libs = ['core']
+if(os.name == 'posix'):
+	libs.append(['rt', 'dl'])
+#end
+
+env.Program('../../build/data2brdf', sources, LIBS=libs, LIBPATH=['../../build'])
