@@ -1,5 +1,7 @@
+import os
+
 env = Environment()
-env.Append(CPPPATH = '/home/belcour/Sources/eigen')
+env.Append(CPPPATH = '../../external/build/include')
 
 # Library sources
 sources = ['common.cpp', 
@@ -9,5 +11,9 @@ sources = ['common.cpp',
            'rational_function.cpp', 
            'vertical_segment.cpp']
 
+libs = []
+if(os.name == 'posix'):
+	libs = ['rt', 'dl']
+#end
 
-env.StaticLibrary('../build/core', sources)
+env.StaticLibrary('../build/core', sources, LIBS=libs)

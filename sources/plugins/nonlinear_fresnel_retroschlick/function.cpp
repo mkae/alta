@@ -86,7 +86,7 @@ void retro_schlick::fresnelBootstrap(const data* d, const arguments& args)
 }
 
 //! Load function specific files
-void retro_schlick::load(std::istream& in)
+bool retro_schlick::load(std::istream& in)
 {
 	fresnel::load(in);
 
@@ -95,20 +95,34 @@ void retro_schlick::load(std::istream& in)
 	{
 		char line[256];
 		in.getline(line, 256);
+
+		// If we cross the end of the file, or the badbit is
+		// set, the file cannot be loaded
+		if(!in.good())
+			return false;
 	}
 
 	// Checking for the comment line #FUNC nonlinear_fresnel_retro_schlick
 	std::string token;
 	in >> token;
-	if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC")
+    {
+        std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl;
+        return false;
+    }
 
 	in >> token;
-	if(token != "nonlinear_fresnel_retro_schlick") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+    if(token != "nonlinear_fresnel_retro_schlick")
+    {
+        std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl;
+        return false;
+    }
 
 	// R [double]
     for(int i=0; i<dimY(); ++i) {
         in >> token >> R[i];
     }
+    return true;
 }
 
 void retro_schlick::save_call(std::ostream& out, const arguments& args) const

@@ -32,7 +32,7 @@ class blinn_function : public nonlinear_function
 		virtual void bootstrap(const data* d, const arguments& args);
 
 		//! \brief Load function specific files
-		virtual void load(std::istream& filename) ;
+        virtual bool load(std::istream& filename) ;
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const ;

@@ -40,7 +40,7 @@ class lafortune_function : public nonlinear_function
 		virtual vec value(const vec& x, const vec& p);
 
 		//! \brief Load function specific files
-		virtual void load(std::istream& in) ;
+        virtual bool load(std::istream& in) ;
 
         // Save functions
         void save_body(std::ostream& out, const arguments& args) const;

@@ -73,13 +73,13 @@ vec product(const vec& a, const vec& b)
     }
     else
     {
-#ifdef DEBUG
+#ifndef DEBUG
         assert(a.size() == b.size());
 #endif
         vec res(b.size());
         for(int i=0; i<b.size(); ++i)
         {
-            res[i] = a[0]*b[i];
+            res[i] = a[i]*b[i];
         }
         return res;
     }

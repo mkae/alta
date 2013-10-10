@@ -292,8 +292,8 @@ void isotropic_lafortune_function::bootstrap(const data* d, const arguments& arg
 		for(int n=0; n<_n; ++n)
 			for(int i=0; i<dimY(); ++i)
 			{
-				_C[(n*dimY() + i)*2 + 0] = 0.0;
-				_C[(n*dimY() + i)*2 + 1] = 1.0;
+				_C[(n*dimY() + i)*2 + 0] = -1.0;
+				_C[(n*dimY() + i)*2 + 1] =  1.0;
 				_N[n*dimY()  + i]        = (double)_n;
 			}
 	}
@@ -332,13 +332,18 @@ std::ofstream& type_affectation(std::ofstream& out, const std::string& name, con
 }
 
 //! Load function specific files
-void isotropic_lafortune_function::load(std::istream& in)
+bool isotropic_lafortune_function::load(std::istream& in)
 {
 	// Parse line until the next comment
 	while(in.peek() != '#')
 	{
 		char line[256];
 		in.getline(line, 256);
+
+		// If we cross the end of the file, or the badbit is
+		// set, the file cannot be loaded
+		if(!in.good())
+			return false;
 	}
 
     // Checking for the comment line #FUNC nonlinear_function_lafortune
@@ -347,17 +352,25 @@ void isotropic_lafortune_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+        return false;
 	}
 
 	in >> token;
    if(token.compare("nonlinear_function_lafortune") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+        return false;
 	}
 
 	// Shoudl have the #NB_LOBES [int]
 	int nb_lobes;
-	in >> token >> nb_lobes;
+	in >> token;
+	if(token.compare("#NB_LOBES") != 0)
+	{
+		std::cerr << "<<ERROR>> cannot access to the number of lobes" << std::endl;
+        return false;
+	}
+	in >> nb_lobes;
 	setNbLobes(nb_lobes);
 
 	// Parse the lobe
@@ -368,14 +381,14 @@ void isotropic_lafortune_function::load(std::istream& in)
 
 			in >> token >> _C[(n*_nY + i)*2 + 0];
 			in >> token >> _C[(n*_nY + i)*2 + 1];
-			in >> token >> _N[i];
+			in >> token >> _N[n*_nY + i];
 		}
 
 	}
 
 	std::cout << "<<INFO>> Cd = " << _C << std::endl;
-	std::cout << "<<INFO>> N = " << _N << std::endl;
-
+	std::cout << "<<INFO>> N = "  << _N << std::endl;
+    return true;
 }
 
 

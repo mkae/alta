@@ -31,13 +31,18 @@ vec blinn_function::value(const vec& x) const
 }
 
 //! Load function specific files
-void blinn_function::load(std::istream& in) 
+bool blinn_function::load(std::istream& in)
 {
 	    // Parse line until the next comment
     while(in.peek() != '#')
     {
         char line[256];
         in.getline(line, 256);
+
+		  // If we cross the end of the file, or the badbit is
+		  // set, the file cannot be loaded
+		  if(!in.good())
+			  return false;
     }
 
     // Checking for the comment line #FUNC nonlinear_function_blinn
@@ -49,6 +54,7 @@ void blinn_function::load(std::istream& in)
 #ifndef DEBUG
         std::cerr << "<<ERROR>> got \"" << token << "\"" << std::endl;
 #endif
+        return false;
     }
 
     in >> token;
@@ -58,6 +64,7 @@ void blinn_function::load(std::istream& in)
 #ifndef DEBUG
         std::cerr << "<<ERROR>> got \"" << token << "\"" << std::endl;
 #endif
+        return false;
     }
 
     // ks [double]
@@ -71,6 +78,7 @@ void blinn_function::load(std::istream& in)
 #ifdef DEBUG
     std::cout << "<<DEBUG>> load parameters " << parameters() << std::endl;
 #endif
+    return true;
 }
 
 //! Number of parameters to this non-linear function

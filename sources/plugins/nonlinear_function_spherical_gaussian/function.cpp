@@ -245,13 +245,18 @@ void spherical_gaussian_function::bootstrap(const data* d, const arguments& args
 }
 
 //! Load function specific files
-void spherical_gaussian_function::load(std::istream& in)
+bool spherical_gaussian_function::load(std::istream& in)
 {
 	// Parse line until the next comment
 	while(in.peek() != '#')
 	{
 		char line[256];
 		in.getline(line, 256);
+
+		// If we cross the end of the file, or the badbit is
+		// set, the file cannot be loaded
+		if(!in.good())
+			return false;
 	}
 
     // Checking for the comment line #FUNC nonlinear_function_lafortune
@@ -260,12 +265,14 @@ void spherical_gaussian_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+        return false;
 	}
 
 	in >> token;
    if(token.compare("nonlinear_function_spherical_gaussian") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+        return false;
 	}
 
 	// Parse the lobe
@@ -280,6 +287,7 @@ void spherical_gaussian_function::load(std::istream& in)
 	{
 		in >> token >> _a;
 	}
+    return true;
 }
 
 

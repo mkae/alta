@@ -38,22 +38,35 @@ vec retroblinn_function::value(const vec& x) const
 }
 
 //! Load function specific files
-void retroblinn_function::load(std::istream& in) 
+bool retroblinn_function::load(std::istream& in)
 {
 	    // Parse line until the next comment
     while(in.peek() != '#')
     {
         char line[256];
         in.getline(line, 256);
+
+		  // If we cross the end of the file, or the badbit is
+		  // set, the file cannot be loaded
+		  if(!in.good())
+			  return false;
     }
 
     // Checking for the comment line #FUNC nonlinear_function_retroblinn
     std::string token;
     in >> token;
-    if(token != "#FUNC") { std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; }
+    if(token != "#FUNC")
+    {
+        std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl;
+        return false;
+    }
 
     in >> token;
-    if(token != "nonlinear_function_retroblinn") { std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; }
+    if(token != "nonlinear_function_retroblinn")
+    {
+        std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl;
+        return false;
+    }
 
     // ks [double]
 	 // N  [double]
@@ -62,6 +75,7 @@ void retroblinn_function::load(std::istream& in)
         in >> token >> _ks[i];
         in >> token >>  _N[i];
     }
+    return true;
 }
 
 //! Number of parameters to this non-linear function

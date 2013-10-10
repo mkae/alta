@@ -29,22 +29,22 @@ vec ward_function::value(const vec& x) const
 
 	for(int i=0; i<dimY(); ++i)
 	{
-        const double ax = _ax[i];
-        const double ay = _ay[i];
+		const double ax = _ax[i];
+		const double ay = _ay[i];
 
-        const double hx_ax = h[0]/ax;
-        const double hy_ay = h[1]/ay;
+		const double hx_ax = h[0]/ax;
+		const double hy_ay = h[1]/ay;
 
 		const double exponent = (hx_ax*hx_ax + hy_ay*hy_ay) / (h[2]*h[2]);
 
-        if(x[2]*x[5] > 0.0)
-        {
-            res[i] = (_ks[i] / (4.0 * M_PI * ax * ay * sqrt(x[2]*x[5]))) * std::exp(- exponent);
-        }
-        else
-        {
-            res[i] = 0.0;
-        }
+		if(x[2]*x[5] > 0.0)
+		{
+			res[i] = (_ks[i] / (4.0 * M_PI * ax * ay * sqrt(x[2]*x[5]))) * std::exp(- exponent);
+		}
+		else
+		{
+			res[i] = 0.0;
+		}
 	}
 
 	return res;
@@ -166,13 +166,18 @@ void ward_function::bootstrap(const data* d, const arguments& args)
 }
 
 //! Load function specific files
-void ward_function::load(std::istream& in)
+bool ward_function::load(std::istream& in)
 {
 	// Parse line until the next comment
 	while(in.peek() != '#')
 	{
 		char line[256];
 		in.getline(line, 256);
+
+		// If we cross the end of the file, or the badbit is
+		// set, the file cannot be loaded
+		if(!in.good())
+			return false;
 	}
 
     // Checking for the comment line #FUNC nonlinear_function_lafortune
@@ -181,12 +186,14 @@ void ward_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+        return false;
 	}
 
 	in >> token;
    if(token.compare("nonlinear_function_ward") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+        return false;
 	}
 
 	// Parse the lobe
@@ -197,6 +204,7 @@ void ward_function::load(std::istream& in)
 		in >> token >> _ax[i];
 		in >> token >> _ay[i];
 	}
+    return true;
 }
 
 
@@ -257,7 +265,14 @@ void ward_function::save_body(std::ostream& out, const arguments& args) const
         out << "\tvec3  hax = dot(H,X) / ax;" << std::endl;
         out << "\tvec3  hay = dot(H,Y) / ay;" << std::endl;
         out << "\tfloat hn  = dot(H,N);" << std::endl;
-        out << "\treturn (ks / (4 * " << M_PI << " * ax*ay * sqrt(dot(L,N)*dot(V,N)))) * exp(-(hax*hax + hay*hay)/(hn*hn));" << std::endl;
+		  out << "\tfloat ln  = dot(L,N);" << std::endl;
+		  out << "\tfloat vn  = dot(V,N);" << std::endl;
+		  out << "\t" << std::endl;
+		  out << "\tif(ln*vn > 0) {" << std::endl;
+        out << "\t\treturn (ks / (4 * " << M_PI << " * ax*ay * sqrt(ln*vn))) * exp(-(hax*hax + hay*hay)/(hn*hn));" << std::endl;
+		  out << "\t} else {" << std::endl;
+		  out << "\t\t return vec3(0);" << std::endl;
+		  out << "\t}" << std::endl;
         out << "}" << std::endl;
     }
 }

@@ -24,8 +24,9 @@ rational_function_1d::rational_function_1d(const vec& a,
 {
 }
 
-void rational_function_1d::load(std::istream&)
+bool rational_function_1d::load(std::istream&)
 {
+	return true;
 }
 
 void rational_function_1d::update(const vec& in_a,
@@ -338,7 +339,7 @@ vec rational_function::value(const vec& x) const
 }
 
 // IO function to text files
-void rational_function::load(std::istream& in)
+bool rational_function::load(std::istream& in)
 {
 
 	// Parse line until the next comment
@@ -346,6 +347,11 @@ void rational_function::load(std::istream& in)
 	{
 		char line[256];
 		in.getline(line, 256);
+
+		// If we cross the end of the file, or the badbit is
+		// set, the file cannot be loaded
+		if(!in.good())
+			return false;
 	}
 
     // Checking for the comment line #FUNC nonlinear_function_lafortune
@@ -354,12 +360,14 @@ void rational_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+		return false;
 	}
 
 	in >> token;
    if(token.compare("rational_function") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+		return false;
 	}
 
 	int _np, _nq;
@@ -376,6 +384,7 @@ void rational_function::load(std::istream& in)
    if(token.compare("#MIN") != 0) 
 	{
 		std::cerr << "<<ERROR>> the min value for the input space is not defined." << std::endl; 
+		return false;
 	}
 	for(int k=0; k<dimX(); ++k) {in >> min[k];}
 	setMin(min);
@@ -384,6 +393,7 @@ void rational_function::load(std::istream& in)
    if(token.compare("#MAX") != 0) 
 	{
 		std::cerr << "<<ERROR>> the max value for the input space is not defined." << std::endl; 
+		return false;
 	}
 	for(int k=0; k<dimX(); ++k) {in >> max[k]; }
 	setMax(max);
@@ -409,6 +419,7 @@ void rational_function::load(std::istream& in)
 		// Update the i_th color channel
 		get(i)->update(a, b);
 	}
+	return true;
 }
 
 
