@@ -32,7 +32,12 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ce
 		print '<<INSTALL>> configure and build CERES'
 		os.chdir('.' + os.sep + 'ceres-solver-1.7.0')
 		build_dir = os.pardir + os.sep + 'build' + os.sep
-		ret = os.system('cmake -DGLOG_LIB=' + build_dir + 'lib -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .')
+		libname = ''
+		if os.name == 'posix':
+			libname = 'libglog.a'
+		else:
+			libname = 'glog.lib'
+		ret = os.system('cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .')
 		ret = os.system('make install')
 		os.chdir(os.pardir)
 	#end
