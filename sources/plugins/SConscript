@@ -4,3 +4,5 @@ SConscript('nonlinear_fitter_ceres/SConscript')
 
 # Building functions
 SConscript('nonlinear_function_diffuse/SConscript')
+SConscript('nonlinear_function_blinn/SConscript')
+SConscript('nonlinear_function_retroblinn/SConscript')
