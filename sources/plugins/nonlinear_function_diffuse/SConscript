@@ -2,6 +2,6 @@ env = Environment()
 env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
-sources = ['fitter.cpp']
-libs = ['-lceres', '-lcore']
-env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources, LIBS=libs)
+sources = ['function.cpp']
+libs = ['-lcore']
+env.SharedLibrary('../../build/nonlinear_function_diffuse', sources, LIBS=libs)

@@ -1,1 +1,6 @@
+
+# Building fitters
 SConscript('nonlinear_fitter_ceres/SConscript')
+
+# Building functions
+SConscript('nonlinear_function_diffuse/SConscript')
