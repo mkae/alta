@@ -63,7 +63,11 @@ class params
 		 //! <em>unknown</em>.
 		 enum output
 		 {
-			 INV_STERADIAN,
+			 INV_STERADIAN,                /*!< Output values in inverse steradian (sr-1). 
+														   This is the standard definition for a BRDF. */
+			 INV_STERADIAN_COSINE_FACTOR,  /*!< Output values in inverse steradian (sr-1)
+			                                    weighted by the cosine factor of the output
+															direction. */
 			 ENERGY,
 			 RGB_COLOR,
 			 XYZ_COLOR,
