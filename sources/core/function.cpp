@@ -470,6 +470,51 @@ bool product_function::load(std::istream& in)
 	return loaded_f1 || loaded_f2;
 }
 
+void product_function::save_body(std::ostream& out, const arguments& args) const
+{
+	f1->save_body(out, args);
+	out << std::endl;
+	
+	f2->save_body(out, args);
+	out << std::endl;
+
+	function::save_body(out, args);
+}
+
+void product_function::save_call(std::ostream& out, const arguments& args) const
+{
+	bool is_cpp    = args["export"] == "C++";
+	bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
+	bool is_matlab = args["export"] == "matlab";
+
+	// This part is export specific. For ALTA, the coefficients are just
+	// dumped as is with a #FUNC {plugin_name} header.
+	//
+	// For C++ export, the function call should be done before hand and
+	// the line should look like:
+	//   res += call_i(x);
+	if(is_cpp || is_matlab || is_shader)
+	{
+		out << "(";
+	}
+
+	f1->save_call(out, args);
+
+	if(is_cpp || is_matlab || is_shader)
+	{
+		out << " * ";
+	}
+
+	f2->save_call(out, args);
+
+	if(is_cpp || is_matlab || is_shader)
+	{
+		out << ")" << std::endl;
+	}
+
+	function::save_call(out, args);
+}
+
 void product_function::bootstrap(const data* d, const arguments& args)
 {
 	const bool global_bootstrap = args.is_defined("bootstrap");

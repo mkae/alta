@@ -30,9 +30,6 @@ class function : public parametrized
 		virtual vec operator()(const vec& x) const = 0 ;
 		virtual vec value(const vec& x) const = 0 ;
 
-		//! Load function specific files
-		virtual bool load(std::istream& in) = 0 ;
-
 		//! \brief Provide a first rough fit of the function. 
 		//!
 		//! \details
@@ -66,7 +63,10 @@ class function : public parametrized
 		virtual vec getMax() const ;
 
 
-		/* EXPORT FUNCTIONS */
+		/* IMPORT/EXPORT FUNCTIONS */
+
+		//! Load function specific files
+		virtual bool load(std::istream& in) = 0 ;
 
 		//! \brief Save the current function to a specific file type, args 
 		//! can be used to differenciate the type of export.
@@ -537,6 +537,9 @@ class product_function : public nonlinear_function
 		//! to already created nonlinear_function objects.
 		product_function(nonlinear_function* g1, nonlinear_function* g2);
 
+
+		/* EVALUATION FUNCTIONS */
+
 		//! \brief Overload the function operator, directly call the value function.
 		virtual vec operator()(const vec& x) const;
 
@@ -544,12 +547,26 @@ class product_function : public nonlinear_function
 		//! f2. The input parameter x should be in the parametrization of f1. This
 		//! function will do the conversion before getting f2's value.
 		virtual vec value(const vec& x) const;
+
+
+		/* IMPORT/EXPORT FUNCTIONS */
 		
 		//! \brief Load the two functions in order f1, then f2. If one of the 
 		//! function cannot be loaded, this function will continue. It will only
 		//! return false if both functions cannot be loaded.
 		virtual bool load(std::istream& in);
+
+		//! \brief save function specific data. This has no use for ALTA export
+		//! but allows to factorize the code in the C++ or matlab export by
+		//! defining function calls that are common to all the plugins.
+		virtual void save_body(std::ostream& out, const arguments& args) const;
+
+		//! \brief save object specific information. For an ALTA export the
+		//! coefficients will be exported. For a C++ or matlab export, the call
+		//! to the associated function will be done.
+		virtual void save_call(std::ostream& out, const arguments& args) const;
 		
+
 		//! \brief Provide a first rough fit of the function. 
 		virtual void bootstrap(const data* d, const arguments& args);
 
