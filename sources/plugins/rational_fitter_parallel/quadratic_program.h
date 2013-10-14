@@ -11,8 +11,7 @@ class quadratic_program
 {
 	public:
 		//! \brief Constructor need to specify the number of coefficients
-        quadratic_program(int np, int nq) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0), _boundary_factor(1.0) { }
-        quadratic_program(int np, int nq, double boundary_factor) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0), _boundary_factor(boundary_factor) { }
+		quadratic_program(int np, int nq) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0) { }
 
 		//! \brief Remove the already defined constraints
 		void clear_constraints()
@@ -156,7 +155,7 @@ class quadratic_program
 		}
 
 		//! \brief Test all the constraints of the data
-        bool test_constraints(int ny, const rational_function_1d* r, const vertical_segment* data)
+		bool test_constraints(int ny, const rational_function_1d* r, const vertical_segment* data)
 		{
 			int nb_failed = 0;
 			for(int n=0; n<data->size(); ++n)
@@ -164,35 +163,16 @@ class quadratic_program
 				vec x, yl, yu;
 				data->get(n, x, yl, yu);
 
-                // <boundary conditions>
-                if(_boundary_factor != 1.0)
-                {
-                    bool is_boundary = false;
-                    for(int i=0; i<data->dimX(); ++i)
-                    {
-                        is_boundary = is_boundary || (x[i] <= data->min()[i]) || (x[i] >= data->max()[i]);
-                    }
-
-                    if(is_boundary)
-                    {
-                        vec mean = 0.5*(yl+yu);
-                        yl = mean + _boundary_factor * (yl - mean);
-                        yu = mean + _boundary_factor * (yu - mean);
-                    }
-                }
-                // </boundary condition>
-
-
 				vec y = r->value(x);
-				bool fail_upper = y > yu;
-				bool fail_lower = y < yl;
+				bool fail_upper = y[ny] > yu[ny];
+				bool fail_lower = y[ny] < yl[ny];
 				if(fail_lower || fail_upper)
 				{
 					nb_failed++;
 
 					vec cu, cl;
 					get_constraint(x, yl, yu, ny, r, cu, cl);
-					
+
 					add_constraints(cu);
 					add_constraints(cl);
 				}
@@ -207,58 +187,62 @@ class quadratic_program
 		//! \brief Generate two constraint vectors from a vertical segment and a
 		//! ration function type.
 		inline void get_constraint(const vec& xi, const vec& yl, const vec& yu, int ny,
-                const rational_function_1d* func,
-				vec& cu, vec& cl)
-		{
-			cu.resize(_np+_nq);
-			cl.resize(_np+_nq);
-
-			// Create two vector of constraints
-			for(int j=0; j<_np+_nq; ++j)
-			{
-				// Filling the p part
-				if(j<_np)
-				{
-					const double pi = func->p(xi, j) ;
-					cu[j] =  pi ;
-					cl[j] = -pi ;
-
-				}
-				// Filling the q part
-				else
-				{
-					const double qi = func->q(xi, j-_np) ;
-
-					cu[j] = -yu[ny] * qi ;
-					cl[j] =  yl[ny] * qi ;
-				}
-			}
-		}
+		                           const rational_function_1d* func,
+		                           vec& cu, vec& cl);
 
 		//! \brief Give the next position in the data that is not satisfied.
 		//! This method works only for a single color channel ny !
-        static int next_unmatching_constraint(int i, int ny, const rational_function_1d* r,
-				const vertical_segment* data)
-		{
-			for(int n=i; n<data->size(); ++n)
-			{
-				vec x, yl, yu;
-				data->get(n, x, yl, yu);
-
-				vec y = r->value(x);
-				if(y[ny] < yl[ny] || y[ny] > yu[ny])
-				{
-					return n;
-				}
-			}
-			return data->size();
-		}
+		static int next_unmatching_constraint(int i, int ny, const rational_function_1d* r,
+		                                      const vertical_segment* data);
 
 	protected:
-		int _np, _nq ;
+		int _np, _nq;
 		QuadProgPP::Matrix<double> CI;
-
-        // Boundary conditions factor
-        double _boundary_factor;
-
 };
+		
+
+inline void quadratic_program::get_constraint(const vec& xi, const vec& yl, const vec& yu, 
+                                              int ny, const rational_function_1d* func,
+															 vec& cu, vec& cl)
+{
+	cu.resize(_np+_nq);
+	cl.resize(_np+_nq);
+
+	// Create two vector of constraints
+	for(int j=0; j<_np+_nq; ++j)
+	{
+		// Filling the p part
+		if(j<_np)
+		{
+			const double pi = func->p(xi, j) ;
+			cu[j] =  pi ;
+			cl[j] = -pi ;
+
+		}
+		// Filling the q part
+		else
+		{
+			const double qi = func->q(xi, j-_np) ;
+
+			cu[j] = -yu[ny] * qi ;
+			cl[j] =  yl[ny] * qi ;
+		}
+	}
+}
+
+int quadratic_program::next_unmatching_constraint(int i, int ny, const rational_function_1d* r,
+                                                  const vertical_segment* data)
+{
+	for(int n=i; n<data->size(); ++n)
+	{
+		vec x, yl, yu;
+		data->get(n, x, yl, yu);
+
+		vec y = r->value(x);
+		if(y[ny] < yl[ny] || y[ny] > yu[ny])
+		{
+			return n;
+		}
+	}
+	return data->size();
+}

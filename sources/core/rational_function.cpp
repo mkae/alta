@@ -404,13 +404,21 @@ bool rational_function::load(std::istream& in)
 		// Parse the p_i coefficients
 		for(int j=0; j<_np; ++j)
 		{
-			in >> token >> a[j];
+			for(int k=0; k<_nX; ++k)
+			{
+				in >> token;
+			}
+			in >> a[j];
 		}
 		
 		// Parse the q_i coefficients
 		for(int j=0; j<_nq; ++j)
 		{
-			in >> token >> b[j];
+			for(int k=0; k<_nX; ++k)
+			{
+				in >> token;
+			}
+			in >> b[j];
 		}
 
 		std::cout << a << std::endl;

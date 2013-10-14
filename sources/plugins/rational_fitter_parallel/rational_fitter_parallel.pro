@@ -1,8 +1,6 @@
 TARGET          = rational_fitter_parallel
 TEMPLATE        = lib
-CONFIG         *= qt         \
-                  plugin     \
-						eigen      \
+CONFIG         *= eigen      \
 						quadprog   \
 						openmp
 
@@ -12,11 +10,11 @@ INCLUDEPATH    += ../rational_function \
                   ../rational_data     \
                   ../.. 
 
-HEADERS         = rational_fitter.h \
-    quadratic_program.h
+HEADERS         = rational_fitter.h   \
+                  quadratic_program.h
 SOURCES         = rational_fitter.cpp
 
-LIBS           += -L../../build        \
+LIBS           += -L../../build       \
 						-lcore	
 
 #QMAKE_CXXFLAGS += -fPIC
