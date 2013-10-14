@@ -69,13 +69,14 @@ int main(int argc, char** argv)
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+	file.precision(10);
 
 	if(d != NULL)
 	{
 		for(int i=0; i<d->size(); ++i)
 		{
 			vec v = d->get(i) ;
-         vec x(f->dimX());
+			vec x(f->dimX());
 
 			if(f->input_parametrization() == params::UNKNOWN_INPUT)
 			{
@@ -83,7 +84,7 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-            params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+				params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
 			}
 
 			vec y2 = f->value(x) ;
@@ -101,7 +102,7 @@ int main(int argc, char** argv)
 			{
 				if(plot_error)
 				{
-                    file << (v[d->dimX() + u] - y2[u]) << "\t" ;
+					file << (v[d->dimX() + u] - y2[u]) << "\t" ;
 				}
 				else if(linear_plot)
 				{
