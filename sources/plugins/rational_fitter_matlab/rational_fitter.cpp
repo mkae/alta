@@ -154,6 +154,8 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		// Norm of the row vector
 		double a0_norm = 0.0 ;
 		double a1_norm = 0.0 ;
+		double a0_sum  = 0.0 ;
+		double a1_sum  = 0.0 ;
 
 		vec xi = d->get(i) ;
 
@@ -188,12 +190,17 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 			// Update the norm of the row
 			a0_norm += CI(2*i+0, j)*CI(2*i+0, j);
 			a1_norm += CI(2*i+1, j)*CI(2*i+1, j);
+			a0_sum  += CI(2*i+0, j);
+			a1_sum  += CI(2*i+1, j);
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
 		ci(2*i+0) = -sqrt(a0_norm) ;
 		ci(2*i+1) = -sqrt(a1_norm) ;
+
+		if(std::abs(a0_sum) < 1.0E-2) { std::cout << "Constraint " << 2*i+0 << " has a low sum: " << a0_sum << std::endl; }
+		if(std::abs(a1_sum) < 1.0E-2) { std::cout << "Constraint " << 2*i+1 << " has a low sum: " << a1_sum << std::endl; }
 	}
 	
 	// Update the ci column with the delta parameter
@@ -215,7 +222,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 #endif
 		return false ;
 	}
-	else if(delta == 0.0)
+	else if(delta < 1.0E-6)
 	{
 		delta = 1.0 ;
 	}
