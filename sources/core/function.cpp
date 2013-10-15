@@ -48,10 +48,11 @@ vec function::getMax() const
 
 void function::save(const std::string& filename, const arguments& args) const
 {
-    bool is_cpp      = args["export"] == "C++";
-    bool is_explorer = args["export"] == "explorer";
-    bool is_shader   = args["export"] == "shader" || is_explorer;
-    bool is_matlab   = args["export"] == "matlab";
+	bool is_alta     = !args.is_defined("export") || args["export"] == "alta";
+	bool is_cpp      = args["export"] == "C++";
+	bool is_explorer = args["export"] == "explorer";
+	bool is_shader   = args["export"] == "shader" || is_explorer;
+	bool is_matlab   = args["export"] == "matlab";
 
 	// Open the file
 	std::ofstream file(filename.c_str());
@@ -60,60 +61,66 @@ void function::save(const std::string& filename, const arguments& args) const
 		std::cerr << "<<ERROR>> unable to open output file for writing" << std::endl;
 	}
 
-    if(is_explorer)
-    {
-        file << "analytic" << std::endl;
-        file << std::endl;
-        file << "::begin shader" << std::endl;
-    }
+	// If the export is the alta format, use the maximum precision formatting
+	if(is_alta)
+	{
+		file.precision(10);
+	}
+
+	if(is_explorer)
+	{
+		file << "analytic" << std::endl;
+		file << std::endl;
+		file << "::begin shader" << std::endl;
+	}
 
 	// Save common header
-    save_header(file, args);
+	save_header(file, args);
 
 	// Save function definition
-    save_body(file, args);
+	save_body(file, args);
 
-    if(is_cpp)
-    {
-        file << "vec brdf(const vec& in, const vec& file)" << std::endl;
-        file << "{" << std::endl;
-        file << "\tvec res(" << dimY() << ");" << std::endl;
-        file << "\t";
-    }
-    else if(is_matlab)
-    {
-        file << "function res = brdf(in, file)" << std::endl;
-        file << "{" << std::endl;
-        file << "\tres = zeros(" << dimY() << ");" << std::endl;
-        file << "\t";
-    }
-    else if(is_shader)
-    {
-        file << "vec3 BRDF(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y)" << std::endl;
-        file << "{" << std::endl;
-        file << "\tvec3 res = ";
-    }
+	if(is_cpp)
+	{
+		file << "vec brdf(const vec& in, const vec& file)" << std::endl;
+		file << "{" << std::endl;
+		file << "\tvec res(" << dimY() << ");" << std::endl;
+		file << "\t";
+	}
+	else if(is_matlab)
+	{
+		file << "function res = brdf(in, file)" << std::endl;
+		file << "{" << std::endl;
+		file << "\tres = zeros(" << dimY() << ");" << std::endl;
+		file << "\t";
+	}
+	else if(is_shader)
+	{
+		file << "vec3 BRDF(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y)" << std::endl;
+		file << "{" << std::endl;
+		file << "\tvec3 res = ";
+	}
 
 	// Save fit data
-    save_call(file, args);
-    if(is_cpp || is_shader)
-    {
-        file << ";" << std::endl;
-        file << "\treturn res;" << std::endl;
-        file << "}" << std::endl;
-    }
-    else if(is_matlab)
-    {
-        file << ";" << std::endl;
-        file << "\treturn res;" << std::endl;
-        file << "endfunction" << std::endl;
-    }
-    file << std::endl;
+	save_call(file, args);
+	if(is_cpp || is_shader)
+	{
+		file << ";" << std::endl;
+		file << "\treturn res;" << std::endl;
+		file << "}" << std::endl;
+	}
+	else if(is_matlab)
+	{
+		file << ";" << std::endl;
+		file << "\treturn res;" << std::endl;
+		file << "endfunction" << std::endl;
+	}
+	file << std::endl;
 
-    if(is_explorer)
-    {
-        file << "::end shader" << std::endl;
-    }
+	if(is_explorer)
+	{
+		file << "::end shader" << std::endl;
+	}
 }
 		
 //! \brief save the header of the output function file. The header should
@@ -128,9 +135,10 @@ void function::save_header(std::ostream& out, const arguments& args) const
 		out << "#DIM " << _nX << " " << _nY << std::endl;
 		out << "#PARAM_IN  " << params::get_name(input_parametrization()) << std::endl;
 		//out << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;*
-        if(args.is_defined("export-append")) {
-            out << args["export-append"] << std::endl;
-        }
+		if(args.is_defined("export-append")) 
+		{
+			out << args["export-append"] << std::endl;
+		}
 		out << "#ALTA HEADER END" << std::endl;
 		out << std::endl;
 	}

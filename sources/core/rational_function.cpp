@@ -35,7 +35,13 @@ void rational_function_1d::update(const vec& in_a,
 	a.resize(in_a.size()) ;
 	b.resize(in_b.size()) ;
 
-    const double b0 = 1.0;//in_b[0];
+#define NORMALIZE
+
+#ifdef NORMALIZE
+    const double b0 = (std::abs(in_b[0]) > 1.0E-10) ? in_b[0] : 1.0;
+#else
+    const double b0 = 1.0;
+#endif
 
     for(int i=0; i<a.size(); ++i) { a[i] = in_a[i] / b0; }
     for(int i=0; i<b.size(); ++i) { b[i] = in_b[i] / b0; }

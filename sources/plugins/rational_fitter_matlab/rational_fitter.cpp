@@ -124,11 +124,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 	// Size of the problem
 	int N = np+nq ;
 	int M = d->size() ;
-/*
-	// Get the maximum value in data to scale the input parameter space
-	// so that it reduces the values of the polynomial
-	vec dmax = d->max() ;
-*/
+	
 	// Matrices of the problem
 	Eigen::MatrixXd G (N, N) ;
 	Eigen::VectorXd g (N) ;
@@ -171,26 +167,27 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 			if(j<np)
 			{
 				const double pi = r->p(xi, j) ;
-				a0_norm += pi*pi ;
-				a1_norm += pi*pi ;
+				
 				// Updating Eigen matrix
-				CI(2*i+0, j) =  pi ;
-				CI(2*i+1, j) = -pi ;
+				CI(2*i+0, j) =  pi;
+				CI(2*i+1, j) = -pi;
 			}
 			// Filling the q part
 			else
 			{
-				vec yl, yu ; 
-				d->get(i, yl, yu) ;
+				vec yl, yu; 
+				d->get(i, yl, yu);
 
-				const double qi = r->q(xi, j-np) ;
-				a0_norm += qi*qi * (yu[ny]*yu[ny]) ;
-				a1_norm += qi*qi * (yl[ny]*yl[ny]) ;
+				const double qi = r->q(xi, j-np);
 				
 				// Updating Eigen matrix
-				CI(2*i+0, j) = -yu[ny] * qi ;
-				CI(2*i+1, j) =  yl[ny] * qi ;
+				CI(2*i+0, j) = -yu[ny] * qi;
+				CI(2*i+1, j) =  yl[ny] * qi;
 			}
+
+			// Update the norm of the row
+			a0_norm += CI(2*i+0, j)*CI(2*i+0, j);
+			a1_norm += CI(2*i+1, j)*CI(2*i+1, j);
 		}
 	
 		// Set the c vector, will later be updated using the

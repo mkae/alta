@@ -208,6 +208,9 @@ function* plugins_manager::get_function(const std::string& filename)
 		throw ;
 	}
 
+	// Set the precision of the input
+	file.precision(10);
+
 	// Parameters of the function object
 	int nX, nY;
 	arguments args;
