@@ -11,11 +11,11 @@ SUBDIRS  = \
 				rational_function_chebychev				\
 				rational_function_legendre					\
 				nonlinear_fitter_eigen                 \
-            nonlinear_fitter_ceres						\
-            nonlinear_fitter_ipopt						\
-            nonlinear_fitter_nlopt						\
+#            nonlinear_fitter_ceres						\
+#            nonlinear_fitter_ipopt						\
+#            nonlinear_fitter_nlopt						\
 				nonlinear_fresnel_schlick					\
-				nonlinear_fresnel_normalized_schlick	\
+#				nonlinear_fresnel_normalized_schlick	\
 				nonlinear_fresnel_retroschlick			\
 				nonlinear_function_diffuse					\
 				nonlinear_function_blinn					\
