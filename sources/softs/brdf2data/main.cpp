@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     d = plugins_manager::get_data(args["data"]) ;
 
 	function* f = NULL;
-    f = plugins_manager::get_function(args["input"]);
+    f = plugins_manager::get_function(args);
 
 	// Modify function or data to provide coherent
 	// interfaces

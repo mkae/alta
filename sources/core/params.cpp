@@ -201,29 +201,29 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case params::RUSIN_TH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
+			outvec[1] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
 
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
 			outvec[0] = acos(half[2]);
-            outvec[1] = atan2(half[1], half[0]);
+			outvec[1] = atan2(half[1], half[0]);
 			outvec[2] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
 			break;
-        case params::RUSIN_TH_TD_PD:
-            outvec[0] = acos(half[2]);
+		case params::RUSIN_TH_TD_PD:
+			outvec[0] = acos(half[2]);
 
-            // Compute the diff vector
-            diff[0] = invec[0];
-            diff[1] = invec[1];
-            diff[2] = invec[2];
+			// Compute the diff vector
+			diff[0] = invec[0];
+			diff[1] = invec[1];
+			diff[2] = invec[2];
 
-            rotate_normal(diff, -atan2(half[1], half[0]));
-            rotate_binormal(diff, -outvec[0]);
-            
-				outvec[1] = acos(diff[2]);
-            outvec[2] = atan2(diff[1], diff[0]);
-            break;
+			rotate_normal(diff, -atan2(half[1], half[0]));
+			rotate_binormal(diff, -outvec[0]);
+
+			outvec[1] = acos(diff[2]);
+			outvec[2] = atan2(diff[1], diff[0]);
+			break;
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
 			outvec[1] = acos(invec[5]);

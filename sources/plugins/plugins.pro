@@ -25,5 +25,6 @@ SUBDIRS  = \
 				nonlinear_function_lafortune				\
 				nonlinear_function_isotropic_lafortune	\
 				data_merl										\
+				data_brdf_slice								\
 #				data_astm
 
