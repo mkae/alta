@@ -120,6 +120,8 @@ void timer::start()
 void timer::stop()
 {
     _stop = current_time();
+    _elapsed += _stop - _start;
+    _start = _stop;
 }
 
 void timer::reset()

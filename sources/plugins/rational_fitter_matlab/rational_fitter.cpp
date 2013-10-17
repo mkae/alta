@@ -154,6 +154,8 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 		// Norm of the row vector
 		double a0_norm = 0.0 ;
 		double a1_norm = 0.0 ;
+		double a0_sum  = 0.0 ;
+		double a1_sum  = 0.0 ;
 
 		vec xi = d->get(i) ;
 
@@ -188,12 +190,19 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 			// Update the norm of the row
 			a0_norm += CI(2*i+0, j)*CI(2*i+0, j);
 			a1_norm += CI(2*i+1, j)*CI(2*i+1, j);
+			a0_sum  += CI(2*i+0, j);
+			a1_sum  += CI(2*i+1, j);
 		}
 	
 		// Set the c vector, will later be updated using the
 		// delta parameter.
 		ci(2*i+0) = -sqrt(a0_norm) ;
 		ci(2*i+1) = -sqrt(a1_norm) ;
+
+#ifdef REMOVE
+		if(std::abs(a0_sum) < 1.0E-2) { std::cout << "Constraint " << 2*i+0 << " has a low sum: " << a0_sum << std::endl; }
+		if(std::abs(a1_sum) < 1.0E-2) { std::cout << "Constraint " << 2*i+1 << " has a low sum: " << a1_sum << std::endl; }
+#endif
 	}
 	
 	// Update the ci column with the delta parameter
@@ -215,7 +224,7 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 #endif
 		return false ;
 	}
-	else if(delta == 0.0)
+	else if(delta < 1.0E-06)
 	{
 		delta = 1.0 ;
 	}
@@ -305,15 +314,21 @@ bool rational_fitter_matlab::fit_data(const vertical_segment* d, int np, int nq,
 	{
 		if(flag != NULL)
 		{
-			if(mxGetScalar(flag) != 1)
+			const double flag_val = mxGetScalar(flag);
+			if(flag_val < 0)
 			{
 				mxDestroyArray(x);
 				mxDestroyArray(flag);
 			
 #ifdef DEBUG
-				std::cerr << "<<ERROR>> flag is not equal to 1" << std::endl ;
+				std::cerr << "<<ERROR>> flag is an error flag with no solution" << std::endl ;
 #endif
 				return false ;
+			}
+			else if(flag_val != 0)
+			{
+				std::cout << "<<INFO>> the solution might not be the optimal solution, this might be" << std::endl;
+				std::cout << "<<INFO>> caused by local min, or under precision steps" << std::endl;
 			}
 
 			double* val = (double*)mxGetData(x) ;
