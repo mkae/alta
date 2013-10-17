@@ -109,7 +109,6 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		double mean_delta = 0.0;
 		int nb_sol_found  = 0;
 		int nb_sol_tested = 0;
-		int np, nq ;
 
 		#pragma omp parallel for
 		for(int j=1; j<i; ++j)
@@ -118,6 +117,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			int temp_nq = j;
 
 			vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
+			rs[omp_get_thread_num()]->setSize(temp_np, temp_nq);
 
 			double delta, linf_dist, l2_dist;
 			bool is_fitted = fit_data(d, temp_np, temp_nq, rs[omp_get_thread_num()], args, p, q, delta, linf_dist, l2_dist);
@@ -138,7 +138,11 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 					if(delta < min_delta)
 					{
 						min_delta   = delta ;
-						r = rs[omp_get_thread_num()];
+						r->setSize(temp_np, temp_nq);
+						for(int y=0; y<r->dimY(); ++y)
+						{
+							r->update(y, rs[omp_get_thread_num()]->get(y));
+						}
 					}
 
 					// Get the solution with the minumum L2 norm
@@ -198,7 +202,6 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 
 			time.stop();
 			std::cout << "<<INFO>> got a fit using N = " << i << std::endl ;
-			std::cout << "<<INFO>> got a fit using {np, nq} = " << np << ", " << nq << std::endl ;
 			std::cout << "<<INFO>> it took " << time << std::endl ;
 			std::cout << "<<INFO>> I got " << nb_sol_found << " solutions to the QP" << std::endl ;
 			return true ;
@@ -222,6 +225,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 	{
 		vec p(np), q(nq);
 		rational_function_1d* rf = r->get(j);
+		rf->resize(np, nq);
 		if(!fit_data(d, np, nq, j, rf, p, q, delta))
 		{
 			return false ;
