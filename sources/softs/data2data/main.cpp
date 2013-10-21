@@ -61,9 +61,7 @@ int main(int argc, char** argv)
 		{
 			// Copy the input vector
 			vec x = d_out->get(i);
-			//params::convert(&x[0], d_out->parametrization(), d_in->parametrization(), &temp[0]);
-			temp[0] = x[0];
-			temp[1] = x[1];
+			params::convert(&x[0], d_out->parametrization(), d_in->parametrization(), &temp[0]);
 			
 			vec y = d_in->value(temp);
 

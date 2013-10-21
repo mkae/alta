@@ -1,4 +1,5 @@
 #include "params.h"
+#include "common.h"
 
 struct param_info
 {
@@ -201,7 +202,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case params::RUSIN_TH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[1] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
+			outvec[1] = acos(clamp(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2], -1.0, 1.0));
 			break;
 
 			// 3D Parametrization

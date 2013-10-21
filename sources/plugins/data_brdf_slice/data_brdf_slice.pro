@@ -1,6 +1,7 @@
 TEMPLATE        = lib
-CONFIG         *=  plugin \
-						 eigen
+CONFIG         *=  plugin  \
+						 eigen   \
+						 openexr
 
 DESTDIR         = ../../build
 
@@ -10,7 +11,4 @@ SOURCES         = data.cpp
 
 
 LIBS           += -L../../build   \
-						-lcore          \
-						-lfreeimageplus
-
-
+						-lcore          
