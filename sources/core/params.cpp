@@ -324,6 +324,7 @@ std::string params::get_name(const params::input param)
 		return it->second.name;
 	}
 
+	std::cerr << "<<ERROR>> Unknown parametrization, " << get_name(param) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	return std::string("UNKNOWN_INPUT");
 }
 

@@ -12,50 +12,54 @@
 #include <core/common.h>
 
 
-class schlick : public fresnel
+class schlick : public nonlinear_function
 {
 
 	public: // methods
 
+		// Constructor
+		schlick();
+
 		//! \brief Load function specific files
-        virtual bool load(std::istream& in) ;
+		virtual bool load(std::istream& in) ;
 
 		virtual void save_call(std::ostream& out, const arguments& args) const;
 		virtual void save_body(std::ostream& out, const arguments& args) const;
 
 	protected: // methods
 
-		virtual vec fresnelValue(const vec& x) const;
-		
+		virtual vec operator()(const vec& x) const { return value(x); }
+		virtual vec value(const vec& x) const;
+
 		//! \brief Number of parameters to this non-linear function
-		virtual int nbFresnelParameters() const ;
+		virtual int nbParameters() const ;
 
 		//! \brief Get the vector of parameters for the function
-		virtual vec getFresnelParameters() const ;
+		virtual vec parameters() const ;
 
 		//! \brief Update the vector of parameters for the function
-		virtual void setFresnelParameters(const vec& p) ;
+		virtual void setParameters(const vec& p) ;
 
 		//! Get the vector of min parameters for the function
-        virtual vec getFresnelParametersMin() const;
+		virtual vec parametersMin() const;
 
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
-		virtual vec getFresnelParametersJacobian(const vec& x) const ;
+		virtual vec parametersJacobian(const vec& x) const ;
 
 		//! \brief Boostrap the function by defining the diffuse term
-		virtual void fresnelBootstrap(const data* d, const arguments& args);
+		virtual void bootstrap(const data* d, const arguments& args);
 
-        //! \brief resize the parameter vector
-        virtual void setDimY(int nY)
-        {
-            fresnel::setDimY(nY);
-            R.resize(nY);
-        }
+		//! \brief resize the parameter vector
+		virtual void setDimY(int nY)
+		{
+			nonlinear_function::setDimY(nY);
+			R.resize(nY);
+		}
 
 	private: // data
 
 		//! Unidimensional Fresnel reflectance at theta = 0
-        vec R;
+		vec R;
 } ;
 

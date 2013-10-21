@@ -372,7 +372,16 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 		if(args.is_vec("bootstrap"))
 		{
 			vec p = args.get_vec("bootstrap", nbParameters());
+			std::cout << "<<INFO>> Will use " << p << " as a bootstrap for the non-linear function" << std::endl;
 			setParameters(p);
+		
+			for(unsigned int i=0; i<fs.size(); ++i)
+			{
+				if(fs[i]->nbParameters() == 0)
+				{
+					fs[i]->bootstrap(d, fs_args[i]);
+				}
+			}
 		}
 		else
 		{
@@ -657,7 +666,7 @@ void product_function::setParameters(const vec& p)
 	vec f2_params(nb_f2_params);
 	for(int i=0; i<nb_f2_params; ++i)
 	{
-		f2_params[i] = p[i+nb_f2_params];
+		f2_params[i] = p[i+nb_f1_params];
 	}
 	f2->setParameters(f2_params);
 }
@@ -720,8 +729,8 @@ vec product_function::parametersJacobian(const vec& x) const
 	vec xf(f2->dimX());
 	params::convert(&x[0], f1->input_parametrization(), f2->input_parametrization(), &xf[0]);
 
-	vec f1_jacobian = f1->parametersJacobian(xf);
-	vec f2_jacobian = f2->parametersJacobian(x);
+	vec f1_jacobian = f1->parametersJacobian(x);
+	vec f2_jacobian = f2->parametersJacobian(xf);
 
 	vec f1_value = f1->value(x);
 	vec f2_value = f2->value(xf);
