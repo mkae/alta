@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     arguments args(argc, argv) ;
 
 #ifdef __linux__
-	//feenableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
+	feenableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
 #endif
 
     fitter* fit = plugins_manager::get_fitter(args["fitter"]) ;

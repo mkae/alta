@@ -242,9 +242,18 @@ void params::from_cartesian(const double* invec, params::input outtype,
                 const double Kz = invec[2]-invec[5];
 
                 const double norm =  sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
-                outvec[0] = Kx / norm;
-                outvec[1] = Ky / norm;
-                outvec[2] = Kz / norm;
+					 if(norm > 1.0E-10)
+					 {
+	                outvec[0] = Kx / norm;
+		             outvec[1] = Ky / norm;
+			          outvec[2] = Kz / norm;
+					 }
+					 else
+					 {
+	                outvec[0] = 0.0;
+		             outvec[1] = 0.0;
+			          outvec[2] = 1.0;
+					 }
             }
             break;
 
