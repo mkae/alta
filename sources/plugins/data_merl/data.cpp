@@ -311,9 +311,9 @@ vec data_merl::get(int i) const
 
 
 	vec res(6) ;
-	res[2] = phid_ind * M_PI / (BRDF_SAMPLING_RES_PHI_D / 2);
-	res[1] = thed_ind * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_D);
-	res[0] = theh_ind * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_H);
+	res[2] = (phid_ind+0.5) * M_PI / (BRDF_SAMPLING_RES_PHI_D / 2);
+	res[1] = (thed_ind+0.5) * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_D);
+	res[0] = (theh_ind+0.5) * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_H);
 	res[3] = brdf[i] * RED_SCALE;
 	res[4] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 	res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;

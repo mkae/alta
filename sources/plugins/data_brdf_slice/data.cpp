@@ -50,8 +50,8 @@ vec data_brdf_slice::get(int id) const
 	const int i = id % width;
 	const int j = id / width;
 
-	res[0] = 0.5*M_PI*i / double(width);
-	res[1] = 0.5*M_PI*j / double(height);
+	res[0] = 0.5*M_PI*(i+0.5) / double(width);
+	res[1] = 0.5*M_PI*(j+0.5) / double(height);
 
 	res[2] = _data[3*id + 0];
 	res[3] = _data[3*id + 1];
