@@ -517,16 +517,18 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 							std::cout << "<<DEBUG>> Unable to load second function of product, regular bootstraping" << std::endl;
 						}
 					}
-					
+					else
+					{	
+						// If the function cannot be loaded, put the input stream
+						// in the previous state and bootstrap normaly this function.
+						if(!fs[i]->load(file))
+						{
+							file.seekg(pos);
 
-					// If the function cannot be loaded, put the input stream
-					// in the previous state and bootstrap normaly this function.
-					if(!fs[i]->load(file))
-					{
-						file.seekg(pos);
-
-						// Bootstrap the function as if it was not loaded
-						fs[i]->bootstrap(d, fs_args[i]);
+							// Bootstrap the function as if it was not loaded
+							fs[i]->bootstrap(d, fs_args[i]);
+							std::cout << "<<DEBUG>> Unable to load one function of compound, regular bootstraping" << std::endl;
+						}
 					}
 				}
 			}

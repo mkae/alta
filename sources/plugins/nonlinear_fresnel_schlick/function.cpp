@@ -181,5 +181,5 @@ vec schlick::parametersJacobian(const vec& x) const
 
 void schlick::bootstrap(const data* d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i) { R[i] = 1.0; }
+    for(int i=0; i<dimY(); ++i) { R[i] = 0.5; }
 }
