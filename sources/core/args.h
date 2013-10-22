@@ -307,7 +307,7 @@ class arguments
 			  }
 
 			  arguments current_args(argc, argv);
-			  delete argv;
+			  delete[] argv;
 			  return current_args;
 		  }
 

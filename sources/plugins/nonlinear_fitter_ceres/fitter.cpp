@@ -211,6 +211,9 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
          /* the following starting values provide a rough fit. */
          vec p = nf->parameters();
 
+			std::cout << "<<DEBUG>> Starting vector: " << p << std::endl;
+			std::cout << "<<DEBUG>> Final vector should be between " << nf->getParametersMin() << " and " << nf->getParametersMax() << std::endl;
+
          // Create the problem
          ceres::Problem problem;
          for(int i=0; i<d->size(); ++i)

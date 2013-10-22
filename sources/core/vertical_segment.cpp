@@ -93,7 +93,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
         else
         {
 
-		vec v(dimX() + 3*dimY()) ;
+		vec v = vec::Zero(dimX() + 3*dimY()) ;
 		for(int i=0; i<dimX(); ++i)
 			linestream >> v[i] ;
 

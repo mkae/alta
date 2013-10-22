@@ -53,7 +53,7 @@ double dot(const vec& a, const vec& b)
 
 vec product(const vec& a, const vec& b)
 {
-    if(a.size() == 1 && b.size() > 1)
+    if(a.size() == 1 && b.size() >= 1)
     {
         vec res(b.size());
         for(int i=0; i<b.size(); ++i)
@@ -62,7 +62,7 @@ vec product(const vec& a, const vec& b)
         }
         return res;
     }
-    else if(b.size() == 1 && a.size() > 1)
+    else if(b.size() == 1 && a.size() >= 1)
     {
         vec res(a.size());
         for(int i=0; i<a.size(); ++i)

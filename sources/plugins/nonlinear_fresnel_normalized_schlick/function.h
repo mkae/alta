@@ -41,7 +41,8 @@ class schlick : public nonlinear_function
 		virtual void setParameters(const vec& p) ;
 
 		//! Get the vector of min parameters for the function
-		virtual vec parametersMin() const;
+		virtual vec getParametersMin() const;
+		virtual vec getParametersMax() const;
 
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 

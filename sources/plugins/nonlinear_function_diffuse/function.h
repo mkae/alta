@@ -23,6 +23,7 @@ class diffuse_function : public nonlinear_function
         diffuse_function()
         {
             setParametrization(params::CARTESIAN);
+				setDimX(6);
         }
 
 		// Overload the function operator

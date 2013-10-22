@@ -105,6 +105,10 @@ vec schlick::value(const vec& x) const
 
     const double dotVH = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
 
+	 //std::cout << "v_h  = [" << xp[0] << ", " << xp[1] << ", " << xp[2] << "]" << std::endl;
+	 //std::cout << "cart = [" << cart[0] << ", " << cart[1] << ", " << cart[2] << "], [" << cart[3] << ", " << cart[4] << ", " << cart[5] << "]" << std::endl;
+	 //std::cout << dotVH << std::endl;
+
     vec res(dimY());
     for(int i=0; i<dimY(); ++i)
     {
