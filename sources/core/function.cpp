@@ -488,11 +488,36 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 				for(unsigned int i=0; i<fs.size(); ++i)
 				{
 					std::streampos pos = file.tellg();
-					/*
+					
 					if(dynamic_cast<product_function*>(fs[i]) != NULL)
 					{
+						product_function* p = dynamic_cast<product_function*>(fs[i]);
+						nonlinear_function* f1 = p->first();
+						nonlinear_function* f2 = p->second();
+
+						pos = file.tellg();
+						if(!f1->load(file))
+						{
+							file.seekg(pos);
+
+							// Bootstrap the function as if it was not loaded
+							f1->bootstrap(d, args);
+							std::cout << "<<DEBUG>> Unable to load first function of product, regular bootstraping" << std::endl;
+						}
+
+						// If the second function cannot be loaded, put the input stream
+						// in the previous state and bootstrap normaly this function.
+						pos = file.tellg();
+						if(!f2->load(file))
+						{
+							file.seekg(pos);
+
+							// Bootstrap the function as if it was not loaded
+							f2->bootstrap(d, args);
+							std::cout << "<<DEBUG>> Unable to load second function of product, regular bootstraping" << std::endl;
+						}
 					}
-					*/
+					
 
 					// If the function cannot be loaded, put the input stream
 					// in the previous state and bootstrap normaly this function.
@@ -1086,4 +1111,14 @@ void product_function::setParametrization(params::output new_param)
 {
 	f1->setParametrization(new_param);
 	f2->setParametrization(new_param);
+}
+
+nonlinear_function* product_function::first() const
+{
+	return f1;
+}
+
+nonlinear_function* product_function::second() const
+{
+	return f2;
 }

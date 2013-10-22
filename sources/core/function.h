@@ -304,6 +304,15 @@ class product_function : public nonlinear_function
 		product_function(nonlinear_function* g1, nonlinear_function* g2);
 
 
+		/* ACCESS TO INDIVIDUAL ELEMENTS */
+
+		//! \brief Access to the first member of the product
+		nonlinear_function* first() const;
+
+		//! \biref Access to the second member of the product
+		nonlinear_function* second() const;
+
+
 		/* EVALUATION FUNCTIONS */
 
 		//! \brief Overload the function operator, directly call the value function.

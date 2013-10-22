@@ -17,6 +17,7 @@ ALTA_DLL_EXPORT function* provide_function()
 schlick::schlick()
 {
 	setParametrization(params::CARTESIAN);
+	setDimX(6);
 }
 
 //! Load function specific files
@@ -187,5 +188,5 @@ vec schlick::parametersJacobian(const vec& x) const
 
 void schlick::bootstrap(const data* d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i) { R[i] = 0.000001; }
+    for(int i=0; i<dimY(); ++i) { R[i] = 0.1; }
 }
