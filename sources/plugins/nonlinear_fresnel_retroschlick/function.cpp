@@ -148,12 +148,21 @@ void retro_schlick::save_call(std::ostream& out, const arguments& args) const
 	if(is_alta)
 	{
 		out << "#FUNC nonlinear_fresnel_retro_schlick" << std::endl ;
-		out << "R " << R << std::endl;
+		for(int i=0; i<dimY(); ++i)
+		{
+			out << "R " << R[i] << std::endl;
+		}
 		out << std::endl;
 	}
 	else
 	{
-		out << " * retro_schlick_fresnel(L, V, N, X, Y, " << R << ")";
+		out << "retro_schlick_fresnel(L, V, N, X, Y, vec3(";
+		for(int i=0; i<dimY(); ++i)
+		{
+			out << R[i];
+			if(i < _nY-1) { out << ", "; }
+		}
+		out << "))";
 	}
 }
 
@@ -164,11 +173,11 @@ void retro_schlick::save_body(std::ostream& out, const arguments& args) const
 	if(is_shader)
 	{
 		out << std::endl;
-		out << "vec3 retro_schlick_fresnel(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, float R)" << std::endl;
+		out << "vec3 retro_schlick_fresnel(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 R0)" << std::endl;
 		out << "{" << std::endl;
 		out << "\tvec3 R = 2.0f*dot(V,N)*N - V;" << std::endl;
 		out << "\tvec3 K = normalize(L + R);" << std::endl;
-		out << "\treturn vec3(R + (1.0f - R) * pow(1.0f - clamp(dot(K,R), 0.0f, 1.0f), 5));" << std::endl;
+		out << "\treturn vec3(R0 + (vec3(1.0f) - R0) * pow(1.0f - clamp(dot(K,R), 0.0f, 1.0f), 5.0f));" << std::endl;
 		out << "}" << std::endl;
 		out << std::endl;
 	}
