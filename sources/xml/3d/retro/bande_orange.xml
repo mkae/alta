@@ -20,11 +20,18 @@
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
-		<function name="nonlinear_function_blinn" />
-		<function name="nonlinear_function_retroblinn" />
+		<function name="nonlinear_function_blinn">
+			<parameter name="fresnel" value="./build/libnonlinear_fresnel_schlick.so" />
+		</function>
+		<function name="nonlinear_function_retroblinn">
+			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so" />
+		</function>
 
 		<!-- Define the ftting procedure to use -->
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+	
+		<!-- Parameters -->
+		<parameter name="data-correct-cosine" value="" />
 	</action>
 	
 	<!-- Export the fit -->
@@ -52,11 +59,15 @@
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_spherical_gaussian" />
 		<function name="nonlinear_function_spherical_gaussian">
+			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so" />
 			<parameter name="sg-type" value="back" />
 		</function>
 
 		<!-- Define the ftting procedure to use -->
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+		
+		<!-- Parameters -->
+		<parameter name="data-correct-cosine" value="" />
 	</action>
 	
 	<!-- Export the fit -->
