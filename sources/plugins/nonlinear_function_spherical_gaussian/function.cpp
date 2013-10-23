@@ -287,6 +287,9 @@ bool spherical_gaussian_function::load(std::istream& in)
 	{
 		in >> token >> _a;
 	}
+
+	std::cout << "<<DEBUG>> Spherical gaussians plugin, found p= " << parameters() << std::endl;
+
     return true;
 }
 
