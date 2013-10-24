@@ -93,12 +93,26 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
         else
         {
 
-		vec v(dimX() + 3*dimY()) ;
+		vec v = vec::Zero(dimX() + 3*dimY()) ;
 		for(int i=0; i<dimX(); ++i)
 			linestream >> v[i] ;
 
+
+		// Correction of the data by 1/cosine(theta_L)
+		double factor = 1.0;
+		if(args.is_defined("data-correct-cosine"))
+		{
+			double cart[6];
+			params::convert(&v[0], input_parametrization(), params::CARTESIAN, cart);
+			factor = 1.0/cart[5];
+		}
+		// End of correction
+
 		for(int i=0; i<dimY(); ++i)
-			linestream >> v[dimX() + i] ;
+		{
+			linestream >> v[dimX() + i];
+			v[dimX() + i] /= factor;
+		}
 
         // Check if the data containt a vertical segment around the mean
         // value.

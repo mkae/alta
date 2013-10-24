@@ -1,4 +1,5 @@
 #include "params.h"
+#include "common.h"
 
 struct param_info
 {
@@ -86,7 +87,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 
 		case params::RUSIN_TH_TD:
-            half_to_cartesian(invec[0], 0.0, invec[1], 0.0, outvec);
+            half_to_cartesian(invec[0], 0.0, invec[1], 0.5*M_PI, outvec);
 			break;
 
 			// 3D Parametrization
@@ -201,7 +202,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case params::RUSIN_TH_TD:
 			outvec[0] = acos(half[2]);
-			outvec[1] = acos(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2]);
+			outvec[1] = acos(clamp(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2], -1.0, 1.0));
 			break;
 
 			// 3D Parametrization
@@ -241,9 +242,18 @@ void params::from_cartesian(const double* invec, params::input outtype,
                 const double Kz = invec[2]-invec[5];
 
                 const double norm =  sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
-                outvec[0] = Kx / norm;
-                outvec[1] = Ky / norm;
-                outvec[2] = Kz / norm;
+					 if(norm > 1.0E-10)
+					 {
+	                outvec[0] = Kx / norm;
+		             outvec[1] = Ky / norm;
+			          outvec[2] = Kz / norm;
+					 }
+					 else
+					 {
+	                outvec[0] = 0.0;
+		             outvec[1] = 0.0;
+			          outvec[2] = 1.0;
+					 }
             }
             break;
 
@@ -323,6 +333,7 @@ std::string params::get_name(const params::input param)
 		return it->second.name;
 	}
 
+	std::cerr << "<<ERROR>> Unknown parametrization, " << get_name(param) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	return std::string("UNKNOWN_INPUT");
 }
 

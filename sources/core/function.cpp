@@ -308,22 +308,50 @@ vec compound_function::operator()(const vec& x) const
 }
 vec compound_function::value(const vec& x) const
 {
-	vec res(_nY);
-	res = vec::Zero(_nY);
+	vec res = vec::Zero(dimY());
 	for(unsigned int i=0; i<fs.size(); ++i)
 	{
-		if(fs[i]->input_parametrization() != input_parametrization())
-		{
-			vec temp_x(fs[i]->dimX());
-			params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
-			res = res + fs[i]->value(temp_x);
-		}
-		else
-		{
-			res = res + fs[i]->value(x);
-		}
+		vec temp_x(fs[i]->dimX());
+		params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
+		res = res + fs[i]->value(temp_x);
 	}
 	return res;
+}
+
+vec compound_function::parametersJacobian(const vec& x) const
+{
+	int nb_params = nbParameters();
+	vec jac = vec::Zero(nb_params*dimY());
+
+	int start_i = 0;
+
+	// Export the sub-Jacobian for each function
+	for(unsigned int f=0; f<fs.size(); ++f)
+	{
+		nonlinear_function* func = fs[f];
+		int nb_f_params = func->nbParameters(); 
+
+		// Only export Jacobian if there are non-linear parameters
+		if(nb_f_params > 0 && !is_fixed[f])
+		{
+
+			vec temp_x(func->dimX());
+			params::convert(&x[0], input_parametrization(), func->input_parametrization(), &temp_x[0]);
+			vec func_jac = func->parametersJacobian(temp_x);
+
+			for(int i=0; i<nb_f_params; ++i)
+			{
+				for(int y=0; y<dimY(); ++y)
+				{
+					jac[y*nb_params + (i+start_i)] = func_jac[y*nb_f_params + i];
+				}
+			}
+
+			start_i += nb_f_params;
+		}
+	}
+
+	return jac;
 }
 
 void compound_function::push_back(nonlinear_function* f, const arguments& f_args)
@@ -361,6 +389,62 @@ nonlinear_function* compound_function::operator[](int i) const
 #endif
 	return fs[i];
 }
+		
+unsigned int compound_function::size() const
+{
+	return fs.size();
+}
+
+bool compound_function::load(std::istream& in)
+{
+	int nb_good = 0; // Number of correctly openned functions
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		std::streampos pos = in.tellg();
+		if(!fs[i]->load(in))
+		{
+			in.seekg(pos);
+		}
+		else
+		{
+			nb_good++;
+		}
+	}
+	return nb_good > 0;
+}
+
+void compound_function::setParametrization(params::input new_param)
+{
+	if(new_param == params::UNKNOWN_INPUT)
+		return;
+
+	// If there is more than one parametrization defined to this function, convert
+	// it to the parametrization that conserves the most degrees of freedom. Right now
+	// this is the CARTESIAN param. It might change in future release.
+	if(input_parametrization() != new_param)
+	{
+		function::setParametrization(params::CARTESIAN);
+		function::setDimX(6);
+	}
+
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			fs[i]->setParametrization(new_param);
+			fs[i]->setDimX(params::dimension(new_param));
+		}
+	}
+}
+		
+void compound_function::setParametrization(params::output new_param)
+{
+	parametrized::setParametrization(new_param);
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		fs[i]->setParametrization(new_param);
+	}
+}
 
 void compound_function::bootstrap(const ::data* d, const arguments& args)
 {
@@ -372,7 +456,16 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 		if(args.is_vec("bootstrap"))
 		{
 			vec p = args.get_vec("bootstrap", nbParameters());
+			std::cout << "<<INFO>> Will use " << p << " as a bootstrap for the non-linear function" << std::endl;
 			setParameters(p);
+		
+			for(unsigned int i=0; i<fs.size(); ++i)
+			{
+				if(fs[i]->nbParameters() == 0)
+				{
+					fs[i]->bootstrap(d, fs_args[i]);
+				}
+			}
 		}
 		else
 		{
@@ -395,15 +488,47 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 				for(unsigned int i=0; i<fs.size(); ++i)
 				{
 					std::streampos pos = file.tellg();
-
-					// If the function cannot be loaded, put the input stream
-					// in the previous state and bootstrap normaly this function.
-					if(!fs[i]->load(file))
+					
+					if(dynamic_cast<product_function*>(fs[i]) != NULL)
 					{
-						file.seekg(pos);
+						product_function* p = dynamic_cast<product_function*>(fs[i]);
+						nonlinear_function* f1 = p->first();
+						nonlinear_function* f2 = p->second();
 
-						// Bootstrap the function as if it was not loaded
-						fs[i]->bootstrap(d, fs_args[i]);
+						pos = file.tellg();
+						if(!f1->load(file))
+						{
+							file.seekg(pos);
+
+							// Bootstrap the function as if it was not loaded
+							f1->bootstrap(d, args);
+							std::cout << "<<DEBUG>> Unable to load first function of product, regular bootstraping" << std::endl;
+						}
+
+						// If the second function cannot be loaded, put the input stream
+						// in the previous state and bootstrap normaly this function.
+						pos = file.tellg();
+						if(!f2->load(file))
+						{
+							file.seekg(pos);
+
+							// Bootstrap the function as if it was not loaded
+							f2->bootstrap(d, args);
+							std::cout << "<<DEBUG>> Unable to load second function of product, regular bootstraping" << std::endl;
+						}
+					}
+					else
+					{	
+						// If the function cannot be loaded, put the input stream
+						// in the previous state and bootstrap normaly this function.
+						if(!fs[i]->load(file))
+						{
+							file.seekg(pos);
+
+							// Bootstrap the function as if it was not loaded
+							fs[i]->bootstrap(d, fs_args[i]);
+							std::cout << "<<DEBUG>> Unable to load one function of compound, regular bootstraping" << std::endl;
+						}
 					}
 				}
 			}
@@ -422,6 +547,200 @@ void compound_function::bootstrap(const ::data* d, const arguments& args)
 	}
 }
 
+void compound_function::setDimX(int nX) 
+{
+	if(input_parametrization() == params::UNKNOWN_INPUT)
+	{
+		function::setDimX(nX);
+	}
+	
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			fs[i]->setDimX(nX);
+		}
+	}
+}
+		
+void compound_function::setDimY(int nY)
+{
+	function::setDimY(nY);
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		fs[i]->setDimY(nY);
+	}
+}
+
+void compound_function::setMin(const vec& min) 
+{
+	function::setMin(min);
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		fs[i]->setMin(min);
+	}
+}
+void compound_function::setMax(const vec& max) 
+{
+	function::setMax(max);
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		fs[i]->setMax(max);
+	}
+}
+
+//! Number of parameters to this non-linear function
+int compound_function::nbParameters() const
+{
+	int nb_params = 0;
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		if(!is_fixed[i]) {
+			nb_params += fs[i]->nbParameters();
+		}
+	}
+	return nb_params;
+}
+
+//! Get the vector of parameters for the function
+vec compound_function::parameters() const
+{
+	vec params(nbParameters());
+	int current_i = 0;
+	for(unsigned int f=0; f<fs.size(); ++f)
+	{
+		int f_size = fs[f]->nbParameters();
+
+		// Handle when there is no parameters to include
+		if(f_size > 0 && !is_fixed[f])
+		{
+			vec f_params = fs[f]->parameters();
+			for(int i=0; i<f_size; ++i)
+			{
+				params[i + current_i] = f_params[i];
+			}
+
+			current_i += f_size;
+		}
+	}
+
+	return params;
+}
+
+//! Get the vector of min parameters for the function
+vec compound_function::getParametersMin() const
+{
+	vec params(nbParameters());
+	int current_i = 0;
+	for(unsigned int f=0; f<fs.size(); ++f)
+	{
+		int f_size = fs[f]->nbParameters();
+
+		// Handle when there is no parameters to include
+		if(f_size > 0 && !is_fixed[f])
+		{
+			vec f_params = fs[f]->getParametersMin();
+			for(int i=0; i<f_size; ++i)
+			{
+				params[i + current_i] = f_params[i];
+			}
+
+			current_i += f_size;
+		}
+	}
+
+	return params;
+}
+
+//! Get the vector of min parameters for the function
+vec compound_function::getParametersMax() const
+{
+	vec params(nbParameters());
+	int current_i = 0;
+	for(unsigned int f=0; f<fs.size(); ++f)
+	{
+		int f_size = fs[f]->nbParameters();
+
+		// Handle when there is no parameters to include
+		if(f_size > 0 && !is_fixed[f])
+		{
+			vec f_params = fs[f]->getParametersMax();
+			for(int i=0; i<f_size; ++i)
+			{
+				params[i + current_i] = f_params[i];
+			}
+
+			current_i += f_size;
+		}
+	}
+
+	return params;
+}
+
+//! Update the vector of parameters for the function
+void compound_function::setParameters(const vec& p) 
+{
+	int current_i = 0;
+	for(unsigned int f=0; f<fs.size(); ++f)
+	{
+		int f_size = fs[f]->nbParameters();
+
+		// Handle when there is no parameters to include
+		if(f_size > 0 && !is_fixed[f])
+		{
+			vec f_params(f_size);
+			for(int i=0; i<f_params.size(); ++i)
+			{
+				f_params[i] = p[i + current_i];
+			}
+
+			fs[f]->setParameters(f_params);
+			current_i += f_size;
+		}
+	}
+}
+		
+void compound_function::save_body(std::ostream& out, const arguments& args) const
+{
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		fs[i]->save_body(out, args);
+		out << std::endl;
+	}
+
+	function::save_body(out, args);
+}
+		
+void compound_function::save_call(std::ostream& out, const arguments& args) const
+{
+	bool is_cpp    = args["export"] == "C++";
+	bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
+	bool is_matlab = args["export"] == "matlab";
+
+	// This part is export specific. For ALTA, the coefficients are just
+	// dumped as is with a #FUNC {plugin_name} header.
+	//
+	// For C++ export, the function call should be done before hand and
+	// the line should look like:
+	//   res += call_i(x);
+	for(unsigned int i=0; i<fs.size(); ++i)
+	{
+		if(i != 0 && (is_cpp || is_matlab || is_shader))
+		{
+			out << "\tres += ";
+		}
+
+		fs[i]->save_call(out, args);
+
+		if(is_cpp || is_matlab || is_shader)
+		{
+			out << ";" << std::endl;
+		}
+	}
+
+	function::save_call(out, args);
+}
+
 
 
 /*--- Product functions implementation ----*/
@@ -430,6 +749,19 @@ product_function::product_function(nonlinear_function* g1, nonlinear_function* g
 {
 	this->f1 = g1;
 	this->f2 = g2;
+
+	// If the two parametrization are different, use the CARTESIAN parametrization
+	// as the input parametrization, then do the convertion for all the functions.
+	if(g1->input_parametrization() != g2->input_parametrization())
+	{
+		function::setParametrization(params::CARTESIAN);
+		function::setDimX(6);
+	}
+	else
+	{
+		setParametrization(g1->input_parametrization());
+		function::setDimX(g1->dimX());
+	}
 }
 
 vec product_function::operator()(const vec& x) const
@@ -438,15 +770,23 @@ vec product_function::operator()(const vec& x) const
 }
 vec product_function::value(const vec& x) const
 {
-	// Get the first function value
-	vec f1res = f1->value(x);
+	// Convert input space to the 1rst function parametrization and compute the
+	// output value
+	vec xf1(f1->dimX());
+	params::convert(&x[0], input_parametrization(), f1->input_parametrization(), &xf1[0]);
+	vec f1res = f1->value(xf1);
 
-	// Convert input space to the 2nd function parametreization
+	// Convert input space to the 2nd function parametrization and compute the
+	// output value
 	vec xf2(f2->dimX());
-	params::convert(&x[0], f1->input_parametrization(), f2->input_parametrization(), &xf2[0]);
+	params::convert(&x[0], input_parametrization(), f2->input_parametrization(), &xf2[0]);
 	vec f2res = f2->value(xf2);
 
-	return product(f1res, f2res);
+	vec res = product(f1res, f2res);
+
+	//std::cout << f1res << " :::::::::: " << res << std::endl;
+	//std::cout << f2res << std::endl;
+	return res;
 }
 		
 bool product_function::load(std::istream& in)
@@ -559,6 +899,7 @@ void product_function::bootstrap(const data* d, const arguments& args)
 
 					// Bootstrap the function as if it was not loaded
 					f1->bootstrap(d, args);
+					std::cout << "<<DEBUG>> Unable to load first function of product, regular bootstraping" << std::endl;
 				}
 				
 				// If the second function cannot be loaded, put the input stream
@@ -569,6 +910,7 @@ void product_function::bootstrap(const data* d, const arguments& args)
 
 					// Bootstrap the function as if it was not loaded
 					f2->bootstrap(d, args);
+					std::cout << "<<DEBUG>> Unable to load second function of product, regular bootstraping" << std::endl;
 				}
 			}
 			else
@@ -657,7 +999,7 @@ void product_function::setParameters(const vec& p)
 	vec f2_params(nb_f2_params);
 	for(int i=0; i<nb_f2_params; ++i)
 	{
-		f2_params[i] = p[i+nb_f2_params];
+		f2_params[i] = p[i+nb_f1_params];
 	}
 	f2->setParameters(f2_params);
 }
@@ -717,14 +1059,16 @@ vec product_function::parametersJacobian(const vec& x) const
 	int nb_params = nb_f1_params + nb_f2_params;
 
 	// Convert the input value x to the input space of the f1tion
-	vec xf(f2->dimX());
-	params::convert(&x[0], f1->input_parametrization(), f2->input_parametrization(), &xf[0]);
+	vec xf2(f2->dimX());
+	params::convert(&x[0], input_parametrization(), f2->input_parametrization(), &xf2[0]);
+	vec xf1(f1->dimX());
+	params::convert(&x[0], input_parametrization(), f1->input_parametrization(), &xf1[0]);
 
-	vec f1_jacobian = f1->parametersJacobian(xf);
-	vec f2_jacobian = f2->parametersJacobian(x);
+	vec f1_jacobian = f1->parametersJacobian(xf1);
+	vec f2_jacobian = f2->parametersJacobian(xf2);
 
-	vec f1_value = f1->value(x);
-	vec f2_value = f2->value(xf);
+	vec f1_value = f1->value(xf1);
+	vec f2_value = f2->value(xf2);
 
 	// F = f2nel; f = f1tion
 	// d(F * f)(x) /dp = F(x) df(x) /dp + f(x) dF(x) / dp
@@ -744,11 +1088,6 @@ vec product_function::parametersJacobian(const vec& x) const
 
 	return jac;
 }
-		
-params::input product_function::input_parametrization() const
-{
-	return f1->input_parametrization();
-}
 
 //! \brief provide the outout parametrization of the object.
 params::output product_function::output_parametrization() const
@@ -758,12 +1097,30 @@ params::output product_function::output_parametrization() const
 		
 void product_function::setParametrization(params::input new_param)
 {
-	f1->setParametrization(new_param);
-	f2->setParametrization(new_param);
+	if(f1->input_parametrization() == params::UNKNOWN_INPUT) 
+	{
+		f1->setParametrization(new_param); 
+		f1->setDimX(params::dimension(new_param));
+	}
+	if(f2->input_parametrization() == params::UNKNOWN_INPUT) 
+	{
+		f2->setParametrization(new_param);
+		f2->setDimX(params::dimension(new_param));
+	}
 }
 
 void product_function::setParametrization(params::output new_param)
 {
 	f1->setParametrization(new_param);
 	f2->setParametrization(new_param);
+}
+
+nonlinear_function* product_function::first() const
+{
+	return f1;
+}
+
+nonlinear_function* product_function::second() const
+{
+	return f2;
 }

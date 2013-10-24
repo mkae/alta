@@ -150,39 +150,47 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 	nlopt_algorithm algorithm;
 	nlopt_result res;
 	std::string optimizerName = args["nlopt-optimizer"];
-	if(optimizerName == "COBYLA")
+	if(optimizerName == "local-COBYLA")
 	{
 		algorithm = NLOPT_LN_COBYLA;
 	}
-	else if(optimizerName == "BOBYQA")
+	else if(optimizerName == "local-BOBYQA")
 	{
 		algorithm = NLOPT_LN_BOBYQA;
 	}
-	else if(optimizerName == "NEWUOA")
+	else if(optimizerName == "local-NEWUOA")
 	{
 		algorithm = NLOPT_LN_NEWUOA_BOUND;
 	}
-	else if(optimizerName == "PRAXIS")
+	else if(optimizerName == "local-PRAXIS")
 	{
 		algorithm = NLOPT_LN_PRAXIS;
 	}
-    else if(optimizerName == "Nelder-Mead")
+    else if(optimizerName == "local-Nelder-Mead")
 	{
 		algorithm = NLOPT_LN_NELDERMEAD;
 	}
-	else if(optimizerName == "Sbplx")
+	else if(optimizerName == "local-spblx")
 	{
 		algorithm = NLOPT_LN_SBPLX;
 	}
-	else if(optimizerName == "controlled-random-search")
+	else if(optimizerName == "global-crs")
 	{
 		algorithm = NLOPT_GN_CRS2_LM;
 	}
-	else if(optimizerName == "MMA")
+	else if(optimizerName == "global-stogo")
+	{
+		algorithm = NLOPT_GD_STOGO;
+	}
+	else if(optimizerName == "global-isres")
+	{
+		algorithm = NLOPT_GN_ISRES;
+	}
+	else if(optimizerName == "local-mma")
 	{
 		algorithm = NLOPT_LD_MMA; 
 	}
-	else if(optimizerName == "SQP")
+	else if(optimizerName == "local-sqp")
 	{
 		algorithm = NLOPT_LD_SLSQP;
 	}

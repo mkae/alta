@@ -14,11 +14,15 @@ ALTA_DLL_EXPORT function* provide_function()
 	return new schlick();
 }
 
+schlick::schlick()
+{
+	setParametrization(params::CARTESIAN);
+	setDimX(6);
+}
+
 //! Load function specific files
 bool schlick::load(std::istream& in)
 {
-	fresnel::load(in);
-
 	// Parse line until the next comment
 	while(in.peek() != '#')
 	{
@@ -59,15 +63,6 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
 {
 	bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-    if(is_alta)
-    {
-       f->save_call(out, args);
-    }
-    else
-    {
-        out << "(";	f->save_call(out, args); out << ")";
-    }
-
 	if(is_alta)
 	{
         out << "#FUNC nonlinear_fresnel_normalized_schlick" << std::endl ;
@@ -79,7 +74,7 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
 	}
 	else
 	{
-        out << " * normalized_schlick_fresnel(L, V, N, X, Y, vec3(";
+        out << "normalized_schlick_fresnel(L, V, N, X, Y, vec3(";
         for(int i=0; i<dimY(); ++i)
         {
             out << R[i];
@@ -91,7 +86,6 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
 
 void schlick::save_body(std::ostream& out, const arguments& args) const
 {
-	f->save_body(out, args);
 	bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
 
 	if(is_shader)
@@ -100,45 +94,58 @@ void schlick::save_body(std::ostream& out, const arguments& args) const
         out << "vec3 normalized_schlick_fresnel(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 R)" << std::endl;
 		out << "{" << std::endl;
         out << "\tvec3 H = normalize(L + V);" << std::endl;
-        out << "\treturn vec3(1.0f) + (R - vec3(1.0f)) * pow(1.0f - clamp(dot(H,V), 0.0f, 1.0f), 5);" << std::endl;
+        out << "\treturn vec3(1.0f) + (vec3(1.0f)/R - vec3(1.0f)) * pow(1.0f - clamp(dot(H,V), 0.0f, 1.0f), 5);" << std::endl;
 		out << "}" << std::endl;
         out << std::endl;
 	}
 
 }
 
-vec schlick::fresnelValue(const vec& x) const
+vec schlick::value(const vec& x) const
 {
-    double xp[3], cart[6];
-    params::convert(&x[0], input_parametrization(), params::RUSIN_VH, xp);
-    params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
+    vec xp(3), cart(6);
+    params::convert(&x[0], input_parametrization(), params::RUSIN_VH, &xp[0]);
+    params::convert(&x[0], input_parametrization(), params::CARTESIAN, &cart[0]);
+	 //std::cout << xp << " ===== " << cart << std::endl;
+
 
     const double dotVH = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
 
-    vec res(_nY);
-    for(int i=0; i<_nY; ++i)
+    vec res(dimY());
+    for(int i=0; i<dimY(); ++i)
     {
-        res[i] = 1.0 + (R[i] - 1.0) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
+        res[i] = 1.0 + (1.0/R[i] - 1.0) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
     }
-
-    return res;
+/*
+	 std::cout << " # " << R << ", " << dotVH << std::endl;
+	 std::cout << " ## " << res << std::endl;
+    
+	 */
+	 return res;
 }
 
 //! \brief Number of parameters to this non-linear function
-int schlick::nbFresnelParameters() const 
+int schlick::nbParameters() const 
 {
     return dimY();
 }
 
-vec schlick::getFresnelParametersMin() const
+vec schlick::getParametersMin() const
 {
-    vec m(dimY());
-    for(int i=0; i<dimY(); ++i) { m[i] = 1.0; }
+    vec m(nbParameters());
+    for(int i=0; i<nbParameters(); ++i) { m[i] = 1.0E-10; }
+    return m;
+}
+
+vec schlick::getParametersMax() const
+{
+    vec m(nbParameters());
+    for(int i=0; i<nbParameters(); ++i) { m[i] = 1.0; }
     return m;
 }
 
 //! \brief Get the vector of parameters for the function
-vec schlick::getFresnelParameters() const 
+vec schlick::parameters() const 
 {
     vec p(dimY());
     for(int i=0; i<dimY(); ++i) { p[i] = R[i]; }
@@ -146,14 +153,14 @@ vec schlick::getFresnelParameters() const
 }
 
 //! \brief Update the vector of parameters for the function
-void schlick::setFresnelParameters(const vec& p) 
+void schlick::setParameters(const vec& p) 
 {
     for(int i=0; i<dimY(); ++i) { R[i] = p[i]; }
 }
 
 //! \brief Obtain the derivatives of the function with respect to the
 //! parameters. 
-vec schlick::getFresnelParametersJacobian(const vec& x) const 
+vec schlick::parametersJacobian(const vec& x) const 
 {
 	const int nY = dimY();
     double xp[3], cart[6];
@@ -168,7 +175,7 @@ vec schlick::getFresnelParametersJacobian(const vec& x) const
         for(int j=0; j<nY; ++j)
         {
             if(i == j) {
-                jac[j*dimY() + i] = pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
+                jac[j*dimY() + i] = - (1.0/R[i]) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
             } else {
                 jac[j*dimY() + i] = 0.0;
             }
@@ -179,7 +186,7 @@ vec schlick::getFresnelParametersJacobian(const vec& x) const
 }
 
 
-void schlick::fresnelBootstrap(const data* d, const arguments& args)
+void schlick::bootstrap(const data* d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i) { R[i] = 1.0; }
+    for(int i=0; i<dimY(); ++i) { R[i] = 0.5; }
 }

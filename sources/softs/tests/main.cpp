@@ -38,11 +38,61 @@ int main(int argc, char** argv)
 	return nb_tests_failed;
 }
 
+bool is_close(const vec& a, const vec& b)
+{
+	double dist = 0.0;
+	for(int i=0; i<a.size(); ++i)
+	{
+		dist += abs(a[i] - b[i]);
+	}
+	return dist < 1.0E-10;
+}
+
 int parametrization_tests()
 {
 	// Params
 	int nb_tests_failed = 0;
 
+	
+	// Test RUSIN_TH_TD
+	vec rhd(2), cart(6), res(6), vh(3);
+
+	// Convert RUSIN_TH_TD (0,0) to CARTESIAN (0,0,1,0,0,1)
+	rhd[0] = 0;	rhd[1] = 0;
+	res[0] = 0; res[1] = 0; res[2] = 1; res[3] = 0; res[4] = 0; res[5] = 1;
+	params::convert(&rhd[0], params::RUSIN_TH_TD, params::CARTESIAN, &cart[0]);
+	if(!is_close(cart, res)) {
+		nb_tests_failed++;
+		std::cout << "<<FAILED>> out = " << cart << ", while attending " << res << std::endl;
+	}
+
+	// Convert RUSIN_TH_TD (0,pi/2) to CARTESIAN (1,0,0,-1,0,0)
+	rhd[0] = 0;	rhd[1] = M_PI*0.5;
+	res[0] = 1; res[1] = 0; res[2] = 0; res[3] = -1; res[4] = 0; res[5] = 0;
+	params::convert(&rhd[0], params::RUSIN_TH_TD, params::CARTESIAN, &cart[0]);
+	if(!is_close(cart, res)) {
+	  	nb_tests_failed++;
+		std::cout << "<<FAILED>> out = " << cart << ", while attending " << res << std::endl;
+	}
+
+	// Convert RUSIN_TH_TD (0, pi/2) to CARTESIAN (1,0,0,-1,0,0) and to RUSIN_VH (0,0,1)
+	rhd[0] = 0;	rhd[1] = M_PI*0.5;
+	res[0] = 1; res[1] = 0; res[2] = 0; res[3] = -1; res[4] = 0; res[5] = 0;
+	params::convert(&rhd[0], params::RUSIN_TH_TD, params::CARTESIAN, &cart[0]);
+	if(!is_close(cart, res)) {
+	  	nb_tests_failed++;
+		std::cout << "<<FAILED>> out = " << cart << ", while attending " << res << std::endl;
+	}
+	else
+	{
+		params::convert(&rhd[0], params::RUSIN_TH_TD, params::RUSIN_VH, &vh[0]);
+		res.resize(3); res[0] = 0; res[1] = 0; res[2] = 1;
+		if(!is_close(vh, res)) {
+			nb_tests_failed++;
+			std::cout << "<<FAILED>> out = " << vh << ", while attending " << res << std::endl;
+		}
+	}
+/*
 
 	// Test the rotation code
 	vec x(3);
@@ -145,6 +195,6 @@ int parametrization_tests()
     params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, params::RUSIN_TH_TD_PD, &rusi[0]);
 	 std::cout << "From spherical to rusi" << std::endl;
     std::cout << rusi << std::endl << std::endl;
-
+*/
 	return nb_tests_failed;
 }

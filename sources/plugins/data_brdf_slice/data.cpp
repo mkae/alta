@@ -4,11 +4,13 @@
 #include <cstdlib>
 #include <cmath>
 
+#include "EXR_IO.h"
+
 data_brdf_slice::data_brdf_slice()
 {
 	// Allocate data
-	_data = new fipImage();
-	//_data->setSize(FIT_FLOAT, 512, 512, 16);
+	width = 512; height = 512;
+	_data = new double[3*width*height];
 
     // Set the input and output parametrization
     _in_param  = params::RUSIN_TH_TD;
@@ -19,16 +21,14 @@ data_brdf_slice::data_brdf_slice()
 
 data_brdf_slice::~data_brdf_slice()
 {
-	delete _data;
+	delete[] _data;
 }
 
 // Load data from a file
 void data_brdf_slice::load(const std::string& filename) 
 {
-	_data->load(filename.c_str());
-	_data->convertTo32Bits();
-	width  = _data->getWidth();
-	height = _data->getHeight();
+	delete[] _data;
+	t_EXR_IO<double>::LoadEXR(filename.c_str(), width, height, _data);
 }
 void data_brdf_slice::load(const std::string& filename, const arguments&)
 {
@@ -37,7 +37,7 @@ void data_brdf_slice::load(const std::string& filename, const arguments&)
 
 void data_brdf_slice::save(const std::string& filename) const 
 {
-	if(!_data->save(filename.c_str()))
+	if(!t_EXR_IO<double>::SaveEXR(filename.c_str(), width, height, _data))
 	{
 		std::cerr << "<<ERROR>> unable to save image file" << std::endl;
 	}
@@ -46,16 +46,16 @@ void data_brdf_slice::save(const std::string& filename) const
 // Acces to data
 vec data_brdf_slice::get(int id) const 
 {
-	vec res(3) ;
-	int i = id % width;
-	int j = id / width;
+	vec res(5) ;
+	const int i = id % width;
+	const int j = id / width;
 
-	RGBQUAD pixel;
-	_data->getPixelColor(i, j, &pixel);
+	res[0] = 0.5*M_PI*(i+0.5) / double(width);
+	res[1] = 0.5*M_PI*(j+0.5) / double(height);
 
-	res[0] = pixel.rgbRed / 255.0;
-	res[1] = pixel.rgbGreen / 255.0;
-	res[2] = pixel.rgbBlue / 255.0;
+	res[2] = _data[3*id + 0];
+	res[3] = _data[3*id + 1];
+	res[4] = _data[3*id + 2];
 
 	return res ;
 }
@@ -68,15 +68,17 @@ vec data_brdf_slice::operator[](int i) const
 void data_brdf_slice::set(vec x)
 {
 	assert(x.size() == 5);
+	assert(x[0] <= 0.5*M_PI && x[0] >= 0.0);
+	assert(x[1] <= 0.5*M_PI && x[1] >= 0.0);
 
-	int i = floor(x[0] * width / (0.5*M_PI));
-	int j = floor(x[1] * height / (0.5*M_PI));
+	const int i  = floor(x[0] * width / (0.5*M_PI));
+	const int j  = floor(x[1] * height / (0.5*M_PI));
 
-	RGBQUAD* pixel;
-	_data->getPixelColor(i, j, pixel);
-	pixel->rgbRed   = x[2];
-	pixel->rgbGreen = x[3];
-	pixel->rgbBlue  = x[4];
+	const int id = i + j*width;
+
+	_data[3*id + 0] = x[2];
+	_data[3*id + 1] = x[3];
+	_data[3*id + 2] = x[4];
 }
 
 vec data_brdf_slice::value(vec, vec) const
@@ -86,13 +88,21 @@ vec data_brdf_slice::value(vec, vec) const
 }
 vec data_brdf_slice::value(vec x) const
 {
-	int i = floor(x[0] * width / (0.5*M_PI));
-	int j = floor(x[1] * height / (0.5*M_PI));
+	assert(x[0] <= 0.5*M_PI && x[0] >= 0.0);
+	assert(x[1] <= 0.5*M_PI && x[1] >= 0.0);
+
+	const int i  = floor(x[0] * width / (0.5*M_PI));
+	const int j  = floor(x[1] * height / (0.5*M_PI));
+	const int id = i + j*width;
 
 	if(i < 0 || i >= width)  { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
 	if(j < 0 || j >= height) { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
 
-   return get(i + j*width);
+	vec res(3);
+	res[0] = _data[3*id + 0];
+	res[1] = _data[3*id + 1];
+	res[2] = _data[3*id + 2];
+   return res;
 }
 
 // Get data size, e.g. the number of samples to fit

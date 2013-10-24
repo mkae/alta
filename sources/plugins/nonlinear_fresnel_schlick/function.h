@@ -20,6 +20,7 @@ class schlick : public nonlinear_function//fresnel
 		schlick()
 		{
 			setParametrization(params::CARTESIAN);
+			setDimX(6);
 		}
 
 		//! \brief Load function specific files

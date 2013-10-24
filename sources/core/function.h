@@ -201,29 +201,10 @@ class compound_function: public nonlinear_function
 		nonlinear_function* operator[](int i) const;
 
 		//! \brief Access to the number of elements in the compound object.
-		unsigned int size() const
-		{
-			return fs.size();
-		}
+		unsigned int size() const;
 
 		//! Load function specific files
-		virtual bool load(std::istream& in)
-		{
-			int nb_good = 0; // Number of correctly openned functions
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				std::streampos pos = in.tellg();
-				if(!fs[i]->load(in))
-				{
-					in.seekg(pos);
-				}
-				else
-				{
-					nb_good++;
-				}
-			}
-			return nb_good > 0;
-		}
+		virtual bool load(std::istream& in);
 
 		//! \brief Provide a first rough fit of the function. 
 		//! For compound object, you can define the first guess using the
@@ -248,152 +229,29 @@ class compound_function: public nonlinear_function
 		virtual void bootstrap(const ::data* d, const arguments& args);
 
 		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX) 
-		{
-			function::setDimX(nX);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->setDimX(nX);
-			}
-		}
+		virtual void setDimX(int nX);
+
 		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY)
-		{
-			function::setDimY(nY);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->setDimY(nY);
-			}
-		}
+		virtual void setDimY(int nY);
 
 		// Acces to the domain of definition of the function
-		virtual void setMin(const vec& min) 
-		{
-			function::setMin(min);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->setMin(min);
-			}
-		}
-		virtual void setMax(const vec& max) 
-		{
-			function::setMax(max);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->setMax(max);
-			}
-		}
+		virtual void setMin(const vec& min);
+		virtual void setMax(const vec& max);
 
 		//! Number of parameters to this non-linear function
-		virtual int nbParameters() const
-		{
-			int nb_params = 0;
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				if(!is_fixed[i]) {
-					nb_params += fs[i]->nbParameters();
-				}
-			}
-			return nb_params;
-		}
+		virtual int nbParameters() const;
 
 		//! Get the vector of parameters for the function
-		virtual vec parameters() const
-		{
-			vec params(nbParameters());
-			int current_i = 0;
-			for(unsigned int f=0; f<fs.size(); ++f)
-			{
-				int f_size = fs[f]->nbParameters();
-
-				// Handle when there is no parameters to include
-				if(f_size > 0 && !is_fixed[f])
-				{
-					vec f_params = fs[f]->parameters();
-					for(int i=0; i<f_size; ++i)
-					{
-						params[i + current_i] = f_params[i];
-					}
-
-					current_i += f_size;
-				}
-			}
-
-			return params;
-		}
+		virtual vec parameters() const;
 		
 		//! Get the vector of min parameters for the function
-		virtual vec getParametersMin() const
-		{
-			vec params(nbParameters());
-			int current_i = 0;
-			for(unsigned int f=0; f<fs.size(); ++f)
-			{
-				int f_size = fs[f]->nbParameters();
-
-				// Handle when there is no parameters to include
-				if(f_size > 0 && !is_fixed[f])
-				{
-					vec f_params = fs[f]->getParametersMin();
-					for(int i=0; i<f_size; ++i)
-					{
-						params[i + current_i] = f_params[i];
-					}
-
-					current_i += f_size;
-				}
-			}
-
-			return params;
-		}
+		virtual vec getParametersMin() const;
 		
 		//! Get the vector of min parameters for the function
-		virtual vec getParametersMax() const
-		{
-			vec params(nbParameters());
-			int current_i = 0;
-			for(unsigned int f=0; f<fs.size(); ++f)
-			{
-				int f_size = fs[f]->nbParameters();
-
-				// Handle when there is no parameters to include
-				if(f_size > 0 && !is_fixed[f])
-				{
-					vec f_params = fs[f]->getParametersMax();
-					for(int i=0; i<f_size; ++i)
-					{
-						params[i + current_i] = f_params[i];
-					}
-
-					current_i += f_size;
-				}
-			}
-
-			return params;
-		}
+		virtual vec getParametersMax() const;
 
 		//! Update the vector of parameters for the function
-		virtual void setParameters(const vec& p) 
-		{
-			int current_i = 0;
-			for(unsigned int f=0; f<fs.size(); ++f)
-			{
-				int f_size = fs[f]->nbParameters();
-
-				// Handle when there is no parameters to include
-				if(f_size > 0 && !is_fixed[f])
-				{
-					vec f_params(f_size);
-					for(int i=0; i<f_params.size(); ++i)
-					{
-						f_params[i] = p[i + current_i];
-					}
-
-					fs[f]->setParameters(f_params);
-					current_i += f_size;
-				}
-			}
-		}
+		virtual void setParameters(const vec& p);
 
 		//! \brief Obtain the derivatives of the function with respect to the 
 		//! parameters. 
@@ -404,118 +262,26 @@ class compound_function: public nonlinear_function
 		//
 		// The result vector should be orderer as res[i + dimY()*j], output
 		// dimension first, then parameters.
-		virtual vec parametersJacobian(const vec& x) const
-		{
-			int nb_params = nbParameters();
-			vec jac(nb_params*_nY);
-			jac = vec::Zero(nb_params*_nY);
-
-			int start_i = 0;
-
-			// Export the sub-Jacobian for each function
-			for(unsigned int f=0; f<fs.size(); ++f)
-			{
-				nonlinear_function* func = fs[f];
-				int nb_f_params = func->nbParameters(); 
-
-				// Only export Jacobian if there are non-linear parameters
-				if(nb_f_params > 0 && !is_fixed[f])
-				{
-
-					vec temp_x(func->dimX());
-					params::convert(&x[0], input_parametrization(), func->input_parametrization(), &temp_x[0]);
-					vec func_jac = func->parametersJacobian(temp_x);
-
-					for(int i=0; i<nb_f_params; ++i)
-					{
-						for(int y=0; y<_nY; ++y)
-						{
-                            jac[y*nb_params + (i+start_i)] = func_jac[y*nb_f_params + i];
-						}
-					}
-
-					start_i += nb_f_params;
-				}
-			}
-
-			return jac;
-		}
+		virtual vec parametersJacobian(const vec& x) const;
 
 		//! \brief can set the input parametrization of a non-parametrized
 		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input new_param)
-		{
-			if(new_param == params::UNKNOWN_INPUT)
-				return;
-
-			parametrized::setParametrization(new_param);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
-				{
-					fs[i]->setParametrization(new_param);
-				}
-			}
-		}
+		virtual void setParametrization(params::input new_param);
 
 		//! \brief can set the output parametrization of a non-parametrized
 		//! function. Throw an exception if it tries to erase a previously
 		//! defined one.
-		virtual void setParametrization(params::output new_param)
-		{
-			parametrized::setParametrization(new_param);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->setParametrization(new_param);
-			}
-		}
+		virtual void setParametrization(params::output new_param);
 
 		//! \brief save function specific data. This has no use for ALTA export
 		//! but allows to factorize the code in the C++ or matlab export by
 		//! defining function calls that are common to all the plugins.
-		virtual void save_body(std::ostream& out, const arguments& args) const
-		{
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				fs[i]->save_body(out, args);
-				out << std::endl;
-			}
-
-			function::save_body(out, args);
-		}
+		virtual void save_body(std::ostream& out, const arguments& args) const;
 
 		//! \brief save object specific information. For an ALTA export the
 		//! coefficients will be exported. For a C++ or matlab export, the call
 		//! to the associated function will be done.
-		virtual void save_call(std::ostream& out, const arguments& args) const
-		{
-			bool is_cpp    = args["export"] == "C++";
-			bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
-			bool is_matlab = args["export"] == "matlab";
-
-			// This part is export specific. For ALTA, the coefficients are just
-			// dumped as is with a #FUNC {plugin_name} header.
-			//
-			// For C++ export, the function call should be done before hand and
-			// the line should look like:
-			//   res += call_i(x);
-			for(unsigned int i=0; i<fs.size(); ++i)
-			{
-				if(i != 0 && (is_cpp || is_matlab || is_shader))
-				{
-					out << "\tres += ";
-				}
-
-				fs[i]->save_call(out, args);
-
-				if(is_cpp || is_matlab || is_shader)
-				{
-					out << ";" << std::endl;
-				}
-			}
-
-			function::save_call(out, args);
-		}
+		virtual void save_call(std::ostream& out, const arguments& args) const;
 
 	protected:
 		std::vector<nonlinear_function*> fs;
@@ -536,6 +302,15 @@ class product_function : public nonlinear_function
 		//! \brief Constructor of the product function, affect the two function
 		//! to already created nonlinear_function objects.
 		product_function(nonlinear_function* g1, nonlinear_function* g2);
+
+
+		/* ACCESS TO INDIVIDUAL ELEMENTS */
+
+		//! \brief Access to the first member of the product
+		nonlinear_function* first() const;
+
+		//! \biref Access to the second member of the product
+		nonlinear_function* second() const;
 
 
 		/* EVALUATION FUNCTIONS */
@@ -578,8 +353,7 @@ class product_function : public nonlinear_function
 		virtual void setMin(const vec& min);
 		virtual void setMax(const vec& max);
 		
-		//! Provide the input/output parametrization of the object.
-		virtual params::input  input_parametrization() const;
+		//! Provide the output parametrization of the object.
 		virtual params::output output_parametrization() const;
 		
 		//! Set the input/output parametrization of a non-parametrized
@@ -610,293 +384,3 @@ class product_function : public nonlinear_function
 		nonlinear_function *f1, *f2;
 };
 
-/*! \brief A Fresnel interface
- *  \ingroup core
- *  \todo Change it to a product_function instead
- */
-class fresnel : public nonlinear_function
-{
-	public: // methods
-
-		// Overload the function operator
-		virtual vec operator()(const vec& x) const
-		{
-			return value(x);
-		}
-		virtual vec value(const vec& x) const
-		{
-			vec fres = fresnelValue(x);
-
-			// Convert input space to the function
-			vec xf(f->dimX());
-			params::convert(&x[0], params::CARTESIAN, f->input_parametrization(), &xf[0]);
-			vec func = f->value(xf);
-
-			return product(fres, func);
-		}
-
-		//! Load function specific files
-		virtual bool load(std::istream& in)
-		{
-			if(f != NULL)
-			{
-				return f->load(in);
-			}
-			else
-			{
-				std::cout << "<<ERROR>> trying to load a Fresnel object with no base class" << std::endl;
-				return false;
-			}
-		}
-
-		//! \brief Provide a first rough fit of the function. 
-		virtual void bootstrap(const data* d, const arguments& args) 
-		{
-			fresnelBootstrap(d, args);
-			f->bootstrap(d, args);
-		}
-
-		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX) 
-		{
-			function::setDimX(nX);
-			f->setDimX(nX);
-		}
-		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY)
-		{
-			function::setDimY(nY);
-			f->setDimY(nY);
-		}
-
-		// Acces to the domain of definition of the function
-		virtual void setMin(const vec& min) 
-		{
-			function::setMin(min);
-			f->setMin(min);
-		}
-		virtual void setMax(const vec& max) 
-		{
-			function::setMax(max);
-			f->setMax(max);
-		}
-
-		//! Number of parameters to this non-linear function
-		virtual int nbParameters() const
-		{
-			return f->nbParameters() + nbFresnelParameters();
-		}
-
-		//! Get the vector of parameters for the function
-		virtual vec parameters() const
-		{
-			int nb_func_params = f->nbParameters();
-			int nb_fres_params = nbFresnelParameters();
-			int nb_params = nb_func_params + nb_fres_params;
-
-			vec params(nb_params);
-
-			vec func_params = f->parameters();
-			for(int i=0; i<nb_func_params; ++i)
-			{
-				params[i] = func_params[i];
-			}
-
-			vec fres_params = getFresnelParameters();
-			for(int i=0; i<nb_fres_params; ++i)
-			{
-				params[i+nb_func_params] = fres_params[i];
-			}
-
-			return params;
-		}
-		
-		//! Get the vector of min parameters for the function
-		virtual vec getParametersMax() const
-		{
-			int nb_func_params = f->nbParameters();
-			int nb_fres_params = nbFresnelParameters();
-			int nb_params = nb_func_params + nb_fres_params;
-
-			vec params(nb_params);
-
-			vec func_params = f->getParametersMax();
-			for(int i=0; i<nb_func_params; ++i)
-			{
-				params[i] = func_params[i];
-			}
-
-			vec fres_params = getFresnelParametersMax();
-			for(int i=0; i<nb_fres_params; ++i)
-			{
-				params[i+nb_func_params] = fres_params[i];
-			}
-
-			return params;
-		}
-		
-		//! Get the vector of min parameters for the function
-		virtual vec getParametersMin() const
-		{
-			int nb_func_params = f->nbParameters();
-			int nb_fres_params = nbFresnelParameters();
-			int nb_params = nb_func_params + nb_fres_params;
-
-			vec params(nb_params);
-
-			vec func_params = f->getParametersMin();
-			for(int i=0; i<nb_func_params; ++i)
-			{
-				params[i] = func_params[i];
-			}
-
-			vec fres_params = getFresnelParametersMin();
-			for(int i=0; i<nb_fres_params; ++i)
-			{
-				params[i+nb_func_params] = fres_params[i];
-			}
-
-			return params;
-		}
-
-		//! Update the vector of parameters for the function
-		virtual void setParameters(const vec& p)
-		{
-			int nb_func_params = f->nbParameters();
-			int nb_fres_params = nbFresnelParameters();
-
-			vec func_params(nb_func_params);
-			for(int i=0; i<nb_func_params; ++i)
-			{
-				func_params[i] = p[i];
-			}
-			f->setParameters(func_params);
-
-			vec fres_params(nb_fres_params);
-			for(int i=0; i<nb_fres_params; ++i)
-			{
-				fres_params[i] = p[i+nb_func_params];
-			}
-			setFresnelParameters(fres_params);
-		}
-
-		//! \brief Obtain the derivatives of the function with respect to the 
-		//! parameters.
-		virtual vec parametersJacobian(const vec& x) const
-		{
-			int nb_func_params = f->nbParameters();
-			int nb_fres_params = nbFresnelParameters();
-			int nb_params = nb_func_params + nb_fres_params;
-
-            // Convert the input value x to the input space of the function
-            vec xf(f->dimX());
-            params::convert(&x[0], params::CARTESIAN, f->input_parametrization(), &xf[0]);
-
-            vec func_jacobian = f->parametersJacobian(xf);
-			vec fres_jacobian = getFresnelParametersJacobian(x);
-
-            vec func_value = f->value(xf);
-			vec fres_value = fresnelValue(x);
-
-			// F = fresnel; f = function
-			// d(F * f)(x) /dp = F(x) df(x) /dp + f(x) dF(x) / dp
-			vec jac(nb_params*_nY);
-			for(int y=0; y<_nY; ++y)
-			{
-				for(int i=0; i<nb_func_params; ++i)
-				{
-                    jac[y*nb_params + i] = func_jacobian[y*nb_func_params + i] * fres_value[y];
-				}
-
-				for(int i=0; i<nb_fres_params; ++i)
-				{
-                    jac[y*nb_params + (i+nb_func_params)] = fres_jacobian[y*nb_fres_params + i] * func_value[y];
-				}
-			}
-
-			return jac;
-		}
-
-		//! \brief set the value for the base function
-		void setBase(nonlinear_function* fin)
-		{
-			f = fin;
-		}
-
-		//! \brief provide the input parametrization of the object.
-		virtual params::input input_parametrization() const
-		{
-            return params::CARTESIAN;
-		}
-
-		//! \brief provide the outout parametrization of the object.
-		virtual params::output output_parametrization() const
-		{
-			return f->output_parametrization();
-		}
-
-		//! \brief can set the input parametrization of a non-parametrized
-		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input new_param)
-		{
-			function::setParametrization(new_param);
-			f->setParametrization(new_param);
-		}
-
-		//! \brief can set the output parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		virtual void setParametrization(params::output new_param)
-		{
-			function::setParametrization(new_param);
-			f->setParametrization(new_param);
-		}
-
-	protected: // methods
-
-		//! \brief the interface for the Fresnel code
-		virtual vec fresnelValue(const vec& x) const  = 0;
-
-		//! Number of parameters to this non-linear function
-		virtual int nbFresnelParameters() const = 0;
-
-		//! Get the vector of parameters for the function
-		virtual vec getFresnelParameters() const = 0;
-
-		//! Get the vector of min parameters for the function
-		virtual vec getFresnelParametersMin() const
-		{
-			vec m(nbFresnelParameters());
-			for(int i=0; i<nbFresnelParameters(); ++i)
-			{
-				m[i] = -std::numeric_limits<double>::max();
-			}
-			return m;
-		}
-
-		//! Get the vector of min parameters for the function
-		virtual vec getFresnelParametersMax() const
-		{
-			vec M(nbFresnelParameters());
-			for(int i=0; i<nbFresnelParameters(); ++i)
-			{
-				M[i] = std::numeric_limits<double>::max();
-			}
-			return M;
-		}
-
-		//! Update the vector of parameters for the function
-		virtual void setFresnelParameters(const vec& p) = 0;
-
-		//! \brief Obtain the derivatives of the function with respect to the 
-		//! parameters.
-		virtual vec getFresnelParametersJacobian(const vec& x) const = 0;		
-
-		//! \brief Boostrap the function by defining the diffuse term
-		virtual void fresnelBootstrap(const data* d, const arguments& args) = 0;
-
-	protected: //data
-
-		//! the base object
-		nonlinear_function* f;
-};

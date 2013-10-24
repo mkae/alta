@@ -4,8 +4,6 @@
 #include <core/common.h>
 #include <core/args.h>
 
-#include <FreeImagePlus.h>
-
 class data_brdf_slice : public data
 {
 	public: // methods
@@ -40,7 +38,7 @@ class data_brdf_slice : public data
 		virtual int dimY() const ; 
 
 	private: // data
-		fipImage* _data;
+		double* _data;
 		int width, height;
 
 } ;
