@@ -35,7 +35,7 @@ void rational_function_1d::update(const vec& in_a,
 	a.resize(in_a.size()) ;
 	b.resize(in_b.size()) ;
 
-#define NORMALIZE
+//#define NORMALIZE
 
 #ifdef NORMALIZE
     const double b0 = (std::abs(in_b[0]) > 1.0E-10) ? in_b[0] : 1.0;
