@@ -11,7 +11,7 @@
 		<parameter name="lib-dir" value="./build" />
 	</configuration>
 
-	<!-- Fit the data to a BRDF model -->
+	<!-- Fit the data to a Blinn BRDF model -->
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
@@ -69,7 +69,7 @@
 
 
 
-	<!-- Fit the data to a BRDF model -->
+	<!-- Fit the data to a Spherical Gaussian BRDF model -->
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
@@ -97,6 +97,39 @@
 		<!-- Input and output arguments of the action -->
 		<input  name="./results/3d/retro/3M_jaune_sg.brdf" />
 		<output name="./results/3d/retro/3M_jaune_sg.dat" />
+
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+	</action>
+
+	
+
+	<!-- Fit the data to a Lafortune BRDF model -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<output name="./results/3d/retro/3M_jaune_lafortune.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_isotropic_lafortune">
+			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so" />-->
+			<parameter name="lobes" value="3" />
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+		
+		<!-- Parameters -->
+		<parameter name="data-correct-cosine" value="" />		
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/3d/retro/3M_jaune_lafortune.brdf" />
+		<output name="./results/3d/retro/3M_jaune_lafortune.dat" />
 
 		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
 	</action>

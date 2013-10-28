@@ -21,6 +21,27 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_blinn">
+			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_schlick.so" />-->
+		</function>
+		<function name="nonlinear_function_retroblinn">
+			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so" />-->
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+	
+		<!-- Parameters -->
+		<parameter name="data-correct-cosine" value="" />
+	</action>
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/Bande_orange_isotropic_brdfcc_rescaled_alta.dat" />
+		<output name="./results/3d/retro/bande_orange_blinn.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_blinn">
 			<parameter name="fresnel" value="./build/libnonlinear_fresnel_schlick.so" />
 		</function>
 		<function name="nonlinear_function_retroblinn">
@@ -32,6 +53,7 @@
 	
 		<!-- Parameters -->
 		<parameter name="data-correct-cosine" value="" />
+		<parameter name="bootstrap" value="./results/3d/retro/bande_orange_blinn.brdf" />
 	</action>
 	
 	<!-- Export the fit -->
@@ -59,7 +81,7 @@
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_spherical_gaussian" />
 		<function name="nonlinear_function_spherical_gaussian">
-			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so" />
+			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so" />-->
 			<parameter name="sg-type" value="back" />
 		</function>
 

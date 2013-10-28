@@ -5,6 +5,8 @@ SConscript('rational_fitter_quadprog/SConscript')
 
 # Building functions
 SConscript('nonlinear_function_diffuse/SConscript')
+SConscript('nonlinear_function_beckmann/SConscript')
+SConscript('nonlinear_function_retrobeckmann/SConscript')
 SConscript('nonlinear_function_blinn/SConscript')
 SConscript('nonlinear_function_retroblinn/SConscript')
 SConscript('rational_function_legendre/SConscript')
