@@ -34,16 +34,15 @@ vec beckmann_function::value(const vec& x) const
 		const double dh2  = h[2]*h[2];
 		const double expo = exp((dh2 - 1.0) / (a2 * dh2));
 
-		if(h[2] > 0.0 && x[2]*x[4]>0.0)
+		if(h[2] > 0.0 && x[2]*x[5]>0.0)
 		{
-			res[i] = _ks[i] / (4.0 * x[2]*x[4] * M_PI * a2 * dh2*dh2) * expo;
+			res[i] = _ks[i] / (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2) * expo;
 		}
 		else
 		{
 			res[i] = 0.0; 
 		}
 	}
-
 	return res;
 }
 
@@ -111,13 +110,13 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 	 {
 		 for(int j=0; j<dimY(); ++j)
 		 {
-			 if(i == j && h[2]>0.0 && x[2]*x[4]>0.0)
+			 if(i == j && h[2]>0.0 && x[2]*x[5]>0.0)
 			 {
 				 const double a    = _a[i];
 				 const double a2   = a*a;
 				 const double dh2  = h[2]*h[2];
 				 const double expo = exp((dh2 - 1.0) / (a2 * dh2));
-				 const double fac  = (4.0 * x[2]*x[4] * M_PI * a2 * dh2*dh2);
+				 const double fac  = (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2);
 
 				 // df / dk_s
 				 jac[i*nbParameters() + j*2+0] = expo / fac;
