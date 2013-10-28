@@ -14,6 +14,28 @@ ALTA_DLL_EXPORT function* provide_function()
 {
     return new beckmann_function();
 }
+		
+vec beckmann_function::G(const vec& x) const
+{
+	vec res(dimY());
+
+	for(int i=0; i<dimY(); ++i)
+	{
+		const double cl = x[2] / (_a[i] * sqrt(1 - x[2]*x[2]));
+		const double cv = x[5] / (_a[i] * sqrt(1 - x[5]*x[5]));
+
+		res[i] = 1.0;
+		if(cl < 1.6)
+		{
+			res[i] *= (3.535*cl + 2.181*cl*cl) / (1 + 2.276*cl + 2.577*cl*cl);
+		}
+		if(cv < 1.6)
+		{
+			res[i] *= (3.535*cv + 2.181*cv*cv) / (1 + 2.276*cv + 2.577*cv*cv);
+		}
+	}
+	return res;
+}
 
 // Overload the function operator
 vec beckmann_function::operator()(const vec& x) const 
@@ -22,10 +44,11 @@ vec beckmann_function::operator()(const vec& x) const
 }
 vec beckmann_function::value(const vec& x) const 
 {
-	vec res(dimY());
-
 	double h[3];
 	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, &h[0]);
+
+	// Compute the Shadow term to init res
+	vec res = G(x);
 
 	for(int i=0; i<dimY(); ++i)
 	{
@@ -36,11 +59,11 @@ vec beckmann_function::value(const vec& x) const
 
 		if(h[2] > 0.0 && x[2]*x[5]>0.0)
 		{
-			res[i] = _ks[i] / (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2) * expo;
+			res[i] *= _ks[i] / (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2) * expo;
 		}
 		else
 		{
-			res[i] = 0.0; 
+			res[i] *= 0.0; 
 		}
 	}
 	return res;
@@ -105,6 +128,9 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 	double h[3];
 	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, h);
 
+	// Get the geometry term
+	vec g = G(x);
+
     vec jac(dimY()*nbParameters());
 	 for(int i=0; i<dimY(); ++i)
 	 {
@@ -119,10 +145,10 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 				 const double fac  = (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2);
 
 				 // df / dk_s
-				 jac[i*nbParameters() + j*2+0] = expo / fac;
+				 jac[i*nbParameters() + j*2+0] = g[i] * expo / fac;
 
 				 // df / da_x
-				 jac[i*nbParameters() + j*2+1] = - _ks[i] * (expo/(4.0*x[2]*x[5])) * ((2* a * h[2])/(M_PI*a2*a2*dh2)) * (1 + (dh2 - 1.0)*h[2]/(a2*dh2*h[2]));
+				 jac[i*nbParameters() + j*2+1] = - g[i] * _ks[i] * (expo/(4.0*x[2]*x[5])) * ((2* a * h[2])/(M_PI*a2*a2*dh2)) * (1 + (dh2 - 1.0)*h[2]/(a2*dh2*h[2]));
 			 }
 			 else
 			 {
@@ -228,6 +254,29 @@ void beckmann_function::save_body(std::ostream& out, const arguments& args) cons
 
     if(is_shader)
     {
+        out << "vec3 g_beckmann(vec3 M, vec3 N, vec3 a)" << std::endl;
+		  out << "{" << std::endl;
+        out << "\tfloat d = dot(M,N);" << std::endl;
+		  out << "\tvec3 c = d / (a * sqrt(1.0f-d));" << std::endl;
+		  out << "\tvec3 r;" << std::endl;
+		  out << "\tif(c.x < 1.6f) {" << std::endl;
+		  out << "\t\tr.x = (3.535*c.x + 2.181*c.x*c.x) / (1 + 2.276*c.x + 2.577*c.x*c.x);" << std::endl;
+		  out << "\t} else {" << std::endl;
+		  out << "\t\tr.x = 1.0f;" << std::endl;
+		  out << "\t}" << std::endl;
+		  out << "\tif(c.y < 1.6f) {" << std::endl;
+		  out << "\t\tr.y = (3.535*c.y + 2.181*c.y*c.y) / (1 + 2.276*c.y + 2.577*c.y*c.y);" << std::endl;
+		  out << "\t} else {" << std::endl;
+		  out << "\t\tr.y = 1.0f;" << std::endl;
+		  out << "\t}" << std::endl;
+		  out << "\tif(c.z < 1.6f) {" << std::endl;
+		  out << "\t\tr.z = (3.535*c.z + 2.181*c.z*c.z) / (1 + 2.276*c.z + 2.577*c.z*c.z);" << std::endl;
+		  out << "\t} else {" << std::endl;
+		  out << "\t\tr.z = 1.0f;" << std::endl;
+		  out << "\t}" << std::endl;
+		  out << "\treturn r;" << std::endl;
+        out << "}" << std::endl;
+		  out << std::endl;
         out << "vec3 beckmann(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 ks, vec3 a)" << std::endl;
         out << "{" << std::endl;
         out << "\tvec3  H   = normalize(L + V);" << std::endl;
@@ -235,7 +284,7 @@ void beckmann_function::save_body(std::ostream& out, const arguments& args) cons
 		  out << "\tfloat ln  = dot(L,N);" << std::endl;
 		  out << "\tfloat vn  = dot(V,N);" << std::endl;
 		  out << "\t" << std::endl;
-        out << "\treturn ks / (4 * " << M_PI << " * a*a * ln*vn) * exp((hn*hn - 1.0) / (a*a*hn*hn));" << std::endl;
+        out << "\treturn ks / (4 * " << M_PI << " * a*a * ln*vn) * exp((hn*hn - 1.0) / (a*a*hn*hn)) * g_beckmann(L,N,a) * g_beckmann(V,N,a);" << std::endl;
         out << "}" << std::endl;
     }
 }
