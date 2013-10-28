@@ -35,7 +35,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 		std::string line ;
 		std::getline(file, line) ;
 		std::stringstream linestream(line) ;
-		
+
 		// Discard incorrect lines
 		if(linestream.peek() == '#')
 		{
@@ -56,7 +56,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				_min.resize(dimX()) ;
 				_max.resize(dimX()) ;
-				
+
 				min = args.get_vec("min", _nX, -std::numeric_limits<float>::max()) ;
 				max = args.get_vec("max", _nX,  std::numeric_limits<float>::max()) ;
 
@@ -72,112 +72,112 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				linestream >> t ;
 				vs[current_vs] = t ; ++current_vs ;
 			}
-         else if(comment == std::string("PARAM_IN"))
-         {
+			else if(comment == std::string("PARAM_IN"))
+			{
 				std::string param;
 				linestream >> param;
 				_in_param = params::parse_input(param);
-         }
-         else if(comment == std::string("PARAM_OUT"))
-         {
+			}
+			else if(comment == std::string("PARAM_OUT"))
+			{
 				std::string param;
 				linestream >> param;
 				_out_param = params::parse_output(param);
-         }
+			}
 			continue ;
 		} 
 		else if(line.empty())
 		{
 			continue ;
 		}
-        else
-        {
-
-		vec v = vec::Zero(dimX() + 3*dimY()) ;
-		for(int i=0; i<dimX(); ++i)
-			linestream >> v[i] ;
-
-
-		// Correction of the data by 1/cosine(theta_L)
-		double factor = 1.0;
-		if(args.is_defined("data-correct-cosine"))
+		else
 		{
-			double cart[6];
-			params::convert(&v[0], input_parametrization(), params::CARTESIAN, cart);
-			factor = 1.0/cart[5];
-		}
-		// End of correction
 
-		for(int i=0; i<dimY(); ++i)
-		{
-			linestream >> v[dimX() + i];
-			v[dimX() + i] /= factor;
-		}
-
-        // Check if the data containt a vertical segment around the mean
-        // value.
-        for(int i=0; i<dimY(); ++i)
-        {
-            double min_dt = 0.0;
-            double max_dt = 0.0;
+			vec v = vec::Zero(dimX() + 3*dimY()) ;
+			for(int i=0; i<dimX(); ++i)
+				linestream >> v[i] ;
 
 
-            if(vs[i] == 2)
-            {
-                linestream >> min_dt ;
-                linestream >> max_dt ;
-                min_dt = min_dt-v[dimX()+i];
-                max_dt = max_dt-v[dimX()+i];
-            }
-            else if(vs[i] == 1)
-            {
-                double dt ;
-                linestream >> dt ;
-                min_dt = -dt;
-                max_dt =  dt;
-            }
-            else
-            {
-                double dt = args.get_float("dt", 0.1f);
-                min_dt = -dt;
-                max_dt =  dt;
-            }
-
-            if(args.is_defined("dt-relative"))
-            {
-                v[dimX() + dimY()+i]   = v[dimX() + i] * (1.0 + min_dt) ;
-                v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
-            }
-            else
-            {
-                v[dimX() + dimY()+i]   = v[dimX() + i] + min_dt ;
-                v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
-            }
-        }
-
-		// If data is not in the interval of fit
-		bool is_in = true ;
-		for(int i=0; i<dimX(); ++i)
-		{
-			if(v[i] < min[i] || v[i] > max[i])
+			// Correction of the data by 1/cosine(theta_L)
+			double factor = 1.0;
+			if(args.is_defined("data-correct-cosine"))
 			{
-				is_in = false ;
+				double cart[6];
+				params::convert(&v[0], input_parametrization(), params::CARTESIAN, cart);
+				factor = 1.0/cart[5];
+			}
+			// End of correction
+
+			for(int i=0; i<dimY(); ++i)
+			{
+				linestream >> v[dimX() + i];
+				v[dimX() + i] /= factor;
+			}
+
+			// Check if the data containt a vertical segment around the mean
+			// value.
+			for(int i=0; i<dimY(); ++i)
+			{
+				double min_dt = 0.0;
+				double max_dt = 0.0;
+
+
+				if(vs[i] == 2)
+				{
+					linestream >> min_dt ;
+					linestream >> max_dt ;
+					min_dt = min_dt-v[dimX()+i];
+					max_dt = max_dt-v[dimX()+i];
+				}
+				else if(vs[i] == 1)
+				{
+					double dt ;
+					linestream >> dt ;
+					min_dt = -dt;
+					max_dt =  dt;
+				}
+				else
+				{
+					double dt = args.get_float("dt", 0.1f);
+					min_dt = -dt;
+					max_dt =  dt;
+				}
+
+				if(args.is_defined("dt-relative"))
+				{
+					v[dimX() + dimY()+i]   = v[dimX() + i] * (1.0 + min_dt) ;
+					v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
+				}
+				else
+				{
+					v[dimX() + dimY()+i]   = v[dimX() + i] + min_dt ;
+					v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
+				}
+			}
+
+			// If data is not in the interval of fit
+			bool is_in = true ;
+			for(int i=0; i<dimX(); ++i)
+			{
+				if(v[i] < min[i] || v[i] > max[i])
+				{
+					is_in = false ;
+				}
+			}
+			if(!is_in)
+			{
+				continue ;
+			}
+
+			_data.push_back(v) ;
+
+			// Update min and max
+			for(int k=0; k<dimX(); ++k)
+			{
+				_min[k] = std::min(_min[k], v[k]) ;
+				_max[k] = std::max(_max[k], v[k]) ;
 			}
 		}
-		if(!is_in)
-		{
-			continue ;
-		}
-
-		_data.push_back(v) ;
-
-		// Update min and max
-		for(int k=0; k<dimX(); ++k)
-		{
-			_min[k] = std::min(_min[k], v[k]) ;
-			_max[k] = std::max(_max[k], v[k]) ;
-		}
-        }
 	}
 
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;

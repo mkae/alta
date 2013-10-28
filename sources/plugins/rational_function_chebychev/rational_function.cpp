@@ -95,8 +95,23 @@ rational_function_1d* rational_function_chebychev::get(int i)
 			rs[i] = new rational_function_chebychev_1d(np, nq);
 			rs[i]->setDimX(dimX());
 			rs[i]->setDimY(dimY());
-			rs[i]->setMin(getMin()) ;
-			rs[i]->setMax(getMax()) ;
+
+			// Test if the input domain is not empty. If one dimension of
+			// the input domain is a point, I manually inflate this dimension
+			// to avoid numerical issues.
+			vec _min = getMin();
+			vec _max = getMax();
+			for(int k=0; k<dimX(); ++k)
+			{
+				if(_min[k] == _max[k]) 
+				{
+					_min[k] -= 1.0;
+					_max[k] += 1.0;
+				}
+			}
+
+			rs[i]->setMin(_min) ;
+			rs[i]->setMax(_max) ;
 		}
 		return rs[i];
 	}

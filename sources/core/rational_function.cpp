@@ -12,16 +12,18 @@ rational_function_1d::rational_function_1d()
 {
 }
 
-rational_function_1d::rational_function_1d(int np, int nq) 
+rational_function_1d::rational_function_1d(int np, int nq, bool separable) 
 {
 	a.resize(np);
 	b.resize(nq);
+	_separable = separable;
 }
 
 rational_function_1d::rational_function_1d(const vec& a, 
                                            const vec& b) :
 	a(a), b(b)
 {
+	_separable = false;
 }
 
 bool rational_function_1d::load(std::istream&)
@@ -162,40 +164,57 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 
 	if(i == 0)
 		return deg ;
-
+	
+	// The case of one dimensional signals is trivial
 	if(dimX() == 1)
 	{
 		deg[0] = i;
+		return deg;
 	}
-	else if(dimX() == 2)
-	{
-		int Nk = 1 ;
-		int k  = 1 ;
-		while(!(i >= Nk && i < Nk+k+1))
-		{
-			Nk += k+1 ;
-			++k ;
-		}
 
-		int r = i-Nk ;
-		deg[0] = k-r;
-		deg[1] = r;
+	// Case of two or more dimension signal, we differ the treatment of
+	// separable signals and non separable signals.
+	if(_separable)
+	{
+		const int index = i-1;
+		const int base  = index / dimX() + 1;
+		for(int k=0; k<dimX(); ++k)
+		{
+			deg[k] = (index % dimX() == k) ? base : 0;
+		}
 	}
 	else
 	{
-		int Nk = 1 ;
-		int k  = 1 ;
-		int dk = estimate_dk(k, dimX()) ;
-		while(!(i >= Nk && i < Nk+dk))
+		if(dimX() == 2)
 		{
-			Nk += dk ;
-			++k ;
-			dk = estimate_dk(k, dimX()) ;
-		}
+			int Nk = 1 ;
+			int k  = 1 ;
+			while(!(i >= Nk && i < Nk+k+1))
+			{
+				Nk += k+1 ;
+				++k ;
+			}
 
-		// Populate the vector from front to back
-		int j = i-Nk ;
-		populate(deg, dimX(), k, j) ;
+			int r = i-Nk ;
+			deg[0] = k-r;
+			deg[1] = r;
+		}
+		else
+		{
+			int Nk = 1 ;
+			int k  = 1 ;
+			int dk = estimate_dk(k, dimX()) ;
+			while(!(i >= Nk && i < Nk+dk))
+			{
+				Nk += dk ;
+				++k ;
+				dk = estimate_dk(k, dimX()) ;
+			}
+
+			// Populate the vector from front to back
+			int j = i-Nk ;
+			populate(deg, dimX(), k, j) ;
+		}
 	}
 
 	return deg ;
@@ -305,8 +324,23 @@ rational_function_1d* rational_function::get(int i)
 			rs[i] = new rational_function_1d(np, nq);
 			rs[i]->setDimX(dimX());
 			rs[i]->setDimY(dimY());
-			rs[i]->setMin(getMin()) ;
-			rs[i]->setMax(getMax()) ;
+
+			// Test if the input domain is not empty. If one dimension of
+			// the input domain is a point, I manually inflate this dimension
+			// to avoid numerical issues.
+			vec _min = getMin();
+			vec _max = getMax();
+			for(int k=0; k<dimX(); ++k)
+			{
+				if(_min[k] == _max[k]) 
+				{
+					_min[k] -= 0.1;
+					_max[k] += 0.1;
+				}
+			}
+
+			rs[i]->setMin(_min) ;
+			rs[i]->setMax(_max) ;
 		}
 		return rs[i];
 	}

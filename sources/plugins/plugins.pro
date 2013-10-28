@@ -18,6 +18,7 @@ SUBDIRS  = \
 				nonlinear_fresnel_normalized_schlick	\
 				nonlinear_fresnel_retroschlick			\
 				nonlinear_function_diffuse					\
+				nonlinear_function_beckmann				\
 				nonlinear_function_blinn					\
 				nonlinear_function_retroblinn				\
 				nonlinear_function_ward 					\

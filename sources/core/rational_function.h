@@ -21,7 +21,7 @@ class rational_function_1d : public function
 	public: // methods
 
 		rational_function_1d() ;
-		rational_function_1d(int np, int nq) ;
+		rational_function_1d(int np, int nq, bool separable = true) ;
         rational_function_1d(const vec& a, const vec& b) ;
 		virtual ~rational_function_1d() {}
 
@@ -75,6 +75,11 @@ class rational_function_1d : public function
 		// Store the coefficients for the moment, I assume
 		// the functions to be polynomials.
         vec a, b ;
+
+		  //! Is the function separable with respect to its input dimensions?
+		  //! \todo Make possible to have only part of the dimensions
+		  //! separable.
+		  bool _separable;
 } ;
 
 #ifdef TODO
@@ -285,19 +290,11 @@ template<class T> class rational_function_t : public function
 		virtual void setMin(const vec& min)
 		{
 			function::setMin(min);
-			for(int i=0; i<dimY(); ++i)
-			{
-				get(i)->setMin(min);
-			}
 		}
 
 		virtual void setMax(const vec& max)
 		{
 			function::setMax(max);
-			for(int i=0; i<dimY(); ++i)
-			{
-				get(i)->setMax(max);
-			}
 		}
 
 		//! \brief Save the rational function to the rational format (see \ref 
@@ -409,19 +406,11 @@ class rational_function : public function
 		virtual void setMin(const vec& min)
 		{
 			function::setMin(min);
-			for(int i=0; i<dimY(); ++i)
-			{
-				get(i)->setMin(min);
-			}
 		}
 
 		virtual void setMax(const vec& max)
 		{
 			function::setMax(max);
-			for(int i=0; i<dimY(); ++i)
-			{
-				get(i)->setMax(max);
-			}
 		}
 
 		//! \brief Save the rational function to the rational format (see 
