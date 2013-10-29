@@ -37,32 +37,6 @@ class function : public parametrized
 		//! example. The default behaviour is to load a function file.
 		virtual void bootstrap(const data*, const arguments& args);
 
-		//! Provide the dimension of the input space of the function
-		virtual int dimX() const { return _nX ; }
-		//! Provide the dimension of the output space of the function
-		virtual int dimY() const { return _nY ; }
-
-		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX) { _nX = nX ; }
-		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY) { _nY = nY ; }
-
-
-		/* DEFINITION DOMAIN OF THE FUNCTION */
-
-		//! \brief Set the minimum value the input can take
-		virtual void setMin(const vec& min) ;
-
-		//! \brief Set the maximum value the input can take
-		virtual void setMax(const vec& max) ;
-
-		//! \brief Get the minimum value the input can take
-		virtual vec getMin() const ;
-
-		//! \brief Get the maximum value the input can take
-		virtual vec getMax() const ;
-
-
 		/* IMPORT/EXPORT FUNCTIONS */
 
 		//! Load function specific files
@@ -109,10 +83,6 @@ class function : public parametrized
 
 
 	protected: // data
-
-		// Dimension of the function & domain of definition.
-		int _nX, _nY ;
-		vec _min, _max ;
 };
 
 /*! \brief Non-linear function interface

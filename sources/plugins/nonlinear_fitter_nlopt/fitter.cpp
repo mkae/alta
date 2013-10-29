@@ -122,8 +122,8 @@ bool nonlinear_fitter_nlopt::fit_data(const data* d, function* fit, const argume
 	// to the dimension of my fitting problem
 	fit->setDimX(d->dimX()) ;
 	fit->setDimY(d->dimY()) ;
-	fit->setMin(d->min()) ;
-	fit->setMax(d->max()) ;
+	fit->setMin(d->getMin()) ;
+	fit->setMax(d->getMax()) ;
 
 	// Convert the function and bootstrap it with the data
 	if(dynamic_cast<nonlinear_function*>(fit) == NULL)
