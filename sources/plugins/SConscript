@@ -1,3 +1,6 @@
+# Building datas
+SConscript('data_merl/SConscript')
+SConscript('data_interpolant/SConscript')
 
 # Building fitters
 SConscript('nonlinear_fitter_ceres/SConscript')
