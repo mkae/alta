@@ -3,10 +3,14 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <cassert>
+
+#include <core/vertical_segment.h>
 
 data_interpolant::data_interpolant()
 {
 	_kdtree = new flann::Index< flann::L2<double> >(flann::KDTreeIndexParams(4));
+	_data = new vertical_segment();
 
 	_knn = 10;
 }
@@ -28,6 +32,8 @@ void data_interpolant::load(const std::string& filename)
 	setDimY(_data->dimY());
 	setMin(_data->min());
 	setMax(_data->max());
+
+	std::cout << "   " << _kdtree->veclen() << std::endl;
 
 	// Update the KDtreee by inserting all points
 	for(int i=0; i<_data->size(); ++i)
@@ -106,6 +112,7 @@ vec data_interpolant::value(vec x) const
 // Get data size, e.g. the number of samples to fit
 int data_interpolant::size() const 
 {
+	assert(_data != NULL);
 	return _data->size();
 }
 
