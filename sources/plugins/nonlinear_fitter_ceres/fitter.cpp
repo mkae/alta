@@ -176,8 +176,8 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
     // to the dimension of my fitting problem
     fit->setDimX(d->dimX()) ;
     fit->setDimY(d->dimY()) ;
-    fit->setMin(d->getMin()) ;
-    fit->setMax(d->getMax()) ;
+    fit->setMin(d->min()) ;
+    fit->setMax(d->max()) ;
 
 	 // Convert the function and bootstrap it with the data
     if(dynamic_cast<nonlinear_function*>(fit) == NULL)

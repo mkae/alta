@@ -26,8 +26,8 @@ void data_interpolant::load(const std::string& filename)
 	// Copy the informations
 	setDimX(_data->dimX());
 	setDimY(_data->dimY());
-	setMin(_data->getMin());
-	setMax(_data->getMax());
+	setMin(_data->min());
+	setMax(_data->max());
 
 	// Update the KDtreee by inserting all points
 	for(int i=0; i<_data->size(); ++i)

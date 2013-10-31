@@ -155,21 +155,9 @@ class data_params : public data
 			return _data.size();
 		}
 
-		// Get min and max input space values
-		virtual vec min() const
-		{
-			return _min;
-		}
-		virtual vec max() const
-		{
-			return _max;
-		}
-
 	protected: // data
 
 		data_params::clustrering _clustering_method;
 
 		std::vector<vec> _data;
-
-		vec _min, _max;
 };

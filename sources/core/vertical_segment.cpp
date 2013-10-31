@@ -235,13 +235,3 @@ int vertical_segment::size() const
 {
 	return _data.size() ;
 }
-
-vec vertical_segment::min() const 
-{
-	return _min ;
-}
-
-vec vertical_segment::max() const 
-{
-	return _max ;
-}

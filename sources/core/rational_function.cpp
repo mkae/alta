@@ -328,8 +328,8 @@ rational_function_1d* rational_function::get(int i)
 			// Test if the input domain is not empty. If one dimension of
 			// the input domain is a point, I manually inflate this dimension
 			// to avoid numerical issues.
-			vec _min = getMin();
-			vec _max = getMax();
+			vec _min = min();
+			vec _max = max();
 			for(int k=0; k<dimX(); ++k)
 			{
 				if(_min[k] == _max[k]) 

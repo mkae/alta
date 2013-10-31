@@ -373,11 +373,11 @@ void parametrized::setMax(const vec& max)
 #endif
     _max = max ;
 }
-vec parametrized::getMin() const
+vec parametrized::min() const
 {
     return _min ;
 }
-vec parametrized::getMax() const
+vec parametrized::max() const
 {
     return _max ;
 }

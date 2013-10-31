@@ -360,10 +360,10 @@ class parametrized
 		virtual void setMax(const vec& max) ;
 
 		//! \brief Get the minimum value the input can take
-		virtual vec getMin() const ;
+		virtual vec min() const ;
 
 		//! \brief Get the maximum value the input can take
-		virtual vec getMax() const ;
+		virtual vec max() const ;
 
 
 	protected:
