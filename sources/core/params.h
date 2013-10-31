@@ -8,6 +8,8 @@
 #include <cassert>
 #include <iostream>
 
+#include "common.h"
+
 /*! \class params
  *  \ingroup core
  *  \brief a static class allowing to change from one parametrization

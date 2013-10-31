@@ -22,30 +22,6 @@ void function::bootstrap(const data*, const arguments& args)
     }
 }
 
-// Acces to the domain of definition of the function
-void function::setMin(const vec& min)
-{
-#ifdef DEBUG
-    assert(min.size() == _nX) ;
-#endif
-    _min = min ;
-}
-void function::setMax(const vec& max)
-{
-#ifdef DEBUG
-    assert(max.size() == _nX) ;
-#endif
-    _max = max ;
-}
-vec function::getMin() const
-{
-    return _min ;
-}
-vec function::getMax() const
-{
-    return _max ;
-}
-
 void function::save(const std::string& filename, const arguments& args) const
 {
 	bool is_alta     = !args.is_defined("export") || args["export"] == "alta";
