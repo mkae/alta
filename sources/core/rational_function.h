@@ -21,7 +21,7 @@ class rational_function_1d : public function
 	public: // methods
 
 		rational_function_1d() ;
-		rational_function_1d(int np, int nq, bool separable = true) ;
+		rational_function_1d(int np, int nq, bool separable = false) ;
         rational_function_1d(const vec& a, const vec& b) ;
 		virtual ~rational_function_1d() {}
 

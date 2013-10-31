@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['fitter.cpp']
-libs = ['-lceres', '-lcore']
+libs = ['-lceres', '-lglog', '-lgomp', '-lcore']
 env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources, LIBS=libs)

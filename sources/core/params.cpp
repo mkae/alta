@@ -357,3 +357,27 @@ void params::print_input_params()
 		std::cout << it->second.name << std::endl;
 	}
 }
+
+// Acces to the domain of definition of the function
+void parametrized::setMin(const vec& min)
+{
+#ifdef DEBUG
+    assert(min.size() == _nX) ;
+#endif
+    _min = min ;
+}
+void parametrized::setMax(const vec& max)
+{
+#ifdef DEBUG
+    assert(max.size() == _nX) ;
+#endif
+    _max = max ;
+}
+vec parametrized::min() const
+{
+    return _min ;
+}
+vec parametrized::max() const
+{
+    return _max ;
+}
