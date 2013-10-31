@@ -64,20 +64,7 @@ class data : public parametrized
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;
 
-
-		// Get min and max input space values
-		virtual vec min() const = 0 ;
-		virtual vec max() const = 0 ;
-
-
-		// Get the size of the input X domain and output Y domain
-		virtual int dimX() const { return _nX ; }
-		virtual int dimY() const { return _nY ; }
-
 	protected: // data
-
-		// Dimensions of the data
-		int _nX, _nY ;
 } ;
 
 /*! \brief Change the parametrization of data to fit the parametrization of the
