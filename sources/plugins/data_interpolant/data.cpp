@@ -33,17 +33,17 @@ void data_interpolant::load(const std::string& filename)
 	setMin(_data->min());
 	setMax(_data->max());
 
-	std::cout << "   " << _kdtree->veclen() << std::endl;
-
 	// Update the KDtreee by inserting all points
+	flann::Matrix<double> pts(new double[dimX()*_data->size()], _data->size(), dimX());
 	for(int i=0; i<_data->size(); ++i)
 	{
 		vec x = _data->get(i);
-		flann::Matrix<double> pts(&x[0], dimX(), 1);
-
-		_kdtree->addPoints(pts);
+		memcpy(pts[i], &x[0], dimX()*sizeof(double)); 
 	}
-	_kdtree->buildIndex();
+	_kdtree->buildIndex(pts);
+	
+	std::cout << "   " << _kdtree->veclen() << std::endl;
+
 }
 void data_interpolant::load(const std::string& filename, const arguments&)
 {
@@ -82,7 +82,7 @@ vec data_interpolant::value(vec x) const
 	vec res = vec::Zero(dimY());
 
 	// Query point
-	flann::Matrix<double> pts(&x[0], dimX(), 1);
+	flann::Matrix<double> pts(&x[0], 1, dimX());
 	std::vector< std::vector<int> >    indices;
 	std::vector< std::vector<double> > dists;
 
