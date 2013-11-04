@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --loader loader.so" << std::endl ;
+		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --data loader.so" << std::endl ;
 		std::cout << " - input and output are mandatory parameters" << std::endl ;
 		return 0 ;
 	}
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	}
 
 	data* d = NULL ;
-    d = plugins_manager::get_data(args["loader"]) ;
+    d = plugins_manager::get_data(args["data"]) ;
 	d->load(args["input"]);
 
 	// Create output file
@@ -49,18 +49,24 @@ int main(int argc, char** argv)
 		in[1] = sin(phi_in)*sin(theta_in);
 		in[2] = cos(theta_in);
 
-		const int N = 1000;
+		vec _min = d->min();
+		vec _max = d->max();
+
+		vec x(d->dimX());
+		x = _min + 0.5*(_max - _min);
+
+		const int N = 100;
 		for(int i=0; i<N; ++i)
 			for(int j=0; j<N; ++j)
 			{
-				double phi   = (i-N/2) * M_PI / (N-1) * 2;
-				double theta = (j-N/2) * M_PI / (N-1) ;
-				out[0] = cos(phi)*sin(theta);
-				out[1] = sin(phi)*sin(theta);
-				out[2] = cos(theta);
-				vec v = d->value(in, out) ;
+				x[0] = _min[0] + (_max[0] - _min[0]) * double(i) / double(N-1);
+				x[1] = _min[1] + (_max[1] - _min[1]) * double(j) / double(N-1);
+				vec v = d->value(x) ;
 
-				file << phi << "\t" << theta << "\t" ;
+				for(int u=0; u<d->dimX(); ++u)
+				{
+					file << x[u] << "\t";
+				}
 				for(int u=0; u<d->dimY(); ++u)
 				{
 					file << v[u] << "\t" ;

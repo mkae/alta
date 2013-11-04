@@ -12,7 +12,7 @@ data_interpolant::data_interpolant()
 	_kdtree = new flann::Index< flann::L2<double> >(flann::KDTreeIndexParams(4));
 	_data = new vertical_segment();
 
-	_knn = 10;
+	_knn = 3;
 }
 
 data_interpolant::~data_interpolant()
