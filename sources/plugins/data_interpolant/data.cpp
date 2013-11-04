@@ -41,8 +41,6 @@ void data_interpolant::load(const std::string& filename)
 		memcpy(pts[i], &x[0], dimX()*sizeof(double)); 
 	}
 	_kdtree->buildIndex(pts);
-	
-	std::cout << "   " << _kdtree->veclen() << std::endl;
 
 }
 void data_interpolant::load(const std::string& filename, const arguments&)
@@ -101,9 +99,12 @@ vec data_interpolant::value(vec x) const
 		}
 		cum_dist += dists[0][i];
 	}
-	for(int j=0; j<dimY(); ++j)
+	if(cum_dist > 0.0)
 	{
-		res[j] /= cum_dist;
+		for(int j=0; j<dimY(); ++j)
+		{
+			res[j] /= cum_dist;
+		}
 	}
 
    return res;
