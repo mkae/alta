@@ -123,13 +123,28 @@ vec data_interpolant::value(vec ax) const
 
 	// Evaluate the matlab routine
 	std::stringstream cmd;
-	cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x);";
+	cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x, 'linear');";
 	engEvalString(ep, cmd.str().c_str());
 	
 	// Get results and copy it
 	y = engGetVariable(ep, "y") ;
 	double* y_val = (double*)mxGetData(y);
 	memcpy(&res[0], y_val, dimY()*sizeof(double));
+
+	// Fail safe: if the query point is outside of the convex hull of the
+	// data, rerun the algorithm using a nearest option.
+	if(isnan(res[0]))
+	{
+		cmd.str(std::string());
+
+		cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x, 'nearest');";
+		engEvalString(ep, cmd.str().c_str());
+
+		// Get results and copy it
+		y = engGetVariable(ep, "y") ;
+		double* y_val = (double*)mxGetData(y);
+		memcpy(&res[0], y_val, dimY()*sizeof(double));
+	}
 
    return res;
 }
