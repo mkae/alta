@@ -7,6 +7,24 @@
 
 #include <core/vertical_segment.h>
 
+//#define USE_DELAUNAY
+#ifdef USE_DELAUNAY
+#include <CGAL/Cartesian_d.h>
+#include <CGAL/Homogeneous_d.h>
+#include <CGAL/leda_integer.h>
+#include <CGAL/Delaunay_d.h>
+
+
+typedef CGAL::Homogeneous_d<double> Kernel;
+typedef CGAL::Delaunay_d<Kernel> Delaunay_d;
+typedef Delaunay_d::Point_d Point;
+typedef Delaunay_d::Simplex_handle S_handle;
+typedef Delaunay_d::Point_const_iterator P_iter;
+
+Delaunay_d* D;
+int dD;
+#endif
+
 data_interpolant::data_interpolant()
 {
 	_kdtree = new flann::Index< flann::L2<double> >(flann::KDTreeIndexParams(4));
@@ -18,7 +36,11 @@ data_interpolant::data_interpolant()
 data_interpolant::~data_interpolant()
 {
 	delete _data;
+#ifndef USE_DELAUNAY
 	delete _kdtree;
+#else
+	delete D;
+#endif
 }
 
 // Load data from a file
@@ -33,6 +55,20 @@ void data_interpolant::load(const std::string& filename)
 	setMin(_data->min());
 	setMax(_data->max());
 
+#ifdef USE_DELAUNAY
+	dD = dimX()+dimY();
+	D  = new Delaunay_d(dD);
+	for(int i=0; i<_data->size(); ++i)
+	{
+		vec x = _data->get(i);
+
+		Point pt(dD, &x[0], &x[dD]);
+		D->insert(pt);
+	}
+
+	std::cout << "<<DEBUG>> number of points in the Delaunay triangulation: " << D->all_points().size() << std::endl;
+	std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
+#else
 	// Update the KDtreee by inserting all points
 	flann::Matrix<double> pts(new double[dimX()*_data->size()], _data->size(), dimX());
 	for(int i=0; i<_data->size(); ++i)
@@ -41,7 +77,7 @@ void data_interpolant::load(const std::string& filename)
 		memcpy(pts[i], &x[0], dimX()*sizeof(double)); 
 	}
 	_kdtree->buildIndex(pts);
-
+#endif
 }
 void data_interpolant::load(const std::string& filename, const arguments&)
 {
@@ -79,6 +115,7 @@ vec data_interpolant::value(vec x) const
 {
 	vec res = vec::Zero(dimY());
 
+#ifndef USE_DELAUNAY
 	// Query point
 	flann::Matrix<double> pts(&x[0], 1, dimX());
 	std::vector< std::vector<int> >    indices;
@@ -106,6 +143,46 @@ vec data_interpolant::value(vec x) const
 			res[j] /= cum_dist;
 		}
 	}
+#else
+
+	Point pt_x(dD);
+	for(int j=0; j<dimX(); ++j) { pt_x[j] = x[j]; }
+	S_handle simplex = D->locate(pt_x);
+
+	if(simplex == Delaunay_d::Simplex_handle())
+	{
+		return res;
+	}
+
+	// Interpolate the value of the vertices of the Simplex to estimate
+	// the value of x
+	double cum_dist = 0.0;
+	for(int j=0; j<=dD; ++j)
+	{
+		Point y = D->point_of_simplex(simplex, j);
+
+		// Compute the distance between y and x
+		double dist = 0.0;
+		for(int i=0; i<dimX(); ++i) { dist += pow(y.homogeneous(i)-x[i], 2); }
+		dist = sqrt(dist);
+
+		// Interpolate the data
+		cum_dist += dist;
+		for(int i=0; i<dimY(); ++i)
+		{
+			res[i] += dist * y.homogeneous(dimX() + i);
+		}
+
+	}
+
+	if(cum_dist > 0.0)
+	{
+		for(int j=0; j<dimY(); ++j)
+		{
+			res[j] /= cum_dist;
+		}
+	}
+#endif
 
    return res;
 }

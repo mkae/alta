@@ -40,6 +40,7 @@ int main(int argc, char** argv)
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 
+	// Slices of the data to be extracted
 	std::vector<int> slice = args.get_vec<int>("slice");
 	assert(slice.size() <= d->dimX());
 	if(slice.size() == 0)

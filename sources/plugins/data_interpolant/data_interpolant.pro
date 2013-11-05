@@ -10,6 +10,9 @@ SOURCES         = data.cpp
 
 
 LIBS           += -L../../build \
-						-lcore
+						-lcore        \
+						-lCGAL
 
-
+unix {
+	QMAKE_CXXFLAGS += -frounding-math 
+}
