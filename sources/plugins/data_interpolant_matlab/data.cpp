@@ -25,11 +25,15 @@ data_interpolant::data_interpolant()
 	{
 		std::cerr << "<ERROR>> can't start MATLAB engine" << std::endl ;
 	}
+
+	output[BUFFER_SIZE] = '\0';
+	engOutputBuffer(ep, output, BUFFER_SIZE) ;
 }
 
 data_interpolant::~data_interpolant()
 {
 	delete _data;
+	delete[] output;
 
 	mxDestroyArray(x);
 	mxDestroyArray(y);
@@ -74,17 +78,8 @@ void data_interpolant::load(const std::string& filename)
 	Y = mxCreateDoubleMatrix(_data->size(), dimY(), mxREAL);
 	memcpy((void *)mxGetPr(Y), (void *) eY.data(),  _data->size()*dimY()*sizeof(double));
 	engPutVariable(ep, "Y", Y);
-
-	output[BUFFER_SIZE] = '\0';
-	engOutputBuffer(ep, output, BUFFER_SIZE) ;
-
-	engEvalString(ep, "display(X)");
-	std::cout << output << std::endl ;
-	engEvalString(ep, "display(Y)");
-	std::cout << output << std::endl ;
-
+	
 	x = mxCreateDoubleMatrix(1, dimX(), mxREAL);
-	engPutVariable(ep, "x", x);
 }
 void data_interpolant::load(const std::string& filename, const arguments&)
 {
@@ -124,16 +119,13 @@ vec data_interpolant::value(vec ax) const
 	
 	// Copy the input vector to matlab code
 	memcpy((void *)mxGetPr(x), (void *)&ax[0],  dimX()*sizeof(double));
+	engPutVariable(ep, "x", x);
 
 	// Evaluate the matlab routine
 	std::stringstream cmd;
-	cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x)";
+	cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x);";
 	engEvalString(ep, cmd.str().c_str());
-	std::cout << output << std::endl ;
 	
-	engEvalString(ep, "display(y)");
-	std::cout << output << std::endl ;
-
 	// Get results and copy it
 	y = engGetVariable(ep, "y") ;
 	double* y_val = (double*)mxGetData(y);
