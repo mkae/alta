@@ -29,5 +29,6 @@ SUBDIRS  = \
 				data_merl										\
 				data_brdf_slice								\
 				data_interpolant								\
+				data_interpolant_matlab						\
 #				data_astm
 
