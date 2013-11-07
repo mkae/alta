@@ -60,18 +60,21 @@ void data_interpolant::load(const std::string& filename)
 	{
 		vec x = _data->get(i);
 
+		// For a point extract all its coordinates
+		for(int j=0; j<dimX(); ++j)
+		{
+			eX(i, j) =  x[j];
+		}
+
+		// Extract all its values
 		for(int k=0; k<dimY(); ++k)
 		{
-			for(int j=0; j<dimX(); ++j)
-			{
-				eX(i, j + k*dimX()) =  x[j];
-			}
 			eY(i, k) = x[dimX() + k];
 		}
 	}
 
 	// Create matrices
-	X = mxCreateDoubleMatrix(_data->size(), dimX()*dimY(), mxREAL);
+	X = mxCreateDoubleMatrix(_data->size(), dimX(), mxREAL);
 	memcpy((void *)mxGetPr(X), (void *) eX.data(),  _data->size()*dimY()*dimX()*sizeof(double));
 	engPutVariable(ep, "X", X);
 	
@@ -121,11 +124,30 @@ vec data_interpolant::value(vec ax) const
 	memcpy((void *)mxGetPr(x), (void *)&ax[0],  dimX()*sizeof(double));
 	engPutVariable(ep, "x", x);
 
-	// Evaluate the matlab routine
 	std::stringstream cmd;
-	cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x, 'linear');";
-	engEvalString(ep, cmd.str().c_str());
 	
+	// Iterate over the output dimension
+	for(int i=0; i<dimY(); ++i)
+	{
+		// Evaluate the matlab routine
+		if(dimX() == 2)
+		{
+			cmd << "y(" << i+1 << ") = griddata(X(:,1), X(:,2), Y(:," << i+1 << "), x(1), x(2), 'cubic');";
+		}
+		else if(dimX() == 3)
+		{
+			cmd << "y(" << i+1 << ") = griddata(X(:,1), X(:,2), X(:,3), Y(:," << i+1 << "), x(1), x(2), x(3), 'cubic');";
+		}
+		else
+		{
+			cmd << "y(" << i+1 << ") = griddatan(X(:, 1:" << dimX() <<"), Y(:, " << i+1 << "), x, 'linear');";
+		}
+		engEvalString(ep, cmd.str().c_str());
+#ifdef DEBUG
+		std::cout << output;
+#endif
+	}
+
 	// Get results and copy it
 	y = engGetVariable(ep, "y") ;
 	double* y_val = (double*)mxGetData(y);
@@ -135,11 +157,12 @@ vec data_interpolant::value(vec ax) const
 	// data, rerun the algorithm using a nearest option.
 	if(isnan(res[0]))
 	{
-		cmd.str(std::string());
-
-		cmd << "y = griddatan(X(:, 1:" << dimX() <<"), Y(:, 1), x, 'nearest');";
-		engEvalString(ep, cmd.str().c_str());
-
+		for(int i=0; i<dimY(); ++i)
+		{
+			cmd.str(std::string());
+			cmd << "y("<< i+1 <<") = griddatan(X(:, 1:" << dimX() <<"), Y(:, " << i+1 << "), x, 'nearest');";
+			engEvalString(ep, cmd.str().c_str());
+		}
 		// Get results and copy it
 		y = engGetVariable(ep, "y") ;
 		double* y_val = (double*)mxGetData(y);
