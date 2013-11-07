@@ -24,7 +24,7 @@ class beckmann_function : public nonlinear_function
 
 	public: // methods
 
-		beckmann_function()
+		beckmann_function(): _use_back_param(true)
 		{
 			setParametrization(params::CARTESIAN);
 			setDimX(6);
@@ -77,5 +77,6 @@ class beckmann_function : public nonlinear_function
 	private: // data
 
 		vec _ks, _a; // Lobes data
+		bool _use_back_param;
 } ;
 

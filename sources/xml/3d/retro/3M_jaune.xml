@@ -133,4 +133,45 @@
 
 		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
 	</action>
+	
+
+	<!-- Fit the data to a Blinn BRDF model -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<output name="./results/3d/retro/3M_jaune_backbeckmann.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_beckmann" />
+		<function name="nonlinear_function_retrobeckmann" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+		
+		<!-- Parameters -->
+		<parameter name="data-correct-cosine" value="" />		
+	</action>
+	
+	<!-- Fit the data to a Blinn BRDF model -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<output name="./results/3d/retro/3M_jaune_retrobeckmann.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_beckmann" />
+		<function name="nonlinear_function_retrobeckmann">
+			<parameter name="retro" value="" />
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+		
+		<!-- Parameters -->
+		<parameter name="data-correct-cosine" value="" />		
+	</action>
 </alta>
