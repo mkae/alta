@@ -30,17 +30,23 @@ class params
 
 		 //! \brief list of all supported parametrization for the input space.
 		 //! An unsupported parametrization will go under the name
-		 //! <em>unknown</em>.
+		 //! <em>unknown</em>. We use the following notations:
+		 //!   * The view vector is \f$\vec{v}\f$
+		 //!   * The light vector is \f$\vec{l}\f$
+		 //!   * The normal vector is \f$\vec{n}\f$
+		 //!   * The reflected vector is \f$\vec{r} = 2\mbox{dot}(\vec{v}, \vec{n})\vec{n} - \vec{v}\f$
 		 enum input
 		 {
              RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described in [Rusinkiewicz'98] */
              RUSIN_TH_PH_TD,
              RUSIN_TH_TD_PD,
              RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
-             RUSIN_VH_VD,           /*!< Half-angle parametrization with no azimutal information in
-				                             vector format */
-             RUSIN_VH,              /*!< Half-angle parametrization with no azimutal information
-				                             and no difference direction in vector format */
+             RUSIN_VH_VD,           /*!< Half-angle parametrization in vector format. Coordinates are:
+				                             [\f$\vec{h}_x, \vec{h}_y, \vec{h}_z, \vec{d}_x, \vec{d}_y, 
+													  \vec{d}_z \f$].*/
+             RUSIN_VH,              /*!< Half-angle parametrization with no difference direction in 
+												     vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
+													  \vec{h}_z\f$]. */
              COS_TH_TD,
              COS_TH,
 
@@ -53,6 +59,9 @@ class params
              SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
              ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
                                          with the difference of azimutal coordinates in the last component  */
+				 ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
+				                             Coordinates are: [\f$\theta_v \cos(\Delta\phi), \theta_v 
+													  \sin(\Delta\phi).\f$]*/
              ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
              CARTESIAN,             /*!< Light and View vectors represented in cartesian coordinates */

@@ -22,6 +22,7 @@ SUBDIRS  = \
 				nonlinear_function_retrobeckmann			\
 				nonlinear_function_blinn					\
 				nonlinear_function_retroblinn				\
+				nonlinear_function_retroyoo				\
 				nonlinear_function_ward 					\
 				nonlinear_function_spherical_gaussian  \
 				nonlinear_function_lafortune				\

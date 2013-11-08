@@ -21,6 +21,7 @@ std::map<params::input, const param_info> create_map()
 
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
@@ -85,9 +86,19 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case params::COS_TH_TD:
 			half_to_cartesian(acos(invec[0]), 0.0, acos(invec[1]), 0.0, outvec);
 			break;
-
 		case params::RUSIN_TH_TD:
-            half_to_cartesian(invec[0], 0.0, invec[1], 0.5*M_PI, outvec);
+         half_to_cartesian(invec[0], 0.0, invec[1], 0.5*M_PI, outvec);
+			break;
+		case ISOTROPIC_TV_PROJ_DPHI:
+		{
+			const double theta = 0.5*sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
+			outvec[0] = invec[0]/theta*sin(theta);
+			outvec[1] = invec[1]/theta*sin(theta);
+			outvec[2] = cos(theta);
+			outvec[3] = 0.0;
+			outvec[4] = 0.0;
+			outvec[5] = 1.0;
+		}
 			break;
 
 			// 3D Parametrization
@@ -130,29 +141,28 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[5] = cos(invec[2]);
 			break;
 
-        case params::STEREOGRAPHIC:
-        {
-            // Project the 2D direction on the surface invec[0,1] to the View
-            // vector outvec[0,1,2]
-            const double normL = invec[0]*invec[0] + invec[1]*invec[1];
-            const double alphL = (1.0 - normL) / (1.0 + normL);
-            outvec[0] = invec[0] + alphL;
-            outvec[1] = invec[1] + alphL;
-            outvec[2] = alphL;
+		case params::STEREOGRAPHIC:
+      {
+			// Project the 2D direction on the surface invec[0,1] to the View
+         // vector outvec[0,1,2]
+         const double normL = invec[0]*invec[0] + invec[1]*invec[1];
+         const double alphL = (1.0 - normL) / (1.0 + normL);
+         outvec[0] = invec[0] + alphL;
+         outvec[1] = invec[1] + alphL;
+         outvec[2] = alphL;
 
-            // Project the 2D direction on the surface invec[2,3] to the Light
-            // vector outvec[3,4,5]
-            const double normV = invec[2]*invec[2] + invec[3]*invec[3];
-            const double alphV = (1.0 - normV) / (1.0 + normV);
-            outvec[3] = invec[2] + alphV;
-            outvec[4] = invec[3] + alphV;
-            outvec[5] = alphV;
+         // Project the 2D direction on the surface invec[2,3] to the Light
+         // vector outvec[3,4,5]
+         const double normV = invec[2]*invec[2] + invec[3]*invec[3];
+         const double alphV = (1.0 - normV) / (1.0 + normV);
+         outvec[3] = invec[2] + alphV;
+         outvec[4] = invec[3] + alphV;
+         outvec[5] = alphV;
+		}
+         break;
 
-            break;
-        }
-
-			// 6D Parametrization
-        case params::CARTESIAN:
+		// 6D Parametrization
+      case params::CARTESIAN:
 			memcpy(outvec, invec, 6*sizeof(double));
 			break;
 
@@ -187,12 +197,12 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[0] = half[2];
 			break;
 		case params::COS_TK:
-			{
-				double Kx = invec[0]-invec[3];
-				double Ky = invec[1]-invec[4];
-				double Kz = invec[2]+invec[5];
-				outvec[0] = (invec[2] + invec[5]) / sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
-			}
+		{
+			const double Kx = invec[0]-invec[3];
+			const double Ky = invec[1]-invec[4];
+			const double Kz = invec[2]+invec[5];
+			outvec[0] = (invec[2] + invec[5]) / sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
+		}
 			break;
 
 			// 2D Parametrizations
@@ -203,6 +213,14 @@ void params::from_cartesian(const double* invec, params::input outtype,
 		case params::RUSIN_TH_TD:
 			outvec[0] = acos(half[2]);
 			outvec[1] = acos(clamp(half[0]*invec[0] + half[1]*invec[1] + half[2]*invec[2], -1.0, 1.0));
+			break;
+		case ISOTROPIC_TV_PROJ_DPHI:
+		{
+			const double theta = acos(invec[2]);
+			const double dphi  = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			outvec[0] = theta * cos(dphi);
+			outvec[1] = theta * sin(dphi);
+		}
 			break;
 
 			// 3D Parametrization
@@ -235,27 +253,27 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[1] = half[1];  
 			outvec[2] = half[2];  
 			break;
-        case params::SCHLICK_VK:
-            {
-                const double Kx = invec[0]-invec[3];
-                const double Ky = invec[1]-invec[4];
-                const double Kz = invec[2]-invec[5];
+      case params::SCHLICK_VK:
+      {
+			const double Kx = invec[0]-invec[3];
+         const double Ky = invec[1]-invec[4];
+         const double Kz = invec[2]-invec[5];
 
-                const double norm =  sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
-					 if(norm > 1.0E-10)
-					 {
-	                outvec[0] = Kx / norm;
-		             outvec[1] = Ky / norm;
-			          outvec[2] = Kz / norm;
-					 }
-					 else
-					 {
-	                outvec[0] = 0.0;
-		             outvec[1] = 0.0;
-			          outvec[2] = 1.0;
-					 }
-            }
-            break;
+         const double norm =  sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
+			if(norm > 1.0E-10)
+			{
+				outvec[0] = Kx / norm;
+		      outvec[1] = Ky / norm;
+			   outvec[2] = Kz / norm;
+			}
+			else
+			{
+				outvec[0] = 0.0;
+		      outvec[1] = 0.0;
+			   outvec[2] = 1.0;
+			}
+      }
+			break;
 
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:
@@ -283,22 +301,22 @@ void params::from_cartesian(const double* invec, params::input outtype,
 #endif
 			break;
 
-        case params::STEREOGRAPHIC:
-        {
-            // Project the View vector invec[0,1,2] on a 2D direction on the
-            // surface outvec[0,1]
-            double dotVN = invec[2];
-            outvec[0] = invec[0] / (1.0+dotVN);
-            outvec[1] = invec[1] / (1.0+dotVN);
+      case params::STEREOGRAPHIC:
+      {
+			// Project the View vector invec[0,1,2] on a 2D direction on the
+         // surface outvec[0,1]
+         const double dotVN = invec[2];
+         outvec[0] = invec[0] / (1.0+dotVN);
+         outvec[1] = invec[1] / (1.0+dotVN);
 
-            // Project the Light vector invec[0,1,2] on a 2D direction on the
-            // surface outvec[2,3]
-            double dotLN = invec[5];
-            outvec[2] = invec[3] / (1.0+dotLN);
-            outvec[3] = invec[4] / (1.0+dotLN);
+         // Project the Light vector invec[0,1,2] on a 2D direction on the
+         // surface outvec[2,3]
+         const double dotLN = invec[5];
+         outvec[2] = invec[3] / (1.0+dotLN);
+         outvec[3] = invec[4] / (1.0+dotLN);
 
-            break;
-        }
+		}
+         break;
 
 			// 6D Parametrization
 		case params::CARTESIAN:
