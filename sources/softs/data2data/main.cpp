@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 
 	if(args.is_defined("help")) {
 		std::cout << "<<HELP>> data2data --input data.file --output data.file --out-data exporter.so --in-data importer.so" << std::endl ;
-		std::cout << " - input, output, func, data are mandatory parameters" << std::endl ;
+		std::cout << " - input, output, out-data are mandatory parameters" << std::endl ;
 		return 0 ;
 	}
 
@@ -31,14 +31,12 @@ int main(int argc, char** argv)
 		std::cerr << "<<ERROR>> the output filename is not defined" << std::endl ;
 		return 1 ;
 	}
-	if(! args.is_defined("in-data")) {
-		std::cerr << "<<ERROR>> the data importer is not defined" << std::endl ;
-		return 1 ;
-	}
+	/*
 	if(! args.is_defined("out-data")) {
 		std::cerr << "<<ERROR>> the data exporter is not defined" << std::endl ;
 		return 1 ;
 	}
+	*/
 	
 	
 	// Import data

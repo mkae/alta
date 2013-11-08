@@ -44,8 +44,17 @@ vec beckmann_function::operator()(const vec& x) const
 }
 vec beckmann_function::value(const vec& x) const 
 {
-	double h[3];
-	params::convert(&x[0], params::CARTESIAN, params::SCHLICK_VK, &h[0]);
+	double dot;
+	if(_use_back_param)
+	{
+		double h[3];
+		params::convert(&x[0], params::CARTESIAN, params::SCHLICK_VK, &h[0]);
+		dot = h[2];
+	}
+	else
+	{
+		dot = std::max(x[0]*x[3] +  x[2]*x[4] +  x[2]*x[5], 0.0);
+	}
 
 	// Compute the Shadow term to init res
 	vec res = G(x);
@@ -54,10 +63,10 @@ vec beckmann_function::value(const vec& x) const
 	{
 		const double a    = _a[i];
 		const double a2   = a*a;
-		const double dh2  = h[2]*h[2];
+		const double dh2  = dot*dot;
 		const double expo = exp((dh2 - 1.0) / (a2 * dh2));
 
-		if(h[2] > 0.0 && x[2]*x[5]>0.0)
+		if(dot > 0.0 && x[2]*x[5]>0.0)
 		{
 			res[i] *= _ks[i] / (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2) * expo;
 		}
@@ -125,8 +134,17 @@ void beckmann_function::setParameters(const vec& p)
 //! \todo finish. 
 vec beckmann_function::parametersJacobian(const vec& x) const 
 {
-	double h[3];
-	params::convert(&x[0], params::CARTESIAN, params::SCHLICK_VK, h);
+	double dot;
+	if(_use_back_param)
+	{
+		double h[3];
+		params::convert(&x[0], params::CARTESIAN, params::SCHLICK_VK, &h[0]);
+		dot = h[2];
+	}
+	else
+	{
+		dot = std::max(x[0]*x[3] +  x[2]*x[4] +  x[2]*x[5], 0.0);
+	}
 
 	// Get the geometry term
 	vec g = G(x);
@@ -136,11 +154,11 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 	 {
 		 for(int j=0; j<dimY(); ++j)
 		 {
-			 if(i == j && h[2]>0.0 && x[2]*x[5]>0.0)
+			 if(i == j && dot>0.0 && x[2]*x[5]>0.0)
 			 {
 				 const double a    = _a[i];
 				 const double a2   = a*a;
-				 const double dh2  = h[2]*h[2];
+				 const double dh2  = dot*dot;
 				 const double expo = exp((dh2 - 1.0) / (a2 * dh2));
 				 const double fac  = (4.0 * x[2]*x[5] * M_PI * a2 * dh2*dh2);
 
@@ -148,7 +166,7 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 				 jac[i*nbParameters() + j*2+0] = g[i] * expo / fac;
 
 				 // df / da_x
-				 jac[i*nbParameters() + j*2+1] = - g[i] * _ks[i] * (expo/(4.0*x[2]*x[5])) * ((2* a * h[2])/(M_PI*a2*a2*dh2)) * (1 + (dh2 - 1.0)*h[2]/(a2*dh2*h[2]));
+				 jac[i*nbParameters() + j*2+1] = - g[i] * _ks[i] * (expo/(4.0*x[2]*x[5])) * ((2* a * dot)/(M_PI*a2*a2*dh2)) * (1 + (dh2 - 1.0)*dot/(a2*dh2*dot));
 			 }
 			 else
 			 {
@@ -167,6 +185,15 @@ void beckmann_function::bootstrap(const data* d, const arguments& args)
 	{
 		_ks[i] = 1.0;
 		_a[i]  = 1.0;
+	}
+
+	if(args.is_defined("retro"))
+	{
+		_use_back_param = false;
+	}
+	else
+	{
+		_use_back_param = true;
 	}
 }
 
@@ -193,6 +220,24 @@ bool beckmann_function::load(std::istream& in)
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
         return false;
 	}
+	
+	in >> token;
+	if(token.compare("#TYPE") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+        return false;
+	}
+
+	in >> token;
+	if(token.compare("RETRO") != 0) 
+	{ 
+		_use_back_param = false;
+	}
+	else
+	{
+		_use_back_param = true;
+	}
+
 
 	in >> token;
    if(token.compare("nonlinear_function_retrobeckmann") != 0) 
@@ -214,38 +259,40 @@ bool beckmann_function::load(std::istream& in)
 
 void beckmann_function::save_call(std::ostream& out, const arguments& args) const
 {
-    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
+	bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
-    if(is_alta)
-    {
+	if(is_alta)
+	{
 		out << "#FUNC nonlinear_function_retrobeckmann" << std::endl ;
+		out << "#TYPE ";
+		if(_use_back_param) { out << "BACK" << std::endl; }
+		else { out << "RETRO" << std::endl; }
 
-		 for(int i=0; i<_nY; ++i)
-		 {
-			 out << "Ks " << _ks[i] << std::endl;
-			 out << "a  " << _a[i]  << std::endl;
-		 }
-	
-		 out << std::endl;
-	 }
-	 else
-	 {
-		 out << "retrobeckmann(L, V, N, X, Y, vec3(";
-		 for(int i=0; i<_nY; ++i)
-		 {
-			 out << _ks[i];
-			 if(i < _nY-1) { out << ", "; }
-		 }
+			for(int i=0; i<_nY; ++i)
+			{
+				out << "Ks " << _ks[i] << std::endl;
+				out << "a  " << _a[i]  << std::endl;
+			}
 
-		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
-		 {
-			 out << _a[i];
-			 if(i < _nY-1) { out << ", "; }
-		 }
-		 out << "))";
-	 }
+		out << std::endl;
+	}
+	else
+	{
+		out << "retrobeckmann(L, V, N, X, Y, vec3(";
+		for(int i=0; i<_nY; ++i)
+		{
+			out << _ks[i];
+			if(i < _nY-1) { out << ", "; }
+		}
 
+		out << "), vec3(";
+		for(int i=0; i<_nY; ++i)
+		{
+			out << _a[i];
+			if(i < _nY-1) { out << ", "; }
+		}
+		out << "))";
+	}
 }
 
 void beckmann_function::save_body(std::ostream& out, const arguments& args) const

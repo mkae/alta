@@ -180,8 +180,8 @@ class arguments
 		vec get_vec(const std::string& key, int size, float default_value = 0.0f) const
 		{
 			vec res(size);
-            for(int i=0; i<size; ++i)
-                res[i] = default_value;
+			for(int i=0; i<size; ++i)
+				res[i] = default_value;
 
 			if(_map.count(key) > 0)
 			{
@@ -196,14 +196,14 @@ class arguments
 
 						if(ppos != std::string::npos)
 						{
-                            res[i] = atof(s.substr(pos, ppos-pos).c_str());
+							res[i] = atof(s.substr(pos, ppos-pos).c_str());
 							pos = ppos+1;
 							++i;
 						}
 						else
 						{
-                            std::string temp = s.substr(pos, std::string::npos);
-                            res[i] = atof(temp.substr(0, temp.size()-1).c_str());
+							std::string temp = s.substr(pos, std::string::npos);
+							res[i] = atof(temp.substr(0, temp.size()-1).c_str());
 							pos = ppos;
 							++i;
 						}
@@ -216,6 +216,38 @@ class arguments
 			for(int i=0; i<size; ++i)
 			{
 				res[i] = val;
+			}
+			return res;
+		}
+
+		//! \brief access a vector of element of type \a T of variable length.
+		//! the string associated with the key \a key should have the form
+		//! "[a, b, c]" where a, b, c are of type \a T.
+		template<typename T>
+		std::vector<T> get_vec(const std::string& key) const
+		{
+			std::vector<T> res;
+
+			if(_map.count(key) > 0)
+			{
+				std::string str = _map.find(key)->second;
+				if(str[0] == '[' && str[str.size()-1] == ']') // Is an array of type [a, b, c]
+				{
+					std::stringstream stream(str.substr(1, str.size()-2));
+					char s[256];
+					while(stream.good())
+					{
+						// Extract the value v from the stream s
+						stream.get(s, 256, ',');
+						stream.ignore(1);
+						std::stringstream sstream(s);
+						T v;
+						sstream >> v;
+
+						// Push the value at the end of the vector
+						res.push_back(v);
+					}
+				}
 			}
 			return res;
 		}

@@ -1,6 +1,7 @@
 TEMPLATE        = lib
 CONFIG         *=  plugin \
-						 eigen
+						 eigen  \
+                   matlab  
 
 DESTDIR         = ../../build
 
@@ -10,9 +11,5 @@ SOURCES         = data.cpp
 
 
 LIBS           += -L../../build \
-						-lcore        \
-						-lCGAL
+						-lcore        
 
-unix {
-	QMAKE_CXXFLAGS += -frounding-math 
-}

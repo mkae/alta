@@ -17,8 +17,10 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --loader loader.so" << std::endl ;
+		std::cout << "<<HELP>> data2gnuplot --input data.file --output gnuplot.file --data loader.so --slice [0, 1, 2]" << std::endl ;
 		std::cout << " - input and output are mandatory parameters" << std::endl ;
+		std::cout << " - if no data parameter is set, the data will be loaded using vertical segments plugin" << std::endl ;
+		std::cout << " - the slice parameter allows to select the dimensions to output" << std::endl ;
 		return 0 ;
 	}
 
@@ -32,11 +34,30 @@ int main(int argc, char** argv)
 	}
 
 	data* d = NULL ;
-    d = plugins_manager::get_data(args["loader"]) ;
+    d = plugins_manager::get_data(args["data"]) ;
 	d->load(args["input"]);
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+
+	// Slices of the data to be extracted
+	std::vector<int> slice = args.get_vec<int>("slice");
+	assert(slice.size() <= d->dimX());
+	if(slice.size() == 0)
+	{
+		slice.resize(d->dimX());
+		for(int u=0; u<d->dimX(); ++u)
+		{
+			slice[u] = u;
+		}
+	}
+	else
+	{
+		for(int u=0; u<slice.size(); ++u)
+		{
+			assert(slice[u] < d->dimX());
+		}
+	}
 
 	if(d != NULL)
 	{
@@ -49,25 +70,38 @@ int main(int argc, char** argv)
 		in[1] = sin(phi_in)*sin(theta_in);
 		in[2] = cos(theta_in);
 
-		const int N = 1000;
+		vec _min = d->min();
+		vec _max = d->max();
+
+		vec x(d->dimX());
+		x = _min + 0.5*(_max - _min);
+
+		const int N = 10000;
+		const int n = int(pow(N, 1.0/slice.size()));
+
 		for(int i=0; i<N; ++i)
-			for(int j=0; j<N; ++j)
+		{
+			// Set the point of evaluation and get the value
+			for(int u=0; u<d->dimX(); ++u)
 			{
-				double phi   = (i-N/2) * M_PI / (N-1) * 2;
-				double theta = (j-N/2) * M_PI / (N-1) ;
-				out[0] = cos(phi)*sin(theta);
-				out[1] = sin(phi)*sin(theta);
-				out[2] = cos(theta);
-				vec v = d->value(in, out) ;
-
-				file << phi << "\t" << theta << "\t" ;
-				for(int u=0; u<d->dimY(); ++u)
-				{
-					file << v[u] << "\t" ;
-				}
-
-				file << std::endl ;
+				int j = (i / int(pow(n, u))) % n;
+				int v = slice[u];
+				x[v] = _min[v] + (_max[v] - _min[v]) * double(j) / double(n);
 			}
+			vec v = d->value(x) ;
+
+			// Copy the value in the file
+			for(int u=0; u<d->dimX(); ++u)
+			{
+				file << x[u] << "\t";
+			}
+			for(int u=0; u<d->dimY(); ++u)
+			{
+				file << v[u] << "\t" ;
+			}
+
+			file << std::endl ;
+		}
 	}	
 	else
 	{

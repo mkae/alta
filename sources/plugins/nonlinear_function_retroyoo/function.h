@@ -11,20 +11,23 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A Microfacet model using a Gaussian distribution for the
- *  micro-gemeotry distribution parametrized by the half-angle.
+/*! \brief  A retro-reflective model using biological tissues model [Yoo et al. 1990].
+ *  The 1D retro profile is a modified Gaussain.
  *
  *  \details
+ *  This model is wavelength dependant, but we removed this by considering a 633nm spectrum
  *
  *  <h3>Plugin parameters</h3>
+ *  This model has three parameters: \f$k_r\f$ the relative albedo of the retroreflection, 
+ *  and \f$l_t\f$, the mean free path.
  *
  */
-class beckmann_function : public nonlinear_function
+class yoo_function : public nonlinear_function
 {
 
 	public: // methods
 
-		beckmann_function(): _use_back_param(true)
+		yoo_function()
 		{
 			setParametrization(params::CARTESIAN);
 			setDimX(6);
@@ -33,9 +36,6 @@ class beckmann_function : public nonlinear_function
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;
-
-		// Geometrical term of the microfacets
-		virtual vec G(const vec& x) const;
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
@@ -76,7 +76,6 @@ class beckmann_function : public nonlinear_function
 
 	private: // data
 
-		vec _ks, _a; // Lobes data
-		bool _use_back_param;
+		vec _kr, _lt; // Lobes data
 } ;
 

@@ -68,17 +68,28 @@ int main(int argc, char** argv)
 
 #ifndef OLD
 		// Number of elements per dimension
-		const vec dim = args.get_vec("dim", nX, 100.0);
-		assert(dim.size() == nX);
+		std::vector<int> dim;
+		if(args.is_defined("dim"))
+		{	
+			dim = args.get_vec<int>("dim");
+			assert(dim.size() == nX);
+		}
+		else
+		{
+			for(int i=0; i<nX; ++i)
+			{
+				dim.push_back(100);
+			}
+		}
 
 		// Compute the volume in which we integrate and then compute the
 		// dt to apply for each element.
 		double dt = 1.0;
-		int nb = 0;
+		int nb = 1;
 		for(int k=0; k<nX; ++k)
 		{
 			dt *= d->max()[k] - d->min()[k];
-			nb += int(dim[k]);
+			nb *= dim[k];
 		}
 		dt /= double(nb);
 		
@@ -101,8 +112,8 @@ int main(int argc, char** argv)
 			int global = i;
 			for(int k=0; k<nX; ++k)
 			{
-				indices[k] = global % int(dim[k]);
-				global /= int(dim[k]);
+				indices[k] = global % dim[k];
+				global /= dim[k];
 			}
 
 			vec x(nX);
