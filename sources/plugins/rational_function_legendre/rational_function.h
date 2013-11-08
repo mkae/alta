@@ -50,15 +50,12 @@ class rational_function_legendre : public rational_function
 					rs[i] = new rational_function_legendre_1d(np, nq);
 					rs[i]->setDimX(dimX());
 					rs[i]->setDimY(dimY());
-
-					// Test if the input domain is not empty. If one dimension of
-					// the input domain is a point, I manually inflate this dimension
-					// to avoid numerical issues.
+					
 					vec _min = min();
 					vec _max = max();
 					for(int k=0; k<dimX(); ++k)
 					{
-						if(_min[k] == _max[k]) 
+						if(_min[k] == _max[k])
 						{
 							_min[k] -= 1.0;
 							_max[k] += 1.0;

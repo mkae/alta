@@ -27,7 +27,6 @@ int dD;
 
 data_interpolant::data_interpolant()
 {
-	_kdtree = new flann::Index< flann::L2<double> >(flann::KDTreeIndexParams(4));
 	_data = new vertical_segment();
 
 	_knn = 3;
@@ -37,9 +36,11 @@ data_interpolant::~data_interpolant()
 {
 	delete _data;
 #ifndef USE_DELAUNAY
-	delete _kdtree;
+	if(_kdtree != NULL)
+		delete _kdtree;
 #else
-	delete D;
+	if(D != NULL)
+		delete D;
 #endif
 }
 
@@ -76,7 +77,8 @@ void data_interpolant::load(const std::string& filename)
 		vec x = _data->get(i);
 		memcpy(pts[i], &x[0], dimX()*sizeof(double)); 
 	}
-	_kdtree->buildIndex(pts);
+	_kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
+	_kdtree->buildIndex();
 #endif
 }
 void data_interpolant::load(const std::string& filename, const arguments&)
