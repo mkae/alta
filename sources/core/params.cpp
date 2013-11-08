@@ -29,6 +29,7 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_TL_DPHI, param_info("ISOTROPIC_TV_TL_DPHI", 3, "Isotropic Light/View angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_VH, param_info("RUSIN_VH", 3, "Vector representation of the Half angle only")));
     _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TL_TV_PROJ_DPHI, param_info("ISOTROPIC_TL_TV_PROJ_DPHI", 3, "Isoptropic projected phi parametrization.")));
 
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
@@ -93,12 +94,12 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case ISOTROPIC_TV_PROJ_DPHI:
 		{
 			const double theta = 0.5*sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
-			outvec[0] = invec[0]/theta*sin(theta);
-			outvec[1] = invec[1]/theta*sin(theta);
-			outvec[2] = cos(theta);
-			outvec[3] = 0.0;
-			outvec[4] = 0.0;
-			outvec[5] = 1.0;
+			outvec[3] = invec[0]/theta*sin(theta);
+			outvec[4] = invec[1]/theta*sin(theta);
+			outvec[5] = cos(theta);
+			outvec[0] = 0.0;
+			outvec[1] = 0.0;
+			outvec[2] = 1.0;
 		}
 			break;
 
@@ -119,7 +120,7 @@ void params::to_cartesian(const double* invec, params::input intype,
             half_to_cartesian(acos(invec[2]), atan2(invec[1], invec[0]), 0.0, 0.0, outvec);
 			break;
         // \todo I should handle the phi_k in the conversion to CARTESIAN
-        case params::SCHLICK_VK:
+      case params::SCHLICK_VK:
             outvec[0] = invec[2]*invec[2]-1.0;
             outvec[1] = 0.0;
             outvec[2] = invec[2];
@@ -127,6 +128,17 @@ void params::to_cartesian(const double* invec, params::input intype,
             outvec[4] = 0.0;
             outvec[5] = invec[2];
             break;
+		case ISOTROPIC_TL_TV_PROJ_DPHI:
+		{
+			const double theta = 0.5*sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
+			outvec[3] = invec[1]/theta*sin(theta);
+			outvec[4] = invec[2]/theta*sin(theta);
+			outvec[5] = cos(theta);
+			outvec[0] = 0.0;
+			outvec[1] = 0.0;
+			outvec[2] = cos(invec[0]);
+		}
+			break;
 
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:
@@ -217,7 +229,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case ISOTROPIC_TV_PROJ_DPHI:
 		{
-			const double theta = acos(invec[2]);
+			const double theta = acos(invec[5]);
 			const double dphi  = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
 			outvec[0] = theta * cos(dphi);
 			outvec[1] = theta * sin(dphi);
@@ -274,6 +286,16 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			   outvec[2] = 1.0;
 			}
       }
+			break;
+		case ISOTROPIC_TL_TV_PROJ_DPHI:
+		{
+			const double theta_l = acos(invec[2]);
+			const double theta_v = acos(invec[5]);
+			const double dphi    = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			outvec[0] = theta_l;
+			outvec[1] = theta_v * cos(dphi);
+			outvec[2] = theta_v * sin(dphi);
+		}
 			break;
 
 			// 4D Parametrization

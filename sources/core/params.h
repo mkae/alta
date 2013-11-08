@@ -62,6 +62,9 @@ class params
 				 ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
 				                             Coordinates are: [\f$\theta_v \cos(\Delta\phi), \theta_v 
 													  \sin(\Delta\phi).\f$]*/
+				 ISOTROPIC_TL_TV_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected.
+				                                Coordinates are: [\f$\theta_l, \theta_v \cos(\Delta\phi), 
+														  \theta_v \sin(\Delta\phi).\f$]*/
              ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
              CARTESIAN,             /*!< Light and View vectors represented in cartesian coordinates */
