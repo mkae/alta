@@ -15,7 +15,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/3M_jaune_blinn.brdf" />
 
 		<!-- Define the function to use -->
@@ -36,7 +36,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/3M_jaune_blinn.brdf" />
 
 		<!-- Define the function to use -->
@@ -63,7 +63,7 @@
 		<input  name="./results/3d/retro/3M_jaune_blinn.brdf" />
 		<output name="./results/3d/retro/3M_jaune_blinn.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 	</action>
 
 
@@ -73,7 +73,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/3M_jaune_sg.brdf" />
 
 		<!-- Define the function to use -->
@@ -98,7 +98,7 @@
 		<input  name="./results/3d/retro/3M_jaune_sg.brdf" />
 		<output name="./results/3d/retro/3M_jaune_sg.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 	</action>
 
 	
@@ -107,7 +107,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/3M_jaune_lafortune.brdf" />
 
 		<!-- Define the function to use -->
@@ -139,7 +139,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/3M_jaune_backbeckmann.brdf" />
 
 		<!-- Define the function to use -->
@@ -158,7 +158,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_isotropic_brdfcc_rescaled_alta.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/3M_jaune_retrobeckmann.brdf" />
 
 		<!-- Define the function to use -->

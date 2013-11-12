@@ -94,8 +94,16 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case ISOTROPIC_TV_PROJ_DPHI:
 		{
 			const double theta = 0.5*sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
-			outvec[3] = invec[0]/theta*sin(theta);
-			outvec[4] = invec[1]/theta*sin(theta);
+			if(theta > 0.0)
+			{
+				outvec[3] = invec[0]/theta*sin(theta);
+				outvec[4] = invec[1]/theta*sin(theta);
+			}
+			else
+			{
+				outvec[3] = 0.0;
+				outvec[4] = 0.0;
+			}
 			outvec[5] = cos(theta);
 			outvec[0] = 0.0;
 			outvec[1] = 0.0;
@@ -131,10 +139,18 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case ISOTROPIC_TL_TV_PROJ_DPHI:
 		{
 			const double theta = 0.5*sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
-			outvec[3] = invec[1]/theta*sin(theta);
-			outvec[4] = invec[2]/theta*sin(theta);
+			if(theta > 0.0)
+			{
+				outvec[3] = invec[1]/theta*sin(theta);
+				outvec[4] = invec[2]/theta*sin(theta);
+			}
+			else
+			{
+				outvec[3] = 0.0;
+				outvec[4] = 0.0;
+			}
 			outvec[5] = cos(theta);
-			outvec[0] = 0.0;
+			outvec[0] = sin(invec[0]);
 			outvec[1] = 0.0;
 			outvec[2] = cos(invec[0]);
 		}
@@ -358,6 +374,7 @@ params::input params::parse_input(const std::string& txt)
 	{
 		if(txt.compare(it->second.name) == 0)
 		{
+			std::cout << "<<INFO>> parsed input parametrization " << it->second.name << std::endl;
 			return it->first;
 		}
 	}
