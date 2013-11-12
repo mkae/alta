@@ -33,8 +33,7 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-	data* d = NULL ;
-    d = plugins_manager::get_data(args["data"]) ;
+	data* d = plugins_manager::get_data(args["data"]) ;
 	d->load(args["input"]);
 
 	// Create output file
