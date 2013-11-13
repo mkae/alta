@@ -18,8 +18,8 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
-		std::cout << " - input, output and data are mandatory parameters" << std::endl ;
+		std::cout << "Usage: data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
+		std::cout << "  -> input, output and data are mandatory parameters" << std::endl ;
 		return 0 ;
 	}
 
