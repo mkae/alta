@@ -33,93 +33,130 @@ int main(int argc, char** argv)
 	}
 
 	// Load a function file
-    function* f = plugins_manager::get_function(args["input"]) ;
-
-	// Load a data file
-	data* d = NULL ;
-	if(args.is_defined("data"))
-	{
-		std::cout << "<<INFO>> Using data \"" << args["data"] << "\"" << std::endl ;
-        d = plugins_manager::get_data() ;
-		d->load(args["data"]) ;
-	}
-
-    /*
-    // Print the distance to the data to check if it correspond to the value
-    // computed prior.
-    double L2   = f->L2_distance(d);
-    double Linf = f->Linf_distance(d);
-    std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
-    std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
-    */
-
-    // Check the kind of plot to do
-	bool plot_error = false ;
-	bool linear_plot = false;
-	if(args.is_defined("error"))
-	{
-		std::cout << "<<INFO>> Exporting an error plot" << std::endl;
-		plot_error = true ;
-	}
-	else if(args.is_defined("linear_error"))
-	{
-		std::cout << "<<INFO>> Exporting linear error plot" << std::endl;
-		linear_plot = true;
-	}
+	function* f = plugins_manager::get_function(args["input"]) ;
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 	file.precision(10);
 
-	if(d != NULL)
+	// Load a data file
+	data* d = NULL ;
+	if(args.is_defined("data"))
 	{
-		for(int i=0; i<d->size(); ++i)
+		std::cout << "<<INFO>> Using data file \"" << args["data"] << "\"" << std::endl ;
+		d = plugins_manager::get_data() ;
+		d->load(args["data"]) ;
+
+		// Print the distance to the data to check if it correspond to the value
+		// computed prior.
+		double L2   = f->L2_distance(d);
+		double Linf = f->Linf_distance(d);
+		std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
+		std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
+
+		// Check the kind of plot to do
+		bool plot_error = false ;
+		bool linear_plot = false;
+		if(args.is_defined("error"))
 		{
-			vec v = d->get(i) ;
-			vec x(f->dimX());
+			std::cout << "<<INFO>> Exporting an error plot" << std::endl;
+			plot_error = true ;
+		}
+		else if(args.is_defined("linear_error"))
+		{
+			std::cout << "<<INFO>> Exporting linear error plot" << std::endl;
+			linear_plot = true;
+		}
 
-			if(f->input_parametrization() == params::UNKNOWN_INPUT)
+		if(d != NULL)
+		{
+			for(int i=0; i<d->size(); ++i)
 			{
-				memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
-			}
-			else
-			{
-				params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
-			}
+				vec v = d->get(i) ;
+				vec x(f->dimX());
 
-			vec y2 = f->value(x) ;
-			if(!linear_plot)
-			{
-				for(int u=0; u<d->dimX(); ++u)
-					file << v[u] << "\t" ;
-			}
-			else
-			{
-				file << i << "\t" ;
-			}
-
-			for(int u=0; u<d->dimY(); ++u)
-			{
-				if(plot_error)
+				if(f->input_parametrization() == params::UNKNOWN_INPUT)
 				{
-					file << (v[d->dimX() + u] - y2[u]) << "\t" ;
-				}
-				else if(linear_plot)
-				{
-					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+					memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
 				}
 				else
 				{
-					file << y2[u] << "\t" ;
+					params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
 				}
-			}
 
-			file << std::endl ;
+				vec y2 = f->value(x) ;
+				if(!linear_plot)
+				{
+					for(int u=0; u<d->dimX(); ++u)
+						file << v[u] << "\t" ;
+				}
+				else
+				{
+					file << i << "\t" ;
+				}
+
+				for(int u=0; u<d->dimY(); ++u)
+				{
+					if(plot_error)
+					{
+						file << (v[d->dimX() + u] - y2[u]) << "\t" ;
+					}
+					else if(linear_plot)
+					{
+						file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+					}
+					else
+					{
+						file << y2[u] << "\t" ;
+					}
+				}
+
+				file << std::endl ;
+			}
+		}	
+		else
+		{
+			std::cerr << "<<ERROR>> data argument is incorrectly defined" << std::endl ;
 		}
-	}	
-	else
+	}
+	else if(args.is_defined("polar-plot"))
 	{
-		std::cerr << "<<ERROR>> --data is not defined" << std::endl ;
+		vec spherical(4);
+		spherical[0] = args.get_float("inc-angle", 0.0);
+		spherical[1] = M_PI;
+
+		const int N = args.get_int("samples", 100) / 2;
+
+		// Plot retro direction
+		for(int i=0; i<N; ++i)
+		{
+			spherical[2] = 0.5 * M_PI * double(i) / double(N);
+			spherical[3] = M_PI;
+
+			vec x(f->dimX());
+			params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, f->input_parametrization(), &x[0]);
+
+			vec y = f->value(x);
+			file << -spherical[2] << "\t";
+			for(int k=0; k<f->dimY(); ++k) { file << y[k] << "\t"; }
+			file << std::endl;
+		}
+
+		// Plot forward direction
+		for(int i=0; i<N; ++i)
+		{
+			spherical[2] = 0.5 * M_PI * double(i) / double(N);
+			spherical[3] = 0.0;
+
+			vec x(f->dimX());
+			params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, f->input_parametrization(), &x[0]);
+
+			vec y = f->value(x);
+			file << spherical[2] << "\t";
+			for(int k=0; k<f->dimY(); ++k) { file << y[k] << "\t"; }
+			file << std::endl;
+		}
+
 	}
 
 	file.close();
