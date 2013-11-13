@@ -4,45 +4,70 @@
 <h2>Description</h2>
 ALTA is a software library to analyse, fit and understand BRDFs. It
 provides a set of command line softwares to fit measured data to analytical
-forms, new tools to understand models and data.
-
-This package provide C++ code to analyze BRDF, fit measured data to 
-analytical formulation, etc. It is decomposed in three components:
-<ul>
-	<li><em>\ref core</em>: a set of classes providing interfaces to BRDFs, 
-	data type and fitting algorithms. All the code using this library should 
-	rely on this part.</li>
-	<li><em>\ref plugins</em>: a set of plugins providing fitting algorithms
-	for rational BRDFs, non-linear BRDFs, etc.</li>
-	<li><em>\ref softs</em>: a set of tools to fit data, convert data, 
-	export fitting to plots, etc.</li>
-</ul>
-
-Three types of plugins are availables:
-<ul>
-	<li><em>\ref data</em> plugins allow to load BRDF measurements files.
-	</li>
-	<li><em>\ref function</em> plugins provide BRDF representations.</li>
-	<li><em>\ref fitter</em> plugins provide fitting algorithms.</li>
-</ul>
+forms, tools to understand models and data.
+<br /><br />
 
 
-<h2>Obtain sources</h2>
+<h2>Download and install</h2>
+
+<h3>Obtain sources</h3>
 
 To access the sources of ALTA, you can clone the mercurial repository:
 \verbatim
 	hg clone https://manao.inria.fr/mercurial/alta
 \endverbatim
 
+<h3>Build</h3>
 
-<h2>Install and use ALTA</h2>
+You can build ALTA using either QMake or Scons. To start, we advise to use
+Scons as it is lightweight and only requires Python to be installed (ALTA
+uses Python for its high level scripting mechanism). To build using scons, 
+go to the root directory of ALTA and type:
+\verbatim
+   scons -i
+\endverbatim
 
-Documentation to \ref install
+This should obtain some of ALTA's dependencies (such as Eigen) and compile the
+main package of the library (i.e. the core, the command line tools, and some
+plugins).
 
-Documentation to \ref contribute
+To use QMake, or for a more detailed view of ALTA's building scripts and
+dependencies, please refer to \ref install.
+<br /><br />
 
-The \ref plugins_manager class allows to load plugins and provide access 
-to requested elements. See the documentation of this class.
+
+<h2>How to use it</h2>
+
+After compiling the different command line tools and associated plugins,
+go to the sources directory and launch this command line (for Linux users only):
+\verbatim
+   ./build/data2brdf --input ../data/1d/Kirby.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
+\endverbatim
+
+Tada ! You have produced your first BRDF fit.
+
+The <i>data2brdf</i> is one of many \a commands available in ALTA. It
+allows to perform a fitting procedure by converting a \ref data object into a
+brdf object (also named \ref function).
+
+To convert this brdf file (in ALTA \ref format), you will need another command:
+\verbatim
+   ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
+\endverbatim
+
+<i>brdf2brdf</i> converts an ALTA brdf file into another format such as
+Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
+convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann
+distribution).
+<br /><br />
+
+
+<h2>Contribute</h2>
+
+There are many ways in which you can extend ALTA. Please refer to 
+\ref contribute for more information.
+
+
 
 \defgroup core
 \defgroup plugins
