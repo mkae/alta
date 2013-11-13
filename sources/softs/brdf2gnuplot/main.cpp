@@ -13,24 +13,37 @@
 
 int main(int argc, char** argv)
 {
-	arguments args(argc, argv) ;
+	arguments args(argc, argv);
 
 	if(args.is_defined("help")) 
 	{
-		std::cout << "<<HELP>> brdf2gnuplot --input brdf.file --output gnuplot.file --func function.lib --data data.file" << std::endl ;
-		std::cout << " - input, output and data are mandatory parameters" << std::endl ;
+		std::cout << "Usage: brdf2gnuplot [options] --input brdf.file --output gnuplot.file" << std::endl ;
+		std::cout << "   ->  input, and output parameters are mandatory parameters" << std::endl ;
+		std::cout << std::endl;
+		std::cout << "Options:" << std::endl;
+		std::cout << "  --data [filename]   produce a data by using the abcissas of the [filename]" << std::endl;
+		std::cout << "                      data file." << std::endl;
+		std::cout << "  --polar-plot        produce a polar data by sampling regularly the elevation" << std::endl;
+		std::cout << "                      angle. Use parameter --inc-angle to define the incoming" << std::endl;
+		std::cout << "                      angle. Use parameter --samples to define the number of" << std::endl;
+		std::cout << "                      samples on this domain." << std::endl;
+		std::cout << "  --inc-angle [float] set the incoming light elevation in radian for the polar" << std::endl;
+		std::cout << "                      plot export." << std::endl;
+		std::cout << "  --samples [int]     set the points used for the polar plot export." << std::endl;
+		return 0;
 	}
-
+	
 	if(! args.is_defined("input")) 
 	{
-		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl ;
-		return 1 ;
+		std::cerr << "<<ERROR>> the input filename is not defined" << std::endl;
+		return 1;
 	}
 	if(! args.is_defined("output")) 
 	{
-		std::cerr << "<<ERROR>> the output filename is not defined" << std::endl ;
-		return 1 ;
+		std::cerr << "<<ERROR>> the output filename is not defined" << std::endl;
+		return 1;
 	}
+
 
 	// Load a function file
 	function* f = plugins_manager::get_function(args["input"]) ;
