@@ -7,8 +7,13 @@ provides a set of command line softwares to fit measured data to analytical
 forms, tools to understand models and data.
 
 <h3>Target audience</h3>
-You are a <bold>researcher</bold> working on BRDFs and you want to 
-experiment a new model and compare it with other models and data easily.
+You are working on BRDFs and you want to  <b>benchmark new BRDF models</b> and
+compare it with state-of-the-art BRDF models and data easily. You have working
+on optical measurements and you want <b>experiment different fitting procedures
+and models</b> on your data.
+
+<h3>Sample results</h3>
+
 
 
 <h2>Download and install</h2>

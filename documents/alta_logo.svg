@@ -9,7 +9,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="260"
+   width="100"
    height="100"
    id="svg2"
    version="1.1"
@@ -27,9 +27,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="164.82291"
-     inkscape:cy="137.62971"
+     inkscape:zoom="7.919596"
+     inkscape:cx="49.77896"
+     inkscape:cy="53.497789"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -61,7 +61,7 @@
      transform="translate(-218.72743,-395.33271)">
     <g
        id="g3008"
-       transform="matrix(0.340257,0,0,0.340257,145.31405,324.51401)">
+       transform="matrix(0.340257,0,0,0.340257,144.43016,324.51401)">
       <path
          sodipodi:nodetypes="sssssscss"
          inkscape:connector-curvature="0"
@@ -215,17 +215,5 @@
          d="m 351.76926,411.13346 c 10.71797,-11.13495 13.99811,-25.36757 13.57674,-25.77316 -0.45147,-0.43456 -14.51851,3.41511 -25.23648,14.55007 -10.71796,11.13495 -16.79646,22.67398 -13.57671,25.77316 3.21974,3.09916 14.51848,-3.41511 25.23645,-14.55007 z"
          style="fill:none;stroke:#cdd1ff;stroke-width:0.79749054;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0" />
     </g>
-    <text
-       xml:space="preserve"
-       style="font-size:72.44132996px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Comfortaa;-inkscape-font-specification:Comfortaa"
-       x="287.89276"
-       y="472.83273"
-       id="text3009"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan3011"
-         x="287.89276"
-         y="472.83273"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans">ALTA</tspan></text>
   </g>
 </svg>
