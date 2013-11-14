@@ -1,3 +1,16 @@
+/*! \package data2brdf
+ *  \ingroup commands
+ *  \brief
+ *  This command allows to convert a \ref data object to a \ref function object.
+ *  \details
+ *  <h3>Parameters</h3>
+ *  <ul>
+ *		<li><b>\-\-input <i>filename</i></b> data file to be loaded uwing the data
+ *		plugin specified by the <b>\-\-data <i>filename</i></b> option. If no
+ *		plugin is specified, the data file will be loaded using a \ref 
+ *		vertical_segment data object.</li>
+ *  </ul>
+ */
 #include <core/args.h>
 #include <core/data.h>
 #include <core/function.h>

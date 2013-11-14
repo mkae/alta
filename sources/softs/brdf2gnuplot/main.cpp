@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	{
 		std::cout << "<<INFO>> Using data file \"" << args["data"] << "\"" << std::endl ;
 		d = plugins_manager::get_data() ;
-		d->load(args["data"]) ;
+		d->load(args["data"], args) ;
 
 		// Print the distance to the data to check if it correspond to the value
 		// computed prior.
