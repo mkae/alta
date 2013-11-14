@@ -1,3 +1,31 @@
+/*! \package data2data
+ *  \ingroup commands
+ *  \brief
+ *  This command transform a \ref data object into another data object.
+ *  \details
+ *  This command is useful to change the parametrization of a data file,
+ *  or to perform interpolation of sample values (i.e. to fill gaps).
+ *
+ *  <h3>Usage</h3>
+ *  \verbatim	
+       data2data --input data.file --output data.file --out-data exporter.so --in-data importer.so
+    \endverbatim
+ *
+ *  <h3>Parameters</h3>
+ *  <ul>
+ *		<li><b>\-\-input <i>filename</i></b> data file to be loaded. The
+ *		loading plugin is defined using the option <b>\-\-in-data <i>
+ *		filename</i></b>.
+ *		</li>
+ *		<li><b>\-\-in-data <i>filename</i></b></li> specify the data plugin
+ *		used to load the input file. If this option is not specified, the
+ *		loading plugin will be a \ref vertical_segment plugin. \note If
+ *		the input plugin is not interpolating, like \ref vertical_segment,
+ *		you can only use the reparametrization tool.
+ *		<li><b>\-\-input <i>filename</i></b> the resulting data file.
+ *		</li>
+ *  </ul>
+ */
 #include <core/args.h>
 #include <core/data.h>
 #include <core/params.h>
