@@ -3,5 +3,6 @@
 		<tab type="mainpage" visible="yes" title="Overview"/>
 		<tab type="user" url="@ref examples" title="Examples"/>
 		<tab type="user" url="@ref license" title="License"/>
+		<tab type="user" url="@ref contacts" title="Contacts"/>
 	</navindex>
 </doxygenlayout>
