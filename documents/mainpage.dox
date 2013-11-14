@@ -54,7 +54,7 @@ go to the sources directory and launch this command line (for Linux users only):
    ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
-Tada ! You have produced your first fit. The produced output is a 1D rational 
+Tada! You have produced your first fit. The produced output is a 1D rational 
 function, using a monomial basis, interpolating the 
 <a href="http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml">Kirby 2</a> 
 dataset.

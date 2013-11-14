@@ -1,3 +1,19 @@
+/*! \package data2moment
+ *  \ingroup commands
+ *  \brief
+ *  This command computes the moments of a \ref data object.
+ *  \details
+ *  <h3>Parameters</h3>
+ *  <ul>
+ *		<li><b>\-\-input <i>filename</i></b> data file to be loaded uwing the data
+ *		plugin specified by the <b>\-\-data <i>filename</i></b> option.
+ *		</li>
+ *		<li><b>\-\-data <i>filename</i></b> specify the data plugin used to load
+ *		the data file. \note It is required to provide a data plugin that performs
+ *		interpolation of the data.
+ *		</li>
+ *  </ul>
+ */
 #include <core/args.h>
 #include <core/data.h>
 #include <core/params.h>
