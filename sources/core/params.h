@@ -326,7 +326,8 @@ class parametrized
 			else
 			{
 				std::cout << "<<ERROR>> an input parametrization is already defined: " << params::get_name(_in_param) << std::endl;
-				std::cout << "<<ERROR>> trying to change to: " << params::get_name(new_param) << std::endl;
+				std::cout << "<<ERROR>> changing to: " << params::get_name(new_param) << std::endl;
+				_in_param = new_param;
 			}
 		}
 		

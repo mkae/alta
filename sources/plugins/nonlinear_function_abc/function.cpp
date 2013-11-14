@@ -143,6 +143,19 @@ void abc_function::bootstrap(const data* d, const arguments& args)
 		_b[i]  = 1.0;
 		_c[i]  = 1.0;
 	}
+	
+	if(args.is_defined("param"))
+	{
+		setParametrization(params::parse_input(args["param"]));
+	}
+	else
+	{
+		setParametrization(params::COS_TH);
+	}
+	if(params::dimension(input_parametrization()) != 1)
+	{
+		std::cerr << "<<ERROR>> the parametrization specifed in the file for the ABC model is incorrect" << std::endl;
+	}
 }
 
 //! Load function specific files
@@ -175,6 +188,19 @@ bool abc_function::load(std::istream& in)
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
         return false;
 	}
+	
+	in >> token;
+	if(token.compare("#PARAM") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #PARAM is not the next line defined." << std::endl; 
+        return false;
+	}
+	in >> token;
+	setParametrization(params::parse_input(token));
+	if(params::dimension(input_parametrization()) != 1)
+	{
+		std::cerr << "<<ERROR>> the parametrization specifed in the file for the ABC model is incorrect" << std::endl;
+	}
 
 	// Parse the lobe
 	for(int i=0; i<_nY; ++i)
@@ -195,6 +221,7 @@ void abc_function::save_call(std::ostream& out, const arguments& args) const
     if(is_alta)
     {
 		out << "#FUNC nonlinear_function_abc" << std::endl ;
+		out << "#PARAM " << params::get_name(input_parametrization()) << std::endl;
 
 		 for(int i=0; i<_nY; ++i)
 		 {
