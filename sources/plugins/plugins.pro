@@ -19,6 +19,7 @@ SUBDIRS  = \
 				nonlinear_fresnel_retroschlick			\
 				nonlinear_function_diffuse					\
 				nonlinear_function_microfacets			\
+				nonlinear_function_abc						\
 				nonlinear_function_beckmann				\
 				nonlinear_function_retrobeckmann			\
 				nonlinear_function_blinn					\
