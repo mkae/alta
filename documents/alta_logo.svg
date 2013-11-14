@@ -9,11 +9,11 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="100"
+   width="260"
    height="100"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="alta_logo.svg"
    inkscape:export-filename="/home/laurent/PostDoc/Projects/alta/documents/alta_icon.png"
    inkscape:export-xdpi="19.200001"
@@ -28,8 +28,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="174.41936"
-     inkscape:cy="143.14496"
+     inkscape:cx="164.82291"
+     inkscape:cy="137.62971"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -37,10 +37,10 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1215"
-     inkscape:window-height="776"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
+     inkscape:window-width="1200"
+     inkscape:window-height="1888"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -50,7 +50,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,10 +58,10 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-218.72743,-400.84796)">
+     transform="translate(-218.72743,-395.33271)">
     <g
        id="g3008"
-       transform="matrix(0.340257,0,0,0.340257,144.30389,328.99877)">
+       transform="matrix(0.340257,0,0,0.340257,145.31405,324.51401)">
       <path
          sodipodi:nodetypes="sssssscss"
          inkscape:connector-curvature="0"
@@ -215,5 +215,17 @@
          d="m 351.76926,411.13346 c 10.71797,-11.13495 13.99811,-25.36757 13.57674,-25.77316 -0.45147,-0.43456 -14.51851,3.41511 -25.23648,14.55007 -10.71796,11.13495 -16.79646,22.67398 -13.57671,25.77316 3.21974,3.09916 14.51848,-3.41511 25.23645,-14.55007 z"
          style="fill:none;stroke:#cdd1ff;stroke-width:0.79749054;stroke-miterlimit:4;stroke-opacity:1;stroke-dashoffset:0" />
     </g>
+    <text
+       xml:space="preserve"
+       style="font-size:72.44132996px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Comfortaa;-inkscape-font-specification:Comfortaa"
+       x="287.89276"
+       y="472.83273"
+       id="text3009"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3011"
+         x="287.89276"
+         y="472.83273"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans">ALTA</tspan></text>
   </g>
 </svg>

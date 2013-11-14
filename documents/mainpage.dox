@@ -5,7 +5,10 @@
 ALTA is a software library to analyse, fit and understand BRDFs. It
 provides a set of command line softwares to fit measured data to analytical
 forms, tools to understand models and data.
-<br /><br />
+
+<h3>Target audience</h3>
+You are a <bold>researcher</bold> working on BRDFs and you want to 
+experiment a new model and compare it with other models and data easily.
 
 
 <h2>Download and install</h2>
@@ -33,7 +36,6 @@ plugins).
 
 To use QMake, or for a more detailed view of ALTA's building scripts and
 dependencies, please refer to \ref install.
-<br /><br />
 
 
 <h2>How to use it</h2>
@@ -59,7 +61,6 @@ To convert this brdf file (in ALTA \ref format), you will need another command:
 Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
 convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann
 distribution).
-<br /><br />
 
 
 <h2>Contribute</h2>

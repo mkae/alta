@@ -34,9 +34,6 @@ class beckmann_function : public nonlinear_function
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;
 
-		// Geometrical term of the microfacets
-		virtual vec G(const vec& x) const;
-
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
 

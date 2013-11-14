@@ -92,11 +92,11 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 		case ISOTROPIC_TV_PROJ_DPHI:
 		{
-			const double theta = 0.5*sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
+			const double theta = sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
 			if(theta > 0.0)
 			{
-				outvec[3] = invec[0]/theta*sin(theta);
-				outvec[4] = invec[1]/theta*sin(theta);
+				outvec[3] = (invec[0]/theta)*sin(theta);
+				outvec[4] = (invec[1]/theta)*sin(theta);
 			}
 			else
 			{

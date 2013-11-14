@@ -79,7 +79,7 @@ for t in range(0,M):
 			if retrocos < 0.0:
 				retrocos = 0.0
 
-			val = blinn(cos, 300) + blinn(retrocos, 150);
+			val = blinn(cos, 300)# + blinn(retrocos, 150);
 
 			f.write(str(theta_i) + '\t' + str(x) + '\t' + str(y) + '\t' + str(val) + "\n");
 		#end
