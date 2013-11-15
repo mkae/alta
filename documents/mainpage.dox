@@ -1,6 +1,12 @@
 /**
 \mainpage A BRDF analysis library 
 
+<center style="color:red">
+We have not released ALTA yet, you will not have access to source code and
+data. They will be shipped afterwards. This page was generated automatically
+using doxygen. Consequently, you could experience broken links.
+</center>
+
 <h2>Description</h2>
 ALTA is a software library to analyse, fit and understand BRDFs. It
 provides a set of command line softwares to fit measured data to analytical
