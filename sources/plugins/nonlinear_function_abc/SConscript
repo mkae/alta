@@ -4,4 +4,4 @@ env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['function.cpp']
 libs = ['-lcore']
-env.SharedLibrary('../../build/nonlinear_function_abs', sources, LIBS=libs)
+env.SharedLibrary('../../build/nonlinear_function_abc', sources, LIBS=libs)
