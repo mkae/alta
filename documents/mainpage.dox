@@ -64,7 +64,7 @@ go to the sources directory and launch this command line (for Linux users only):
 Tada! You have produced your first fit. The produced output is a 1D rational 
 function, using a monomial basis, interpolating the 
 <a href="http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml">Kirby 2</a> 
-dataset.
+dataset. Note that this fit is not a BRDF.
 
 The \a data2brdf is one of many \ref commands available in ALTA. It
 allows to perform a fitting procedure by converting a \ref data object into a
