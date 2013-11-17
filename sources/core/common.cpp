@@ -157,6 +157,8 @@ unsigned int timer::current_time() const
 	SYSTEMTIME res;
 	GetSystemTime(&res);
 	return (unsigned int)(res.wSecond + res.wMinute*60 + res.wHour*360);
+#elif __APPLE__
+	return 0;
 #else
     struct timespec res;
     clock_gettime(CLOCK_MONOTONIC, &res);
