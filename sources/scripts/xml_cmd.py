@@ -68,10 +68,12 @@ def baseName():
 #end
 
 def libName(name):
-	if os.name == 'posix':
-		return 'lib' + name + '.so'
+	if sys.platform == 'darwin':
+		return 'lib' + name + '.dylib'
 	elif os.name == 'nt':
-		return name + ".dll"
+		return name + ".dll" 
+	else:
+		return 'lib' + name + '.so'
 	#endif
 
 #end

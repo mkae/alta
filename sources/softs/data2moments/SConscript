@@ -1,4 +1,4 @@
-import os
+import sys
 
 env = Environment()
 env.Append(CPPPATH = ['../../', '../../../external/build/include'])
@@ -7,8 +7,10 @@ env.Append(CPPPATH = ['../../', '../../../external/build/include'])
 sources = ['main.cpp']
 
 libs = ['core']
-if(os.name == 'posix'):
+if sys.platform == 'linux2':
 	libs.append(['rt', 'dl'])
+elif sys.platform == 'darwin':
+	libs.append(['dl'])
 #end
 
 env.Program('../../build/data2moments', sources, LIBS=libs, LIBPATH=['../../build'])

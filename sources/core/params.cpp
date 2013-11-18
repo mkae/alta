@@ -22,7 +22,6 @@ std::map<params::input, const param_info> create_map()
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
-	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("THETA_OUT_COS_DPHI_THETA_OUT_SIN_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
@@ -93,9 +92,17 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 		case ISOTROPIC_TV_PROJ_DPHI:
 		{
-			const double theta = 0.5*sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
-			outvec[3] = invec[0]/theta*sin(theta);
-			outvec[4] = invec[1]/theta*sin(theta);
+			const double theta = sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
+			if(theta > 0.0)
+			{
+				outvec[3] = (invec[0]/theta)*sin(theta);
+				outvec[4] = (invec[1]/theta)*sin(theta);
+			}
+			else
+			{
+				outvec[3] = 0.0;
+				outvec[4] = 0.0;
+			}
 			outvec[5] = cos(theta);
 			outvec[0] = 0.0;
 			outvec[1] = 0.0;
@@ -130,11 +137,19 @@ void params::to_cartesian(const double* invec, params::input intype,
             break;
 		case ISOTROPIC_TL_TV_PROJ_DPHI:
 		{
-			const double theta = 0.5*sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
-			outvec[3] = invec[1]/theta*sin(theta);
-			outvec[4] = invec[2]/theta*sin(theta);
+			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
+			if(theta > 0.0)
+			{
+				outvec[3] = (invec[1]/theta)*sin(theta);
+				outvec[4] = (invec[2]/theta)*sin(theta);
+			}
+			else
+			{
+				outvec[3] = 0.0;
+				outvec[4] = 0.0;
+			}
 			outvec[5] = cos(theta);
-			outvec[0] = 0.0;
+			outvec[0] = sin(invec[0]);
 			outvec[1] = 0.0;
 			outvec[2] = cos(invec[0]);
 		}
@@ -358,6 +373,7 @@ params::input params::parse_input(const std::string& txt)
 	{
 		if(txt.compare(it->second.name) == 0)
 		{
+			std::cout << "<<INFO>> parsed input parametrization " << it->second.name << std::endl;
 			return it->first;
 		}
 	}

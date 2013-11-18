@@ -11,23 +11,22 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A Microfacet model using a Gaussian distribution for the
- *  micro-gemeotry distribution parametrized by the half-angle.
- *
+/*! \brief  The ABC brdf model.
  *  \details
+ *  Follows the implementation of Löw <i>et al.</i> [2012].
  *
  *  <h3>Plugin parameters</h3>
  *
  */
-class beckmann_function : public nonlinear_function
+class abc_function : public nonlinear_function
 {
 
 	public: // methods
 
-		beckmann_function(): _use_back_param(true)
+		abc_function()
 		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+			setParametrization(params::COS_TH);
+			setDimX(1);
 		}
 
 		// Overload the function operator
@@ -62,18 +61,11 @@ class beckmann_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 6;
-		}
-
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);
 
 	private: // data
 
-		vec _ks, _a; // Lobes data
-		bool _use_back_param;
+		vec _a, _b, _c; // Lobes data
 } ;
 

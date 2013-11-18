@@ -1,3 +1,14 @@
+/*! \package brdf2brdf
+ *  \ingroup commands
+ *  \brief
+ *  This command exports a \ref function object to software specific file.
+ *  \details
+ *  <h3>Parameters</h3>
+ *  <ul>
+ *		<li><b>\-\-input <i>filename</i></b> ALTA function file to be loaded.
+ *		</li>
+ *  </ul>
+ */
 #include <core/args.h>
 #include <core/function.h>
 #include <core/plugins_manager.h>

@@ -478,6 +478,11 @@ size_t plugins_manager::get_system_memory()
 	GlobalMemoryStatusEx(&status);
 	return status.ullTotalPhys;
 }
+#elif __APPLE__
+size_t plugins_manager::get_system_memory()
+{
+	return 0;
+}
 #else
 #include <unistd.h>
 size_t plugins_manager::get_system_memory()

@@ -33,9 +33,8 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-	data* d = NULL ;
-    d = plugins_manager::get_data(args["data"]) ;
-	d->load(args["input"]);
+	data* d = plugins_manager::get_data(args["data"]) ;
+	d->load(args["input"], args);
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);

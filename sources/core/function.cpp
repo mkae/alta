@@ -144,12 +144,12 @@ double function::L2_distance(const data* d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-        vec x(d->dimX()), y(d->dimY());
-        for(int j=0; j<d->dimX(); ++j) { x[j] = dat[j]; }
-        for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
+		vec x(dimX()), y(d->dimY());
+		params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
 
 		//linf_dist = std::max<double>(linf_dist, std::abs<double>(norm(y-rj->value(dat))));
-        l2_dist  += std::pow(norm(y-value(x)), 2);
+		l2_dist  += std::pow(norm(y-value(x)), 2);
 	}
 	l2_dist = std::sqrt(l2_dist / d->size());
 	return l2_dist;
@@ -163,11 +163,11 @@ double function::Linf_distance(const data* d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-        vec x(d->dimX()), y(d->dimY());
-        for(int j=0; j<d->dimX(); ++j) { x[j] = dat[j]; }
-        for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
+		vec x(dimX()), y(d->dimY());
+		params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
 
-		linf_dist = std::max<double>(linf_dist, std::abs(norm(y-value(dat))));
+		linf_dist = std::max<double>(linf_dist, std::abs(norm(y-value(x))));
 	}
 
 	return linf_dist;

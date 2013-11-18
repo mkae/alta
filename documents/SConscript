@@ -1,0 +1,5 @@
+import os
+
+env = Environment()
+
+ret = os.system('doxygen doxygen.conf')

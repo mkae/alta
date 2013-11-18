@@ -1,3 +1,19 @@
+/*! \package data2moment
+ *  \ingroup commands
+ *  \brief
+ *  This command computes the moments of a \ref data object.
+ *  \details
+ *  <h3>Parameters</h3>
+ *  <ul>
+ *		<li><b>\-\-input <i>filename</i></b> data file to be loaded uwing the data
+ *		plugin specified by the <b>\-\-data <i>filename</i></b> option.
+ *		</li>
+ *		<li><b>\-\-data <i>filename</i></b> specify the data plugin used to load
+ *		the data file. \note It is required to provide a data plugin that performs
+ *		interpolation of the data.
+ *		</li>
+ *  </ul>
+ */
 #include <core/args.h>
 #include <core/data.h>
 #include <core/params.h>
@@ -18,8 +34,8 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
-		std::cout << " - input, output and data are mandatory parameters" << std::endl ;
+		std::cout << "Usage: data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
+		std::cout << "  -> input, output and data are mandatory parameters" << std::endl ;
 		return 0 ;
 	}
 
