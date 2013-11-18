@@ -57,6 +57,7 @@ class params
              STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
 
              SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
+             ISOTROPIC_TV_TL,       /*!< Light and View vectors represented in spherical coordinates, */
              ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
                                          with the difference of azimutal coordinates in the last component  */
 				 ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
@@ -67,7 +68,9 @@ class params
 														  \theta_v \sin(\Delta\phi).\f$]*/
              ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
-             CARTESIAN,             /*!< Light and View vectors represented in cartesian coordinates */
+             CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
+				                             We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
+													  v.z, l.x, l.y, l.z] \f$*/
 
              UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data */
 		 };

@@ -158,6 +158,7 @@ double function::L2_distance(const data* d) const
 //! \brief Linf norm to data.
 double function::Linf_distance(const data* d) const
 {
+	vec mean(dimY()), var(dimY());
 
 	double linf_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)
@@ -168,7 +169,26 @@ double function::Linf_distance(const data* d) const
 		for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
 
 		linf_dist = std::max<double>(linf_dist, std::abs(norm(y-value(x))));
+
+		mean += (y-value(x)) / double(d->size());
 	}
+	
+	for(int i=0; i<d->size(); ++i)
+	{
+		vec dat = d->get(i);
+		vec x(dimX()), y(d->dimY()), val(dimY());
+
+		params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		val = value(x);
+
+		for(int j=0; j<d->dimY(); ++j) 
+		{ 
+			y[j] = dat[d->dimX()+j]; 
+			var[j] += pow(mean[j] - (val[j]-y[j]), 2) / double(d->size());
+		}
+	}
+
+	std::cout << "<<INFO>> Mean = " << mean << ", Var = " << var << std::endl;
 
 	return linf_dist;
 }
