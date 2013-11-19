@@ -145,10 +145,17 @@ double function::L2_distance(const data* d) const
 	{
 		vec dat = d->get(i);
 		vec x(dimX()), y(d->dimY());
-		params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
-		for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
 
-		//linf_dist = std::max<double>(linf_dist, std::abs<double>(norm(y-rj->value(dat))));
+		if(input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+		}
+		else
+		{
+			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		}
+		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
+
 		l2_dist  += std::pow(norm(y-value(x)), 2);
 	}
 	l2_dist = std::sqrt(l2_dist / d->size());
@@ -165,8 +172,16 @@ double function::Linf_distance(const data* d) const
 	{
 		vec dat = d->get(i);
 		vec x(dimX()), y(d->dimY());
-		params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
-		for(int j=0; j<d->dimY(); ++j) { y[j] = dat[d->dimX()+j]; }
+
+		if(input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+		}
+		else
+		{
+			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		}
+		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
 
 		linf_dist = std::max<double>(linf_dist, std::abs(norm(y-value(x))));
 
@@ -178,7 +193,15 @@ double function::Linf_distance(const data* d) const
 		vec dat = d->get(i);
 		vec x(dimX()), y(d->dimY()), val(dimY());
 
-		params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		if(input_parametrization() == params::UNKNOWN_INPUT)
+		{
+			memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+		}
+		else
+		{
+			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+		}
+		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
 		val = value(x);
 
 		for(int j=0; j<d->dimY(); ++j) 
@@ -787,7 +810,7 @@ vec product_function::value(const vec& x) const
 		
 bool product_function::load(std::istream& in)
 {
-	bool loaded_f1,loaded_f2;
+	bool loaded_f1 = false,loaded_f2 = false;
 	std::streampos pos = in.tellg();
 
 	// Load the first function
