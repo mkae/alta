@@ -755,7 +755,7 @@ product_function::product_function(nonlinear_function* g1, nonlinear_function* g
 	}
 	else
 	{
-		setParametrization(g1->input_parametrization());
+		function::setParametrization(g1->input_parametrization());
 		function::setDimX(g1->dimX());
 	}
 }

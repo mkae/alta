@@ -68,6 +68,10 @@ class params
 														  \theta_v \sin(\Delta\phi).\f$]*/
              ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
+				 BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined in Stark et alL [2004].
+				                               Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
+														 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
+
              CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
 				                             We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
 													  v.z, l.x, l.y, l.z] \f$*/
