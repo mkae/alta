@@ -362,7 +362,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 
 		default:
-			std::cerr << "<<ERROR>> Transformation not implemented, " << get_name(outtype) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			std::cerr << "<<ERROR>> Transformation not implemented, n°" << outtype << ", " << __FILE__ << ":" << __LINE__ << std::endl;
 			assert(false);
 			break;
 	}
@@ -390,7 +390,8 @@ std::string params::get_name(const params::input param)
 		return it->second.name;
 	}
 
-	std::cerr << "<<ERROR>> Unknown parametrization, " << get_name(param) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cerr << "<<ERROR>> Unknown parametrization, n°" << param << ", "<< __FILE__ << ":" << __LINE__ << std::endl;
+	assert(false);
 	return std::string("UNKNOWN_INPUT");
 }
 
