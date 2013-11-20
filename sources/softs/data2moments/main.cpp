@@ -20,6 +20,7 @@
 #include <core/function.h>
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
+#include <core/vertical_segment.h>
 
 #include <iostream>
 #include <vector>
@@ -55,6 +56,11 @@ int main(int argc, char** argv)
 	// Import data
 	data* d = NULL ;
 	d = plugins_manager::get_data(args["data"]) ;
+
+	if(dynamic_cast<const vertical_segment*>(d) != NULL) {
+		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;
+		return 1;
+	}
 	d->load(args["input"]);
 
 	// Create output file

@@ -26,12 +26,12 @@ vec retro_schlick::value(const vec& x) const
 	params::convert(&x[0], input_parametrization(), params::SCHLICK_VK, xp);
 	params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
 
-	const double dotRK = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
+	const double dotRK = xp[2]*cart[2] - (xp[0]*cart[0] + xp[1]*cart[1]) ;
 
 	vec res(_nY);
 	for(int i=0; i<_nY; ++i)
 	{
-		res[i] = R[i] + (1.0 - R[i]) * pow(1.0 - clamp(dotRK, 0.0, 1.0), 5.0);
+		res[i] = R[i] + (1.0 - R[i]) * (pow(1.0 - dotRK, 5.0));
 	}
 
 	return res;
@@ -66,7 +66,7 @@ vec retro_schlick::parametersJacobian(const vec& x) const
 	params::convert(&x[0], input_parametrization(), params::SCHLICK_VK, xp);
 	params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
 
-	const double dotRK = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
+	const double dotRK = xp[2]*cart[2] - (xp[0]*cart[0] + xp[1]*cart[1]) ;
 
 	vec jac(nbParameters()*nY);
 	for(int i=0; i<nY; ++i)
@@ -74,7 +74,7 @@ vec retro_schlick::parametersJacobian(const vec& x) const
 		{
 			if(i == j)
 			{
-				jac[i*nY + j] = 1.0 - pow(1.0 - clamp(dotRK, 0.0, 1.0), 5.0);
+				jac[i*nY + j] = 1.0 - (pow(1.0 - dotRK, 5.0));
 			}
 			else
 			{

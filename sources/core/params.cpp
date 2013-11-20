@@ -140,18 +140,18 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
 			if(theta > 0.0)
 			{
-				outvec[3] = (invec[1]/theta)*sin(theta);
-				outvec[4] = (invec[2]/theta)*sin(theta);
+				outvec[0] = (invec[1]/theta)*sin(theta);
+				outvec[1] = (invec[2]/theta)*sin(theta);
 			}
 			else
 			{
-				outvec[3] = 0.0;
-				outvec[4] = 0.0;
+				outvec[0] = 0.0;
+				outvec[1] = 0.0;
 			}
-			outvec[5] = cos(theta);
-			outvec[0] = sin(invec[0]);
-			outvec[1] = 0.0;
-			outvec[2] = cos(invec[0]);
+			outvec[2] = cos(theta);
+			outvec[3] = sin(invec[0]);
+			outvec[4] = 0.0;
+			outvec[5] = cos(invec[0]);
 		}
 			break;
 
@@ -161,12 +161,12 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 
 		case params::SPHERICAL_TL_PL_TV_PV:
-			outvec[0] = cos(invec[1])*sin(invec[0]);
-			outvec[1] = sin(invec[1])*sin(invec[0]);
-			outvec[2] = cos(invec[0]);
-			outvec[3] = cos(invec[3])*sin(invec[2]);
-			outvec[4] = sin(invec[3])*sin(invec[2]);
-			outvec[5] = cos(invec[2]);
+			outvec[0] = cos(invec[3])*sin(invec[2]);
+			outvec[1] = sin(invec[3])*sin(invec[2]);
+			outvec[2] = cos(invec[2]);
+			outvec[3] = cos(invec[1])*sin(invec[0]);
+			outvec[4] = sin(invec[1])*sin(invec[0]);
+			outvec[5] = cos(invec[0]);
 			break;
 
 		case params::STEREOGRAPHIC:
@@ -274,7 +274,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 		case params::ISOTROPIC_TV_TL_DPHI:
 			outvec[0] = acos(invec[2]);
 			outvec[1] = acos(invec[5]);
-			outvec[2] = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			outvec[2] = atan2(invec[4], invec[3]) - atan2(invec[1], invec[0]);
 			break;
 		case params::RUSIN_VH:
 			outvec[0] = half[0];  
@@ -283,9 +283,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
       case params::SCHLICK_VK:
       {
-			const double Kx = invec[0]-invec[3];
-         const double Ky = invec[1]-invec[4];
-         const double Kz = invec[2]-invec[5];
+			const double Kx = invec[3]-invec[0];
+         const double Ky = invec[4]-invec[1];
+         const double Kz = invec[5]+invec[2];
 
          const double norm =  sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
 			if(norm > 1.0E-10)
@@ -304,9 +304,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case ISOTROPIC_TL_TV_PROJ_DPHI:
 		{
-			const double theta_l = acos(invec[2]);
-			const double theta_v = acos(invec[5]);
-			const double dphi    = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
+			const double theta_l = acos(invec[5]);
+			const double theta_v = acos(invec[2]);
+			const double dphi    = atan2(invec[4], invec[3]) - atan2(invec[1], invec[0]);
 			outvec[0] = theta_l;
 			outvec[1] = theta_v * cos(dphi);
 			outvec[2] = theta_v * sin(dphi);
@@ -330,10 +330,10 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 
 		case params::SPHERICAL_TL_PL_TV_PV:
-			outvec[0] = acos(invec[2]);
-			outvec[1] = atan2(invec[1], invec[0]);
-			outvec[2] = acos(invec[5]);
-			outvec[3] = atan2(invec[4], invec[3]);
+			outvec[0] = acos(invec[5]);
+			outvec[1] = atan2(invec[4], invec[3]);
+			outvec[2] = acos(invec[2]);
+			outvec[3] = atan2(invec[1], invec[0]);
 #ifdef DEBUG
 			std::cout << invec[2] << " - acos -> " << outvec[0] << std::endl;
 #endif
@@ -362,7 +362,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 
 		default:
-			std::cerr << "<<ERROR>> Transformation not implemented, " << get_name(outtype) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			std::cerr << "<<ERROR>> Transformation not implemented, n°" << outtype << ", " << __FILE__ << ":" << __LINE__ << std::endl;
 			assert(false);
 			break;
 	}
@@ -390,7 +390,9 @@ std::string params::get_name(const params::input param)
 		return it->second.name;
 	}
 
-	std::cerr << "<<ERROR>> Unknown parametrization, " << get_name(param) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+#ifdef DEBUG
+	std::cerr << "<<WARNING>> Unknown parametrization, n°" << param << ", "<< __FILE__ << ":" << __LINE__ << std::endl;
+#endif
 	return std::string("UNKNOWN_INPUT");
 }
 

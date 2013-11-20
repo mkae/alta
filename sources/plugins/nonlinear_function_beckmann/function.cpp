@@ -191,14 +191,16 @@ bool beckmann_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
-        return false;
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+      return false;
 	}
 
 	in >> token;
    if(token.compare("nonlinear_function_beckmann") != 0) 
 	{
 		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
-        return false;
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+      return false;
 	}
 
 	// Parse the lobe
