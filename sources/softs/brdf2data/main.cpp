@@ -18,8 +18,8 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> brdf2data --input brdf.file --func importer.so --output data.file --data exporter.so" << std::endl ;
-		std::cout << " - input, output, func, data are mandatory parameters" << std::endl ;
+		std::cout << "Usage: brdf2data --input brdf.file --output data.file [--data exporter.so --data-file data.file]" << std::endl ;
+		std::cout << " - input, output are mandatory parameters, you need to either specify a data exporter or a data file" << std::endl ;
 		return 0 ;
 	}
 
@@ -35,22 +35,18 @@ int main(int argc, char** argv)
 		std::cerr << "<<ERROR>> the data exporter is not defined" << std::endl ;
 		return 1 ;
 	}
-/*
-	if(! args.is_defined("func")) {
-		std::cerr << "<<ERROR>> the function importer is not defined" << std::endl ;
-		return 1 ;
-	}
-*/
-	// Import data
+	
+	// Get the associated data object and load the file is any
 	data* d = NULL ;
-    d = plugins_manager::get_data(args["data"]) ;
+	d = plugins_manager::get_data(args["data"]) ;
+	if(args.is_defined("data-file"))
+	{
+		d->load(args["data-file"]);
+	}
 
+	// Get the function file
 	function* f = NULL;
-    f = plugins_manager::get_function(args);
-
-	// Modify function or data to provide coherent
-	// interfaces
-//	plugins_manager::check_compatibility(d, f, args);	
+	f = plugins_manager::get_function(args);
 
 	if(d != NULL && f != NULL)
 	{
