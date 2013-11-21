@@ -29,6 +29,7 @@
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  0,  2]" />
+		<parameter name="data-correct-cosine" value="" />
 	</action>
 	<action name="data2brdf">
 
@@ -50,6 +51,7 @@
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  0,  2]" />
 		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc.brdf" />
+		<parameter name="data-correct-cosine" value="" />
 	</action>
 	<action name="data2brdf">
 
@@ -74,6 +76,7 @@
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
 		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc.brdf" />
+		<parameter name="data-correct-cosine" value="" />
 	</action>
 	<action name="data2brdf">
 
@@ -99,6 +102,7 @@
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
 		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc.brdf" />
+		<parameter name="data-correct-cosine" value="" />
 	</action>
 	
 	<!-- Export the fit -->
