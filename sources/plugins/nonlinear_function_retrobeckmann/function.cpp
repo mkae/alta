@@ -192,14 +192,24 @@ bool beckmann_function::load(std::istream& in)
 	if(token.compare("#FUNC") != 0) 
 	{ 
 		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
-        return false;
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+		return false;
+	}
+
+	in >> token;
+   if(token.compare("nonlinear_function_retrobeckmann") != 0) 
+	{
+		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+		return false;
 	}
 	
 	in >> token;
 	if(token.compare("#TYPE") != 0) 
 	{ 
-		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
-        return false;
+		std::cerr << "<<ERROR>> parsing the stream. The #TYPE is not the next line defined." << std::endl; 
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+		return false;
 	}
 
 	in >> token;
@@ -212,13 +222,6 @@ bool beckmann_function::load(std::istream& in)
 		_use_back_param = true;
 	}
 
-
-	in >> token;
-   if(token.compare("nonlinear_function_retrobeckmann") != 0) 
-	{
-		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
-        return false;
-	}
 
 	// Parse the lobe
 	for(int i=0; i<_nY; ++i)

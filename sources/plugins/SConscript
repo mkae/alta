@@ -5,6 +5,7 @@ SConscript('data_interpolant/SConscript')
 
 # Building fitters
 SConscript('nonlinear_fitter_ceres/SConscript')
+SConscript('rational_fitter_eigen/SConscript')
 SConscript('rational_fitter_quadprog/SConscript')
 
 # Building functions

@@ -20,6 +20,7 @@
 #include <core/function.h>
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
+#include <core/vertical_segment.h>
 
 #include <iostream>
 #include <vector>
@@ -55,6 +56,11 @@ int main(int argc, char** argv)
 	// Import data
 	data* d = NULL ;
 	d = plugins_manager::get_data(args["data"]) ;
+
+	if(dynamic_cast<const vertical_segment*>(d) != NULL) {
+		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;
+		return 1;
+	}
 	d->load(args["input"]);
 
 	// Create output file
@@ -74,6 +80,15 @@ int main(int argc, char** argv)
 		vec m_xx(nY);
 		vec m_xy(nY);
 		vec m_yy(nY);
+		vec m_xxx(nY);
+		vec m_xxy(nY);
+		vec m_xyy(nY);
+		vec m_yyy(nY);
+		vec m_xxxx(nY);
+		vec m_xxxy(nY);
+		vec m_xxyy(nY);
+		vec m_xyyy(nY);
+		vec m_yyyy(nY);
 
 		// Cumulants
 		vec k_x(nY);
@@ -81,6 +96,15 @@ int main(int argc, char** argv)
 		vec k_xx(nY);
 		vec k_xy(nY);
 		vec k_yy(nY);
+		vec k_xxx(nY);
+		vec k_xxy(nY);
+		vec k_xyy(nY);
+		vec k_yyy(nY);
+		vec k_xxxx(nY);
+		vec k_xxxy(nY);
+		vec k_xxyy(nY);
+		vec k_xyyy(nY);
+		vec k_yyyy(nY);
 
 #ifndef OLD
 		// Number of elements per dimension
@@ -116,6 +140,15 @@ int main(int argc, char** argv)
 		m_xx = vec::Zero(nY);
 		m_xy = vec::Zero(nY);
 		m_yy = vec::Zero(nY);
+		m_xxx = vec::Zero(nY);
+		m_xxy = vec::Zero(nY);
+		m_xyy = vec::Zero(nY);
+		m_yyy = vec::Zero(nY);
+		m_xxxx = vec::Zero(nY);
+		m_xxxy = vec::Zero(nY);
+		m_xxyy = vec::Zero(nY);
+		m_xyyy = vec::Zero(nY);
+		m_yyyy = vec::Zero(nY);
 
 		// Integrate the moments over the integration domain
 		for(int i=0; i<nb; ++i)
@@ -152,6 +185,15 @@ int main(int argc, char** argv)
 				m_xx[k] += val * x[0] * x[0];
 				m_xy[k] += val * x[0] * x[1];
 				m_yy[k] += val * x[1] * x[1];
+				m_xxx[k] += val* x[0]  * x[0] * x[0];
+				m_xxy[k] += val* x[0]  * x[0] * x[1];
+				m_xyy[k] += val* x[0]  * x[1] * x[1];
+				m_yyy[k] += val* x[1]  * x[1] * x[1];
+				m_xxxx[k] += val* x[0]  * x[0] * x[0] * x[0];
+				m_xxxy[k] += val* x[0]  * x[0] * x[0] * x[1];
+				m_xxyy[k] += val* x[0]  * x[0] * x[1] * x[1];
+				m_xyyy[k] += val* x[0]  * x[1] * x[1] * x[1];
+				m_yyyy[k] += val* x[1]  * x[1] * x[1] * x[1];
 			}
 		}
 		
@@ -162,6 +204,15 @@ int main(int argc, char** argv)
 			m_xx[k] /= m_0[k];
 			m_xy[k] /= m_0[k];
 			m_yy[k] /= m_0[k];
+			m_xxx[k] /= m_0[k];
+			m_xxy[k] /= m_0[k];
+			m_xyy[k] /= m_0[k];
+			m_yyy[k] /= m_0[k];
+			m_xxxx[k] /= m_0[k];
+			m_xxxy[k] /= m_0[k];
+			m_xxyy[k] /= m_0[k];
+			m_xyyy[k] /= m_0[k];
+			m_yyyy[k] /= m_0[k];
 		}
 
 		// compute cumulants
@@ -170,14 +221,37 @@ int main(int argc, char** argv)
 		k_xx = m_xx - product(m_x,m_x);
 		k_xy = m_xy - product(m_x,m_y);
 		k_yy = m_yy - product(m_y,m_y);
+		k_xxx = m_xxx - 3*product(m_xx, m_x) + 2*product(m_x, product(m_x, m_x));
+		k_xxy = m_xxy - product(m_xx, m_y) - 2*product(m_xy, m_x) +2*product(m_x, product(m_x, m_y));
+		k_xyy = m_xyy - product(m_yy, m_x) - 2*product(m_xy, m_y) +2*product(m_x, product(m_y, m_y));
+		k_yyy = m_yyy - 3*product(m_yy, m_y)+2*product(m_y, product(m_y, m_y));
+#ifdef NOT
+		k_xxxx = m_xxxx - 4*m_xxx*m_x - 3*m_xx*m_xx + 12*m_xx*m_x*m_x - 6*m_x*m_x*m_x*m_x;
+		k_xxxy = m_xxxy - 3*m_xxy*m_x - m_xxx*m_y   - 3*m_xx*m_xy     + 6*m_xx*m_x*m_y + 6*m_xy*m_x*m_x - 6*m_x*m_x*m_x*m_y;
+		k_xxyy = m_xxyy - 2*m_xxy*m_y - m_xyy*m_x   - 2*m_xy*m_xy     - m_xx*m_yy      + 8*m_xy*m_x*m_y + 2*m_xx*m_y*m_y + 2*m_yy*m_x*m_x - 6*m_x*m_x*m_y*m_y;
+		k_xyyy = m_xyyy - 3*m_xyy*m_y - m_yyy*m_x   - 3*m_yy*m_xy     + 6*m_yy*m_x*m_y + 6*m_xy*m_y*m_y - 6*m_x*m_y*m_y*m_y;
+		k_yyyy = m_yyyy - 4*m_yyy*m_y - 3*m_yy*m_yy + 12*m_yy*m_y*m_y - 6*m_y*m_y*m_y*m_y;
+#endif
+		std::cout << "<<RESULT>> moment    0: " << m_0  << std::endl;
 
-		std::cout << "<<RESULT>> moment  0: " << m_0  << std::endl;
-		std::cout << "<<RESULT>> moment  x: " << m_x  << std::endl;
-		std::cout << "<<RESULT>> moment  y: " << m_y  << std::endl;
-		std::cout << "<<RESULT>> moment xx: " << m_xx << std::endl;
-		std::cout << "<<RESULT>> moment xy: " << m_xy << std::endl;
-		std::cout << "<<RESULT>> moment yy: " << m_yy << std::endl;
+		std::cout << "<<RESULT>> moment    x: " << m_x  << std::endl;
+		std::cout << "<<RESULT>> moment    y: " << m_y  << std::endl;
 
+		std::cout << "<<RESULT>> moment   xx: " << m_xx << std::endl;
+		std::cout << "<<RESULT>> moment   xy: " << m_xy << std::endl;
+		std::cout << "<<RESULT>> moment   yy: " << m_yy << std::endl;
+
+		std::cout << "<<RESULT>> moment  xxx: " << m_xxx << std::endl;
+		std::cout << "<<RESULT>> moment  xxy: " << m_xxy << std::endl;
+		std::cout << "<<RESULT>> moment  xyy: " << m_xyy << std::endl;
+		std::cout << "<<RESULT>> moment  yyy: " << m_yyy << std::endl;
+#ifdef NOT
+		std::cout << "<<RESULT>> moment xxxx: " << m_xxxx << std::endl;
+		std::cout << "<<RESULT>> moment xxxy: " << m_xxxy << std::endl;
+		std::cout << "<<RESULT>> moment xxyy: " << m_xxyy << std::endl;
+		std::cout << "<<RESULT>> moment xyyy: " << m_xyyy << std::endl;
+		std::cout << "<<RESULT>> moment yyyy: " << m_yyyy << std::endl;
+#endif
 #else
 		// Options
 		bool with_cosine = args.is_defined("cosine");
