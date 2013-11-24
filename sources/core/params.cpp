@@ -18,6 +18,8 @@ std::map<params::input, const param_info> create_map()
 	/* 1D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TH, param_info("COS_TH", 1, "Cosine of the Half angle")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TK, param_info("COS_TK", 1, "Cosine of the Back angle")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TLV, param_info("COS_TLV", 1, "Cosine of the Light and View directions")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TLR, param_info("COS_TLR", 1, "Cosine of the Light and Reflected directions")));
 
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
@@ -81,6 +83,22 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[3] = 1.0-invec[0]*invec[0];
 			outvec[4] = 0.0;
 			outvec[5] = invec[0];
+			break;
+		case params::COS_TLV:
+			outvec[0] = sqrt(1.0 - invec[0]*invec[0]);
+			outvec[1] = 0.0;
+			outvec[2] = invec[0];
+			outvec[3] = 0.0;
+			outvec[4] = 0.0;
+			outvec[5] = 1.0;
+			break;
+		case params::COS_TLR:
+			outvec[0] = - sqrt(1.0 - invec[0]*invec[0]);
+			outvec[1] = 0.0;
+			outvec[2] = invec[0];
+			outvec[3] = 0.0;
+			outvec[4] = 0.0;
+			outvec[5] = 1.0;
 			break;
 
 			// 2D Parametrizations
@@ -231,6 +249,12 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			const double Kz = invec[2]+invec[5];
 			outvec[0] = (invec[2] + invec[5]) / sqrt(Kx*Kx + Ky*Ky + Kz*Kz);
 		}
+			break;
+		case params::COS_TLV:
+			outvec[0] = invec[0]*invec[3] + invec[1]*invec[4] + invec[2]*invec[5];
+			break;
+		case params::COS_TLR:
+			outvec[0] = invec[0]*invec[3] - (invec[1]*invec[4] + invec[2]*invec[5]);
 			break;
 
 			// 2D Parametrizations
