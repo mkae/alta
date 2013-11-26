@@ -162,15 +162,40 @@ vec diffuse_function::parametersJacobian(const vec& x) const
 void diffuse_function::bootstrap(const data* d, const arguments& args)
 {
 	// Set the diffuse component
-	vec x0 = d->get(0);
-	for(int i=0; i<d->dimY(); ++i)
-		_kd[i] = x0[d->dimX() + i];
-
-	for(int i=1; i<d->size(); ++i)
+	if(params::is_cosine_weighted(d->output_parametrization()))
 	{
-		vec xi = d->get(i);
-		for(int j=0; j<d->dimY(); ++j)
-			_kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+		vec cart(6);
+
+		for(int i=0; i<d->dimY(); ++i)
+			_kd[i] = std::numeric_limits<double>::max();
+
+		for(int i=1; i<d->size(); ++i)
+		{
+			vec x = d->get(i);
+			params::convert(&x[0], d->input_parametrization(), params::CARTESIAN, &cart[0]);
+			double cosine = (cart[2] > 0.0 ? cart[2] : 0.0) * (cart[5] > 0.0 ? cart[5] : 0.0);
+
+			if(cosine > 0.0)
+			{
+				for(int j=0; j<d->dimY(); ++j)
+				{
+					_kd[j] = std::min(x[d->dimX() + j] / cosine, _kd[j]);
+				}
+			}
+		}
+	}
+	else
+	{
+		vec x0 = d->get(0);
+		for(int i=0; i<d->dimY(); ++i)
+			_kd[i] = x0[d->dimX() + i];
+
+		for(int i=1; i<d->size(); ++i)
+		{
+			vec xi = d->get(i);
+			for(int j=0; j<d->dimY(); ++j)
+				_kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+		}
 	}
 	std::cout << "<<INFO>> found diffuse: " << _kd << std::endl;
 

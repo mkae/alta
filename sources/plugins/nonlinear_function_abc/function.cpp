@@ -29,7 +29,14 @@ vec abc_function::value(const vec& x) const
 
 	for(int i=0; i<dimY(); ++i)
 	{
-		res[i] = _a[i] / pow(1.0 + _b[i]*hn, _c[i]);
+		if(hn > 0.0 && hn < 1.0)
+		{
+			res[i] = _a[i] / pow(1.0 + _b[i]*hn, _c[i]);
+		}
+		else
+		{
+			res[i] = 0.0;
+		}
 	}
 	return res;
 }

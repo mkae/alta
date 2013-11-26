@@ -98,6 +98,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				linestream >> v[i] ;
 
 
+			/*
 			// Correction of the data by 1/cosine(theta_L)
 			double factor = 1.0;
 			if(args.is_defined("data-correct-cosine"))
@@ -107,11 +108,12 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				factor = 1.0/cart[5];
 			}
 			// End of correction
+			*/
 
 			for(int i=0; i<dimY(); ++i)
 			{
 				linestream >> v[dimX() + i];
-				v[dimX() + i] /= factor;
+//				v[dimX() + i] /= factor;
 			}
 
 			// Check if the data containt a vertical segment around the mean

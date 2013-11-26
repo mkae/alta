@@ -24,6 +24,7 @@ std::map<params::input, const param_info> create_map()
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::RETRO_TL_TVL_PROJ_DPHI, param_info("RETRO_TVL_PROJ_DPHI", 2, "Isoptropic projected phi parametrization around the retro direction.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
@@ -156,6 +157,25 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case ISOTROPIC_TL_TV_PROJ_DPHI:
 		{
 			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
+			if(theta > 0.0)
+			{
+				outvec[0] = (invec[1]/theta)*sin(theta);
+				outvec[1] = (invec[2]/theta)*sin(theta);
+			}
+			else
+			{
+				outvec[0] = 0.0;
+				outvec[1] = 0.0;
+			}
+			outvec[2] = cos(theta);
+			outvec[3] = sin(invec[0]);
+			outvec[4] = 0.0;
+			outvec[5] = cos(invec[0]);
+		}
+			break;
+		case RETRO_TL_TVL_PROJ_DPHI:
+		{
+			const double theta = std::fabs(sqrt(invec[1]*invec[1] + invec[2]*invec[2]) - invec[0]);
 			if(theta > 0.0)
 			{
 				outvec[0] = (invec[1]/theta)*sin(theta);
@@ -397,13 +417,41 @@ params::input params::parse_input(const std::string& txt)
 	{
 		if(txt.compare(it->second.name) == 0)
 		{
-			std::cout << "<<INFO>> parsed input parametrization " << it->second.name << std::endl;
+			std::cout << "<<INFO>> parsed input parametrization " << it->second.name << " from name \"" << txt << "\"" << std::endl;
 			return it->first;
 		}
 	}
 
 	std::cout << "<<INFO>> the input parametrization is UNKNOWN_INPUT" << std::endl;
 	return params::UNKNOWN_INPUT;
+}
+        
+params::output params::parse_output(const std::string& txt)
+{
+	if(txt == std::string("ENERGY"))
+	{
+		return params::ENERGY;
+	}
+	else if(txt == std::string("INV_STERADIAN"))
+	{
+		return params::INV_STERADIAN;
+	}
+	else if(txt == std::string("INV_STERADIAN_COSINE_FACTOR"))
+	{
+		return params::INV_STERADIAN_COSINE_FACTOR;
+	}
+	else if(txt == std::string("RGB_COLOR"))
+	{
+		return params::RGB_COLOR;
+	}
+	else if(txt == std::string("XYZ_COLOR"))
+	{
+		return params::XYZ_COLOR;
+	}
+	else
+	{
+		return params::UNKNOWN_OUTPUT;
+	}
 }
 		  
 std::string params::get_name(const params::input param)

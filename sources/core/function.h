@@ -354,3 +354,52 @@ class product_function : public nonlinear_function
 		nonlinear_function *f1, *f2;
 };
 
+class cosine_function : public nonlinear_function
+{
+	public:
+		// Set the input parametrization to CARTESIAN to reduce the number
+		// of transformations in a compound object.
+		cosine_function()
+		{
+			setParametrization(params::CARTESIAN);
+			setDimX(6);
+		}
+
+		// Overload the function operator
+		virtual vec operator()(const vec& x) const 
+		{
+			return value(x);
+		}
+		virtual vec value(const vec& x) const
+		{
+			vec res(dimY());
+			for(int i=0; i<dimY(); ++i) { res[i] = ((x[2] > 0.0) ? x[2] : 0.0) * ((x[5] > 0.0) ? x[5] : 0.0); }
+			return res;
+		}
+
+		//! \brief Number of parameters to this non-linear function
+		virtual int nbParameters() const
+		{
+			return 0;
+		}
+
+		//! Get the vector of parameters for the function
+		vec parameters() const 
+		{
+			vec res(1);
+			return res;
+		}
+
+		//! Update the vector of parameters for the function
+		void setParameters(const vec&) 
+		{
+		}
+
+		//! Obtain the derivatives of the function with respect to the 
+		//! parameters. 
+		vec parametersJacobian(const vec&) const 
+		{
+			vec jac(1);
+			return jac;
+		}
+};

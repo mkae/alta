@@ -374,7 +374,15 @@ function* plugins_manager::get_function(const arguments& args)
 		 }
 
 	 }
-
+//*
+	 // Correction of the data by 1/cosine(theta_L)
+	 if(args.is_defined("data-correct-cosine"))
+	 {
+		 nonlinear_function* cosine = new cosine_function();
+		 func = new product_function(cosine, dynamic_cast<nonlinear_function*>(func));
+	 }
+	 // End of correction
+//*/			
     return func;
 }
 data* plugins_manager::get_data(const std::string& n)

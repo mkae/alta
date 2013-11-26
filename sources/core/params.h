@@ -52,9 +52,19 @@ class params
 
              SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
              SCHLICK_VK,            /*!< Schlick's back vector */
+				 SCHLICK_TK_PROJ_DPHI,  /*!< 2D Parametrization where the phi component is projected and
+				                            the parametrization is centered around the back direction.
+													 \f$[x, y] = [\theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
              COS_TK,                /*!< Schlick's back vector dot product with the normal */
 
+
+				 RETRO_TL_TVL_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected and
+				                             the parametrization is centered around the retro direction
+													  \f$[x, y] = [\theta_{VL} \cos(\Delta\phi), \theta_{VL} 
+													  \sin(\Delta\phi)]\f$.*/
+
              STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
+
 
              SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
 				 COS_TLV,               /*!< Dot product between the Light and View vector */
@@ -70,7 +80,7 @@ class params
 														  \theta_v \sin(\Delta\phi).\f$]*/
              ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
-				 BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined in Stark et alL [2004].
+				 BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined in Stark et al. [2004].
 				                               Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
 														 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
 
@@ -102,22 +112,12 @@ class params
         //! \brief parse a string to provide a parametrization type.
         static params::input parse_input(const std::string& txt);
 
+        //! \brief parse a string to provide a parametrization type.
+        static params::output parse_output(const std::string& txt);
+
 		  //! \brief look for the string associated with a parametrization
 		  //! type.
 		  static std::string get_name(const params::input param);
-
-        //! \brief parse a string to provide a parametrization type.
-        static params::output parse_output(const std::string& txt)
-        {
-            if(txt == std::string("ENERGY"))
-            {
-                return params::ENERGY;
-            }
-            else
-            {
-                return params::UNKNOWN_OUTPUT;
-            }
-        }
 
         //! \brief static function for input type convertion. This
         //! function allocate the resulting vector.
@@ -214,6 +214,25 @@ class params
                     break;
             }
         }
+
+		  //! \brief Is the value stored weighted by a cosine factor
+		  static bool is_cosine_weighted(params::output t)
+		  {
+			  switch(t)
+			  {
+				  case params::INV_STERADIAN_COSINE_FACTOR:
+					  return true;
+					  break;
+
+				  case params::INV_STERADIAN:
+				  case params::ENERGY:
+				  case params::RGB_COLOR:
+				  case params::XYZ_COLOR:
+				  default:
+					  return false;
+					  break;
+			  }
+		  }
 
         //! \brief from the 4D definition of a half vector parametrization,
         //! export the cartesian coordinates.
