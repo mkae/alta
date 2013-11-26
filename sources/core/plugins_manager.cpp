@@ -363,9 +363,15 @@ function* plugins_manager::get_function(const arguments& args)
 		 }
 
 		 nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
-//		 func_fres->setBase(nl_func);		 
-//		 return func_fres;
-		 return new product_function(nl_func, func_fres);
+		 if(func_fres != NULL)
+		 {
+			return new product_function(nl_func, func_fres);
+		 }
+		 else
+		 {
+			 std::cerr << "<<ERROR>> the right part of the product is not a nonlinear function. Will use only the left part." << std::endl;
+			 return func;
+		 }
 
 	 }
 

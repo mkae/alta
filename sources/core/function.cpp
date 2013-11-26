@@ -144,7 +144,7 @@ double function::L2_distance(const data* d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-		vec x(dimX()), y(d->dimY());
+		vec x(dimX()), y(dimY());
 
 		if(input_parametrization() == params::UNKNOWN_INPUT)
 		{
@@ -156,7 +156,7 @@ double function::L2_distance(const data* d) const
 		}
 		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
 
-		l2_dist  += std::pow(norm(y-value(x)), 2);
+		l2_dist += std::pow(norm(y-value(x)), 2);
 	}
 	l2_dist = std::sqrt(l2_dist / d->size());
 	return l2_dist;
@@ -165,13 +165,14 @@ double function::L2_distance(const data* d) const
 //! \brief Linf norm to data.
 double function::Linf_distance(const data* d) const
 {
-	vec mean(dimY()), var(dimY());
+	vec mean = vec::Zero(dimY());
+	vec var  = vec::Zero(dimY());
 
 	double linf_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-		vec x(dimX()), y(d->dimY());
+		vec x(dimX()), y(dimY());
 
 		if(input_parametrization() == params::UNKNOWN_INPUT)
 		{

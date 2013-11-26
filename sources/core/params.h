@@ -57,6 +57,8 @@ class params
              STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
 
              SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
+				 COS_TLV,               /*!< Dot product between the Light and View vector */
+				 COS_TLR,               /*!< Dot product between the Light and Reflected vector */
              ISOTROPIC_TV_TL,       /*!< Light and View vectors represented in spherical coordinates, */
              ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
                                          with the difference of azimutal coordinates in the last component  */
