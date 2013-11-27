@@ -22,22 +22,24 @@ class data : public parametrized
 		virtual void load(const std::string& filename) = 0 ;
 		virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
-        // Save the data to a file
-        virtual void save(const std::string& filename) const
-        {
-            std::ofstream file(filename.c_str(), std::ios_base::trunc);
-            file << "#DIM " << _nX << " " << _nY << std::endl;
-            for(int i=0; i<size(); ++i)
-            {
-                vec x = this->get(i);
-                for(int j=0; j<_nX+_nY; ++j)
-                {
-                    file << x[j] << "\t";
-                }
-                file << std::endl;
-            }
-            file.close();
-        }
+		// Save the data to a file
+		virtual void save(const std::string& filename) const
+		{
+			std::ofstream file(filename.c_str(), std::ios_base::trunc);
+			file << "#DIM " << _nX << " " << _nY << std::endl;
+			file << "PARAM_IN  " << params::get_name(input_parametrization())  << std::endl;
+			file << "PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
+			for(int i=0; i<size(); ++i)
+			{
+				vec x = this->get(i);
+				for(int j=0; j<_nX+_nY; ++j)
+				{
+					file << x[j] << "\t";
+				}
+				file << std::endl;
+			}
+			file.close();
+		}
 
 		// Acces to data
 		virtual vec get(int i) const = 0 ;

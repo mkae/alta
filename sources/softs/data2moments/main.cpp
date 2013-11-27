@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
 	if(args.is_defined("help")) {
 		std::cout << "Usage: data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
-		std::cout << "  -> input, output and data are mandatory parameters" << std::endl ;
+		std::cout << "Compute the statistical moments, up to order 4, on the data file" << std::endl ;
 		return 0 ;
 	}
 
@@ -107,6 +107,7 @@ int main(int argc, char** argv)
 		vec k_yyyy(nY);
 
 #ifndef OLD
+
 		// Number of elements per dimension
 		std::vector<int> dim;
 		if(args.is_defined("dim"))
@@ -156,7 +157,6 @@ int main(int argc, char** argv)
 			// For the global index i of the sample, compute the index in the various
 			// dimensions and then compute the position within the dimension. All the
 			// samples are taken uniformly.
-			// \todo Ad Metropolis integration
 			int indices[nX];
 			int global = i;
 			for(int k=0; k<nX; ++k)
@@ -228,7 +228,7 @@ int main(int argc, char** argv)
 #ifdef NOT
 		k_xxxx = m_xxxx - 4*m_xxx*m_x - 3*m_xx*m_xx + 12*m_xx*m_x*m_x - 6*m_x*m_x*m_x*m_x;
 		k_xxxy = m_xxxy - 3*m_xxy*m_x - m_xxx*m_y   - 3*m_xx*m_xy     + 6*m_xx*m_x*m_y + 6*m_xy*m_x*m_x - 6*m_x*m_x*m_x*m_y;
-		k_xxyy = m_xxyy - 2*m_xxy*m_y - m_xyy*m_x   - 2*m_xy*m_xy     - m_xx*m_yy      + 8*m_xy*m_x*m_y + 2*m_xx*m_y*m_y + 2*m_yy*m_x*m_x - 6*m_x*m_x*m_y*m_y;
+		k_xxyy = m_xxyy - 2*m_xxy*m_y - 2*m_xyy*m_x   - 2*m_xy*m_xy     - m_xx*m_yy      + 8*m_xy*m_x*m_y + 2*m_xx*m_y*m_y + 2*m_yy*m_x*m_x - 6*m_x*m_x*m_y*m_y;
 		k_xyyy = m_xyyy - 3*m_xyy*m_y - m_yyy*m_x   - 3*m_yy*m_xy     + 6*m_yy*m_x*m_y + 6*m_xy*m_y*m_y - 6*m_x*m_y*m_y*m_y;
 		k_yyyy = m_yyyy - 4*m_yyy*m_y - 3*m_yy*m_yy + 12*m_yy*m_y*m_y - 6*m_y*m_y*m_y*m_y;
 #endif

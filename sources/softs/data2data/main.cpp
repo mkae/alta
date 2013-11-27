@@ -32,6 +32,7 @@
 #include <core/function.h>
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
+#include <core/vertical_segment.h>
 
 #include <iostream>
 #include <vector>
@@ -70,25 +71,61 @@ int main(int argc, char** argv)
 	// Import data
 	data* d_in = NULL ;
 	d_in = plugins_manager::get_data(args["in-data"]) ;
-	d_in->load(args["input"]);
+	d_in->load(args["input"], args);
 
 	data* d_out = NULL;
 	d_out = plugins_manager::get_data(args["out-data"]) ;
-
-	if(d_out->dimY() != d_in->dimY())
+	
+	if(d_in == NULL && d_out == NULL)
 	{
-		std::cerr << "<<ERROR>> data types have incompatible output dimensions" << std::endl;
+		std::cerr << "<<ERROR>> cannot import or export data" << std::endl ;
+		return 1;
 	}
 
-	if(d_in != NULL && d_out != NULL)
+	if(dynamic_cast<vertical_segment*>(d_out) != NULL)
 	{
+		params::input param = params::parse_input(args["param"]);
+		if(param == params::UNKNOWN_INPUT)
+		{
+			std::cerr << "<<ERROR>> unable to parse the parametrization" << std::endl;
+			return -1;
+		}
+
+		d_out->setParametrization(param);
+		d_out->setDimX(params::dimension(param));
+		d_out->setDimY(d_in->dimY());
+
+		std::cout << "<<INFO>> output DIM = " << d_out->dimX() << ", " << d_out->dimY() << std::endl;
+
+		vec temp(d_out->dimX() + d_out->dimY());
+		for(int i=0; i<d_in->size(); ++i)
+		{
+			// Copy the input vector
+			vec x = d_in->get(i);
+			params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
+			
+			for(int j=0; j<d_in->dimY(); ++j)
+			{
+				temp[d_out->dimX() + j] = x[d_in->dimX() + j];
+			}
+
+			d_out->set(temp);
+		}	
+	}
+	else
+	{
+		if(d_out->dimY() != d_in->dimY())
+		{
+			std::cerr << "<<ERROR>> data types have incompatible output dimensions" << std::endl;
+		}
+
 		vec temp(d_in->dimX());
 		for(int i=0; i<d_out->size(); ++i)
 		{
 			// Copy the input vector
 			vec x = d_out->get(i);
 			params::convert(&x[0], d_out->parametrization(), d_in->parametrization(), &temp[0]);
-			
+
 			vec y = d_in->value(temp);
 
 			for(int j=0; j<d_in->dimY(); ++j)
@@ -98,14 +135,7 @@ int main(int argc, char** argv)
 
 			d_out->set(x);
 		}	
-
-		d_out->save(args["output"]);
-		return 0 ;
 	}	
-	else
-	{
-		std::cerr << "<<ERROR>> cannot import or export data" << std::endl ;
-		return 1;
-	}
-
+	d_out->save(args["output"]);
+	return 0 ;
 }

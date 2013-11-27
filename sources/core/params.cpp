@@ -32,6 +32,7 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_VH, param_info("RUSIN_VH", 3, "Vector representation of the Half angle only")));
     _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TL_TV_PROJ_DPHI, param_info("ISOTROPIC_TL_TV_PROJ_DPHI", 3, "Isoptropic projected phi parametrization.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_TL_TK_PROJ_DPHI, param_info("SCHLICK_TL_TK_PROJ_DPHI", 3, "Isoptropic projected phi parametrization centered around the back vector.")));
 
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
@@ -172,6 +173,9 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[4] = 0.0;
 			outvec[5] = cos(invec[0]);
 		}
+			break;
+		case SCHLICK_TL_TK_PROJ_DPHI:
+			NOT_IMPLEMENTED();
 			break;
 		case RETRO_TL_TVL_PROJ_DPHI:
 		{
@@ -354,6 +358,19 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[0] = theta_l;
 			outvec[1] = theta_v * cos(dphi);
 			outvec[2] = theta_v * sin(dphi);
+		}
+			break;
+		case SCHLICK_TL_TK_PROJ_DPHI:
+		{
+			const double vkx     = invec[0]-invec[3];
+			const double vky     = invec[1]-invec[4];
+			const double vkz     = invec[2]+invec[5];
+			const double norm    = sqrt(vkx*vkx + vky*vky + vkz*vkz);
+			const double theta_k = acos(vkz / norm);
+			const double dphi    = atan2(invec[4], invec[3]) - atan2(vky/norm, vkx/norm);
+			outvec[0] = acos(invec[5]);
+			outvec[1] = theta_k * cos(dphi);
+			outvec[2] = theta_k * sin(dphi);
 		}
 			break;
 

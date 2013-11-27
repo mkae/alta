@@ -52,9 +52,9 @@ class params
 
              SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
              SCHLICK_VK,            /*!< Schlick's back vector */
-				 SCHLICK_TK_PROJ_DPHI,  /*!< 2D Parametrization where the phi component is projected and
+				 SCHLICK_TL_TK_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected and
 				                            the parametrization is centered around the back direction.
-													 \f$[x, y] = [\theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
+													 \f$[\theta_L, x, y] = [\theta_L, \theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
              COS_TK,                /*!< Schlick's back vector dot product with the normal */
 
 
@@ -118,6 +118,15 @@ class params
 		  //! \brief look for the string associated with a parametrization
 		  //! type.
 		  static std::string get_name(const params::input param);
+		  
+		  //! \brief look for the string associated with a parametrization
+		  //! type.
+		  //! \todo Finish this implementation. It requires another static
+		  //! object.
+		  static std::string get_name(const params::output param)
+		  {
+			  return std::string("UNKNOWN_OUTPUT");
+		  }
 
         //! \brief static function for input type convertion. This
         //! function allocate the resulting vector.
