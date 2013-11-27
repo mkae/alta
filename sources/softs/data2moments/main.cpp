@@ -108,20 +108,34 @@ int main(int argc, char** argv)
 
 #ifndef OLD
 
-		// Number of elements per dimension
-		std::vector<int> dim;
-		if(args.is_defined("dim"))
+		// Number of elements per samplesension
+		std::vector<int> samples;
+		if(args.is_defined("samples"))
 		{	
-			dim = args.get_vec<int>("dim");
-			assert(dim.size() == nX);
+			samples = args.get_vec<int>("samples");
+			assert(samples.size() == nX);
 		}
 		else
 		{
 			for(int i=0; i<nX; ++i)
 			{
-				dim.push_back(100);
+				samples.push_back(100);
 			}
 		}
+
+		std::vector<int> dim;
+		if(args.is_defined("dim"))
+		{
+			dim = args.get_vec<int>("dim");
+			assert(dim.size() == 2);
+		}
+		else
+		{
+			std::cout << "<<INFO>> not dim [int, int] defined. Will use the first two dimensions to compute the moments" << std::endl;
+			dim.push_back(0);
+			dim.push_back(1);
+		}
+
 
 		// Compute the volume in which we integrate and then compute the
 		// dt to apply for each element.
@@ -130,7 +144,7 @@ int main(int argc, char** argv)
 		for(int k=0; k<nX; ++k)
 		{
 			dt *= d->max()[k] - d->min()[k];
-			nb *= dim[k];
+			nb *= samples[k];
 		}
 		dt /= double(nb);
 		
@@ -151,6 +165,9 @@ int main(int argc, char** argv)
 		m_xyyy = vec::Zero(nY);
 		m_yyyy = vec::Zero(nY);
 
+		const int dx = dim[0];
+		const int dy = dim[1];
+
 		// Integrate the moments over the integration domain
 		for(int i=0; i<nb; ++i)
 		{
@@ -161,14 +178,14 @@ int main(int argc, char** argv)
 			int global = i;
 			for(int k=0; k<nX; ++k)
 			{
-				indices[k] = global % dim[k];
-				global /= dim[k];
+				indices[k] = global % samples[k];
+				global /= samples[k];
 			}
 
 			vec x(nX);
 			for(int k=0; k<nX; ++k)
 			{
-				x[k] = d->min()[k] + (d->max()[k] - d->min()[k]) * (double(indices[k]) / dim[k]);
+				x[k] = d->min()[k] + (d->max()[k] - d->min()[k]) * (double(indices[k]) / samples[k]);
 			}
 
 			// Get the value and compute the associated integral. Right now, the data
@@ -180,20 +197,20 @@ int main(int argc, char** argv)
 				double val = y[k] * dt;
 
 				m_0[k]  += val ;
-				m_x[k]  += val * x[0];
-				m_y[k]  += val * x[1];
-				m_xx[k] += val * x[0] * x[0];
-				m_xy[k] += val * x[0] * x[1];
-				m_yy[k] += val * x[1] * x[1];
-				m_xxx[k] += val* x[0]  * x[0] * x[0];
-				m_xxy[k] += val* x[0]  * x[0] * x[1];
-				m_xyy[k] += val* x[0]  * x[1] * x[1];
-				m_yyy[k] += val* x[1]  * x[1] * x[1];
-				m_xxxx[k] += val* x[0]  * x[0] * x[0] * x[0];
-				m_xxxy[k] += val* x[0]  * x[0] * x[0] * x[1];
-				m_xxyy[k] += val* x[0]  * x[0] * x[1] * x[1];
-				m_xyyy[k] += val* x[0]  * x[1] * x[1] * x[1];
-				m_yyyy[k] += val* x[1]  * x[1] * x[1] * x[1];
+				m_x[k]  += val * x[dx];
+				m_y[k]  += val * x[dy];
+				m_xx[k] += val * x[dx] * x[dx];
+				m_xy[k] += val * x[dx] * x[dy];
+				m_yy[k] += val * x[dy] * x[dy];
+				m_xxx[k] += val* x[dx]  * x[dx] * x[dx];
+				m_xxy[k] += val* x[dx]  * x[dx] * x[dy];
+				m_xyy[k] += val* x[dx]  * x[dy] * x[dy];
+				m_yyy[k] += val* x[dy]  * x[dy] * x[dy];
+				m_xxxx[k] += val* x[dx]  * x[dx] * x[dx] * x[dx];
+				m_xxxy[k] += val* x[dx]  * x[dx] * x[dx] * x[dy];
+				m_xxyy[k] += val* x[dx]  * x[dx] * x[dy] * x[dy];
+				m_xyyy[k] += val* x[dx]  * x[dy] * x[dy] * x[dy];
+				m_yyyy[k] += val* x[dy]  * x[dy] * x[dy] * x[dy];
 			}
 		}
 		
