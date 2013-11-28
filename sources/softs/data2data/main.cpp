@@ -47,9 +47,29 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "<<HELP>> data2data --input data.file --output data.file --out-data exporter.so --in-data importer.so" << std::endl ;
-		std::cout << " - input, output, out-data are mandatory parameters" << std::endl ;
+		std::cout << "Usage: data2data [options] --input data.file --output data.file" << std::endl ;
+		std::cout << "Convert a data object to another data object."<< std::endl ;
+		std::cout << std::endl;
+		std::cout << "Mandatory arguments:" << std::endl;
+		std::cout << "  --input    [filename]" << std::endl;
+		std::cout << "  --output   [filename]" << std::endl;
+		std::cout << std::endl;
+		std::cout << "Optional arguments:" << std::endl;
+		std::cout << "  --out-data [filename]  Name of the plugin used to save the outputed data file" << std::endl ;
+		std::cout << "                         If none is provided, the exporter will export in ALTA" << std::endl ;
+		std::cout << "                         by default." << std::endl ;
+		std::cout << "  --in-data  [filename]  Name of the plugin used to load the input data file" << std::endl ;
+		std::cout << "                         If none is provided, the exporter will export in ALTA" << std::endl ;
+		std::cout << "                         by default." << std::endl ;
+		std::cout << "  --param    [NAME]      Name of the parametrization used to output data when" << std::endl;
+		std::cout << "                         No output data plugin is specified. Please see " << std::endl;
+		std::cout << "                         --help-params for the list of available " << std::endl ;
+		std::cout << "                         parametrizations." << std::endl ;
 		return 0 ;
+	}
+	if(args.is_defined("help-params")) {
+		params::print_input_params();
+		return 0;
 	}
 
 	if(! args.is_defined("input")) {
