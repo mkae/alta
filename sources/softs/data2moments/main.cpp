@@ -35,8 +35,22 @@ int main(int argc, char** argv)
 	arguments args(argc, argv) ;
 
 	if(args.is_defined("help")) {
-		std::cout << "Usage: data2moments --input data.file --output gnuplot.file --data loader.so" << std::endl ;
+		std::cout << "Usage: data2moments [options] --input data.file --output gnuplot.file" << std::endl ;
 		std::cout << "Compute the statistical moments, up to order 4, on the data file" << std::endl ;
+		std::cout << std::endl;
+		std::cout << "Mandatory arguments:" << std::endl;
+		std::cout << "  --input   [filename]" << std::endl;
+		std::cout << "  --output  [filename]" << std::endl;
+		std::cout << "  --data    [filename]       You must provide a data loader that provides" << std::endl;
+		std::cout << "                             interpolation mechanism." << std::endl;
+		std::cout << std::endl;
+		std::cout << "Optional arguments:" << std::endl;
+		std::cout << "  --samples [int, int, ...]  Number of samples per dimension used to compute" << std::endl;
+		std::cout << "                             the moments. This vector must have the same" << std::endl;
+		std::cout << "                             size as the number of dimensions of the input" << std::endl;
+		std::cout << "                             space." << std::endl;
+		std::cout << "  --dim     [int, int]       Indices of the two dimensions used to evaluate" << std::endl;
+		std::cout << "                             the moments." << std::endl;
 		return 0 ;
 	}
 
