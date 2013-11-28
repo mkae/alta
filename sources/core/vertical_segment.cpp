@@ -98,15 +98,24 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				linestream >> v[i] ;
 
 
+//			/*
 			// Correction of the data by 1/cosine(theta_L)
 			double factor = 1.0;
 			if(args.is_defined("data-correct-cosine"))
 			{
 				double cart[6];
 				params::convert(&v[0], input_parametrization(), params::CARTESIAN, cart);
-				factor = 1.0/cart[5];
+				if(cart[5] > 0.0 && cart[2] > 0.0)
+				{
+					factor = 1.0/cart[5]*cart[2];
+				}
+				else
+				{
+					continue;
+				}
 			}
 			// End of correction
+//			*/
 
 			for(int i=0; i<dimY(); ++i)
 			{
@@ -179,6 +188,9 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			}
 		}
 	}
+			
+	if(args.is_defined("data-correct-cosine"))
+		save("/tmp/data-corrected.dat");
 
 	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
 	std::cout << "<<INFO>> data inside " << _min << " ... " << _max << std::endl ;

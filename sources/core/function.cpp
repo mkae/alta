@@ -430,6 +430,7 @@ bool compound_function::load(std::istream& in)
 			nb_good++;
 		}
 	}
+	std::cout << "<<DEBUG>> number of correct function loaded in compound: " << nb_good  << " / " << fs.size() << std::endl;
 	return nb_good > 0;
 }
 
