@@ -35,6 +35,24 @@ int main(int argc, char** argv)
 #ifdef __linux__
 	//feenableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
 #endif
+	
+	 if(args.is_defined("help")) {
+		std::cout << "Usage: data2brdf [options] --input data.file --output data.file" << std::endl ;
+		std::cout << "Convert a data object to a function object using a fitting procedure."<< std::endl ;
+		std::cout << std::endl;
+		std::cout << "Mandatory arguments:" << std::endl;
+		std::cout << "  --input    [filename]" << std::endl;
+		std::cout << "  --output   [filename]" << std::endl;
+		std::cout << "  --fitter   [filename]" << std::endl;
+		std::cout << std::endl;
+		std::cout << "Optional arguments:" << std::endl;
+		std::cout << "  --func     [filename]  Name of the function plugin. If not defined, a" << std::endl ;
+		std::cout << "                         monomial rational function will be used." << std::endl ;
+		std::cout << "  --data     [filename]  Name of the data plugin used to load the input" << std::endl ;
+		std::cout << "                         data file. If no plugin is defined, the data file" << std::endl ;
+		std::cout << "                         will be load using ALTA format." << std::endl ;
+		return 0 ;
+	}
 
     fitter* fit = plugins_manager::get_fitter(args["fitter"]) ;
     if(fit == NULL)
