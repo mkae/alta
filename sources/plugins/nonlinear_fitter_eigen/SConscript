@@ -1,0 +1,7 @@
+env = Environment()
+env.Append(CPPPATH = ['../../../external/build/include', '../../'])
+env.Append(LIBPATH = ['../../build'])
+
+sources = ['fitter.cpp']
+libs = ['-lcore']
+env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources, LIBS=libs)
