@@ -1,7 +1,7 @@
 <doxygenlayout version="1.0">
 	<navindex>
 		<tab type="mainpage" visible="yes" title="Overview"/>
-		<tab type="user" url="@ref examples" title="Examples"/>
+		<tab type="user" url="@ref tutorials" title="Tutorials"/>
 		<tab type="user" url="@ref license" title="License"/>
 		<tab type="user" url="@ref contacts" title="Contacts"/>
 	</navindex>
