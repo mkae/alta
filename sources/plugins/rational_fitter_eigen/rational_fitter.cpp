@@ -28,9 +28,14 @@ bool rational_fitter_eigen::fit_data(const data* dat, function* fit, const argum
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
-	if(r == NULL || d == NULL)
+	if(r == NULL)
 	{
-		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
+		std::cerr << "<<ERROR>> not passing the correct function object to the fitter" << std::endl ;
+		return false ;
+	} 
+	if(d == NULL)
+	{
+		std::cerr << "<<ERROR>> not passing the correct data object to the fitter" << std::endl ;
 		return false ;
 	}
 
