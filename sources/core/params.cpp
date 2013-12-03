@@ -24,7 +24,6 @@ std::map<params::input, const param_info> create_map()
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
-	_map.insert(std::make_pair<params::input, const param_info>(params::RETRO_TL_TVL_PROJ_DPHI, param_info("RETRO_TVL_PROJ_DPHI", 2, "Isoptropic projected phi parametrization around the retro direction.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
@@ -33,6 +32,7 @@ std::map<params::input, const param_info> create_map()
     _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TL_TV_PROJ_DPHI, param_info("ISOTROPIC_TL_TV_PROJ_DPHI", 3, "Isoptropic projected phi parametrization.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_TL_TK_PROJ_DPHI, param_info("SCHLICK_TL_TK_PROJ_DPHI", 3, "Isoptropic projected phi parametrization centered around the back vector.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::RETRO_TL_TVL_PROJ_DPHI, param_info("RETRO_TL_TVL_PROJ_DPHI", 3, "Isoptropic retro projected phi parametrization.")));
 
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
@@ -178,23 +178,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			NOT_IMPLEMENTED();
 			break;
 		case RETRO_TL_TVL_PROJ_DPHI:
-		{
-			const double theta = std::fabs(sqrt(invec[1]*invec[1] + invec[2]*invec[2]) - invec[0]);
-			if(theta > 0.0)
-			{
-				outvec[0] = (invec[1]/theta)*sin(theta);
-				outvec[1] = (invec[2]/theta)*sin(theta);
-			}
-			else
-			{
-				outvec[0] = 0.0;
-				outvec[1] = 0.0;
-			}
-			outvec[2] = cos(theta);
-			outvec[3] = sin(invec[0]);
-			outvec[4] = 0.0;
-			outvec[5] = cos(invec[0]);
-		}
+			NOT_IMPLEMENTED();
 			break;
 
 			// 4D Parametrization
@@ -358,6 +342,39 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[0] = theta_l;
 			outvec[1] = theta_v * cos(dphi);
 			outvec[2] = theta_v * sin(dphi);
+		}
+			break;
+		case RETRO_TL_TVL_PROJ_DPHI:
+		{
+			const double cos_v  = invec[2];
+			const double cos_l  = invec[5];
+			const double cos_vl = invec[0]*invec[3] + invec[1]*invec[4] + invec[2]*invec[5];
+			const double sin_l  = sqrt(1.0 - cos_l * cos_l);
+			const double sin_v  = sqrt(1.0 - cos_v * cos_v);
+			const double sin_vl = sqrt(1.0 - cos_vl* cos_vl);
+
+			// Sine of the \Delta_{\phi} angle
+			const double sin_dp = sin(atan2(invec[4], invec[3]) - atan2(invec[1], invec[0]));
+
+			if(sin_vl != 0.0 && sin_l != 0.0)
+			{
+				// Cosine and sine of the phi_{L,V} angle: the spherical
+				// angle between the arclength {L,N} and {V,N}
+				const double cos_phi = (cos_v - cos_l*cos_vl) / (sin_l * sin_vl);
+				const double sin_phi = (sin_dp * sin_v) / sin_vl;
+
+				const double theta = acos(cos_vl);
+
+				outvec[0] = acos(cos_l);
+				outvec[1] = theta * cos_phi;
+				outvec[2] = theta * sin_phi;
+			}
+			else
+			{
+				outvec[0] = acos(cos_l);
+				outvec[1] = acos(cos_v);
+				outvec[2] = 0.0;
+			}
 		}
 			break;
 		case SCHLICK_TL_TK_PROJ_DPHI:
