@@ -500,9 +500,12 @@ int  params::dimension(params::input t)
 
 void params::print_input_params()
 {
+	std::cout << "List of available input parametrizations in the ALTA library:" << std::endl;
 	for(std::map<params::input, const param_info>::const_iterator it=input_map.begin(); it != input_map.end(); ++it)
 	{
-		std::cout << it->second.name << std::endl;
+		std::cout << "  - " << it->second.name;
+		for(int i=it->second.name.size(); i<26; ++i) { std::cout << " "; }
+		std::cout << it->second.info << std::endl;
 	}
 }
 

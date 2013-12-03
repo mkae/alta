@@ -65,6 +65,8 @@ int main(int argc, char** argv)
 		std::cout << "                         No output data plugin is specified. Please see " << std::endl;
 		std::cout << "                         --help-params for the list of available " << std::endl ;
 		std::cout << "                         parametrizations." << std::endl ;
+		std::cout << "  --data-correct-cosine  Divide the value of the data points by the product of" << std::endl;
+		std::cout << "                         the light and view vector dot product with the normal." << std::endl ;
 		return 0 ;
 	}
 	if(args.is_defined("help-params")) {

@@ -1,0 +1,20 @@
+/*!
+\page tutorials Tutorials
+
+<h2>Fitting using the command line</h2>
+
+The \a data2brdf allows to perform a fitting procedure by converting a \ref
+data object into a brdf object (also named \ref function).
+
+\verbatim
+   ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
+\endverbatim
+
+
+<h2>Moment analysis using the command line</h2>
+
+The \a data2moment allows to perform a moment analysis on a \ref data object.
+It can be useful to determine whether a given data correspond to a separable
+function along its different axis.
+
+*/

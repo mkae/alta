@@ -283,6 +283,24 @@ int main(int argc, char** argv)
 		std::cout << "<<RESULT>> moment xyyy: " << m_xyyy << std::endl;
 		std::cout << "<<RESULT>> moment yyyy: " << m_yyyy << std::endl;
 #endif
+
+		file << "\\mu_0 = " << m_0 << std::endl;
+		file << "\\mu_x = "  << m_x << std::endl;
+		file << "\\mu_y = "  << m_y << std::endl;
+		file << "\\mu_{xx} = "  << m_xx << std::endl;
+		file << "\\mu_{xy} = "  << m_xy << std::endl;
+		file << "\\mu_{yy} = "  << m_yy << std::endl;
+		file << "\\mu_{xxx} = "  << m_xxx << std::endl;
+		file << "\\mu_{xxy} = "  << m_xxy << std::endl;
+		file << "\\mu_{xyy} = "  << m_xyy << std::endl;
+		file << "\\mu_{yyy} = "  << m_yyy << std::endl;
+#ifdef NOT
+		file << "\\mu_{xxxx} = "  << m_xxxx << std::endl;
+		file << "\\mu_{xxxy} = "  << m_xxxy << std::endl;
+		file << "\\mu_{xxyy} = "  << m_xxyy << std::endl;
+		file << "\\mu_{xyyy} = "  << m_xyyy << std::endl;
+		file << "\\mu_{yyyy} = "  << m_yyyy << std::endl;
+#endif
 #else
 		// Options
 		bool with_cosine = args.is_defined("cosine");

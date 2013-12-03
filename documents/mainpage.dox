@@ -80,6 +80,8 @@ Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
 convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann
 distribution).
 
+You can find more examples of how to use ALTA on the \ref tutorials page.
+
 
 <h2>Contribute</h2>
 
