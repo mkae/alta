@@ -157,10 +157,21 @@ int main(int argc, char** argv)
 		int nb = 1;
 		for(int k=0; k<nX; ++k)
 		{
-			dt *= d->max()[k] - d->min()[k];
-			nb *= samples[k];
+			const double length = d->max()[k] - d->min()[k];
+
+			if(length > 0.0)
+			{
+				dt *= length;
+				nb *= samples[k];
+			}
+			else
+			{
+				samples[k] = 1;
+			}
 		}
+		std::cout << "<<DEBUG>> volume of the integration domain: " << dt << std::endl;
 		dt /= double(nb);
+		std::cout << "<<DEBUG>> volume of an integration step: " << dt << std::endl;
 		
 		// Set all values to zero
 		m_0  = vec::Zero(nY);

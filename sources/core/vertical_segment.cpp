@@ -27,6 +27,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	}
 
 	vec min, max ;
+	vec ymin, ymax;
 
 	_nX = 0 ; _nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
@@ -60,11 +61,16 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				min = args.get_vec("min", _nX, -std::numeric_limits<float>::max()) ;
 				max = args.get_vec("max", _nX,  std::numeric_limits<float>::max()) ;
 
+				ymin = args.get_vec("ymin", _nY, -std::numeric_limits<float>::max()) ;
+				ymax = args.get_vec("ymax", _nY,  std::numeric_limits<float>::max()) ;
+
+				/*
 				for(int k=0; k<dimX(); ++k)
 				{
 					_min[k] =  std::numeric_limits<double>::max() ;
 					_max[k] = -std::numeric_limits<double>::max() ;
 				}
+				*/
 			}
 			else if(comment == std::string("VS"))
 			{
@@ -169,6 +175,13 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			for(int i=0; i<dimX(); ++i)
 			{
 				if(v[i] < min[i] || v[i] > max[i])
+				{
+					is_in = false ;
+				}
+			}
+			for(int i=0; i<dimY(); ++i)
+			{
+				if(v[dimX()+i] < ymin[i] || v[dimX()+i] > ymax[i])
 				{
 					is_in = false ;
 				}
