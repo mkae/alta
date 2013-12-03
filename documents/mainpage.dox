@@ -17,7 +17,7 @@ ANR 11-BS02-006</a>, a research project on light transport analysis.
 
 <h3>Target audience</h3>
 You are working on BRDFs and you want to  <b>benchmark new BRDF models</b> and
-compare it with state-of-the-art BRDF models and data easily. You have working
+compare them with state-of-the-art BRDF models and data easily. You have working
 on optical measurements and you want <b>experiment different fitting procedures
 and models</b>, or just perform <b>statistical analysis</b> on your data.
 
@@ -37,10 +37,12 @@ To access the sources of ALTA, you can clone the mercurial repository:
 
 <h3>Build</h3>
 
-You can build ALTA using either QMake or Scons. To start, we advise to use
-Scons as it is lightweight and only requires Python to be installed (ALTA
-uses Python for its high level scripting mechanism). To build using scons, 
-go to the root directory of ALTA and type:
+You can build ALTA using either <a
+href="http://qt-project.org/downloads">QMake</a> or <a
+href="http://www.scons.org/">Scons</a>.  To start, we advise to use Scons as it
+is lightweight and only requires Python to be installed (ALTA uses Python for
+its high level scripting mechanism). To build using scons, go to the root
+directory of ALTA and type:
 \verbatim
    scons -i
 \endverbatim
