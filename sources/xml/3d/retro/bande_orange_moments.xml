@@ -15,29 +15,29 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
-		<output name="/tmp/3M_jaune_inc-15_retro.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
+		<output name="/tmp/Bande_orange_inc-15_retro.alta" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="RETRO_TL_TVL_PROJ_DPHI" />
 		<parameter name="min" value="[0.2, -2, -2]" />
 		<parameter name="max" value="[0.3,  2,  2]" />
-		<!--<parameter name="ymin" value="[5.0]" />-->
+		<!--<parameter name="ymin" value="[1.0]" />-->
 	</action>
 	
 	<!-- Compute the moments on the 15 degrees data slice -->
 	<action name="data2moments">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/3M_jaune_inc-15_retro.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-15_TVL.mnt" />
+		<input name="/tmp/Bande_orange_inc-15_retro.alta" />
+		<output name="./results/3d/retro/Bande_orange_inc-15_TVL.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
 
 		<!-- Parameters -->
 		<parameter name="dim" value="[1, 2]" />
-		<parameter name="samples" value="[1, 1000, 1000]" />
+		<parameter name="sampels" value="[1, 1000, 1000]" />
 	</action>
 
 
@@ -45,22 +45,22 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
-		<output name="/tmp/3M_jaune_inc-30_retro.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
+		<output name="/tmp/Bande_orange_inc-30_retro.alta" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="RETRO_TL_TVL_PROJ_DPHI" />
 		<parameter name="min" value="[0.3, -2, -2]" />
 		<parameter name="max" value="[0.8,  2,  2]" />
-		<!--<parameter name="ymin" value="[5.0]" />-->
+		<!--<parameter name="ymin" value="[1.0]" />-->
 	</action>
 	
 	<!-- Compute the moments on the 30 degrees data slice -->
 	<action name="data2moments">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/3M_jaune_inc-30_retro.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-30_TVL.mnt" />
+		<input name="/tmp/Bande_orange_inc-30_retro.alta" />
+		<output name="./results/3d/retro/Bande_orange_inc-30_TVL.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
@@ -75,22 +75,22 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
-		<output name="/tmp/3M_jaune_inc-60_retro.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
+		<output name="/tmp/Bande_orange_inc-60_retro.alta" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="RETRO_TL_TVL_PROJ_DPHI" />
 		<parameter name="min" value="[0.9, -2, -2]" />
 		<parameter name="max" value="[1.1,  2,  2]" />
-		<!--<parameter name="ymin" value="[5.0]" />-->
+		<!--<parameter name="ymin" value="[1.0]" />-->
 	</action>
 	
 	<!-- Compute the moments on the 60 degrees data slice -->
 	<action name="data2moments">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/3M_jaune_inc-60_retro.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-60_TVL.mnt" />
+		<input name="/tmp/Bande_orange_inc-60_retro.alta" />
+		<output name="./results/3d/retro/Bande_orange_inc-60_TVL.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
@@ -106,8 +106,8 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
-		<output name="/tmp/3M_jaune_inc-15.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
+		<output name="/tmp/Bande_orange_inc-15.alta" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
@@ -120,8 +120,8 @@
 	<action name="data2moments">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/3M_jaune_inc-15.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-15_TK.mnt" />
+		<input name="/tmp/Bande_orange_inc-15.alta" />
+		<output name="./results/3d/retro/Bande_orange_inc-15_TK.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
@@ -136,22 +136,22 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
-		<output name="/tmp/3M_jaune_inc-30.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
+		<output name="/tmp/Bande_orange_inc-30.alta" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
 		<parameter name="min" value="[0.5, -2, -2]" />
 		<parameter name="max" value="[0.6,  2,  2]" />
-		<!--<parameter name="ymin" value="[5.0]" />-->
+		<!--<parameter name="ymin" value="[1.0]" />-->
 	</action>
 	
 	<!-- Compute the moments on the 15 degrees data slice -->
 	<action name="data2moments">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/3M_jaune_inc-30.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-30_TK.mnt" />
+		<input name="/tmp/Bande_orange_inc-30.alta" />
+		<output name="./results/3d/retro/Bande_orange_inc-30_TK.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
@@ -166,22 +166,22 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
-		<output name="/tmp/3M_jaune_inc-60.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
+		<output name="/tmp/Bande_orange_inc-60.alta" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
 		<parameter name="min" value="[0.9, -2, -2]" />
 		<parameter name="max" value="[1.1,  2,  2]" />
-		<!--<parameter name="ymin" value="[5.0]" />-->
+		<!--<parameter name="ymin" value="[1.0]" />-->
 	</action>
 	
 	<!-- Compute the moments on the 15 degrees data slice -->
 	<action name="data2moments">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/3M_jaune_inc-60.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-60_TK.mnt" />
+		<input name="/tmp/Bande_orange_inc-60.alta" />
+		<output name="./results/3d/retro/Bande_orange_inc-60_TK.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
