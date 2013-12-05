@@ -29,7 +29,7 @@
 
 		<!-- Input and output arguments of the action -->
 		<input name="/tmp/3M_jaune_inc-15_retro.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-15.mnt" />
+		<output name="./results/3d/retro/3M_jaune_inc-15_TVL.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
@@ -58,7 +58,7 @@
 
 		<!-- Input and output arguments of the action -->
 		<input name="/tmp/3M_jaune_inc-30_retro.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-30.mnt" />
+		<output name="./results/3d/retro/3M_jaune_inc-30_TVL.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
@@ -87,7 +87,7 @@
 
 		<!-- Input and output arguments of the action -->
 		<input name="/tmp/3M_jaune_inc-60_retro.alta" />
-		<output name="./results/3d/retro/3M_jaune_inc-60.mnt" />
+		<output name="./results/3d/retro/3M_jaune_inc-60_TVL.mnt" />
 
 		<!-- Define the data interpolant to use -->
 		<plugin type="data" name="data_interpolant" />
