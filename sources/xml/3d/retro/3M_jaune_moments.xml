@@ -15,7 +15,7 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="/tmp/3M_jaune_inc-15_retro.alta" />
 
 		<!-- Parameters -->
@@ -45,7 +45,7 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="/tmp/3M_jaune_inc-30_retro.alta" />
 
 		<!-- Parameters -->
@@ -75,7 +75,7 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="/tmp/3M_jaune_inc-60_retro.alta" />
 
 		<!-- Parameters -->
@@ -106,7 +106,7 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="/tmp/3M_jaune_inc-15.alta" />
 
 		<!-- Parameters -->
@@ -136,7 +136,7 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="/tmp/3M_jaune_inc-30.alta" />
 
 		<!-- Parameters -->
@@ -166,7 +166,7 @@
 	<action name="data2data">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__brdf_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="/tmp/3M_jaune_inc-60.alta" />
 
 		<!-- Parameters -->
