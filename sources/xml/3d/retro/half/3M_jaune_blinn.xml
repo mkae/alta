@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<alta>
+	<!-- This script file compute the fitting of the retro-reflecting materials 
+		  present in the ALTA library. This script file should be executed in 
+        the sources directory of repository as all directories are relative.
+
+		  It is also necessary to create a results/3d/retro directory to store 
+        the resulting fits and exports to BRDF-explorer and matlab.
+   -->
+	<configuration>
+		<parameter name="lib-dir" value="./build" />
+	</configuration>
+
+	<!-- Fitting the lobe using a back parametrization:
+		  The ABC model uses the dot product between the back and the
+	     normal vectors.
+	-->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe.alta" />
+		<output name="./results/3d/retro/half/3M_jaune_blinn_back.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_retroblinn">
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+		<!-- Parameters -->
+		<parameter name="min" value="[0.1, -2, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+	</action>
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe.alta" />
+		<output name="./results/3d/retro/half/3M_jaune_blinn_back.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_retroblinn">
+			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+		<!-- Parameters -->
+		<parameter name="min" value="[0.1, -2, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="bootstrap" value="./results/3d/retro/half/3M_jaune_blinn_back.brdf" />
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/3d/retro/half/3M_jaune_blinn_back.brdf" />
+		<output name="./results/3d/retro/half/3M_jaune_blinn_back.dat" />
+
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		
+		<parameter name="min" value="[0.1, -2, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+	</action>
+
+
+
+
+	<!-- Fitting the lobe using a retro parametrization:
+		  The ABC model uses the dot product between the light and the
+	     view vectors.
+	-->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe.alta" />
+		<output name="./results/3d/retro/half/3M_jaune_blinn_retro.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_retroblinn">
+			<parameter name="retro" value="" />
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+		<!-- Parameters -->
+		<parameter name="min" value="[0.1, -2, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+	</action>
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe.alta" />
+		<output name="./results/3d/retro/half/3M_jaune_blinn_retro.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_retroblinn">
+			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>
+			<parameter name="retro" value="" />
+		</function>
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+		<!-- Parameters -->
+		<parameter name="min" value="[0.1, -2, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="bootstrap" value="./results/3d/retro/half/3M_jaune_blinn_retro.brdf" />
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/3d/retro/half/3M_jaune_blinn_retro.brdf" />
+		<output name="./results/3d/retro/half/3M_jaune_blinn_retro.dat" />
+
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		
+		<parameter name="min" value="[0.1, -2, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+	</action>
+</alta>
