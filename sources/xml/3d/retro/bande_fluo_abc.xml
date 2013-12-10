@@ -11,12 +11,12 @@
 		<parameter name="lib-dir" value="./build" />
 	</configuration>
 
-	<!-- Fit the data to a Blinn BRDF model -->
+	<!-- Fit the data to a ABC BRDF model -->
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
-		<output name="./results/3d/retro/3M_jaune_abc.brdf" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -28,13 +28,13 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.3,  0,  2]" />
+		<parameter name="max" value="[1.7,  0,  2]" />
 	</action>
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
-		<output name="./results/3d/retro/3M_jaune_abc.brdf" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -49,7 +49,7 @@
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  0,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc.brdf" />
+		<parameter name="bootstrap" value="./results/3d/retro/Bande_fluo_grise_abc.brdf" />
 	</action>
 
 
@@ -60,8 +60,8 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
-		<output name="./results/3d/retro/3M_jaune_abc_back.brdf" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc_back.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -77,15 +77,15 @@
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
 
 		<!-- Parameters -->
-		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.3,  2,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc.brdf" />
+		<parameter name="min" value="[0.1,  0, -2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="bootstrap" value="./results/3d/retro/Bande_fluo_grise_abc.brdf" />
 	</action>
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
-		<output name="./results/3d/retro/3M_jaune_abc_back.brdf" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc_back.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -104,17 +104,17 @@
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc_back.brdf" />
+		<parameter name="bootstrap" value="./results/3d/retro/Bande_fluo_grise_abc_back.brdf" />
 	</action>
 	
 	<!-- Export the fit -->
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/3M_jaune_abc_back.brdf" />
-		<output name="./results/3d/retro/3M_jaune_abc_back.dat" />
+		<input  name="./results/3d/retro/Bande_fluo_grise_abc_back.brdf" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc_back.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
@@ -130,8 +130,8 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
-		<output name="./results/3d/retro/3M_jaune_abc_retro.brdf" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc_retro.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -148,14 +148,14 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.3,  2,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc.brdf" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="bootstrap" value="./results/3d/retro/Bande_fluo_grise_abc.brdf" />
 	</action>
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
-		<output name="./results/3d/retro/3M_jaune_abc_retro.brdf" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc_retro.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -174,17 +174,17 @@
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/3M_jaune_abc_retro.brdf" />
+		<parameter name="bootstrap" value="./results/3d/retro/Bande_fluo_grise_abc_retro.brdf" />
 	</action>
 	
 	<!-- Export the fit -->
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/3M_jaune_abc_retro.brdf" />
-		<output name="./results/3d/retro/3M_jaune_abc_retro.dat" />
+		<input  name="./results/3d/retro/Bande_fluo_grise_abc_retro.brdf" />
+		<output name="./results/3d/retro/Bande_fluo_grise_abc_retro.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_BRDF_dense__nbsgrid_162.alta" />
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
