@@ -17,7 +17,7 @@
 
 		<!-- Input and output arguments of the action -->
 		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
-		<output name="./results/3d/retro/half/Bande_orange_laf_back.brdf" />
+		<output name="./results/3d/retro/half/Bande_orange_laf.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
@@ -38,8 +38,8 @@
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/half/Bande_orange_laf_back.brdf" />
-		<output name="./results/3d/retro/half/Bande_orange_laf_back.dat" />
+		<input  name="./results/3d/retro/half/Bande_orange_laf.brdf" />
+		<output name="./results/3d/retro/half/Bande_orange_laf.dat" />
 
 		<parameter name="data" value="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
 		
