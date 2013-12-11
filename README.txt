@@ -34,9 +34,9 @@ Dependencies:
  Plugin rational_parallel:  The OpenMP library, Quadprog++ library and Eigen
  Plugin rational_matlab:    Matlab engine (matlab.prf required)
  Plugin nonlinear_eigen:    Eigen
- Plugin nonlinear_ceres:    CERES library and its dependancies
- Plugin nonlinear_nlopt:    NLOpt library and its dependancies
- Plugin nonlinear_ipopt:    IpOpt library and its dependancies
+ Plugin nonlinear_ceres:    CERES library and its dependencies
+ Plugin nonlinear_nlopt:    NLOpt library and its dependencies
+ Plugin nonlinear_ipopt:    IpOpt library and its dependencies
 
 Eigen Plugins
  You must provide an eigen.prf file that contains

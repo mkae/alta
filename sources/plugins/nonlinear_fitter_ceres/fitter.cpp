@@ -52,7 +52,7 @@ class CeresFunctor : public ceres::CostFunction
 			}
 
 			// Should add the resulting vector completely
-			vec _y = _di - (*_f)(_xi);
+			vec _y = _di - _f->value(_xi);
 			for(int i=0; i<_f->dimY(); ++i)
 			{
 				y[i] = _y[i];
@@ -90,77 +90,6 @@ class CeresFunctor : public ceres::CostFunction
 
 		const vec _xi;
 		nonlinear_function* _f;
-};
-
-/*! \brief A CostFunction to fit one color channel at a time.
- *
- *  \details This forces the functions to have a full formulation. All the
- *  parameters need to have a value per color channel.
- */
-class ColorChannelCost : public ceres::CostFunction
-{
-    public:
-    ColorChannelCost(nonlinear_function* f, const vec xi, int j) : _f(f), _xi(xi), _j(j)
-        {
-            // The function should be set 1D prior to this call
-            assert(f->dimY() == 1);
-
-            set_num_residuals(1);
-            mutable_parameter_block_sizes()->push_back(f->nbParameters());
-        }
-
-        virtual bool Evaluate(double const* const* x, double* y, double** dy) const
-        {
-            // Check that the parameters used are within the bounds defined
-            // by the function
-            vec p_min = _f->getParametersMin();
-            vec p_max = _f->getParametersMax();
-            for(int i=0; i<_f->nbParameters(); ++i)
-            {
-                if(x[0][i] < p_min[i] || x[0][i] > p_max[i])
-                {
-                    return false;
-                }
-            }
-
-            // Update the parameters vector
-            vec _p(_f->nbParameters());
-            for(int i=0; i<_f->nbParameters(); ++i) { _p[i] = x[0][i]; }
-            _f->setParameters(_p);
-
-            double _di = _xi[_f->dimX() + _j];
-
-            // Should add the resulting vector completely
-            y[0] = _di - (*_f)(_xi)[0];
-
-            if(dy != NULL)
-            {
-                df(dy);
-            }
-
-            return true;
-        }
-
-        // The parameter of the function _f should be set prior to this function
-        // call. If not it will produce undesirable results.
-        virtual void df(double ** fjac) const
-        {
-            // Get the jacobian of the function at position x_i for the current
-            // set of parameters (set prior to function call)
-            vec _jac = _f->parametersJacobian(_xi);
-
-            // Fill the columns of the matrix
-            for(int j=0; j<_f->nbParameters(); ++j)
-            {
-                fjac[0][j] = -_jac[j];
-            }
-        }
-
-    protected:
-
-        const vec _xi;
-        int _j;
-        nonlinear_function* _f;
 };
 
 nonlinear_fitter_ceres::nonlinear_fitter_ceres() 

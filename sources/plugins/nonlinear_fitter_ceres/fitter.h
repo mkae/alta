@@ -67,14 +67,6 @@ class nonlinear_fitter_ceres: public fitter
 		//
 		virtual void set_parameters(const arguments& args) ;
 
-	protected: // function
-#ifdef FIT_CHANNELS
-        // Fit a single color channel from the data
-        //
-        virtual bool fit_channel(const data*, nonlinear_function* fit,
-                                 const arguments& args) ;
-#endif
-
 	protected: // data
 
         // Fitter options
