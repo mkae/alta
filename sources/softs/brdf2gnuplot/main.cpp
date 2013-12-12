@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 		std::cout << "  --inc-angle [float] set the incoming light elevation in radian for the polar" << std::endl;
 		std::cout << "                      plot export." << std::endl;
 		std::cout << "  --samples [int]     set the points used for the polar plot export." << std::endl;
+		std::cout << "  --cos-plot          export the BRDF*cosine instead of the BRDF alone." << std::endl;
 		return 0;
 	}
 	
@@ -47,10 +48,20 @@ int main(int argc, char** argv)
 
 	// Load a function file
 	function* f = plugins_manager::get_function(args["input"]) ;
+	if(f == NULL)
+	{
+		return 1;
+	}
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 	file.precision(10);
+
+	// Should I export a BRDF or BRDF*cos ?
+	// Cannot export a cosine term if no parametrization is defined for the
+	// input function
+	const bool cos_plot = args.is_defined("cos-plot") && f->input_parametrization() != params::UNKNOWN_INPUT;
+
 
 	// Load a data file
 	data* d = NULL ;
@@ -88,6 +99,7 @@ int main(int argc, char** argv)
 				vec v = d->get(i) ;
 				vec x(f->dimX());
 
+				// Convert the data to the function's input space.
 				if(f->input_parametrization() == params::UNKNOWN_INPUT)
 				{
 					memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
@@ -97,7 +109,18 @@ int main(int argc, char** argv)
 					params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
 				}
 
-				vec y2 = f->value(x) ;
+				// Evaluate the function. I can add the cosine term to the BRDF
+				// value.
+				double costerm = 1.0;
+				if(cos_plot) 
+				{
+					double cart[6];
+					params::convert(&x[0], f->input_parametrization(), params::CARTESIAN, cart);
+					costerm = cart[5]*cart[2];
+				}
+				vec y2 = costerm * f->value(x) ;
+
+
 				if(!linear_plot)
 				{
 					for(int u=0; u<d->dimX(); ++u)

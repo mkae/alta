@@ -160,9 +160,9 @@ vec diffuse_function::parametersJacobian(const vec& x) const
 
 
 void diffuse_function::bootstrap(const data* d, const arguments& args)
-{/*
+{
 	// Set the diffuse component
-	if(params::is_cosine_weighted(d->output_parametrization()))
+	if(params::is_cosine_weighted(d->output_parametrization()) || args.is_defined("cos-fit"))
 	{
 		vec cart(6);
 
@@ -185,7 +185,6 @@ void diffuse_function::bootstrap(const data* d, const arguments& args)
 		}
 	}
 	else
-		*/
 	{
 		for(int i=0; i<d->dimY(); ++i)
 			_kd[i] = std::numeric_limits<double>::max();

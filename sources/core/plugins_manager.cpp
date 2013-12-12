@@ -205,7 +205,7 @@ function* plugins_manager::get_function(const std::string& filename)
 	if(!file.is_open())
 	{
 		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw ;
+		return NULL;
 	}
 
 	// Set the precision of the input

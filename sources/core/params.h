@@ -123,7 +123,7 @@ class params
 		  //! type.
 		  //! \todo Finish this implementation. It requires another static
 		  //! object.
-		  static std::string get_name(const params::output param)
+		  static std::string get_name(const params::output)
 		  {
 			  return std::string("UNKNOWN_OUTPUT");
 		  }

@@ -20,7 +20,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 class CeresFunctor : public ceres::CostFunction
 {
 	public:
-		CeresFunctor(nonlinear_function* f, const vec xi) : _f(f), _xi(xi)
+		CeresFunctor(nonlinear_function* f, const vec& xi, bool cos_fit = false) : _f(f), _xi(xi), _cos_fit(cos_fit)
 		{
 			set_num_residuals(f->dimY());
 			mutable_parameter_block_sizes()->push_back(f->nbParameters());
@@ -52,6 +52,13 @@ class CeresFunctor : public ceres::CostFunction
 			}
 
 			// Should add the resulting vector completely
+			double costerm = 1.0;
+			if(_cos_fit) 
+			{
+				double _x[6];
+				params::convert(&_xi[0], _f->input_parametrization(), params::CARTESIAN, _x);
+				costerm = _x[5]*_x[2];
+			}
 			vec _y = _di - _f->value(_xi);
 			for(int i=0; i<_f->dimY(); ++i)
 			{
@@ -88,6 +95,7 @@ class CeresFunctor : public ceres::CostFunction
 
 	protected:
 
+		bool _cos_fit;
 		const vec _xi;
 		nonlinear_function* _f;
 };
@@ -116,6 +124,8 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
     }
     nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
 
+	 // Should I include the cosine term during the fit ?
+	 const bool cos_fit = args.is_defined("cos-fit");
 
 #ifndef DEBUG
 	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
@@ -124,97 +134,37 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 	 {
 		 return true;
 	 }
-#ifdef FIT_CHANNELS
-     if(args.is_defined("ceres-channels"))
-     {
-         std::cout << "<<WARNING>> will fit the output dimensions separately" << std::endl;
-         std::cout << "<<WARNING>> make sur the function is separable." << std::endl;
-         return fit_channel(d, nf, args);
-     }
-     else
-#endif
-     {
-         /* Bootstrap the function */
-         nf->bootstrap(d, args);
 
-         /* the following starting values provide a rough fit. */
-         vec p = nf->parameters();
+	 /* Bootstrap the function */
+	 nf->bootstrap(d, args);
 
-			std::cout << "<<DEBUG>> Starting vector: " << p << std::endl;
-			std::cout << "<<DEBUG>> Final vector should be between " << nf->getParametersMin() << " and " << nf->getParametersMax() << std::endl;
+	 /* the following starting values provide a rough fit. */
+	 vec p = nf->parameters();
 
-         // Create the problem
-         ceres::Problem problem;
-         for(int i=0; i<d->size(); ++i)
-         {
-             vec xi = d->get(i);
-             problem.AddResidualBlock(new CeresFunctor(nf, xi), NULL, &p[0]);
-         }
+	 std::cout << "<<DEBUG>> Starting vector: " << p << std::endl;
+	 std::cout << "<<DEBUG>> Final vector should be between " << nf->getParametersMin() << " and " << nf->getParametersMax() << std::endl;
 
-         // Solves the NL problem
-         ceres::Solver::Summary summary;
-         ceres::Solve(options, &problem, &summary);
+	 // Create the problem
+	 ceres::Problem problem;
+	 for(int i=0; i<d->size(); ++i)
+	 {
+		 vec xi = d->get(i);
+		 problem.AddResidualBlock(new CeresFunctor(nf, xi, cos_fit), NULL, &p[0]);
+	 }
+
+	 // Solves the NL problem
+	 ceres::Solver::Summary summary;
+	 ceres::Solve(options, &problem, &summary);
 
 
 #ifdef DEBUG
-         std::cout << summary.BriefReport() << std::endl;
+	 std::cout << summary.BriefReport() << std::endl;
 #endif
-         std::cout << "<<INFO>> found parameters: " << p << std::endl;
+	 std::cout << "<<INFO>> found parameters: " << p << std::endl;
 
-         nf->setParameters(p);
-         return true;
-     }
+	 nf->setParameters(p);
+	 return true;
 }
-
-#ifdef FIT_CHANNELS
-bool nonlinear_fitter_ceres::fit_channel(const data* d, nonlinear_function* nf,
-                                         const arguments& args)
-{
-    /* the following starting values provide a rough fit. */
-    vec p = nf->parameters();
-
-    // Convert the current function to monochromatic
-    nf->setDimY(1);
-
-
-    for(int c=0; c<d->dimY(); ++c)
-    {
-        nf->bootstrap(d, args);
-
-        // Temp parameter vector
-        vec temp_p = nf->parameters();
-
-        // Create the problem
-        ceres::Problem problem;
-        for(int i=0; i<d->size(); ++i)
-        {
-            vec xi = d->get(i);
-            problem.AddResidualBlock(new ColorChannelCost(nf, xi, c), NULL, &temp_p[0]);
-        }
-
-        // Solves the NL problem
-        ceres::Solver::Summary summary;
-        ceres::Solve(options, &problem, &summary);
-
-#ifdef DEBUG
-        std::cout << summary.BriefReport() << std::endl;
-#endif
-
-        // Update the resulting parameter vector
-        for(int i=0; i<nf->nbParameters(); ++i)
-        {
-            p[c*nf->nbParameters() + i] = temp_p[i];
-        }
-    }
-
-    std::cout << "<<INFO>> found parameters: " << p << std::endl;
-    nf->setDimY(d->dimY());
-    nf->setParameters(p);
-
-    return true;
-}
-#endif
-
 
 void nonlinear_fitter_ceres::set_parameters(const arguments& args)
 {
