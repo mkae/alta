@@ -471,7 +471,7 @@ void lafortune_function::save_body(std::ostream& out, const arguments& args) con
 {
     out << "vec3 lafortune(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 Cx, vec3 Cy, vec3 Cz, vec3 Nl)" << std::endl;
     out << "{" << std::endl;
-    out << "\tvec3 ext_dot = Cx * dot(L,X)*dot(V,X + Cy * dot(L,Y)*dot(V,Y) + Cz * dot(L,N)*dot(V,N);" << std::endl;
+    out << "\tvec3 ext_dot = Cx * dot(L,X)*dot(V,X) + Cy * dot(L,Y)*dot(V,Y) + Cz * dot(L,N)*dot(V,N);" << std::endl;
     out << "\treturn pow(max(ext_dot, vec3(0,0,0)), Nl);" << std::endl;
     out << "}" << std::endl;
     out << std::endl;

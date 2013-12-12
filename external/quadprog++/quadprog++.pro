@@ -5,7 +5,7 @@ CONFIG         *= static  \
                   plugin  \
                   eigen
 
-DESTDIR         = ../../build
+DESTDIR         = ../build/lib
  
 INCLUDEPATH    += ../.. 
 
