@@ -31,18 +31,18 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="max" value="[0.3,  2,  2]" />
 	</action>
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>
+			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>-->
 		</function>
 
 		<!-- Define the ftting procedure to use -->
@@ -50,8 +50,9 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[1.7,  2,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />
+		<parameter name="max" value="[0.3,  2,  2]" />
+		<!--<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />-->
+		<parameter name="cos-fit" value="" />
 	</action>
 	
 	<!-- Export the fit -->
@@ -61,10 +62,12 @@
 		<input  name="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />
 		<output name="./results/3d/retro/half/Bande_fluo_beck_back.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		<!--<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />-->
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="cos-plot" value="" />
 	</action>
 
 
@@ -96,13 +99,13 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		<input name="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />
 		<output name="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>
+			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>-->
 			<parameter name="retro" value="" />
 		</function>
 
@@ -111,8 +114,9 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[1.7,  2,  2]" />
-		<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />
+		<parameter name="max" value="[0.3,  2,  2]" />
+		<!--<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />-->
+		<parameter name="cos-fit" value="" />
 	</action>
 	
 	<!-- Export the fit -->
@@ -122,9 +126,11 @@
 		<input  name="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />
 		<output name="./results/3d/retro/half/Bande_fluo_beck_retro.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		<!--<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />-->
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="cos-plot" value="" />
 	</action>
 </alta>

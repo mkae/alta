@@ -1,6 +1,7 @@
 TARGET          = rational_fitter_parallel
 TEMPLATE        = lib
-CONFIG         *= eigen      \
+CONFIG         *= plugin     \
+						eigen      \
 						quadprog   \
 						openmp
 
