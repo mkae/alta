@@ -18,6 +18,7 @@ SUBDIRS  = \
 				nonlinear_fresnel_normalized_schlick	\
 				nonlinear_fresnel_retroschlick			\
 				nonlinear_shadowing_smith					\
+				nonlinear_shadowing_schlick				\
 				nonlinear_function_diffuse					\
 #				nonlinear_function_microfacets			\
 				nonlinear_function_abc						\
