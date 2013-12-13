@@ -3,6 +3,11 @@ import os
 env = Environment()
 
 ##
+#   NlOpt dependancies
+##
+execfile('obtain_nlopt.py')
+
+##
 #   CERES dependancies
 ##
 execfile('obtain_ceres.py')
