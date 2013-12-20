@@ -3,6 +3,7 @@
 
 <h2>Fitting using the command line</h2>
 
+<h3>Rational interpolation</h3>
 The \a data2brdf allows to perform a fitting procedure by converting a \ref
 data object into a brdf object (also named \ref function).
 
@@ -10,6 +11,15 @@ data object into a brdf object (also named \ref function).
    ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
+<h3>Non-linear fitting</h3>
+In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/">CERES</a> nonlinear fitter to approximate the
+blue metallic paint from the <a href="http://www.merl.com/brdf/">MERL database</a> using a Lafortune lobe (Note that we do not provide the data in ALTA package, you will have to download it). The resulting BRDF is exported in a shader format compatible with BRDF Explorer.
+
+\verbatim
+   ./build/data2brdf --data ./build/libdata_merl.so --input ../data/3d/merl/blue-metallic-paint.binary --output blue-met.brdf --fitter ./build/libnonlinear_fitter_ceres.so --func ./build/libnonlinear_function_lafortune.so  --export explorer
+\endverbatim
+
+This command line is rather long. To help you design complex command line in a more intuitive way, ALTA comes with a python script that creates command lines from XML files (see \ref format for an example).
 
 <h2>Moment analysis using the command line</h2>
 

@@ -11,7 +11,9 @@
 #include <core/common.h>
 
 
-/*! \brief A diffuse component class.
+/*!
+ * \ingroup functions
+ * \brief A Lambertian component class.
  */
 class diffuse_function : public nonlinear_function
 {

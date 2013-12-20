@@ -11,7 +11,9 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A spherical Gaussian lobe class.
+/*! 
+ *  \ingroup functions
+ *  \brief Ward's anisotropic BRDF model.
  *
  *  \details
  *  A ward lobe is defined as \f${k_s \over 4 \pi \alpha_x \alpha_y 

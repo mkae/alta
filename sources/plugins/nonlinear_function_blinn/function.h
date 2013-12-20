@@ -11,7 +11,9 @@
 #include <core/common.h>
 
 
-/*! \brief A blinn lobe class. It is provided for testing with the nonlinear
+/*! 
+ *  \ingroup functions
+ *	 \brief A blinn lobe class. It is provided for testing with the nonlinear
  *  fitting algorithms.
  *
  *  \details

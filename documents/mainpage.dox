@@ -2,8 +2,9 @@
 \mainpage A BRDF analysis library 
 
 <center style="color:red">
-We have not released ALTA yet, you will not have access to source code and
-data. They will be shipped afterwards. This page was generated automatically
+We have not released ALTA yet, we are currently in an alpha stage.
+You can <a href="contacts.html">contact us</a> to acces the current version of our code, or to get more information about its features.
+This page was generated automatically
 using doxygen. Consequently, you could experience broken links.
 </center>
 
@@ -20,6 +21,16 @@ You are working on BRDFs and you want to  <b>benchmark new BRDF models</b> and
 compare them with state-of-the-art BRDF models and data easily. You have working
 on optical measurements and you want <b>experiment different fitting procedures
 and models</b>, or just perform <b>statistical analysis</b> on your data.
+
+<h3>Features</h3>
+
+<ul>
+	<li>Open common BRDF data formats (MERL, ASTM)</li>
+	<li>Non-linear fitting of BRDF (using third party packages)</li>
+	<li>Rational interpolation</li>
+	<li>Analytic BRDF models (see \ref functions)</li>
+	<li>Scripting mechanism to automatize fitting</li>
+</ul>
 
 <h3>Sample results</h3>
 
@@ -96,4 +107,5 @@ There are many ways in which you can extend ALTA. Please refer to
 \defgroup commands
 \defgroup plugins
 \defgroup softs
+\defgroup functions
 */

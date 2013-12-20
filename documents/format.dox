@@ -16,12 +16,11 @@ Each file starts with a header containing :
 
 <h3>Input Parametrization</h3>
 
-Param toujours de la forme NOMDUTYPE_PARAM1_PARAM2_..._PARAMN ou N est le nombre
-de dimensions d'entree.
+ALTA can automaticaly convert samples (either data sample or BRDF 
+evaluation) into a different coordinate system. Here is a non-complete
+list of possible parametrizations:
 
 \verbatim
-enum{
-	ROMEIRO_TH_TD,
 	RUSIN_TH_PH_TD,
 	RUSIN_TH_TD_PD,
 	RUSIN_TH_PH_TD_PD,
@@ -29,18 +28,14 @@ enum{
 	ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
 	CARTESIAN, // 6D (directions: 3d + 3d)
 	SPHERICAL_TL_PL_TV_PV
-	 INCIDENT_PLANT,  // Cf. CEA definition
-}
 \endverbatim
 
 <h3> Output Parametrization </h3>
 
- Romain's Proposition  
- RGB_COLOR
- XYZ_COLOR
- INV_STERADIAN
- ENERGY   ( as specified by the International Unit System i.e., Joule)
- LUMINANCE
+In the current version of ALTA, we cannot handle different output 
+parametrizations (like LAB color space). Fitting will be performed
+independantly of the data and function output space. They only need
+to match in size.
 
 <h2>Input file format</h2>
 
@@ -64,14 +59,13 @@ Vertical segments are not defined if VS is 0. For a VS of 1, each sample as a ra
 
 
 
-<h2>Function file format (.function)</h2>
+<h2>Function file format</h2>
 
-We advise to output function file into <em>.function</em> file for consistency.
 ALTA library assumes that all functions are exported using the following convention:
 
 <ul>
-	<li>The .function file is outputed in plain text and not in binary.</li>
-	<li>The .function file starts with a header. Each line of the header 
+	<li>The *.function file is outputed in plain text and not in binary.</li>
+	<li>The *.function file starts with a header. Each line of the header 
 	starts with the character '#'.</li>
 	<li>The header contains the command line used to create the function
 	in a <em>#CMD ...</em> line.
@@ -79,12 +73,12 @@ ALTA library assumes that all functions are exported using the following convent
 	are enumerated in the file, one color channel by one.</li>
 </ul>
 
-Example of a .function file for a single Lafortune lobe without any diffuse:
+Example of a *.function file for a single Lafortune lobe without any diffuse:
 \verbatim
    #ALTA_HEADER_DATA
    #CMD lafortune --nb_lobes 1 --isotrope
    #DIM 2 1
-   #PARAM_IN  ROMEIRO_TH_TD
+   #PARAM_IN  CARTESIAN
    #PARAM_OUT ENERGY
    #ALTA_HEADER_END
 
@@ -101,14 +95,14 @@ into the file:
    #ALTA_HEADER_FUNC
    #CMD [diffuse, lafortune --nb_lobes 1 --isotrope, phong --fresnel schlick]
    #DIM 2 3
-   #PARAM_IN  ROMEIRO_TH_TD
+   #PARAM_IN  CARTESIAN
    #PARAM_OUT RGB_COLOR
    #ALTA_HEADER_END
 
    #FUNC diffuse 
    kd 1.0
    kd 0.02
-   kd 0.1
+   kd 0.1We advise to output function file into <em>.function</em> file for consistency.
 
    #FUNC lafortune
    Cx 1.0

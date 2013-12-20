@@ -15,7 +15,9 @@
 //#define ADAPT_TO_PARAM
 //#define FIT_DIFFUSE
 
-/*! \brief A lafortune lobe class. It is provided for testing with the nonlinear
+/*! 
+ *  \ingroup functions
+ *  \brief A lafortune lobe class. It is provided for testing with the nonlinear
  *  fitting algorithms.
  *
  *  \details

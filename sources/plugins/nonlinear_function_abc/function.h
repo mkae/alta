@@ -11,7 +11,9 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief  The ABC brdf model.
+/*!
+ * \ingroup functions
+ *	\brief  The ABC distribution for micro-facets models.
  *  \details
  *  Follows the implementation of Löw <i>et al.</i> [2012].
  *

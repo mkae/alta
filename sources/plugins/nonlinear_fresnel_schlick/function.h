@@ -12,6 +12,10 @@
 #include <core/common.h>
 
 
+/*!
+ * \ingroup functions
+ *	\brief Schlick's rational approximation of the Fresnel term.
+ */
 class schlick : public nonlinear_function//fresnel
 {
 

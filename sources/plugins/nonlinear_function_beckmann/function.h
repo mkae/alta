@@ -11,8 +11,9 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A Microfacet model using a Gaussian distribution for the
- *  micro-gemeotry distribution parametrized by the half-angle.
+/*!
+ * \ingroup functions
+ * \brief A Gaussian distribution for micro-facets models.
  *
  *  \details
  *

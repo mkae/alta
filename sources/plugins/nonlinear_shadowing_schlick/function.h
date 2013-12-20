@@ -12,6 +12,10 @@
 #include <core/common.h>
 
 
+/*!
+ * \ingroup functions
+ *	\brief Schlick's rational approximation of the Masking term.
+ */
 class schlick : public nonlinear_function//fresnel
 {
 
