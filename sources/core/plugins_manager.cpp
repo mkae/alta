@@ -228,6 +228,7 @@ function* plugins_manager::get_function(const std::string& filename)
 	while(line != "#ALTA HEADER END")
 	{
 		std::getline(file, line) ;
+		std::cout << line << std::endl;
 		std::stringstream linestream(line) ;
 
 		linestream.ignore(1) ;
@@ -240,7 +241,7 @@ function* plugins_manager::get_function(const std::string& filename)
 			linestream >> nX >> nY ;
 		}
 		else if(comment == std::string("CMD"))
-        {
+      {
 			args = arguments::create_arguments(line.substr(4, std::string::npos));
 		}
 	}

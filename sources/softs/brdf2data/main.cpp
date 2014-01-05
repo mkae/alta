@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
 	// Get the function file
 	function* f = NULL;
-	f = plugins_manager::get_function(args);
+	f = plugins_manager::get_function(args["input"]);
 	if(f == NULL)
 	{
 		return 1;
