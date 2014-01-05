@@ -11,11 +11,11 @@
 
 ALTA_DLL_EXPORT function* provide_function()
 {
-	return new schlick();
+	return new schlick_masking();
 }
 
 //! Load function specific files
-bool schlick::load(std::istream& in)
+bool schlick_masking::load(std::istream& in)
 {
 //    fresnel::load(in);
 
@@ -31,7 +31,7 @@ bool schlick::load(std::istream& in)
 			  return false;
     }
 
-    // Checking for the comment line #FUNC nonlinear_fresnel_schlick
+    // Checking for the comment line #FUNC nonlinear_fresnel_schlick_masking
     std::string token;
     in >> token;
     if(token != "#FUNC")
@@ -41,7 +41,7 @@ bool schlick::load(std::istream& in)
     }
 
     in >> token;
-    if(token != "nonlinear_fresnel_schlick")
+    if(token != "nonlinear_masking_schlick")
     {
         std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl;
         return false;
@@ -55,13 +55,13 @@ bool schlick::load(std::istream& in)
     return true;
 }
 
-void schlick::save_call(std::ostream& out, const arguments& args) const
+void schlick_masking::save_call(std::ostream& out, const arguments& args) const
 {
     bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
 
     if(is_alta)
     {
-        out << "#FUNC nonlinear_shadowing_schlick" << std::endl ;
+        out << "#FUNC nonlinear_masking_schlick" << std::endl ;
         for(int i=0; i<dimY(); ++i)
         {
             out << "K " << w[i] << std::endl;
@@ -70,7 +70,7 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
     }
     else
     {
-        out << "shadowing_schlick(L, V, N, X, Y, vec3";
+        out << "masking_schlick(L, V, N, X, Y, vec3";
         for(int i=0; i<dimY(); ++i)
         {
             out << w[i];
@@ -80,14 +80,14 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
     }
 }
 
-void schlick::save_body(std::ostream& out, const arguments& args) const
+void schlick_masking::save_body(std::ostream& out, const arguments& args) const
 {
     bool is_shader = args["export"] == "shader" || args["export"] == "explorer";
 
     if(is_shader)
     {
         out << std::endl;
-        out << "vec3 shadowing_schlick(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 K)" << std::endl;
+        out << "vec3 masking_schlick(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 K)" << std::endl;
         out << "{" << std::endl;
         out << "\tconst float dotLN = dot(L, N);" << std::endl;
         out << "\tconst float dotVN = dot(L, N);" << std::endl;
@@ -102,7 +102,7 @@ void schlick::save_body(std::ostream& out, const arguments& args) const
 
 }
 
-vec schlick::value(const vec& x) const
+vec schlick_masking::value(const vec& x) const
 {
 	vec res(dimY());
 	const double u = x[5];
@@ -118,12 +118,12 @@ vec schlick::value(const vec& x) const
 }
 
 //! \brief Number of parameters to this non-linear function
-int schlick::nbParameters() const
+int schlick_masking::nbParameters() const
 {
     return dimY();
 }
 
-vec schlick::getParametersMin() const
+vec schlick_masking::getParametersMin() const
 {
     vec m(dimY());
     for(int i=0; i<dimY(); ++i) { m[i] = 0.0; }
@@ -131,7 +131,7 @@ vec schlick::getParametersMin() const
 }
 
 //! \brief Get the vector of parameters for the function
-vec schlick::parameters() const
+vec schlick_masking::parameters() const
 {
     vec p(dimY());
     for(int i=0; i<dimY(); ++i) { p[i] = w[i]; }
@@ -139,14 +139,14 @@ vec schlick::parameters() const
 }
 
 //! \brief Update the vector of parameters for the function
-void schlick::setParameters(const vec& p)
+void schlick_masking::setParameters(const vec& p)
 {
     for(int i=0; i<dimY(); ++i) { w[i] = p[i]; }
 }
 
 //! \brief Obtain the derivatives of the function with respect to the
 //! parameters.
-vec schlick::parametersJacobian(const vec& x) const
+vec schlick_masking::parametersJacobian(const vec& x) const
 {
 	const int nY = dimY();
 	vec jac(nY*nY);
@@ -178,7 +178,7 @@ vec schlick::parametersJacobian(const vec& x) const
 }
 
 
-void schlick::bootstrap(const data*, const arguments&)
+void schlick_masking::bootstrap(const data*, const arguments&)
 {
 	// Start with a non occluding value for k
 	for(int i=0; i<dimY(); ++i) { w[i] = 0.0; }

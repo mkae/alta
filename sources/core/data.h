@@ -27,8 +27,8 @@ class data : public parametrized
 		{
 			std::ofstream file(filename.c_str(), std::ios_base::trunc);
 			file << "#DIM " << _nX << " " << _nY << std::endl;
-			file << "PARAM_IN  " << params::get_name(input_parametrization())  << std::endl;
-			file << "PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
+			file << "#PARAM_IN  " << params::get_name(input_parametrization())  << std::endl;
+			file << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
 			for(int i=0; i<size(); ++i)
 			{
 				vec x = this->get(i);

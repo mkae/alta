@@ -454,9 +454,9 @@ void plugins_manager::check_compatibility(data*& d, function*& f,
 			std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
 			f->setParametrization(d->input_parametrization());
 		}
-		else if(d->input_parametrization() != f->input_parametrization())
+		else if(d->input_parametrization() != f->input_parametrization() && args.is_defined("change-param"))
 		{
-			std::cout << "<<INFO>> has to change the parametrization of the input data" << std::endl;
+			std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->input_parametrization()) << std::endl;
             std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
 			data_params* dd = new data_params(d, f->input_parametrization());
 			d = dd ;

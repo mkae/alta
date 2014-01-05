@@ -186,6 +186,7 @@ class arguments
 			if(_map.count(key) > 0)
 			{
 				std::string s = _map.find(key)->second;
+				std::cout << s << std::endl;
 				if(s[0] == '[') // Is an array of type [a, b, c]
 				{
 					int i = 0;
