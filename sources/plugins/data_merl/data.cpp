@@ -161,6 +161,18 @@ inline int theta_half_index(double theta_half)
 	return ret_val;
 }
 
+// Lookup theta_half from index
+// This is a non-linear mapping!
+// In:  [0 .. 89]
+// Out: [0 .. pi/2]
+inline double theta_half_from_index(int index)
+{
+	if(index > 89) return 0.5*M_PI;
+	const double temp = double(index*index);
+	const double theta_half_deg = temp / double(BRDF_SAMPLING_RES_THETA_H);
+	const double ret_val = theta_half_deg * (0.5*M_PI) / double(BRDF_SAMPLING_RES_THETA_H);
+	return ret_val;
+}
 
 // Lookup theta_diff index
 // In:  [0 .. pi/2]
@@ -174,6 +186,17 @@ inline int theta_diff_index(double theta_diff)
 		return tmp;
 	else
 		return BRDF_SAMPLING_RES_THETA_D - 1;
+}
+
+// Lookup theta_diff from index
+// In:  [0 .. 89]
+// Out: [0 .. pi/2]
+inline double theta_diff_from_index(int index)
+{
+	if(index > 89) return 0.5*M_PI;
+	const double temp = double(index);
+	const double theta_diff = temp * (0.5*M_PI) / double(BRDF_SAMPLING_RES_THETA_D);
+	return theta_diff;
 }
 
 
@@ -196,30 +219,27 @@ inline int phi_diff_index(double phi_diff)
 		return BRDF_SAMPLING_RES_PHI_D / 2 - 1;
 }
 
+// Lookup phi_diff from index
+//
+inline double phi_diff_from_index(int index)
+{
+	const double temp = double(index);
+	const double theta_diff = temp * M_PI / double(BRDF_SAMPLING_RES_THETA_D/2);
+	return theta_diff;
+}
+
 
 // Given a pair of incoming/outgoing angles, look up the BRDF.
-void lookup_brdf_val(double* brdf, double theta_in, double fi_in,
-			  double theta_out, double fi_out, 
+void lookup_brdf_val(double* brdf, double theta_half,
+			  double theta_diff, double fi_diff, 
 			  double& red_val,double& green_val,double& blue_val)
 {
-	// Convert to halfangle / difference angle coordinates
-	double theta_half, fi_half, theta_diff, fi_diff;
 	
-	std_coords_to_half_diff_coords(theta_in, fi_in, theta_out, fi_out,
-		       theta_half, fi_half, theta_diff, fi_diff);
-	
-#ifdef DEBUG
-	std::cout << theta_in << ", " << fi_in << ", " << theta_out << ", " << fi_out << " -> ";
-	std::cout << theta_half << ", " << theta_diff << ", " << fi_diff << std::endl;
-	std::cout << std::endl;
-#endif
-
     // Testing the input domain
 	if(theta_half < 0.0 || theta_half > 0.5*M_PI || 
 	   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
 	   fi_diff > M_PI)
 	{
-        std::cerr << "<<ERROR>> the input vec is incorrect: TL = " << theta_in << ", PL = " << fi_in << ", TV = " << theta_out << ", PV = " << fi_out << std::endl;
         std::cerr << "<<ERROR>> the input vec is incorrect: TH = " << theta_half << ", TD = " << theta_diff << ", PD = " << fi_diff << std::endl;
 		throw; //! \todo Add exception list
 	}
@@ -311,9 +331,9 @@ vec data_merl::get(int i) const
 
 
 	vec res(6) ;
-	res[2] = (phid_ind+0.5) * M_PI / (BRDF_SAMPLING_RES_PHI_D / 2);
-	res[1] = (thed_ind+0.5) * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_D);
-	res[0] = (theh_ind+0.5) * 0.5 * M_PI / (BRDF_SAMPLING_RES_THETA_H);
+	res[2] = phi_diff_from_index(phid_ind);
+	res[1] = theta_diff_from_index(thed_ind);
+	res[0] = theta_half_from_index(theh_ind);
 	res[3] = brdf[i] * RED_SCALE;
 	res[4] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 	res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
@@ -328,9 +348,9 @@ vec data_merl::operator[](int i) const
 void data_merl::set(vec x)
 {
 	assert(x.size() == 6);
-	const int phid_ind = (int)floor((x[2] / M_PI) * (BRDF_SAMPLING_RES_PHI_D/2));
-	const int thed_ind = (int)floor((x[1] / (0.5*M_PI)) * BRDF_SAMPLING_RES_THETA_D);
-	const int theh_ind = (int)floor((x[0] / (0.5*M_PI)) * BRDF_SAMPLING_RES_THETA_H);
+	const int phid_ind = phi_diff_index(x[2]);
+	const int thed_ind = theta_diff_index(x[1]);
+	const int theh_ind = theta_half_index(x[0]);
 
 	const int i = (theh_ind*BRDF_SAMPLING_RES_THETA_D + thed_ind)*(BRDF_SAMPLING_RES_PHI_D/2) + phid_ind;
 	brdf[i] = x[3] / RED_SCALE;
@@ -338,34 +358,10 @@ void data_merl::set(vec x)
 	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
 }
 
-vec data_merl::value(vec in, vec out) const
-{
-	// compute  thetain fi_in, theta_out fi_out
-	double th_in  = acos(in[2]);
-	double fi_in  = atan2(in[1], in[0]);
-	double th_out = acos(out[2]);
-	double fi_out = atan2(out[1], out[0]);
-
-	double r, g, b;
-	lookup_brdf_val(brdf, th_in, fi_in, th_out, fi_out, r, g, b) ;
-
-	vec res(3);
-	res[0] = r;
-	res[1] = g;
-	res[2] = b;
-	return res;
-}
 vec data_merl::value(vec in) const
 {
     double r, g, b;
-
-    double t_in[4];
-    params::convert(&in[0], params::RUSIN_TH_TD_PD, params::SPHERICAL_TL_PL_TV_PV, &t_in[0]);
-#ifdef DEBUG
-	std::cout << "[" << in[0] << ", " << in[1] << ", " << in[2] << "] -> [" << t_in[0] << ", " << t_in[1] << ", " << t_in[2] << ", " << t_in[3] << "]" << std::endl;
-#endif
-
-    lookup_brdf_val(brdf, t_in[0], t_in[1], t_in[2], t_in[3], r, g, b) ;
+    lookup_brdf_val(brdf, in[0], in[1], in[2], r, g, b) ;
 
     vec res(3);
     res[0] = r;
@@ -396,7 +392,7 @@ vec data_merl::max() const
 	vec res(3);
 	res[0] = M_PI / 2 ;
 	res[1] = M_PI / 2 ;
-	res[2] = M_PI / 2 ;
+	res[2] = M_PI;
 	return res ;
 }
 

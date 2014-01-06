@@ -44,7 +44,8 @@ class data : public parametrized
 		// Acces to data
 		virtual vec get(int i) const = 0 ;
 		virtual vec operator[](int i) const = 0 ;
-
+		
+		/*
 		//! \brief Provide an evaluation in a BRDF way of the data. 
 		//!
 		//! \details
@@ -52,6 +53,7 @@ class data : public parametrized
         //! vector out are taken to grab a value and return it. The two vectors
 		//! should be compliant with the size and parametrization of the data.
 		virtual vec value(vec in, vec out) const = 0;
+		*/
 
         //! \brief Provide an evaluation in a BRDF way of the data.
         //!

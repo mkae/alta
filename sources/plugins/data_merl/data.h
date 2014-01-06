@@ -20,8 +20,7 @@ class data_merl : public data
 		virtual vec get(int i) const ;
 		virtual vec operator[](int i) const ;
 
-		virtual vec value(vec in, vec out) const ;
-        virtual vec value(vec in) const;
+      virtual vec value(vec in) const;
 		
 		// Set data
 		virtual void set(vec x);

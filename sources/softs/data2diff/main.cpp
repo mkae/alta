@@ -82,19 +82,19 @@ int main(int argc, char** argv)
 			params::convert(&tempParam[0], p_in, params::CARTESIAN, &tempCart[0]);
 			L[0] = tempCart[0]; L[1] = tempCart[1]; L[2] = tempCart[2];
 			V[0] = tempCart[3]; V[1] = tempCart[4]; V[2] = tempCart[5];
-			vec y1 = d->value(L, V);
+			//vec y1 = d->value(L, V);
 			
 			// Convert perturbed input to CARTESIAN
 			tempParam[dim] -= 2.0*dt;
 			params::convert(&tempParam[0], p_in, params::CARTESIAN, &tempCart[0]);
 			L[0] = tempCart[0]; L[1] = tempCart[1]; L[2] = tempCart[2];
 			V[0] = tempCart[3]; V[1] = tempCart[4]; V[2] = tempCart[5];
-			vec y2 = d->value(L, V);
-
+			//vec y2 = d->value(L, V);
+/*
 			// Compute the diff vector
 			for(int j=0; j<d->dimY(); ++j)
 				out_x[d->dimX() + j] = (y1[j]-y2[j])/(2.0*dt);
-
+*/
 			// Store it into the output data object
 			out_d->set(out_x);
 
