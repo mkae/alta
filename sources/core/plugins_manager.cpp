@@ -436,7 +436,7 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 }
 
 void plugins_manager::check_compatibility(data*& d, function*& f,
-                                          const arguments&)
+                                          const arguments& args)
 {
 	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
 		f->input_parametrization() == params::UNKNOWN_INPUT)

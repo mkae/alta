@@ -1,3 +1,11 @@
+/*! \package brdf2data
+ *  \ingroup commands
+ *  \brief
+ *  This command allows to convert a \ref function object to a \ref data 
+ *  object. And to save the \ref data object in a file specified by the
+ *  \ref data plugin.
+ *  \details
+ */
 #include <core/args.h>
 #include <core/data.h>
 #include <core/params.h>
@@ -19,7 +27,20 @@ int main(int argc, char** argv)
 
 	if(args.is_defined("help")) {
 		std::cout << "Usage: brdf2data --input brdf.file --output data.file [--data exporter.so --data-file data.file]" << std::endl ;
-		std::cout << " - input, output are mandatory parameters, you need to either specify a data exporter or a data file" << std::endl ;
+		std::cout << "Convert a function object to a data object."<< std::endl ;
+		std::cout << std::endl;
+		std::cout << "Mandatory arguments:" << std::endl;
+		std::cout << "  --input     [filename]" << std::endl;
+		std::cout << "  --output    [filename]" << std::endl;
+		std::cout << "  --fitter    [filename]" << std::endl;
+		std::cout << std::endl;
+		std::cout << "Optional arguments:" << std::endl;
+		std::cout << "  --data      [filename] Name of the data plugin used to save the output" << std::endl ;
+		std::cout << "                         data file. If no plugin is defined, the data file" << std::endl ;
+		std::cout << "                         will be load using ALTA format but require an" << std::endl;
+		std::cout << "                         ALTA file as template." << std::endl ;
+		std::cout << "  --data-file [filename] ALTA data file used as a template if no data" << std::endl ;
+		std::cout << "                         plugin is specified to export data." << std::endl ;
 		return 0 ;
 	}
 
