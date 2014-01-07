@@ -66,13 +66,11 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				ymax = args.get_vec("ymax", _nY,  std::numeric_limits<float>::max()) ;
 				std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
 
-				/*
 				for(int k=0; k<dimX(); ++k)
 				{
 					_min[k] =  std::numeric_limits<double>::max() ;
 					_max[k] = -std::numeric_limits<double>::max() ;
 				}
-				*/
 			}
 			else if(comment == std::string("VS"))
 			{

@@ -239,6 +239,7 @@ function* plugins_manager::get_function(const std::string& filename)
 		if(comment == std::string("DIM"))
 		{
 			linestream >> nX >> nY ;
+			std::cout << "<<DEBUG>> " << nX << " x " << nY << std::endl; 
 		}
 		else if(comment == std::string("CMD"))
       {
