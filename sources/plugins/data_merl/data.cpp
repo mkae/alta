@@ -167,10 +167,9 @@ inline int theta_half_index(double theta_half)
 // Out: [0 .. pi/2]
 inline double theta_half_from_index(int index)
 {
-	if(index > 89) return 0.5*M_PI;
-	const double temp = double(index*index);
-	const double theta_half_deg = temp / double(BRDF_SAMPLING_RES_THETA_H);
-	const double ret_val = theta_half_deg * (0.5*M_PI) / double(BRDF_SAMPLING_RES_THETA_H);
+    const double temp = index+0.5;
+    const double theta_half_deg = (temp*temp) / BRDF_SAMPLING_RES_THETA_H;
+	const double ret_val = theta_half_deg * (0.5*M_PI) / BRDF_SAMPLING_RES_THETA_H;
 	return ret_val;
 }
 
@@ -193,9 +192,8 @@ inline int theta_diff_index(double theta_diff)
 // Out: [0 .. pi/2]
 inline double theta_diff_from_index(int index)
 {
-	if(index > 89) return 0.5*M_PI;
-	const double temp = double(index);
-	const double theta_diff = temp * (0.5*M_PI) / double(BRDF_SAMPLING_RES_THETA_D);
+    const double temp = index+0.5;
+	const double theta_diff = temp * (0.5*M_PI) / BRDF_SAMPLING_RES_THETA_D;
 	return theta_diff;
 }
 
@@ -223,9 +221,8 @@ inline int phi_diff_index(double phi_diff)
 //
 inline double phi_diff_from_index(int index)
 {
-	const double temp = double(index);
-	const double theta_diff = temp * M_PI / double(BRDF_SAMPLING_RES_THETA_D/2);
-	return theta_diff;
+    const double phi_diff = (index+0.5) * M_PI / (BRDF_SAMPLING_RES_PHI_D/2);
+	return phi_diff;
 }
 
 
@@ -295,7 +292,7 @@ void data_merl::load(const std::string& filename)
 		throw;
 	}
 }
-void data_merl::load(const std::string& filename, const arguments& args)
+void data_merl::load(const std::string& filename, const arguments&)
 {
 	if(!read_brdf(filename.c_str(), brdf))
 	{
@@ -326,7 +323,7 @@ vec data_merl::get(int i) const
 {
 	int phid_ind = i % (BRDF_SAMPLING_RES_PHI_D / 2);
 	int thed_ind = (i / (BRDF_SAMPLING_RES_PHI_D / 2)) % BRDF_SAMPLING_RES_THETA_D ;
-	int theh_ind = (i / (BRDF_SAMPLING_RES_PHI_D / 2 * BRDF_SAMPLING_RES_THETA_D)) 
+	int theh_ind = (i / ((BRDF_SAMPLING_RES_PHI_D / 2) * BRDF_SAMPLING_RES_THETA_D)) 
 		            % BRDF_SAMPLING_RES_THETA_H ;
 
 
@@ -334,6 +331,10 @@ vec data_merl::get(int i) const
 	res[2] = phi_diff_from_index(phid_ind);
 	res[1] = theta_diff_from_index(thed_ind);
 	res[0] = theta_half_from_index(theh_ind);
+#ifdef DEBUG
+	std::cout << "get -> " << i << " (" << theh_ind << ", " << thed_ind << ", " << phid_ind << ")" << std::endl;
+	std::cout << "       " << res[0] << ", " << res[1]  << ", " << res[2] << std::endl;
+#endif
 	res[3] = brdf[i] * RED_SCALE;
 	res[4] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 	res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
@@ -353,6 +354,11 @@ void data_merl::set(vec x)
 	const int theh_ind = theta_half_index(x[0]);
 
 	const int i = (theh_ind*BRDF_SAMPLING_RES_THETA_D + thed_ind)*(BRDF_SAMPLING_RES_PHI_D/2) + phid_ind;
+#ifdef DEBUG
+	std::cout << "set -> " << i << " (" << theh_ind << ", " << thed_ind << ", " << phid_ind << ")" << std::endl;
+	std::cout << "       " << x[0] << ", " << x[1]  << ", " << x[2] << std::endl;
+    std::cout << std::endl;
+#endif
 	brdf[i] = x[3] / RED_SCALE;
 	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] = x[4] / GREEN_SCALE;
 	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
