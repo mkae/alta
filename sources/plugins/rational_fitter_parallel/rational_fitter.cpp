@@ -57,6 +57,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		timer time ;
 		time.start() ;
 
+#ifdef NOT_WORKING
 		// Allocate enough processor to run fully in parallel, but account for
 		// the fact that each thread will require its own memory.
 		size_t need_memory = ((3*i+1)*d->size()*2 + 2*i + 2*d->dimY()*d->size()) * sizeof(double); 
@@ -71,8 +72,12 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 			std::cout << "<<DEBUG>> " << need_memory / (1024*1024) << "MB required / " 
 				<< avai_memory / (1024*1024) << "MB available" << std::endl;
 #endif
-			return false;
+			//return false;
+			nb_cores = 1;
 		}
+#endif
+		int nb_cores = args.get_int("nbcores", omp_get_num_procs());
+
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
 #endif
@@ -252,23 +257,24 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 
     quadratic_program qp(np, nq);
 
-#ifndef TODO_PUT_IN_METHOD
-	for(int i=0; i<d->size()/100; ++i)
+
+    // Starting with only a 100 vertical segments (meaning a 200xn matrix)
+    const int di = (m-1) / 99;
+    for(int i=0; i<m; i+=di)
 	{
 
 		// Create two vector of constraints
 		vec c1(n), c2(n);
-		get_constraint(100*i, np, nq, ny, d, r, c1, c2);
+        get_constraint(i, np, nq, ny, d, r, c1, c2);
 
 		qp.add_constraints(c1);
 		qp.add_constraints(c2);
 	}
-#endif
 
 	while(qp.nb_constraints() < 2*m)
 	{
 #ifdef DEBUG
-		std::cout << "<<DEBUG>> number of constraints = " << qp.nb_constraints() << std::endl ;
+        std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
 #endif
 		QuadProgPP::Vector<double> x(n);
 		bool solves_qp = qp.solve_program(x, delta, p, q);
@@ -300,9 +306,9 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 				}
 				*/
 				return true;
-			}
-		}
-		else if(!solves_qp)
+            }
+        }
+        else
 		{
 #ifdef DEBUG
 			std::cout << "<<DEBUG>> not enough coefficients" << std::endl;

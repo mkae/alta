@@ -154,10 +154,15 @@ class quadratic_program
 			return solves_qp;
 		}
 
-		//! \brief Test all the constraints of the data
+        //! \brief Test all the constraints of the data.
+        //! Add the sample that is farest away from the function.
 		bool test_constraints(int ny, const rational_function_1d* r, const vertical_segment* data)
 		{
 			int nb_failed = 0;
+            double max_dev = 0.0; // Maximum absolute distance of the current
+                                  // solution to the data.
+            vec cu, cl;
+
 			for(int n=0; n<data->size(); ++n)
 			{
 				vec x, yl, yu;
@@ -168,20 +173,33 @@ class quadratic_program
 				bool fail_lower = y[ny] < yl[ny];
 				if(fail_lower || fail_upper)
 				{
+                    const double dev = std::abs(0.5*(yu[ny]+yl[ny]) - y[ny]);
+
 					nb_failed++;
 
-					vec cu, cl;
-					get_constraint(x, yl, yu, ny, r, cu, cl);
-
-					add_constraints(cu);
-					add_constraints(cl);
+                    if(max_dev < dev)
+                    {
+                        get_constraint(x, yl, yu, ny, r, cu, cl);
+                        max_dev = dev;
+                    }
 				}
 			}
-
 #ifdef DEBUG
-			std::cout << "<<TRACE>> " << nb_failed << " constraints where not satified." << std::endl;
+            std::cout << "<<TRACE>> " << nb_failed << " constraints where not satified." << std::endl;
+            std::cout << "<<TRACE>> an interval failed the test with distance = " << max_dev << std::endl;
 #endif
-			return nb_failed == 0;
+
+            if(nb_failed > 0)
+            {
+                add_constraints(cu);
+                add_constraints(cl);
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
 		}
 
 		//! \brief Generate two constraint vectors from a vertical segment and a

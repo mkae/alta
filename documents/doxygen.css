@@ -1,8 +1,13 @@
 /* The standard CSS for doxygen 1.8.4 */
 
+
+div.image img[src="Kirby2.png"]{ 
+    width:400px; 
+}
+
 body {
 	width: 80%;
-	padding-left:7%;
+	padding-left:10%;
 	padding-right:7%;
 }
 

@@ -11,6 +11,32 @@ data object into a brdf object (also named \ref function).
    ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
+The result can be exported using the \a brdf2gnuplot or \a brdf2data
+commands.
+
+\verbatim
+   ./build/data2gnuplot --input Kirby.brdf --output Kirby.dat --data ../data/1d/Kirby2/Kirby2.dat 
+\endverbatim
+
+The \a brdf2gnuplot allows you to export in a gnuplot compliant format
+the evaluation of a function at the positions indicated in a data file
+(here the original Kirby2 file).
+
+You should obtain gnuplot data files like the following image:
+
+\image html Kirby2.png
+
+To convert this brdf file to be used in another software (here matlab), 
+you will need the following command:
+\verbatim
+   ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
+\endverbatim
+
+\a brdf2brdf converts an ALTA brdf file into another format such as
+Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
+convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann
+distribution).
+
 <h3>Non-linear fitting</h3>
 In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/">CERES</a> nonlinear fitter to approximate the
 blue metallic paint from the <a href="http://www.merl.com/brdf/">MERL database</a> using a Lafortune lobe (Note that we do not provide the data in ALTA package, you will have to download it). The resulting BRDF is exported in a shader format compatible with BRDF Explorer.

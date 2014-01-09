@@ -79,6 +79,8 @@ function, using a monomial basis, interpolating the
 <a href="http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml">Kirby 2</a> 
 dataset. Note that this fit is not a BRDF.
 
+\image html Kirby2.png
+
 The \a data2brdf is one of many \ref commands available in ALTA. It
 allows to perform a fitting procedure by converting a \ref data object into a
 brdf object (also named \ref function).
@@ -88,7 +90,7 @@ To convert this brdf file (in ALTA \ref format), you will need another command:
    ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
 \endverbatim
 
-<i>brdf2brdf</i> converts an ALTA brdf file into another format such as
+\a brdf2brdf converts an ALTA brdf file into another format such as
 Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
 convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann
 distribution).
