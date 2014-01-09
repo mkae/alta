@@ -14,16 +14,15 @@ rational_function_1d::rational_function_1d()
 
 rational_function_1d::rational_function_1d(int np, int nq, bool separable) 
 {
-	a.resize(np);
-	b.resize(nq);
+    resize(np, nq);
 	_separable = separable;
 }
 
 rational_function_1d::rational_function_1d(const vec& a, 
-                                           const vec& b) :
-	a(a), b(b)
+                                           const vec& b)
 {
 	_separable = false;
+    update(a, b);
 }
 
 bool rational_function_1d::load(std::istream&)
@@ -171,7 +170,7 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 		deg[0] = i;
 		return deg;
 	}
-
+#ifdef NOT_WORKING
 	// Case of two or more dimension signal, we differ the treatment of
 	// separable signals and non separable signals.
 	if(_separable)
@@ -184,6 +183,7 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 		}
 	}
 	else
+#endif
 	{
 		if(dimX() == 2)
 		{
@@ -460,13 +460,14 @@ bool rational_function::load(std::istream& in)
 			}
 			in >> b[j];
 		}
-
-		std::cout << a << std::endl;
-		std::cout << b << std::endl;
-
+#ifdef NONE
+        std::cout << "p_" << i << " = " << a << std::endl;
+        std::cout << "q_" << i << " = " << b << std::endl;
+#endif
 		// Update the i_th color channel
 		get(i)->update(a, b);
 	}
+
 	return true;
 }
 
@@ -481,7 +482,7 @@ void rational_function::save_call(std::ostream& out, const arguments&) const
 
 	for(int k=0; k<_nY; ++k)
 	{
-		rational_function_1d* rf = get(k);
+        const rational_function_1d* rf = get(k);
 		vec a = rf->getP();
 		vec b = rf->getQ();
 
