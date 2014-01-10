@@ -32,7 +32,6 @@ int main(int argc, char** argv)
 		std::cout << "Mandatory arguments:" << std::endl;
 		std::cout << "  --input     [filename]" << std::endl;
 		std::cout << "  --output    [filename]" << std::endl;
-		std::cout << "  --fitter    [filename]" << std::endl;
 		std::cout << std::endl;
 		std::cout << "Optional arguments:" << std::endl;
 		std::cout << "  --data      [filename] Name of the data plugin used to save the output" << std::endl ;
@@ -52,7 +51,7 @@ int main(int argc, char** argv)
 		std::cerr << "<<ERROR>> the output filename is not defined" << std::endl ;
 		return 1 ;
 	}
-	if(! args.is_defined("data")) {
+	if(! args.is_defined("data") && ! args.is_defined("data-file")) {
 		std::cerr << "<<ERROR>> the data exporter is not defined" << std::endl ;
 		return 1 ;
 	}

@@ -107,8 +107,7 @@ def parseConfiguration(xmlNode):
 			dat_dir = param.attrib["value"]
 
 		#end
-		#end
-
+	#end
 #end
 
 def parseFunction(xmlNode):
