@@ -19,10 +19,10 @@ rational_function_1d::rational_function_1d(int np, int nq, bool separable)
 }
 
 rational_function_1d::rational_function_1d(const vec& a, 
-                                           const vec& b)
+                                           const vec& b) : a(a), b(b)
 {
-	_separable = false;
-    update(a, b);
+    //update(a, b);
+    _separable = false;
 }
 
 bool rational_function_1d::load(std::istream&)
@@ -39,7 +39,7 @@ void rational_function_1d::update(const vec& in_a,
 //#define NORMALIZE
 
 #ifdef NORMALIZE
-    const double b0 = (std::abs(in_b[0]) > 1.0E-10) ? in_b[0] : 1.0;
+    const double b0 = (std::abs(in_b[0]) > 1.0E-16) ? in_b[0] : 1.0;
 #else
     const double b0 = 1.0;
 #endif

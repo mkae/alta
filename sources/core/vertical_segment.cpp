@@ -49,7 +49,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			{
 				linestream >> _nX >> _nY ;
 
-				vs.assign(dimY(), 0) ;
+				vs.reserve(dimY()) ;
 				for(int k=0; k<dimY(); ++k)
 				{
 					vs[k] = 0 ;
@@ -60,11 +60,15 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				min = args.get_vec("min", _nX, -std::numeric_limits<float>::max()) ;
 				max = args.get_vec("max", _nX,  std::numeric_limits<float>::max()) ;
+#ifdef DEBUG
 				std::cout << "<<DEBUG>> data will remove outside of " << min << " -> " << max << " x-interval" << std::endl;
+#endif
 
 				ymin = args.get_vec("ymin", _nY, -std::numeric_limits<float>::max()) ;
 				ymax = args.get_vec("ymax", _nY,  std::numeric_limits<float>::max()) ;
+#ifdef DEBUG
 				std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
+#endif
 
 				for(int k=0; k<dimX(); ++k)
 				{
@@ -160,7 +164,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				if(args.is_defined("dt-relative"))
 				{
-					v[dimX() + dimY()+i]   = v[dimX() + i] * (1.0 + min_dt) ;
+                    v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 + min_dt) ;
 					v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
 				}
 				else
@@ -168,6 +172,9 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 					v[dimX() +   dimY()+i] = v[dimX() + i] + min_dt ;
 					v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
 				}
+#ifdef DEBUG
+                std::cout << "<<DEBUG>> vs = [" << v[dimX() +   dimY()+i] << ", " << v[dimX() + 2*dimY()+i] << "]" << std::endl;
+#endif
 			}
 
 			// If data is not in the interval of fit

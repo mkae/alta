@@ -100,14 +100,14 @@ int main(int argc, char** argv)
 				vec x(f->dimX());
 
 				// Convert the data to the function's input space.
-				if(f->input_parametrization() == params::UNKNOWN_INPUT)
-				{
-					memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
-				}
-				else
-				{
-					params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
-				}
+                if(f->input_parametrization() == params::UNKNOWN_INPUT)
+                {
+                    memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
+                }
+                else
+                {
+                    params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+                }
 
 				// Evaluate the function. I can add the cosine term to the BRDF
 				// value.

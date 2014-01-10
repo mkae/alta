@@ -168,43 +168,63 @@ double function::Linf_distance(const data* d) const
 	vec mean = vec::Zero(dimY());
 	vec var  = vec::Zero(dimY());
 
+
+	std::cout << "<<DEBUG>> input param here = " << params::get_name(input_parametrization()) << std::endl;
+
 	double linf_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
 		vec x(dimX()), y(dimY());
 
-		if(input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			memcpy(&x[0], &dat[0], dimX()*sizeof(double));
-		}
-		else
-		{
-			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
-		}
-		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
+        // Convert the position of the data sample to the parametrization
+        // of the function.
+        if(input_parametrization() == params::UNKNOWN_INPUT)
+        {
+            memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+        }
+        else
+        {
+            params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+        }
 
-		linf_dist = std::max<double>(linf_dist, std::abs(norm(y-value(x))));
+		// Copy the value part of the data vector in a vector to perform vector
+		// operations on it (used in the computation of the mean).
+        memcpy(&y[0], &dat[d->dimX()], d->dimY()*sizeof(double));
 
-		mean += (y-value(x)) / double(d->size());
+		// Take the componentwise-max of the two vectors.
+		const vec v = value(x);
+        for(int j=0; j<d->dimY(); ++j)
+		{
+			linf_dist = std::max<double>(linf_dist, std::abs(y[j]-v[j]));
+		}
+
+		// Compute the mean
+		mean += (y-v) / double(d->size());
 	}
 	
+	// Compute the standard deviation with respect to the mean error
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
 		vec x(dimX()), y(d->dimY()), val(dimY());
+		
+        // Convert the position of the data sample to the parametrization
+        // of the function.
+        if(input_parametrization() == params::UNKNOWN_INPUT)
+        {
+            memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+        }
+        else
+        {
+            params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+        }
 
-		if(input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			memcpy(&x[0], &dat[0], dimX()*sizeof(double));
-		}
-		else
-		{
-			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
-		}
+		// Copy the value part of the data vector in a vector to perform vector
+		// operations on it (used in the computation of the mean).
 		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
-		val = value(x);
 
+		val = value(x);
 		for(int j=0; j<d->dimY(); ++j) 
 		{ 
 			y[j] = dat[d->dimX()+j]; 

@@ -213,6 +213,7 @@ function* plugins_manager::get_function(const std::string& filename)
 
 	// Parameters of the function object
 	int nX, nY;
+	params::input param_in; params::output param_out;
 	arguments args;
 
 	// Test for the first line of the file. Should be a ALTA FUNC HEADER
@@ -228,7 +229,6 @@ function* plugins_manager::get_function(const std::string& filename)
 	while(line != "#ALTA HEADER END")
 	{
 		std::getline(file, line) ;
-		std::cout << line << std::endl;
 		std::stringstream linestream(line) ;
 
 		linestream.ignore(1) ;
@@ -239,7 +239,19 @@ function* plugins_manager::get_function(const std::string& filename)
 		if(comment == std::string("DIM"))
 		{
 			linestream >> nX >> nY ;
-			std::cout << "<<DEBUG>> " << nX << " x " << nY << std::endl; 
+		}
+		else if(comment == std::string("PARAM_IN"))
+		{
+			std::string name;
+			linestream >> name;
+			std::cout << "<<DEBUG>> parsed input parametrization: " << name << std::endl;
+			param_in = params::parse_input(name);
+		}
+		else if(comment == std::string("PARAM_OUT"))
+		{
+			std::string name;
+			linestream >> name;
+			param_out = params::parse_output(name);
 		}
 		else if(comment == std::string("CMD"))
       {
@@ -251,6 +263,8 @@ function* plugins_manager::get_function(const std::string& filename)
 	function* f = get_function(args);
 	f->setDimX(nX);
 	f->setDimY(nY);
+	f->setParametrization(param_in);
+	f->setParametrization(param_out);
 
 	// Load the function part from the file object
     f->load(file);
