@@ -165,7 +165,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				}
 				else
 				{
-					v[dimX() + dimY()+i]   = v[dimX() + i] + min_dt ;
+					v[dimX() +   dimY()+i] = v[dimX() + i] + min_dt ;
 					v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
 				}
 			}
@@ -252,7 +252,7 @@ vec vertical_segment::get(int i) const
 //! is not already present.
 void vertical_segment::set(vec x)
 {
-	assert(x.size() == _nX + _nY);
+	assert(x.size() == dimX() + dimY());
 	_data.push_back(x);
 }
 

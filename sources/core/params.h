@@ -166,7 +166,7 @@ class params
 			  }
 			  // If the input parametrization is the CARTESIAN param, then 
 			  // there is no need to transform the input data.
-			  if(intype == params::CARTESIAN)
+			  else if(intype == params::CARTESIAN)
 			  {
 				  from_cartesian(invec, outtype, outvec);
 			  }
