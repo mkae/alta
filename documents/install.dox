@@ -1,15 +1,35 @@
 /**
 \page install Install
 
-How to install the various components
+<h1>Qmake</h1>
+
+How to install the various components using <b>qmake</b>.
 
 <h2>Requirement</h2>
 <ul>
-	<li>Qt library with qmake</li>
-	<li>Eigen library (for some plugins)</li>
+	<li>qmake</li>
+	<li>Eigen library (for core and plugins)</li>
+	<li>Quadprog library (provided in external)</li>
 	<li>Matlab with the Engine library (for some plugins)</li>
 	<li>CGAL library (for some plugins)</li>
 </ul>
+
+
+<h2>.prf files</h2>
+
+Qt rely on user specified .prf files to look for external libraries.
+.prf files describe where to find libraries' headers and shared objects
+in a qmake fashion. Here is an example for the <i>quadprog.prf</i> file:
+
+\verbatim
+INCLUDEPATH += ~/Projects/alta/external/quadprog++
+LIBS += -L~/Projects/alta/build -lquadprog++
+\endverbatim
+
+You need to set the environment variable QMAKEFEATURES to the directory
+where you will be storing your .prf files. If you are not familiar with
+this process, we advise to store your .prf files in the external directory
+of ALTA.
 
 <h2>Installation</h2>
 
@@ -23,4 +43,14 @@ $ qmake && make
 
 All the resulting elements (binaries, dynamic and static libraries)
 are outputed in: <em>$ALTA/sources/build</em> directory.
+
+<br />
+
+
+<h1>Scons</h1>
+
+<center style="color:red">
+Work in progress
+</center>
+<br />
 */
