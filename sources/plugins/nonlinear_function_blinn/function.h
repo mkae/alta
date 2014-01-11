@@ -68,13 +68,7 @@ class blinn_function : public nonlinear_function
 		virtual params::input input_parametrization() const
 		{
 			return params::COS_TH ;
-		}
-		virtual void setParametrization(params::input new_param)
-		{
-			std::cerr << "Cannot change the ouput parametrization " 
-				       << __FILE__ << ":" << __LINE__ << std::endl;
-			throw;
-		}
+        }
 
 		void setDimY(int nY)
 		{

@@ -107,11 +107,16 @@ int main(int argc, char** argv)
 	if(dynamic_cast<vertical_segment*>(d_out) != NULL)
 	{
 		params::input param = params::parse_input(args["param"]);
-		if(param == params::UNKNOWN_INPUT)
+        if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
 		{
-			std::cerr << "<<ERROR>> unable to parse the parametrization" << std::endl;
-			return -1;
+            std::cout << "<<DEBUG>> using the input file input param for the output file." << std::endl;
+            param = d_in->input_parametrization();
 		}
+        else if(param == params::UNKNOWN_INPUT)
+        {
+            std::cerr << "<<ERROR>> not parametrization defined for input and output files." << std::endl;
+            return -1;
+        }
 
 		d_out->setParametrization(param);
 		d_out->setDimX(params::dimension(param));

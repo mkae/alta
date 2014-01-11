@@ -263,7 +263,10 @@ function* plugins_manager::get_function(const std::string& filename)
 	function* f = get_function(args);
 	f->setDimX(nX);
 	f->setDimY(nY);
-	f->setParametrization(param_in);
+    if(f->input_parametrization() == params::UNKNOWN_INPUT)
+    {
+        f->setParametrization(param_in);
+    }
 	f->setParametrization(param_out);
 
 	// Load the function part from the file object
