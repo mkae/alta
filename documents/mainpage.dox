@@ -43,6 +43,9 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 		<td>
 		\image html sample_result_02.png 
 		</td>
+		<td>
+		\image html sample_result_03.png 
+		</td>
 	</tr>
 	<tr>
 		<td>
@@ -50,6 +53,9 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 		</td>
 		<td>
 		Blinn lobe
+		</td>
+		<td>
+		Beckmann lobe
 		</td>
 	</tr>
 	</table>
