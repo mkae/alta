@@ -33,6 +33,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 #ifdef DEBUG
 		std::cout << "parameters:" << std::endl << x << std::endl << std::endl ;
 #endif
+
 		// Check that the parameters used are within the bounds defined
 		// by the function
 		vec p_min = _f->getParametersMin();
@@ -45,7 +46,6 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			}
 		}
 
-
 		// Update the parameters vector
 		vec _p(inputs());
 		for(int i=0; i<inputs(); ++i) { _p[i] = x(i); }
@@ -54,6 +54,10 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 		for(int s=0; s<_d->size(); ++s)
 		{
 			vec _x  = _d->get(s);
+		
+			// Convert the sample point into the function space
+			vec x(_f->dimX());
+			params::convert(&_x[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
 			// is set in the object.
@@ -69,7 +73,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 				_di[i] = _x[_f->dimX() + i];
 
 			// Should add the resulting vector completely
-			vec _y = _di - cos*(*_f)(_x);
+			vec _y = _di - cos*(*_f)(x);
 			for(int i=0; i<_f->dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
 
@@ -93,6 +97,10 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 		{
 			// Get the position
 			vec xi = _d->get(s);
+			
+			// Convert the sample point into the function space
+			vec x(_f->dimX());
+			params::convert(&xi[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
 			// is set in the object.
@@ -104,7 +112,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			}
 
 			// Get the associated jacobian
-			vec _jac = _f->parametersJacobian(xi);
+			vec _jac = _f->parametersJacobian(x);
 
 			// Fill the columns of the matrix
 			for(int j=0; j<_f->nbParameters(); ++j)
