@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!-- This script file is part of the ALTA library. It is provided to
+	  perform unit testing of the library nonlinear fitting methods
+     and functions.
+
+     This test script requires to be launched using the xml_cmd python
+     script provided in the $ALTA/sources/scripts directory. It also
+     requires to be launched in the $ALTA/sources directory and it
+     requires to have the data file unitary-blinn.data to be created
+     using the python script $ALTA/sources/tests/unitary-blinn.py	
+
+	  This script should provide a fit of a Blinn lobe 
+         kd = 0
+			ks = 2.1
+         a  = 3.14
+  -->
+<alta>
+	<configuration>
+		<parameter name="lib-dir" value="./build" />
+	</configuration>
+
+	<!-- Fit the data to a Blinn BRDF model -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input  name="unitary-blinn.data" />
+		<output name="unitary-blinn.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_blinn" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_nlopt" />
+	</action>
+
+	<action name="brdf2gnuplot">
+		<!-- Input and output arguments of the action -->
+		<input  name="unitary-blinn.brdf" />
+		<output name="unitary-blinn-export.dat" />
+
+		<!-- Parameters -->
+		<parameter name="data" value="unitary-blinn.data" />
+	</action>
+</alta>

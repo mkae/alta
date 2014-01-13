@@ -14,7 +14,7 @@ def blinn(cost, sigma):
 for i in range(0,99):
 	theta = i * 0.01
 
-	val = blinn(theta, 10);
+	val = 2.1 * blinn(theta, 3.14);
 
 	f.write(str(theta) + "\t" + str(val) + "\n");
 #end
