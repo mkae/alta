@@ -149,7 +149,16 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 	 for(int i=0; i<d->size(); ++i)
 	 {
 		 vec xi = d->get(i);
-		 problem.AddResidualBlock(new CeresFunctor(nf, xi, cos_fit), NULL, &p[0]);
+		 vec xf(nf->dimX() + nf->dimY());
+
+		 // Convert the sample to be in the parametrizatio of the function
+		 params::convert(&xi[0], d->input_parametrization(), nf->input_parametrization(), &xf[0]);
+		 for(int k=0; k<nf->dimY(); ++k)
+		 {
+			 xf[nf->dimX() + k] = xi[d->dimX() + k];
+		 }
+
+		 problem.AddResidualBlock(new CeresFunctor(nf, xf, cos_fit), NULL, &p[0]);
 	 }
 
 	 // Solves the NL problem
