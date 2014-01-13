@@ -17,12 +17,16 @@
  *		loading plugin is defined using the option <b>\-\-in-data <i>
  *		filename</i></b>.
  *		</li>
- *		<li><b>\-\-in-data <i>filename</i></b></li> specify the data plugin
+ *		<li><b>\-\-in-data <i>filename</i></b> specify the data plugin
  *		used to load the input file. If this option is not specified, the
  *		loading plugin will be a \ref vertical_segment plugin. \note If
  *		the input plugin is not interpolating, like \ref vertical_segment,
- *		you can only use the reparametrization tool.
- *		<li><b>\-\-input <i>filename</i></b> the resulting data file.
+ *		you can only use the reparametrization tool.</li>
+ *		<li><b>\-\-output <i>filename</i></b> the resulting data file.
+ *		</li>
+ *		<li><b>\-\-out-data <i>filename</i></b></li> specify the data plugin
+ *		used to export the data. This parameter is optional. If not defined,
+ *		the output format will be ALTA's \ref format.
  *		</li>
  *  </ul>
  */

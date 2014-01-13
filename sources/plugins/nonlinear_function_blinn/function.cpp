@@ -24,7 +24,15 @@ vec blinn_function::value(const vec& x) const
     vec res(dimY());
     for(int i=0; i<dimY(); ++i)
     {
-        res[i] = _ks[i] * std::pow(x[0], _N[i]);
+		 // Check if the cosine is below the hoziron
+		 if(x[0] > 0.0)
+		 {
+			 res[i] = _ks[i] * std::pow(x[0], _N[i]);
+		 }
+		 else
+		 {
+			 res[i] = 0.0;
+		 }
     }
 
     return res;
@@ -120,15 +128,20 @@ vec blinn_function::parametersJacobian(const vec& x) const
 		 {
 			 if(i == j)
 			 {
-
-				 // df / dk_s
-				 jac[i*nbParameters() + j*2+0] = std::pow(x[0], _N[j]);
-
-				 // df / dN
-				 if(x[0] == 0.0)
-					 jac[i*nbParameters() + j*2+1] = 0.0;
+				 // Test if the configuration is below the horizon
+				 if(x[0] <= 0.0)
+				 {
+					jac[i*nbParameters() + j*2+0] = 0.0;
+					jac[i*nbParameters() + j*2+1] = 0.0;
+				 }
 				 else
+				 {
+					 // df / dk_s
+					 jac[i*nbParameters() + j*2+0] = std::pow(x[0], _N[j]);
+
+					 // df / dN
 					 jac[i*nbParameters() + j*2+1] = _ks[j] * std::log(x[0]) * std::pow(x[0], _N[j]);
+				 }
 			 }
 			 else
 			 {
@@ -146,7 +159,7 @@ void blinn_function::bootstrap(const data* d, const arguments& args)
     for(int i=0; i<dimY(); ++i)
     {
         _ks[i] = 1.0;
-        _N[i]  = 1.0;
+        _N[i]  = 10.0;
     }
 }
 

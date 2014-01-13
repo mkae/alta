@@ -68,7 +68,7 @@ class blinn_function : public nonlinear_function
 		virtual params::input input_parametrization() const
 		{
 			return params::COS_TH ;
-        }
+		}
 
 		void setDimY(int nY)
 		{
