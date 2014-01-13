@@ -42,7 +42,13 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 	// Each constraint is of the form data point * color channel
 	for(int s=0; s<d->size(); ++s)
 	{
+		// Get the data sample and extract the value part
 		vec xi = d->get(s);
+		vec _di = vec(d->dimY());
+		for(int i=0; i<d->dimY(); ++i)
+		{
+			_di[i] = xi[d->dimX() + i];
+		}
 		
 		// Convert the sample point into the function space
 		vec x(f->dimX());
@@ -51,12 +57,6 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		// Get the jacobian of the function at position x_i for the current
 		// set of parameters (set prior to function call)
 		vec _jac = f->parametersJacobian(x);
-
-		vec _di = vec(f->dimY());
-		for(int i=0; i<f->dimY(); ++i)
-		{
-			_di[i] = xi[f->dimX() + i];
-		}
 
 		// Should add the resulting vector completely
 		vec _y = (*f)(x) - _di;
@@ -90,16 +90,17 @@ double f(unsigned n, const double* x, double* dy, void* dat)
 	// Each constraint is of the form data point * color channel
 	for(int s=0; s<_d->size(); ++s)
 	{
+		// Get the data sample and extract the value part
 		vec xi = _d->get(s);
-		vec _di = vec(_f->dimY());
-		for(int i=0; i<_f->dimY(); ++i)
+		vec _di = vec(_d->dimY());
+		for(int i=0; i<_d->dimY(); ++i)
 		{
-			_di[i] = xi[_f->dimX() + i];
+			_di[i] = xi[_d->dimX() + i];
 		}
 
 		// Convert the sample point into the function space
-		vec x(f->dimX());
-		params::convert(&xi[0], _d->input_parametrization(), f->input_parametrization(), &x[0]);
+		vec x(_f->dimX());
+		params::convert(&xi[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
 
 		// Should add the resulting vector completely
 		vec _y = (*_f)(x) - _di;
