@@ -104,9 +104,13 @@ class altaNLP : public Ipopt::TNLP
 					_di[i] = _x[_f->dimX() + i];
 				}
 
+				// Convert the sample point into the function space
+				vec x(_f->dimX());
+				params::convert(&_x[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
+
 				// Compute the difference vector and add its
 				// components to the obj_value
-				vec _y = _di - (*_f)(_x);
+				vec _y = _di - (*_f)(x);
 				for(int i=0; i<_f->dimY(); ++i)
 				{
 					obj_value += pow(_y[i], 2);
@@ -138,14 +142,18 @@ class altaNLP : public Ipopt::TNLP
 				{
 					_di[i] = _x[_f->dimX() + i];
 				}
+				
+				// Convert the sample point into the function space
+				vec x(_f->dimX());
+				params::convert(&_x[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
 
 				// Compute the difference vector and add its
 				// components to the obj_value
-				vec _y = (*_f)(_x) - _di;
+				vec _y = (*_f)(x) - _di;
 
 				// Get the jacobian of the function at position x_i for the current
 				// set of parameters (set prior to function call)
-				vec _jac = _f->parametersJacobian(_x);
+				vec _jac = _f->parametersJacobian(x);
 
 				// Fill the columns of the matrix
 				for(int j=0; j<_f->nbParameters(); ++j)

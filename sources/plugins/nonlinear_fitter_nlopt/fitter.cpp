@@ -43,10 +43,14 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 	for(int s=0; s<d->size(); ++s)
 	{
 		vec xi = d->get(s);
+		
+		// Convert the sample point into the function space
+		vec x(f->dimX());
+		params::convert(&xi[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
 
 		// Get the jacobian of the function at position x_i for the current
 		// set of parameters (set prior to function call)
-		vec _jac = f->parametersJacobian(xi);
+		vec _jac = f->parametersJacobian(x);
 
 		vec _di = vec(f->dimY());
 		for(int i=0; i<f->dimY(); ++i)
@@ -55,7 +59,7 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		}
 
 		// Should add the resulting vector completely
-		vec _y = (*f)(xi) - _di;
+		vec _y = (*f)(x) - _di;
 
 		// Fill the columns of the matrix
 		for(int j=0; j<f->nbParameters(); ++j)
@@ -93,8 +97,12 @@ double f(unsigned n, const double* x, double* dy, void* dat)
 			_di[i] = xi[_f->dimX() + i];
 		}
 
+		// Convert the sample point into the function space
+		vec x(f->dimX());
+		params::convert(&xi[0], _d->input_parametrization(), f->input_parametrization(), &x[0]);
+
 		// Should add the resulting vector completely
-		vec _y = (*_f)(xi) - _di;
+		vec _y = (*_f)(x) - _di;
 		for(int i=0; i<_f->dimY(); ++i)
 		{
 			y += pow(_y[i], 2);
