@@ -34,8 +34,27 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 
 <h3>Sample results</h3>
 
-\image html sample_result_01.png 
-
+<center>
+	<table  border="0" style='text-align:center'>
+	<tr>
+		<td>
+		\image html sample_result_01.png 
+		</td>
+		<td>
+		\image html sample_result_02.png 
+		</td>
+	</tr>
+	<tr>
+		<td>
+		Lafortune lobe 
+		</td>
+		<td>
+		Blinn lobe
+		</td>
+	</tr>
+	</table>
+	<caption>Fitting the MERL database with nonlinear lobe functions</caption>
+</center>
 
 <h2>Download and install</h2>
 

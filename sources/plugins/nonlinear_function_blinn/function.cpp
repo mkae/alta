@@ -140,7 +140,7 @@ vec blinn_function::parametersJacobian(const vec& x) const
 					 jac[i*nbParameters() + j*2+0] = std::pow(x[0], _N[j]);
 
 					 // df / dN
-					 jac[i*nbParameters() + j*2+1] = _ks[j] * std::log(x[0]) * std::pow(x[0], _N[j]);
+					 jac[i*nbParameters() + j*2+1] = _ks[j] * log(x[0]) * std::pow(x[0], _N[j]);
 				 }
 			 }
 			 else
