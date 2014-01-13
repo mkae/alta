@@ -1,0 +1,11 @@
+/*!
+\page features Features
+
+<ul>
+	<li>Open common BRDF data formats (MERL, ASTM)</li>
+	<li>Non-linear fitting of BRDF (using third party packages)</li>
+	<li>Rational interpolation</li>
+	<li>Analytic BRDF models (see \ref functions)</li>
+	<li>Scripting mechanism to automatize fitting</li>
+</ul>
+*/
