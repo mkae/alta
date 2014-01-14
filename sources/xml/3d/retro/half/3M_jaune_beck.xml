@@ -12,7 +12,7 @@
 	</configuration>
 
 	<!-- Fitting the lobe using a back parametrization:
-		  The ABC model uses the dot product between the back and the
+		  The Beckmann model uses the dot product between the back and the
 	     normal vectors.
 	-->
 	<action name="data2brdf">
