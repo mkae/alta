@@ -1,18 +1,17 @@
 This file is part of the ALTA library.
 
 ALTA is free software: you can redistribute it and/or modify it under the terms
-of the GNU Lesser General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+of the Mozilla General Public License v2.0 as published by the Mozilla
+foundation.
 
 ALTA is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+PARTICULAR PURPOSE.  See the Mozilla Public License v2.0 for more details.
 
 We however require that you contact us for any use or modification of ALTA.
 
-You should have received a copy of the GNU Lesser General Public License along
-with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the Mozilla Public License v2.0 along
+with this program.  If not, see http://www.mozilla.org/MPL.
 
 Contacts:
    - Laurent Belcour <laurent.belcour@inria.fr>
