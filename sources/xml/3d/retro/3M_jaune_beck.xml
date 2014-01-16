@@ -15,7 +15,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
 		<output name="./results/3d/retro/3M_jaune_beck.brdf" />
 
 		<!-- Define the function to use -->
@@ -34,7 +34,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
 		<output name="./results/3d/retro/3M_jaune_beck.brdf" />
 
 		<!-- Define the function to use -->
@@ -59,7 +59,7 @@
 		<input  name="./results/3d/retro/3M_jaune_beck.brdf" />
 		<output name="./results/3d/retro/3M_jaune_beck.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
@@ -67,7 +67,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
 		<output name="./results/3d/retro/3M_jaune_beck.brdf" />
 
 		<!-- Define the function to use -->
@@ -90,7 +90,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
 		<output name="./results/3d/retro/3M_jaune_beck.brdf" />
 
 		<!-- Define the function to use -->
@@ -119,7 +119,7 @@
 		<input  name="./results/3d/retro/3M_jaune_beck.brdf" />
 		<output name="./results/3d/retro/3M_jaune_beck.dat" />
 
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_BRDF_dense__nbsgrid_81.alta" />
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
