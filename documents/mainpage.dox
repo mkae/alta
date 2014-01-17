@@ -2,16 +2,16 @@
 \mainpage A BRDF analysis library 
 
 <center style="color:red">
-We have not released ALTA yet, we are currently in an alpha stage.
-You can <a href="contacts.html">contact us</a> to acces the current version of our code, or to get more information about its features.
-This page was generated automatically
-using doxygen. Consequently, you could experience broken links.
+ALTA is currently in an alpha stage. We provide an archive that is not 
+feature complete (see below).
+You can <a href="contacts.html">contact us</a> to get more information 
+about its features, roadmap, and missing documentation.
 </center>
 
 <h2>Description</h2>
-ALTA is a software library to analyse, fit and understand BRDFs. It
-provides a set of command line softwares to fit measured data to analytical
-forms, tools to understand models and data.
+ALTA is a multi-platform software library to analyze, fit and understand
+BRDFs. It provides a set of command line softwares to fit measured data to
+analytical forms, tools to understand models and data.
 
 ALTA is part of the <a href="http://maverick.inria.fr/Projets/ALTA/ ">
 ANR 11-BS02-006</a>, a research project on light transport analysis.
@@ -66,9 +66,9 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 
 <h3>Obtain sources</h3>
 
-To access the sources of ALTA, you can clone the mercurial repository:
+To access the sources of ALTA, you can download the alpha sources:
 \verbatim
-	hg clone https://manao.inria.fr/mercurial/alta
+	wget https://gforge.inria.fr/frs/download.php/33325/alta-alpha.tar.gz
 \endverbatim
 
 <h3>Build</h3>
