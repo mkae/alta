@@ -5,7 +5,7 @@
 
 How to install the various components using <b>qmake</b>.
 
-<h2>Requirement</h2>
+<h2>Requirements</h2>
 <ul>
 	<li>qmake</li>
 	<li>Eigen library (for core and plugins)</li>
