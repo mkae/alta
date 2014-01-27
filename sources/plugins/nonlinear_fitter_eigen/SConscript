@@ -1,5 +1,5 @@
 env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
+env.Append(CPPPATH = ['../../../external/build/include', '../../../external/build/include/Eigen', '../../'])
 env.Append(LIBPATH = ['../../build'])
 
 sources = ['fitter.cpp']

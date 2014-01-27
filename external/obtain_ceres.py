@@ -37,7 +37,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ce
 			libname = 'libglog.a'
 		else:
 			libname = 'glog.lib'
-		ret = os.system('cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .')
+		ret = os.system('cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DMINIGLOG=ON -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF')
 		ret = os.system('make install')
 		os.chdir(os.pardir)
 	#end
