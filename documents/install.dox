@@ -1,21 +1,53 @@
 /**
 \page install Install
 
-<h1>Qmake</h1>
+<h2>Dependencies</h2>
+
+ALTA is decomposed into three parts: the <b>core</b>, <b>plugins</b>, and
+command line <b>softwares</b>. The third party dependencies of each part
+follow those rules:
+<ul>
+	<li>The <b>core</b> depends only on Eigen library for its vector class</li>
+	<li><b>Plugins</b> depend on whatever library they need. The dependency of
+	a particular plugin and how to install it must be provided in its 
+	documentation.</li>
+	<li><b>Softwares</b> only depend on the core</li>
+</ul>
+
+To ease the installation of ALTA, we provide scripts to install some of the
+dependencies in the <em>$ALTA/external</em> directory. Each script is a python
+script and has the form <i>obtain_{name}.py</i>. For example, to obtain the
+Eigen library, the commands are:
+
+\verbatim
+$ cd $ALTA/external
+$ python obtain_eigen.py
+\endverbatim
+
+<b>Note: </b> if you plan to use <b>scons</b> to compile ALTA, those scripts
+will be called automatically.
+
+<h3>List of common plugin dependencies:</h3>
+<ul>
+	<li><a href="http://eigen.tuxfamily.org">Eigen</a> library 
+	(for core and plugins)</li>
+	<li><a href="http://quadprog.sourceforge.net/">Quadprog++</a> library 
+	(for \a rational_fitter_quadprog, provided in the external directory)</li>
+	<li><a href="http://www.mathworks.fr/products/matlab/">Matlab</a> with 
+	the Engine library (for some plugins)</li>
+	<li><a href="http://www.cgal.org"/>CGAL</a> library (for some plugins)</li>
+	<li><a href="https://code.google.com/p/ceres-solver/">CERES</a> solver 
+	library (for \a nonlinear_fitter_ceres)</li>
+</ul>
+
+<br />
+
+
+<h2>Qmake</h2>
 
 How to install the various components using <b>qmake</b>.
 
-<h2>Requirements</h2>
-<ul>
-	<li>qmake</li>
-	<li>Eigen library (for core and plugins)</li>
-	<li>Quadprog library (provided in external)</li>
-	<li>Matlab with the Engine library (for some plugins)</li>
-	<li>CGAL library (for some plugins)</li>
-</ul>
-
-
-<h2>.prf files</h2>
+<h3>.prf files</h3>
 
 Qt rely on user specified .prf files to look for external libraries.
 .prf files describe where to find libraries' headers and shared objects
@@ -26,19 +58,22 @@ INCLUDEPATH += ~/Projects/alta/external/quadprog++
 LIBS += -L~/Projects/alta/build -lquadprog++
 \endverbatim
 
+ALTA rely on the user to specify a .prf file for each dependency. Major
+one are: eigen.prf, quadprog.prf, ceres.prf, cgal.prf, matlab.prf.
+
 You need to set the environment variable QMAKEFEATURES to the directory
 where you will be storing your .prf files. If you are not familiar with
 this process, we advise to store your .prf files in the external directory
 of ALTA.
 
-<h2>Installation</h2>
+<h3>Installation</h3>
 
 Once you have the required libraries, the installation of the fitting
 tools is straightforward:
 
 \verbatim
 $ cd $ALTA/sources
-$ qmake && make
+$ qmake && make -i
 \endverbatim
 
 All the resulting elements (binaries, dynamic and static libraries)
@@ -47,10 +82,19 @@ are outputed in: <em>$ALTA/sources/build</em> directory.
 <br />
 
 
-<h1>Scons</h1>
+<h2>Scons</h2>
 
-<center style="color:red">
-Work in progress
-</center>
+Using scons, the compilation of ALTA is straightforward:
+
+\verbatim
+$ cd $ALTA
+$ scons -i
+\endverbatim
+
+All the resulting elements of ALTA (binaries, dynamic and static libraries)
+are outputted in: <em>$ALTA/sources/build</em> directory. The dependencies
+(Eigen, ceres, ...) will be compiled in the <em>$ALTA/external/build</em>
+directory.
+
 <br />
 */

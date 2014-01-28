@@ -68,7 +68,7 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 
 To access the sources of ALTA, you can download the alpha sources:
 \verbatim
-	wget https://gforge.inria.fr/frs/download.php/33325/alta-alpha.tar.gz
+ $ wget https://gforge.inria.fr/frs/download.php/33325/alta-alpha.tar.gz
 \endverbatim
 
 <h3>Build</h3>
@@ -80,7 +80,7 @@ is lightweight and only requires Python to be installed (ALTA uses Python for
 its high level scripting mechanism). To build using scons, go to the root
 directory of ALTA and type:
 \verbatim
-   scons -i
+ $ scons -i
 \endverbatim
 
 This should obtain some of ALTA's dependencies (such as Eigen) and compile the
@@ -96,7 +96,7 @@ dependencies, please refer to \ref install.
 After compiling the different command line tools and associated plugins,
 go to the sources directory and launch this command line (for Linux users only):
 \verbatim
-   ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
+ $ ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
 Tada! You have produced your first fit. The produced output is a 1D rational 
@@ -112,7 +112,7 @@ brdf object (also named \ref function).
 
 To convert this brdf file (in ALTA \ref format), you will need another command:
 \verbatim
-   ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
+ $ ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
 \endverbatim
 
 \a brdf2brdf converts an ALTA brdf file into another format such as
