@@ -1,11 +1,65 @@
 /*!
 \page features Features
 
+<h3>Data formats</h3>
+ALTA can open common BRDF data formats such as 
+<a href="http://www.merl.com/brdf/">MERL</a> binary files and ASTM format
+(used in the Cornell BRDF database). We also provide our text-based data
+format that is compatible with <a href="http://www.gnuplot.info">
+Gnuplot</a>.
+
+<br />
+
+<h3>Rational interpolation</h3>
+
+ALTA can perform rational interpolation in the sense of 
+<a href="http://hal.inria.fr/hal-00678885/en" />Pacanowski et al. 
+[2012]</a>. Multiple implementations are provided with various library
+for the quadratic solver:
+
 <ul>
-	<li>Open common BRDF data formats (MERL, ASTM)</li>
-	<li>Non-linear fitting of BRDF (using third party packages)</li>
-	<li>Rational interpolation</li>
-	<li>Analytic BRDF models (see \ref functions)</li>
-	<li>Scripting mechanism to automatize fitting</li>
+	<li><a href="http://www.cgal.org">CGAL</a>. Warning: due to the internal
+	representation of floatting point numbers by CGAL, this plugin is very
+	slow).</li>
+	<li><a href="http://www.mathworks.fr/products/matlab/">Matlab</a>.</li>
+	<li><a href="http://quadprog.sourceforge.net/">QuadProg++</a>. Note: 
+	we provide modified sources of QuadProg++ with ALTA. You should be able 
+	to use at least this plugin.</li>
 </ul>
+
+We also provide plugin to perform least-square interpolation of rational
+functions. Those plugins are based on Eigen's solvers. Due to the ill-posed
+formulation of the least-square method, the solution provided by those 
+plugins might have singularities (denominator equals to zero) in the 
+definition domain.
+
+<br />
+
+<h3>Non-linear fitting</h3>
+
+ALTA can perform non-linear optimisation to fit parametric BRDF models
+to data. It supports a wide variety of non-linear optimizers such as:
+<ul>
+	<li><a href="https://code.google.com/p/ceres-solver/">CERES</a>
+	solver</li>
+	<li>MIT NlOpt</li>
+	<li>CoinOr IpOpt</li>
+	<li><a href="http://eigen.tuxfamily.org">Eigen</a> implementation of 
+	the Levenberg-Marquardt algorithm</li>
+</ul>
+
+<br />
+
+<h3>Analytic BRDF models</h3>
+
+We try to provide as much parametric BRDF models as possible. You will find
+the list of currently supported models in the \ref functions page.
+
+<br />
+
+<h3>Scripting mechanisms</h3>
+
+Writing command lines can be burdensome. To avoid having to write lengthy
+command lines, we provide a scripting mechanism to launch ALTA's commands
+from XML formatted files.
 */

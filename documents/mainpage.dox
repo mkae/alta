@@ -96,7 +96,7 @@ dependencies, please refer to \ref install.
 After compiling the different command line tools and associated plugins,
 go to the sources directory and launch this command line (for Linux users only):
 \verbatim
- $ ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
+ $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
 Tada! You have produced your first fit. The produced output is a 1D rational 
