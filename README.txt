@@ -28,7 +28,7 @@ directory.
 
 Dependencies:
  ALTA core: Eigen
- Plugin rational_eigen:     Eigen 
+ Plugin rational_eigen:     Eigen 3.x
  Plugin rational_quadprog:  Quadprog++ 
  Plugin rational_cgal:      The CGAL library
  Plugin rational_parallel:  The OpenMP library, Quadprog++ library and Eigen
