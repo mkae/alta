@@ -3,6 +3,18 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['fitter.cpp']
-libs = ['ceres', 'glog', 'core', 'gomp', 'lapack']
+libs = ['ceres', 'glog', 'core', 'lapack']
 
-env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources, LIBS=libs)
+conf = Configure(env)
+if conf.CheckLib('ceres') and conf.CheckLib('glog'):
+
+	if conf.CheckLib('gomp'):
+		libs.append('gomp')
+	#end
+
+	env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources, LIBS=libs)
+
+#end
+
+env = conf.Finish()
+

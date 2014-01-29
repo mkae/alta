@@ -11,11 +11,11 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
 	if os.name == 'nt':
 		print '<<WARNING>> no automatic installation for this package'
 	else:
-            if sys.plateform == 'darwin':
+            if sys.platform == 'darwin':
                 obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
             #end
-		print '<<INSTALL>> configure and build GLOG v0.3.3'
-		obtain.configure_build('glog-0.3.3')
+	    print '<<INSTALL>> configure and build GLOG v0.3.3'
+	    obtain.configure_build('glog-0.3.3')
 	#end
 else:
 	print '<<INSTALL>> GLOG already installed'
@@ -43,7 +43,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ce
 		libname = 'libglog.dylib'
 	#end
 
-	cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DMINIGLOG=ON -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
+	cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
 
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')

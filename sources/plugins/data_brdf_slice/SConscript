@@ -2,6 +2,12 @@ env = Environment()
 env.Append(CPPPATH = ['../../../external/build/include', '../../', '/usr/include/OpenEXR/'])
 env.Append(LIBPATH = ['../../build'])
 
-sources = ['data.cpp']
-libs = ['core', 'IlmImf', 'IlmThread']
-env.SharedLibrary('../../build/data_brdf_slice', sources, LIBS=libs)
+conf = Configure(env)
+if conf.CheckLib('IlmImf') and conf.CheckLib('IlmThread'):
+
+	sources = ['data.cpp']
+	libs = ['core', 'IlmImf', 'IlmThread']
+	env.SharedLibrary('../../build/data_brdf_slice', sources, LIBS=libs)
+
+#end
+env = conf.Finish()

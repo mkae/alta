@@ -2,6 +2,12 @@ env = Environment()
 env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../build'])
 
-sources = ['data.cpp']
-libs = ['flann', 'core']
-env.SharedLibrary('../../build/data_interpolant', sources, LIBS=libs)
+conf = Configure(env)
+if conf.CheckLib('flann'):
+
+	sources = ['data.cpp']
+	libs = ['flann', 'core']
+	env.SharedLibrary('../../build/data_interpolant', sources, LIBS=libs)
+
+#end
+env = conf.Finish()
