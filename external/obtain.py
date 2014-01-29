@@ -2,6 +2,7 @@ import urllib
 import os
 import sys
 import shutil
+import tarfile
 
 # Check if the build dir exists
 if not os.path.exists('build'):
@@ -15,14 +16,9 @@ def download(url, filename):
 
 # Uncompress the archive
 def uncompress(filename):
-	cmd = '';
-	if os.name == 'posix':
-		cmd = 'tar -xf '
-	elif os.name == 'nt':
-		cmd = '7zip '
+	tfile = tarfile.open(filename, 'r:gz')
+	tfile.extractall()
 
-	cmd += filename
-	ret = os.system(cmd)
 #end
 
 # Obtain a package and uncompress it

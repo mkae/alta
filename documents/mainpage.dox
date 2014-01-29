@@ -67,9 +67,7 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 <h3>Obtain sources</h3>
 
 To access the sources of ALTA, you can download the alpha sources:
-\verbatim
- $ wget https://gforge.inria.fr/frs/download.php/33325/alta-alpha.tar.gz
-\endverbatim
+<center><a href="https://gforge.inria.fr/frs/download.php/33337/alta-alpha.tar.gz">https://gforge.inria.fr/frs/download.php/33337/alta-alpha.tar.gz</a></center>
 
 <h3>Build</h3>
 
