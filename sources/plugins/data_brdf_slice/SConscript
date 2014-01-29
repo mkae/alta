@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../', '/usr/include
 env.Append(LIBPATH = ['../../build'])
 
 sources = ['data.cpp']
-libs = ['-lcore', '-lIlmImf', '-lIlmThread']
+libs = ['core', 'IlmImf', 'IlmThread']
 env.SharedLibrary('../../build/data_brdf_slice', sources, LIBS=libs)

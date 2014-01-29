@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['rational_fitter.cpp']
-libs = ['-lcore']
+libs = ['core']
 env.SharedLibrary('../../build/rational_fitter_eigen', sources, LIBS=libs)

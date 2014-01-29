@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['function.cpp']
-libs = ['-lcore']
+libs = ['core']
 env.SharedLibrary('../../build/nonlinear_function_beckmann', sources, LIBS=libs)

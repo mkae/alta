@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['rational_function.cpp']
-libs = ['-lcore']
+libs = ['core']
 env.SharedLibrary('../../build/rational_function_legendre', sources, LIBS=libs)

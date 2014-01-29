@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../build'])
 
 sources = ['data.cpp']
-libs = ['-lcore']
+libs = ['core']
 env.SharedLibrary('../../build/data_merl', sources, LIBS=libs)

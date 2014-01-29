@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['fitter.cpp']
-libs = ['-lnlopt', '-lcore']
+libs = ['nlopt', 'core']
 env.SharedLibrary('../../build/nonlinear_fitter_nlopt', sources, LIBS=libs)

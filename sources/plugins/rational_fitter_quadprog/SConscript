@@ -3,5 +3,5 @@ env.Append(CPPPATH = ['../../../external/quadprog++', '../../../external/build/i
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['rational_fitter.cpp']
-libs = ['-lcore', '-lquadprog++']
+libs = ['core', 'quadprog++']
 env.SharedLibrary('../../build/rational_fitter_quadprog', sources, LIBS=libs)
