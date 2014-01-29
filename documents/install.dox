@@ -58,8 +58,8 @@ Qt rely on user specified .prf files to look for external libraries.
 in a qmake fashion. Here is an example for the <i>quadprog.prf</i> file:
 
 \verbatim
-INCLUDEPATH += ~/Projects/alta/external/quadprog++
-LIBS += -L~/Projects/alta/build -lquadprog++
+INCLUDEPATH += $(HOME)/Projects/alta/external/quadprog++
+LIBS += -L$(HOME)/Projects/alta/build -lquadprog++
 \endverbatim
 
 ALTA rely on the user to specify a .prf file for each dependency. Major
@@ -73,7 +73,8 @@ of ALTA.
 <h3>Installation</h3>
 
 Once you have the required libraries, the installation of the fitting
-tools is straightforward:
+tools is straightforward. Assuming that the environment variable $ALTA
+contains the path to the alta files:
 
 \verbatim
 $ cd $ALTA/sources
