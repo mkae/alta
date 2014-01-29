@@ -19,7 +19,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
 	#end
 else:
 	print '<<INSTALL>> GLOG already installed'
-end
+#end
 
 
 # Download Eigen3
