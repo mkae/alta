@@ -18,7 +18,11 @@ def download(url, filename):
 def uncompress(filename):
 	tfile = tarfile.open(filename, 'r:gz')
 	tfile.extractall()
+#end
 
+# Apply a patch to some file
+def patch(filename, patch):
+	ret = os.system('patch ' + filename + ' ' + patch)
 #end
 
 # Obtain a package and uncompress it
