@@ -11,12 +11,16 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
 	if os.name == 'nt':
 		print '<<WARNING>> no automatic installation for this package'
 	else:
+            if sys.plateform == 'darwin':
+                obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
+            #end
 		print '<<INSTALL>> configure and build GLOG v0.3.3'
 		obtain.configure_build('glog-0.3.3')
 	#end
 else:
 	print '<<INSTALL>> GLOG already installed'
-#end
+end
+
 
 # Download Eigen3
 execfile('obtain_eigen.py')
@@ -45,6 +49,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ce
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
 		ret = os.system('nmake install')
 	else:
+		ret = os.system(cmake_cmd)
 		ret = os.system('make install')
 	#end
 	

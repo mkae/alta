@@ -16,4 +16,16 @@ if(os.name == 'posix'):
 	libs = ['rt', 'dl']
 #end
 
+# If the compiler is not cl.exe, the option -fPIC should
+# be added to the command line
+if env['CC'] != 'cl':
+	ccflags = env['CCFLAGS']
+	if ccflags != '':
+		ccflags = ccflags + ' -fPIC'
+	else:
+		ccflags = '-fPIC'
+	#end
+	env.Append(CCFLAGS = ccflags)
+#end
+
 env.StaticLibrary('../build/core', sources, LIBS=libs)
