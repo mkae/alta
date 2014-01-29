@@ -26,21 +26,29 @@ obtain.obtain('CERES v1.7.0', 'ceres-solver-1.7.0', 'http://ceres-solver.googlec
 print '<<WARNING>> CERES installation requires CMake. You need to run it yourself'
 
 if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ceres'):
-	if os.name == 'nt':
-		print '<<WARNING>> no automatic installation for this package'
+	print '<<INSTALL>> configure and build CERES'
+	os.chdir('.' + os.sep + 'ceres-solver-1.7.0')
+	build_dir = os.pardir + os.sep + 'build' + os.sep
+
+	libname = ''
+	if os.name == 'posix':
+		libname = 'libglog.a'
+	elif os.name == 'nt':
+		libname = 'glog.lib'
 	else:
-		print '<<INSTALL>> configure and build CERES'
-		os.chdir('.' + os.sep + 'ceres-solver-1.7.0')
-		build_dir = os.pardir + os.sep + 'build' + os.sep
-		libname = ''
-		if os.name == 'posix':
-			libname = 'libglog.a'
-		else:
-			libname = 'glog.lib'
-		ret = os.system('cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DMINIGLOG=ON -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF')
-		ret = os.system('make install')
-		os.chdir(os.pardir)
+		libname = 'libglog.dylib'
 	#end
+
+	cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF -DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DMINIGLOG=ON -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
+
+	if os.name == 'nt':
+		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
+		ret = os.system('nmake install')
+	else:
+		ret = os.system('make install')
+	#end
+	
+	os.chdir(os.pardir)
 else:
 	print '<<INSTALL>> CERES already installed'
 #end
