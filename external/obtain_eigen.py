@@ -11,6 +11,7 @@ if not os.path.exists(rep):
 	shutil.copytree('eigen-eigen-ffa86ffb5570' + os.sep + 'Eigen', rep)
 #end
 
-if not os.path.exists(rep + os.sep + 'unsupported'):
-	shutil.copytree('eigen-eigen-ffa86ffb5570' + os.sep + 'unsupported', rep + os.sep + 'Eigen' + os.sep+ 'unsupported')
+unsup_rep =  rep + os.sep+ 'unsupported'
+if not os.path.exists(unsup_rep):
+	shutil.copytree('eigen-eigen-ffa86ffb5570' + os.sep + 'unsupported', unsup_rep)
 #end
