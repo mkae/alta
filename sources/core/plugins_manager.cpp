@@ -7,7 +7,7 @@
 #include <QDir>
 */
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <windows.h>
 #else
     #include <dlfcn.h>
@@ -19,7 +19,7 @@
 //! specific type.
 template<typename T> T open_library(const std::string& filename, const char* function)
 {
-#ifdef WIN32
+#ifdef _WIN32
     HINSTANCE handle = LoadLibraryA(filename.c_str());
     if(handle != NULL)
     {

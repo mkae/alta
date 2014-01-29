@@ -256,7 +256,7 @@ template<typename T> T clamp(T x, T a, T b)
 	return std::max<T>(std::min<T>(x, b), a);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 #define NOT_IMPLEMENTED() \
 std::cerr << "<<ERROR>> not implemented " << __FUNCDNAME__ << " in file " << __FILE__ \
           << ":" << __LINE__ << std::endl; \
@@ -269,7 +269,7 @@ throw
 #endif
 
 // Mathematical definition not provided on the Window plateform
-#ifdef WIN32
+#ifdef _WIN32
 #define M_PI 3.14159265
 
 template<typename T> bool isnan(T x)
@@ -278,7 +278,7 @@ template<typename T> bool isnan(T x)
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define ALTA_DLL_EXPORT extern "C" __declspec(dllexport)
 #else
 #define ALTA_DLL_EXPORT extern "C"

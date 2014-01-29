@@ -153,7 +153,7 @@ std::ostream& operator<<(std::ostream& out, const timer& t)
 
 unsigned int timer::current_time() const
 {
-#ifdef WIN32
+#ifdef _WIN32
 	SYSTEMTIME res;
 	GetSystemTime(&res);
 	return (unsigned int)(res.wSecond + res.wMinute*60 + res.wHour*360);
