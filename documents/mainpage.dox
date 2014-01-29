@@ -62,6 +62,8 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 	<caption>Fitting the MERL database with nonlinear lobe functions</caption>
 </center>
 
+<br />
+
 <h2>Download and install</h2>
 
 <h3>Obtain sources</h3>
@@ -88,13 +90,14 @@ plugins).
 To use QMake, or for a more detailed view of ALTA's building scripts and
 dependencies, please refer to \ref install.
 
+<br />
 
 <h2>How to use it</h2>
 
 After compiling the different command line tools and associated plugins,
 go to the sources directory and launch this command line (for Linux users only):
 \verbatim
- $ ./build/data2brdf --input ../data/1d/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
+ $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
 Tada! You have produced your first fit. The produced output is a 1D rational 
@@ -120,13 +123,14 @@ distribution).
 
 You can find more examples of how to use ALTA on the \ref tutorials page.
 
+<br />
 
 <h2>Contribute</h2>
 
 There are many ways in which you can extend ALTA. Please refer to 
 \ref contribute for more information.
 
-
+<br />
 
 \defgroup core
 \defgroup commands

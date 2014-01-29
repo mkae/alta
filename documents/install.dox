@@ -30,7 +30,8 @@ will be called automatically.
 <h3>List of common plugin dependencies:</h3>
 <ul>
 	<li><a href="http://eigen.tuxfamily.org">Eigen</a> library 
-	(for core and plugins)</li>
+	(for core and plugins). You will need a version >= 3.0 to have access
+	to the Eigen implementation of Levenberg-Marquardt.</li>
 	<li><a href="http://quadprog.sourceforge.net/">Quadprog++</a> library 
 	(for \a rational_fitter_quadprog, provided in the external directory)</li>
 	<li><a href="http://www.mathworks.fr/products/matlab/">Matlab</a> with 
@@ -38,6 +39,9 @@ will be called automatically.
 	<li><a href="http://www.cgal.org"/>CGAL</a> library (for some plugins)</li>
 	<li><a href="https://code.google.com/p/ceres-solver/">CERES</a> solver 
 	library (for \a nonlinear_fitter_ceres)</li>
+	<li><a href="http://www.cs.ubc.ca/research/flann/">libFLANN</a> (for 
+	the \a data_interpolant plugin). Note that this library is available
+	through Debian's packages and MacOS ports.</li>
 </ul>
 
 <br />
@@ -54,12 +58,12 @@ Qt rely on user specified .prf files to look for external libraries.
 in a qmake fashion. Here is an example for the <i>quadprog.prf</i> file:
 
 \verbatim
-INCLUDEPATH += ~/Projects/alta/external/quadprog++
-LIBS += -L~/Projects/alta/build -lquadprog++
+INCLUDEPATH += $(HOME)/Projects/alta/external/quadprog++
+LIBS += -L$(HOME)/Projects/alta/build -lquadprog++
 \endverbatim
 
 ALTA rely on the user to specify a .prf file for each dependency. Major
-one are: eigen.prf, quadprog.prf, ceres.prf, cgal.prf, matlab.prf.
+ones are: eigen.prf, quadprog.prf, ceres.prf, cgal.prf, matlab.prf.
 
 You need to set the environment variable QMAKEFEATURES to the directory
 where you will be storing your .prf files. If you are not familiar with
@@ -69,7 +73,8 @@ of ALTA.
 <h3>Installation</h3>
 
 Once you have the required libraries, the installation of the fitting
-tools is straightforward:
+tools is straightforward. Assuming that the environment variable $ALTA
+contains the path to the alta files:
 
 \verbatim
 $ cd $ALTA/sources
