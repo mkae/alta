@@ -192,6 +192,7 @@ int main(int argc, char** argv)
 
 		const int dx = dim[0];
 		const int dy = dim[1];
+		int* indices = new int[nX];
 
 		// Integrate the moments over the integration domain
 		for(int i=0; i<nb; ++i)
@@ -199,7 +200,6 @@ int main(int argc, char** argv)
 			// For the global index i of the sample, compute the index in the various
 			// dimensions and then compute the position within the dimension. All the
 			// samples are taken uniformly.
-			int indices[nX];
 			int global = i;
 			for(int k=0; k<nX; ++k)
 			{
@@ -239,6 +239,9 @@ int main(int argc, char** argv)
 			}
 		}
 		
+		// Clean memory
+		delete[] indices;
+
 		for(int k=0; k<nY; ++k)
 		{
 			m_x[k]  /= m_0[k];
