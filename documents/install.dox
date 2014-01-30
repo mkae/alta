@@ -74,7 +74,7 @@ recap the currently tested combination:
 		<td>clang 500.2.79</td>
 		<td>x86_64</td>
 		<td>Works</td>
-		<td>Matlab plugins are not tested on this configuration<<br />
+		<td>Matlab plugins are not tested on this configuration<br />
 		Compiled using scons
 		</td>
 	</tr>
