@@ -47,6 +47,52 @@ will be called automatically.
 <br />
 
 
+<h2>Cross platform</h2>
+
+ALTA is developed as a cross platform library. However, we do not test it
+against any possible combination of platform/compiler/architecture. We however
+recap the currently tested combination:
+
+<center>
+<table>
+	<tr>
+		<td><b>OS</b></td>
+		<td><b>Compiler</b></td>
+		<td><b>Arch</b></td>
+		<td><b>Status</b></td>
+		<td><b>Remarks</b></td>
+	</tr>
+	<tr>
+		<td>Debian 7.0</td>
+		<td>GCC 4.7.2</td>
+		<td>x86_64</td>
+		<td>Works</td>
+		<td>Compiled using qmake</td>
+	</tr>
+	<tr>
+		<td>OS X 10.9.1</td>
+		<td>clang 500.2.79</td>
+		<td>x86_64</td>
+		<td>Works</td>
+		<td>Matlab plugins are not tested on this configuration<<br />
+		Compiled using scons
+		</td>
+	</tr>
+	<tr>
+		<td>Windows 7</td>
+		<td>Visual Studio 2007</td>
+		<td>x86_64</td>
+		<td>Works</td>
+		<td>Matlab plugins are not tested on this configuration<br />
+		Compiled using qmake
+		</td>
+	</tr>
+</table>
+</center>
+
+<br />
+
+
 <h2>Qmake</h2>
 
 How to install the various components using <b>qmake</b>.
