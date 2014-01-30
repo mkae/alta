@@ -6,7 +6,7 @@ conf = Configure(env)
 if conf.CheckLib('IlmImf') and conf.CheckLib('IlmThread'):
 
 	sources = ['data.cpp']
-	libs = ['core', 'IlmImf', 'IlmThread']
+	libs = ['core', 'Half', 'IlmImf', 'IlmThread']
 	env.SharedLibrary('../../build/data_brdf_slice', sources, LIBS=libs)
 
 #end

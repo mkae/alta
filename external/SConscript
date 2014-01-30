@@ -1,23 +1,26 @@
 import os
 
 env = Environment()
+if env.GetOption('clean'):
+	print "Nothing to do in external"	
+else:
+	##
+	#   NlOpt dependancies
+	##
+	execfile('obtain_nlopt.py')
 
-##
-#   NlOpt dependancies
-##
-execfile('obtain_nlopt.py')
+	##
+	#   CERES dependancies
+	##
+	execfile('obtain_ceres.py')
 
-##
-#   CERES dependancies
-##
-execfile('obtain_ceres.py')
+	##
+	#   QuadProg++
+	##
+	qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
+	qp_base    = 'quadprog++' + os.sep
+	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
+	env.Append(CPPPATH = ['build' + os.sep + 'include'])
+	env.StaticLibrary(target = qp_target, source = qp_sources)
 
-
-##
-#   QuadProg++
-##
-qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
-qp_base    = 'quadprog++' + os.sep
-qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
-env.Append(CPPPATH = ['build' + os.sep + 'include'])
-env.StaticLibrary(target = qp_target, source = qp_sources)
+#end

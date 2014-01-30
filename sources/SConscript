@@ -1,3 +1,6 @@
-SConscript('core/SConscript')
-SConscript('plugins/SConscript')
-SConscript('softs/SConscript')
+core    = SConscript('core/SConscript')
+plugins = SConscript('plugins/SConscript')
+softs   = SConscript('softs/SConscript')
+
+Depends(softs,   core)
+Depends(plugins, core)
