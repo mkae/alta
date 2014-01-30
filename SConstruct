@@ -1,8 +1,26 @@
+import sys
+
 env = Environment()
 
-if env['CC'] == 'gcc' or env['CC'] == 'clang':
-	env.Append(CCFLAGS = '-fPIC')
+## PLATFORM dependant section
+##
+
+if sys.platform == 'darwin':
+
+	# Adding the /usr/local/lib directory used to store libraries of
+	# MacPorts or Brew.
+	env.AppendUnique(LIBPATH = '/usr/local/lib')
 #end
+
+## COMPILER dependant section
+##
+
+if env['CC'] == 'gcc' or env['CC'] == 'clang':
+	env.AppendUnique(CCFLAGS = '-fPIC')
+#end
+
+
+
 
 Export('env')
 

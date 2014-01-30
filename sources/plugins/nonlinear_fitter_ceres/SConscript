@@ -1,15 +1,28 @@
-env = Environment()
+Import('env')
+env = env.Clone()
+
 env.Append(CPPPATH = ['../../../external/build/include', '../../'])
 env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['fitter.cpp']
-libs = ['ceres', 'glog', 'core', 'lapack']
+libs = ['ceres', 'glog', 'core', 'lapack', 'blas']
 
 conf = Configure(env)
+# Main dependencies of the CERES plugins: CEREs and GLOG
+# GOMP, LAPACK and BLAS are also tested and added if found. If not
+# CERES might not have been compiled with those dependencies.
 if conf.CheckLib('ceres') and conf.CheckLib('glog'):
 
 	if conf.CheckLib('gomp'):
 		libs.append('gomp')
+	#end
+
+	if conf.CheckLib('lapack'):
+		libs.append('lapack')
+	#end
+	
+	if conf.CheckLib('blas'):
+		libs.append('blas')
 	#end
 
 	env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources, LIBS=libs)
