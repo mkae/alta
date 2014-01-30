@@ -10,6 +10,7 @@ if sys.platform == 'darwin':
 	# Adding the /usr/local/lib directory used to store libraries of
 	# MacPorts or Brew.
 	env.AppendUnique(LIBPATH = '/usr/local/lib')
+	env.AppendUnique(CPPPATH = '/usr/local/include')
 #end
 
 ## COMPILER dependant section
