@@ -101,9 +101,11 @@ go to the sources directory and launch this command line (for Linux users only):
 \endverbatim
 
 Tada! You have produced your first fit. The produced output is a 1D rational 
-function, using a monomial basis, interpolating the 
-<a href="http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml">Kirby 2</a> 
-dataset. Note that this fit is not a BRDF.
+function, using a monomial basis, interpolating the <a
+href="http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml">Kirby 2</a>
+dataset. You can find an ALTA compatible version of this dataset <a
+href="http://alta.gforge.inria.fr/data/Kirby2.dat">here</a>. Note that this
+fit is not a BRDF.
 
 \image html Kirby2.png
 
@@ -131,7 +133,15 @@ There are many ways in which you can extend ALTA. Please refer to
 \ref contribute for more information.
 
 <br />
-
+<center>
+<table border="0px">
+	<tr>
+		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" width="100px"></td>
+		<td width="30px"></td>
+		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS"></td>
+	</tr>
+</table>
+</center>
 \defgroup core
 \defgroup commands
 \defgroup plugins

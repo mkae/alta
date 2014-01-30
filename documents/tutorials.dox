@@ -13,6 +13,8 @@ OSX's format.
 The \a data2brdf allows to perform a fitting procedure by converting a \ref
 data object into a brdf object (also named \ref function).
 
+First, download the Kirby2 dataset in ALTA format: <a href="http://alta.gforge.inria.fr/data/Kirby2.dat">Kirby2.dat</a>. Save this file in <i>$ALTA/data/1d/NIST/Kirby2</i>.
+
 \verbatim
  $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim

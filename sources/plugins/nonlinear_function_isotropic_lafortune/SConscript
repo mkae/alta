@@ -1,0 +1,7 @@
+env = Environment()
+env.Append(CPPPATH = ['../../../external/build/include', '../../'])
+env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+
+sources = ['function.cpp']
+libs = ['core']
+env.SharedLibrary('../../build/nonlinear_function_lafortune', sources, LIBS=libs)
