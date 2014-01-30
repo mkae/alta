@@ -25,6 +25,34 @@ if conf.CheckLib('ceres') and conf.CheckLib('glog'):
 		libs.append('blas')
 	#end
 
+	if conf.CheckLib('cxsparse'):
+		libs.append('cxsparse')
+	#end
+
+	if conf.CheckLib('cholmod'):
+		libs.append('cholmod')
+	#end
+
+	if conf.CheckLib('amd'):
+		libs.append('amd')
+	#end
+
+	if conf.CheckLib('camd'):
+		libs.append('camd')
+	#end
+
+	if conf.CheckLib('colamd'):
+		libs.append('colamd')
+	#end
+
+	if conf.CheckLib('ccolamd'):
+		libs.append('ccolamd')
+	#end
+
+	if conf.CheckLib('ldl'):
+		libs.append('ldl')
+	#end
+
 	env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources, LIBS=libs)
 
 #end
