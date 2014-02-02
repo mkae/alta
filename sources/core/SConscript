@@ -1,7 +1,9 @@
 import os
 
-env = Environment()
-env.Append(CPPPATH = '../../external/build/include')
+Import('env')
+env = env.Clone()
+#env = Environment()
+#env.Append(CPPPATH = ['../../external/build/include'])
 
 # Library sources
 sources = ['common.cpp', 
@@ -14,18 +16,6 @@ sources = ['common.cpp',
 libs = []
 if(os.name == 'posix'):
 	libs = ['rt', 'dl']
-#end
-
-# If the compiler is not cl.exe, the option -fPIC should
-# be added to the command line
-if env['CC'] != 'cl':
-	ccflags = env['CCFLAGS']
-	if ccflags != '':
-		ccflags = ccflags + ' -fPIC'
-	else:
-		ccflags = '-fPIC'
-	#end
-	env.Append(CCFLAGS = ccflags)
 #end
 
 env.StaticLibrary('../build/core', sources, LIBS=libs)

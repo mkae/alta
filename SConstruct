@@ -9,13 +9,14 @@ if sys.platform == 'darwin':
 
 	# Adding the /usr/local/lib directory used to store libraries of
 	# MacPorts or Brew.
-	env.AppendUnique(LIBPATH = '/usr/local/lib')
-	env.AppendUnique(CPPPATH = '/usr/local/include')
+	env.AppendUnique(LIBPATH = ['/usr/local/lib'])
+	env.AppendUnique(CPPPATH = ['/usr/local/include'])
 
-	env.AppendUnique(LIBPATH =  '/opt/local/lib/')
-	env.AppendUnique(CPPPATH =  '/opt/local/include/')
+	env.AppendUnique(LIBPATH = ['/opt/local/lib/'])
+	env.AppendUnique(CPPPATH = ['/opt/local/include/'])
 
 #end
+
 
 ## COMPILER dependant section
 ##
@@ -25,7 +26,18 @@ if env['CC'] == ['gcc', 'g++', 'clang']:
 #end
 
 
+## Load the configuration file if it exists. The configuration file
+## is a python script that updates the env variable with different
+## paths.
+##
 
+env.AppendUnique(LIBPATH = ['#external/build/lib'])
+env.AppendUnique(CPPPATH = ['#external/build/include'])
+
+
+
+## Launch the compilations
+##
 
 Export('env')
 
