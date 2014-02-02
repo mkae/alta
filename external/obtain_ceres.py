@@ -49,6 +49,8 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ce
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
 		ret = os.system('nmake install')
 	else:
+		cmake_cmd += ' -DCMAKE_CXX_FLAGS=\"-fPIC\"'
+		cmake_cmd += ' -DCMAKE_C_FLAGS=\"-fPIC\"'
 		ret = os.system(cmake_cmd)
 		ret = os.system('make install')
 	#end
