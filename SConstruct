@@ -21,7 +21,7 @@ if sys.platform == 'darwin':
 ## COMPILER dependant section
 ##
 
-if env['CC'] == ['gcc', 'g++', 'clang']:
+if env['CC'] in ['gcc', 'g++', 'clang']:
 	env.AppendUnique(CCFLAGS = '-fPIC')
 #end
 
