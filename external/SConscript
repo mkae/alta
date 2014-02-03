@@ -1,6 +1,7 @@
 import os
 
-env = Environment()
+Import('env')
+
 if env.GetOption('clean'):
 	print "Nothing to do in external"	
 else:
@@ -12,7 +13,9 @@ else:
 	##
 	#   CERES dependancies
 	##
-	execfile('obtain_ceres.py')
+	if env['CERES_INC'] == '#external/build/include' and env['CERES_LIB'] == '#external/build/lib':
+		execfile('obtain_ceres.py')
+	#end
 
 	##
 	#   QuadProg++

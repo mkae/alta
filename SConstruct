@@ -25,7 +25,7 @@ vars.Add('CERES_LIBS',        'CERES libraries')
 vars.Add('CERES_OPT_LIBS',    'CERES optional libraries')
 
 env = Environment(variables = vars)
-print(env['CC'])
+
 
 ## PLATFORM dependant section
 ##
@@ -64,7 +64,9 @@ env.AppendUnique(CPPPATH = ['#sources'])
 ##
 Export('env')
 
-external = env.SConscript('external/SConscript')
-sources  = env.SConscript('sources/SConscript')
-
-env.Depends(sources, external)
+if not env.GetOption('help'):
+	external = env.SConscript('external/SConscript')
+	sources  = env.SConscript('sources/SConscript')
+	
+	env.Depends(sources, external)
+#end
