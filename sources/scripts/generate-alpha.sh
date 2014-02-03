@@ -18,6 +18,7 @@ rm -rf sources/softs/rational_1d
 rm -rf sources/softs/generate_data
 rm -rf sources/softs/fourieranalysis
 rm -rf sources/softs/data2diff
+rm -rf sources/scripts/generate-alpha.sh
 
 # Creating the C++ LICENSE header
 echo "/*\n$(cat LICENSE.txt | while read LINE; do echo " * $LINE"; done;)\n */\n\n" > LICENSE.C
@@ -32,7 +33,14 @@ rm -rf LICENSE.C
 # Create the archive
 cd ../
 tar -cf alta-alpha.tar alta-alpha
-gz alta-alpha.tar 
+gzip alta-alpha.tar 
+
+# Copy file that contains not reference to retro
+cd alta-alpha
+cp ../alta-alpha-temp/sources/core/params.* ./sources/core/
+cp ../alta-alpha-temp/sources/plugins/nonlinear_function_beckmann/function.* ./sources/plugins/nonlinear_function_beckmann/
+cp ../alta-alpha-temp/sources/plugins/nonlinear_function_spherical_gaussian//function.* ./sources/plugins/nonlinear_function_spherical_gaussian/
+
 
 # Upload the archive
-scp alta-alpha.tar.gz belcour@scm.gforge.inria.fr:/home/groups/alta/htdocs/downloads
+#scp alta-alpha.tar.gz belcour@scm.gforge.inria.fr:/home/groups/alta/htdocs/downloads
