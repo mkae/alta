@@ -2,7 +2,7 @@ import obtain
 import os
 import sys
 import shutil
-
+import subprocess
 
 # Download GLOG
 obtain.obtain('GLOG v0.3.3', 'glog-0.3.3', 'http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz', 'glog-0.3.3.tar.gz')
@@ -29,7 +29,15 @@ execfile('obtain_eigen.py')
 obtain.obtain('CERES v1.7.0', 'ceres-solver-1.7.0', 'http://ceres-solver.googlecode.com/files/ceres-solver-1.7.0.tar.gz', 'ceres-solver-1.7.0.tar.gz')
 print '<<WARNING>> CERES installation requires CMake. You need to run it yourself'
 
-if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ceres'):
+## Test for the presence of already compiled ceres version in
+## the $ALTA/external/build directory. Then test for the
+## presence of cmake.
+compile_test = not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ceres')
+with open(os.devnull, 'w') as fnull:
+        res = subprocess.call(['cmake', '--version'], stdout = fnull, stderr = fnull, shell=True)
+        compile_test = compile_test and res == 0
+
+if  compile_test:
 	print '<<INSTALL>> configure and build CERES'
 	os.chdir('.' + os.sep + 'ceres-solver-1.7.0')
 	build_dir = os.pardir + os.sep + 'build' + os.sep
@@ -57,5 +65,5 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ce
 	
 	os.chdir(os.pardir)
 else:
-	print '<<INSTALL>> CERES already installed'
+	print '<<INSTALL>> CERES already installed or cannot be installed automatically'
 #end
