@@ -1,8 +1,8 @@
 Import('env')
 env = env.Clone()
 
-env.AppendUnique(CPPPATH = ['../../../external/build/include', '../../'])
-env.AppendUnique(LIBPATH = ['../../../external/build/lib', '../../build'])
+#env.AppendUnique(CPPPATH = ['../../../external/build/include', '../../'])
+#env.AppendUnique(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['fitter.cpp']
 libs = ['ceres', 'glog', 'core']

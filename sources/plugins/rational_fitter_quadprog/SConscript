@@ -1,7 +1,17 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/quadprog++', '../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+Import('env')
+env = env.Clone()
+
+#env = Environment()
+#env.Append(CPPPATH = ['../../../external/quadprog++', '../../../external/build/include', '../../'])
+#env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+env.AppendUnique(CPPPATH = ['../../../external/quadprog++'])
+
+conf = Configure(env)
 
 sources = ['rational_fitter.cpp']
 libs = ['core', 'quadprog++']
-env.SharedLibrary('../../build/rational_fitter_quadprog', sources, LIBS=libs)
+
+if conf.CheckLib('quadprog++'):
+	env.SharedLibrary('../../build/rational_fitter_quadprog', sources, LIBS=libs)
+#end
+conf.Finish()

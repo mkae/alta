@@ -32,6 +32,7 @@ if env['CC'] in ['gcc', 'g++', 'clang']:
 ##
 
 env.AppendUnique(LIBPATH = ['#external/build/lib'])
+env.AppendUnique(LIBPATH = ['#sources/build'])
 env.AppendUnique(CPPPATH = ['#external/build/include'])
 env.AppendUnique(CPPPATH = ['#sources'])
 
