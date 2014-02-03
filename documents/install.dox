@@ -50,8 +50,8 @@ will be called automatically.
 <h2>Cross platform</h2>
 
 ALTA is developed as a cross platform library. However, we do not test it
-against any possible combination of platform/compiler/architecture. We however
-recap the currently tested combination:
+against any possible combination of platform/compiler/architecture. 
+Here is a  recap of the currently tested combinations:
 
 <center>
 <table>
