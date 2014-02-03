@@ -5,7 +5,7 @@ env.AppendUnique(CPPPATH = ['../../../external/build/include', '../../'])
 env.AppendUnique(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['fitter.cpp']
-libs = ['ceres', 'glog', 'core', 'lapack', 'blas']
+libs = ['ceres', 'glog', 'core']
 
 conf = Configure(env)
 # Main dependencies of the CERES plugins: CEREs and GLOG
