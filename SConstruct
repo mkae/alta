@@ -15,7 +15,8 @@ if not os.path.exists(configFile):
 #end
 
 vars = Variables(configFile)
-vars.Add('CC',                'Compiler')
+vars.Add('CXX',               'Compiler')
+vars.Add('CCFLAGS',           'Compiler\'s flags')
 vars.Add('OPENEXR_INC',       'OpenEXR include directory')
 vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory')
 vars.Add('OPENEXR_LIBS',      'OpenEXR libraries')
@@ -23,6 +24,10 @@ vars.Add('CERES_INC',         'CERES include directory')
 vars.Add('CERES_DIR',         'CERES libraries directory')
 vars.Add('CERES_LIBS',        'CERES libraries')
 vars.Add('CERES_OPT_LIBS',    'CERES optional libraries')
+vars.Add('NLOPT_INC',         'NLOPT include directory')
+vars.Add('NLOPT_DIR',         'NLOPT libraries directory')
+vars.Add('NLOPT_LIBS',        'NLOPT libraries')
+vars.Add('NLOPT_OPT_LIBS',    'NLOPT optional libraries')
 
 env = Environment(variables = vars)
 

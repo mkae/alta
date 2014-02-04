@@ -9,8 +9,8 @@ import os, sys
 
 ## Compilators build flags
 ##
-CC             = 'g++'
-CC_FLAGS       = ['-O3', '-Wall']
+CXX            = 'g++'
+CCFLAGS        = ['-O3', '-g', '-Wall', '-m64']
 
 
 ## OpenMP flags
@@ -35,3 +35,14 @@ CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
 CERES_LIBS     = ['ceres', 'glog']
 CERES_OPT_LIBS = ['gomp', 'lapack', 'blas']
+
+
+## NlOpt library
+##
+## You have to specify both the directory of the NlOpt library
+## and the glog library
+##
+NLOPT_INC      = ['#external/build/include']
+NLOPT_DIR      = ['#external/build/lib']
+NLOPT_LIBS     = ['nlopt']
+NLOPT_OPT_LIBS = []
