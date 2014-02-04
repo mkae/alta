@@ -44,7 +44,8 @@ if sys.platform == 'darwin':
 
 ## COMPILER dependant section
 ##
-if env['CC'] in ['gcc', 'g++', 'clang']:
+if env['CC'] in ['gcc', 'clang'] or env['CXX'] in ['g++', 'clang']:
+	print '<<INFO>> add -fPIC option to the compiler'
 	env.AppendUnique(CCFLAGS = '-fPIC')
 #end
 
