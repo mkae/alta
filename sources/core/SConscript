@@ -1,4 +1,5 @@
 import os
+import sys
 
 Import('env')
 env = env.Clone()
@@ -18,4 +19,12 @@ if(os.name == 'posix'):
 	libs = ['rt', 'dl']
 #end
 
-env.StaticLibrary('../build/core', sources, LIBS=libs, LINKFLAGS=['-shared'])
+## Known compilation issue. If the core is not compiled with -fvisibility-hidden
+## on OSX, the shared libraries and the softwares cannot share vtables. This
+## impact the use of dynamic_cast in shared libraries.
+##
+if sys.platform == 'darwin':
+	env.AppendUnique(CCFLAGS = ['-fvisibility=hidden'])
+#end
+
+env.StaticLibrary('../build/core', sources, LIBS=libs)
