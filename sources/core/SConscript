@@ -18,4 +18,4 @@ if(os.name == 'posix'):
 	libs = ['rt', 'dl']
 #end
 
-env.StaticLibrary('../build/core', sources, LIBS=libs)
+env.StaticLibrary('../build/core', sources, LIBS=libs, LINKFLAGS=['-shared'])

@@ -1,7 +1,6 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+Import('env')
+env = env.Clone()
 
 sources = ['rational_fitter.cpp']
 libs = ['core']
-env.SharedLibrary('../../build/rational_fitter_eigen', sources, LIBS=libs)
+env.SharedLibrary('../../build/rational_fitter_eigen', sources, LIBS=libs, LINKFLAGS=['-shared'])

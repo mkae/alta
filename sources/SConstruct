@@ -17,6 +17,7 @@ if not os.path.exists(configFile):
 vars = Variables(configFile)
 vars.Add('CXX',               'Compiler')
 vars.Add('CCFLAGS',           'Compiler\'s flags')
+vars.Add('LINKFLAGS',         'Linker\'s flags')
 vars.Add('OPENEXR_INC',       'OpenEXR include directory')
 vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory')
 vars.Add('OPENEXR_LIBS',      'OpenEXR libraries')
