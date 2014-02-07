@@ -21,7 +21,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 struct EigenFunctor: Eigen::DenseFunctor<double>
 {
 	EigenFunctor(nonlinear_function* f, const data* d, bool use_cosine) :
-		DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _cosine(use_cosine)
+		Eigen::DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
@@ -139,7 +139,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 struct CompoundFunctor: Eigen::DenseFunctor<double>
 {
 	CompoundFunctor(compound_function* f, int index, const data* d, bool use_cosine) :
-		DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), _f(f), _index(index), _d(d), _cosine(use_cosine)
+		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), _f(f), _index(index), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
