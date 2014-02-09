@@ -42,7 +42,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>-->
+			<!--<fresnel name="nonlinear_fresnel_retroschlick"/>-->
 		</function>
 
 		<!-- Define the ftting procedure to use -->
@@ -105,7 +105,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<!--<parameter name="fresnel" value="./build/libnonlinear_fresnel_retroschlick.so"/>-->
+			<!--<fresnel name="nonlinear_fresnel_retroschlick"/>-->
 			<parameter name="retro" value="" />
 		</function>
 

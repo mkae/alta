@@ -25,7 +25,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<parameter name="fresnel" value="./build/libnonlinear_shadowing_smith.so"/>
+			<fresnel name="nonlinear_shadowing_smith"/>
 		</function>
 
 		<!-- Define the ftting procedure to use -->
@@ -45,7 +45,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<parameter name="fresnel" value="./build/libnonlinear_shadowing_schlick.so"/>
+			<fresnel name="nonlinear_shadowing_schlick"/>
 		</function>
 
 		<!-- Define the ftting procedure to use -->
@@ -107,7 +107,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<!--<parameter name="fresnel" value="./build/libnonlinear_shadowing_smith.so"/>-->
+			<!--<fresnel name="nonlinear_shadowing_smith"/>-->
 			<parameter name="retro" value="" />
 		</function>
 

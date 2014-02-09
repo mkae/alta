@@ -13,11 +13,14 @@ SConscript('rational_fitter_quadprog/SConscript')
 # Building functions
 SConscript('nonlinear_function_diffuse/SConscript')
 SConscript('nonlinear_function_beckmann/SConscript')
-SConscript('nonlinear_function_retrobeckmann/SConscript')
 SConscript('nonlinear_function_abc/SConscript')
 SConscript('nonlinear_function_blinn/SConscript')
-SConscript('nonlinear_function_retroblinn/SConscript')
-SConscript('nonlinear_function_retroyoo/SConscript')
 SConscript('rational_function_legendre/SConscript')
 SConscript('rational_function_chebychev/SConscript')
 SConscript('nonlinear_function_isotropic_lafortune/SConscript')
+
+# Building retro functions
+SConscript('nonlinear_function_retroblinn/SConscript')
+SConscript('nonlinear_function_retroyoo/SConscript')
+SConscript('nonlinear_function_retrobeckmann/SConscript')
+SConscript('nonlinear_fresnel_retroschlick/SConscript')
