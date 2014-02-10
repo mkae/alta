@@ -45,7 +45,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<fresnel name="nonlinear_shadowing_schlick"/>
+			<fresnel name="nonlinear_shadowing_smith"/>
 		</function>
 
 		<!-- Define the ftting procedure to use -->
@@ -107,7 +107,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retrobeckmann">
-			<!--<fresnel name="nonlinear_shadowing_smith"/>-->
+			<fresnel name="nonlinear_shadowing_smith"/>
 			<parameter name="retro" value="" />
 		</function>
 

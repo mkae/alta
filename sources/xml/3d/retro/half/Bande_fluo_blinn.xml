@@ -43,7 +43,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retroblinn">
-			<fresnel name="nonlinear_fresnel_retroschlick"/>
+			<fresnel name="nonlinear_shadowing_smith"/>
 			<parameter name="param" value="COS_TK" />
 		</function>
 
@@ -104,7 +104,7 @@
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
 		<function name="nonlinear_function_retroblinn">
-			<fresnel name="nonlinear_fresnel_retroschlick"/>
+			<fresnel name="nonlinear_shadowing_smith"/>
 			<parameter name="param" value="COS_TLV" />
 		</function>
 
