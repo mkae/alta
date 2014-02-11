@@ -32,6 +32,7 @@
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[0.3,  2,  2]" />
+		<parameter name="ymax" value="[0.3,  2,  2]" />
 	</action>
 	<action name="data2brdf">
 
@@ -50,9 +51,9 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.3,  2,  2]" />
-		<!--<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />-->
-		<parameter name="cos-fit" value="" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />
+		<!--<parameter name="cos-fit" value="" />-->
 	</action>
 	
 	<!-- Export the fit -->
@@ -62,12 +63,12 @@
 		<input  name="./results/3d/retro/half/Bande_fluo_beck_back.brdf" />
 		<output name="./results/3d/retro/half/Bande_fluo_beck_back.dat" />
 
-		<!--<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />-->
-		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		<!--<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />-->
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
-		<parameter name="cos-plot" value="" />
+		<!--<parameter name="cos-plot" value="" />-->
 	</action>
 
 
@@ -93,8 +94,8 @@
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
 
 		<!-- Parameters -->
-		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="min" value="[0.1,  0, -2]" />
+		<parameter name="max" value="[0.3,  2,  2]" />
 	</action>
 	<action name="data2brdf">
 
@@ -114,9 +115,9 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.3,  2,  2]" />
-		<!--<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />-->
-		<parameter name="cos-fit" value="" />
+		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="bootstrap" value="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />
+		<!--<parameter name="cos-fit" value="" />-->
 	</action>
 	
 	<!-- Export the fit -->
@@ -126,11 +127,11 @@
 		<input  name="./results/3d/retro/half/Bande_fluo_beck_retro.brdf" />
 		<output name="./results/3d/retro/half/Bande_fluo_beck_retro.dat" />
 
-		<!--<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />-->
-		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
+		<!--<parameter name="data" value="../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" />-->
 		
 		<parameter name="min" value="[0.1, -2, -2]" />
 		<parameter name="max" value="[1.7,  2,  2]" />
-		<parameter name="cos-plot" value="" />
+		<!--<parameter name="cos-plot" value="" />-->
 	</action>
 </alta>
