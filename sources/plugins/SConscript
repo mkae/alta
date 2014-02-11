@@ -10,14 +10,19 @@ SConscript('nonlinear_fitter_eigen/SConscript')
 SConscript('rational_fitter_eigen/SConscript')
 SConscript('rational_fitter_quadprog/SConscript')
 
-# Building functions
+# Building nonlinear functions
 SConscript('nonlinear_function_diffuse/SConscript')
 SConscript('nonlinear_function_beckmann/SConscript')
 SConscript('nonlinear_function_abc/SConscript')
 SConscript('nonlinear_function_blinn/SConscript')
+SConscript('nonlinear_function_isotropic_lafortune/SConscript')
+
+# Building nonlinear masking functions
+SConscript('nonlinear_shadowing_smith/SConscript')
+
+# Building rational functions
 SConscript('rational_function_legendre/SConscript')
 SConscript('rational_function_chebychev/SConscript')
-SConscript('nonlinear_function_isotropic_lafortune/SConscript')
 
 # Building retro functions
 SConscript('nonlinear_function_retroblinn/SConscript')
