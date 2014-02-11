@@ -30,17 +30,17 @@ find ./sources/ -regex ".*\.\(h\|cpp\)$" | while read FILE; do
 done
 rm -rf LICENSE.C
 
+
 # Create the archive
 cd ../
 tar -cf alta-alpha.tar alta-alpha
 gzip alta-alpha.tar 
 
 # Copy file that contains not reference to retro
-cd alta-alpha
-cp ../alta-alpha-temp/sources/core/params.* ./sources/core/
-cp ../alta-alpha-temp/sources/plugins/nonlinear_function_beckmann/function.* ./sources/plugins/nonlinear_function_beckmann/
-cp ../alta-alpha-temp/sources/plugins/nonlinear_function_spherical_gaussian//function.* ./sources/plugins/nonlinear_function_spherical_gaussian/
-
+#cp ../alta-alpha-temp/sources/plugins/SConscript ./sources/plugins/
+#cp ../alta-alpha-temp/sources/core/params.* ./sources/core/
+#cp ../alta-alpha-temp/sources/plugins/nonlinear_function_beckmann/function.* ./sources/plugins/nonlinear_function_beckmann/
+#cp ../alta-alpha-temp/sources/plugins/nonlinear_function_spherical_gaussian//function.* ./sources/plugins/nonlinear_function_spherical_gaussian/
 
 # Upload the archive
 #scp alta-alpha.tar.gz belcour@scm.gforge.inria.fr:/home/groups/alta/htdocs/downloads

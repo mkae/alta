@@ -37,9 +37,9 @@ def obtain(name, rep, url, filename):
 	#end
 #end
 
-def configure_build(rep, configuration = ''):
+def configure_build(rep, options = ''):
 	os.chdir(rep)
-	ret = os.system('./configure -q --prefix=' + os.getcwd() + os.sep + os.pardir + os.sep + 'build ' + configuration)
+	ret = os.system('./configure -q --prefix=' + os.getcwd() + os.sep + os.pardir + os.sep + 'build ' + options)
 	if ret != 0:
 		print '<<ERROR>> unable to configure package'
 		exit

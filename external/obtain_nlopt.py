@@ -12,7 +12,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'nl
 		print '<<WARNING>> no automatic installation for this package'
 	else:
 		print '<<INSTALL>> configure and build Nlopt v2.4.1'
-		obtain.configure_build('nlopt-2.4.1', '--with-pic=yes --without-guile --without-python --without-octave --without-matlab')
+		obtain.configure_build('nlopt-2.4.1', '--without-matlab --without-octave --without-python --without-guile  --with-pic=yes')
 	#end
 else:
 	print '<<INSTALL>> NlOpt already installed'
