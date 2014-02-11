@@ -19,7 +19,7 @@
 
 		<!-- Input and output arguments of the action -->
 		<!--<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />-->
-		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
 		<output name="./results/3d/retro/half/Bande_orange_beck_back.brdf" />
 
 		<!-- Define the function to use -->
@@ -39,7 +39,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
 		<output name="./results/3d/retro/half/Bande_orange_beck_back.brdf" />
 
 		<!-- Define the function to use -->
