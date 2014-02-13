@@ -51,7 +51,7 @@ directory using the Scons script or Qmake .pro file in
 the Engine library is required to compile some plugins:
 <ul>
 	<li>\a rational_fitter_matlab</li> to perform rational interpolation
-	of vertical segments using quadratic programming [Pacanowski 2012].</li>
+	of vertical segments using quadratic programming [Pacanowski et al. 2012].</li>
 	<li>\a data_interpolant_matlab</li> to perform data interpolation and
 	hole filling.</li>
 </ul>

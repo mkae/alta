@@ -95,6 +95,22 @@ Here is a  recap of the currently tested combinations:
 
 <br />
 
+<h2>Scons</h2>
+
+Using scons, the compilation of ALTA is straightforward:
+
+\verbatim
+$ cd $ALTA
+$ scons -i
+\endverbatim
+
+All the resulting elements of ALTA (binaries, dynamic and static libraries)
+are outputted in: <em>$ALTA/sources/build</em> directory. The dependencies
+(Eigen, ceres, ...) will be compiled in the <em>$ALTA/external/build</em>
+directory.
+
+<br />
+
 
 <h2>Qmake</h2>
 
@@ -135,20 +151,4 @@ are outputed in: <em>$ALTA/sources/build</em> directory.
 
 <br />
 
-
-<h2>Scons</h2>
-
-Using scons, the compilation of ALTA is straightforward:
-
-\verbatim
-$ cd $ALTA
-$ scons -i
-\endverbatim
-
-All the resulting elements of ALTA (binaries, dynamic and static libraries)
-are outputted in: <em>$ALTA/sources/build</em> directory. The dependencies
-(Eigen, ceres, ...) will be compiled in the <em>$ALTA/external/build</em>
-directory.
-
-<br />
 */
