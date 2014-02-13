@@ -53,7 +53,7 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="max" value="[0.9,  2,  2]" />
 		<parameter name="bootstrap" value="./results/3d/retro/half/Bande_orange_beck_back.brdf" />
 		<!--<parameter name="cos-fit" value="" />-->
 	</action>
@@ -101,7 +101,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" />
 		<output name="./results/3d/retro/half/Bande_orange_beck_retro.brdf" />
 
 		<!-- Define the function to use -->
@@ -116,7 +116,7 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[1.7,  2,  2]" />
+		<parameter name="max" value="[0.9,  2,  2]" />
 		<parameter name="bootstrap" value="./results/3d/retro/half/Bande_orange_beck_retro.brdf" />
 		<!--<parameter name="cos-fit" value="" />-->
 	</action>

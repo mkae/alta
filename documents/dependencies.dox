@@ -1,0 +1,130 @@
+/**
+\page dependencies Dependencies
+
+To ease the installation of ALTA, we provide scripts to install some of the
+dependencies in the <em>$ALTA/external</em> directory. Each script is a python
+script and has the form <i>obtain_{name}.py</i>. For example, to obtain the
+Eigen library, the commands are:
+
+\verbatim
+$ cd $ALTA/external
+$ python obtain_eigen.py
+\endverbatim
+
+<b>Note: </b> if you plan to use <b>scons</b> to compile ALTA, those scripts
+will be called automatically.
+
+<b>Note: </b> if you plan to use you own compilation of those libraries,
+please make sure to compile static binaries or to make the shared objects
+available in the running environment.
+
+<br />
+
+<h2>List of common plugin dependencies:</h2>
+
+<h3>Eigen</h3>
+<a href="http://eigen.tuxfamily.org">Eigen</a> library is necessary to 
+compile ALTA's core and all plugins. You will need Eigen version >= 3.0 
+to have access	to Eigen non-linear solver.
+
+You can obtain Eigen and install it in <em>$ALTA/external/build</em>
+directory using our scripts:
+\verbatim
+$ cd $ALTA/external
+$ python obtain_eigen.py
+\endverbatim
+
+<br />
+
+<h3>Quadprog++</h3>
+<a href="http://quadprog.sourceforge.net/">Quadprog++</a> library
+(for \a rational_fitter_quadprog, provided in the external directory).
+
+You can obtain Quadprog++ and install it in <em>$ALTA/external/build</em>
+directory using the Scons script or Qmake .pro file in 
+<em>$ALTA/external</em>.
+
+<br />
+
+<h3>Matlab</h3>
+<a href="http://www.mathworks.fr/products/matlab/">Matlab</a> with 
+the Engine library is required to compile some plugins:
+<ul>
+	<li>\a rational_fitter_matlab</li> to perform rational interpolation
+	of vertical segments using quadratic programming [Pacanowski 2012].</li>
+	<li>\a data_interpolant_matlab</li> to perform data interpolation and
+	hole filling.</li>
+</ul>
+
+We do not provide a scripted installation of this dependency. It is up to
+you to install Matlab and to provide a matlab.prf file or to create your
+scons configuration file with MATLAB_INC, MATLAB_LIB, and MATLAB_DIR
+variables.
+
+<br />
+
+<h3>CGAL</h3>
+<a href="http://www.cgal.org"/>CGAL</a> library is required to compile
+the \a rational_fitter_cgal plugin for rational interpolation of vertical
+segment.
+
+We do not provide a scripted installation of this dependency. It is up to
+you to install Matlab and to provide a cgal.prf file or to create your
+scons configuration file with CGAL_INC, CGAL_LIB, and CGAL_DIR
+variables.
+
+<br />
+
+<h3>CERES</h3>
+<a href="https://code.google.com/p/ceres-solver/">CERES</a> solver 
+library is required to compile the \a nonlinear_fitter_ceres plugin.
+
+You can obtain CERES and install it in <em>$ALTA/external/build</em>
+directory using our scripts:
+\verbatim
+$ cd $ALTA/external
+$ python obtain_ceres.py
+\endverbatim
+
+If you are using Qmake, you need to provide a ceres.prf file to ensure
+that the compilation tools will find ceres headers and library files.
+If you want to use your own compilation of CERES in Scons, you need to
+update the CERES_INC, CERES_DIR, CERES_LIB, and CERES_OPT_LIBS variables
+to the Scons configuration file.
+
+<br />
+
+<h3>NlOpt</h3>
+<a href="http://ab-initio.mit.edu/wiki/index.php/NLopt">NlOpt</a> 
+library is required to compile the \a nonlinear_fitter_nlopt plugin for
+nonlinear optimization.
+
+You can obtain NlOpt and install it in <em>$ALTA/external/build</em>
+directory using our scripts:
+\verbatim
+$ cd $ALTA/external
+$ python obtain_nlopt.py
+\endverbatim
+
+If you are using Qmake, you need to provide a nlopt.prf file to ensure
+that the compilation tools will find ceres headers and library files.
+If you want to use your own compilation of NLOPT in Scons, you need to
+update the NLOPT_INC, NLOPT_DIR, NLOPT_LIB, and NLOPT_OPT_LIBS variables
+to the Scons configuration file.
+
+<br />
+
+<h3>FLANN</h3>
+<a href="http://www.cs.ubc.ca/research/flann/">libFLANN</a> (for 
+the \a data_interpolant plugin). Note that this library is available
+through Debian's packages and MacOS ports.
+
+We do not provide a scripted installation of this dependency. It is up to 
+you to install FLANN library and to provide a cgal.prf file or to create 
+your scons configuration file with FLANN_INC, FLANN_LIB, and FLANN_DIR
+variables.
+
+<br />
+
+
+*/
