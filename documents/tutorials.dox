@@ -59,6 +59,51 @@ This command line is rather long. To help you design complex command line in a m
 
 <br />
 
+<h3>XML scripts</h3>
+
+Here is the script to perform the same fitting as the previous example. It 
+performs the fitting of the blue metallic paint from the MERL database using
+a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
+
+\verbatim
+<?xml version="1.0"?>
+<alta>
+	<configuration>
+		<parameter name="lib-dir" value="./build" />
+	</configuration>
+
+	<action name="data2brdf">
+		<!-- Input and output arguments of the action -->
+		<input  name="../data/3d/merl/blue-metallic-paint.binary" />
+		<output name="./results/3d/merl/blue-mettalic-paint.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+		<function name="nonlinear_function_beckmann">
+		</function>
+ 		
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+		<!-- Define the data loader to use -->
+		<plugin type="data" name="data_merl" />
+
+		<!-- Parameter -->
+		<parameter name="export" value="explorer" /> 
+	</action>
+</alta>
+\endverbatim
+
+You can perform this action using the following command, assuming that the
+xml script is in file <em>script.xml</em>:
+\verbatim
+ $ ./scripts/xml_cmd.py script.xml
+\endverbatim
+
+You can put multiple <action> commands in the xml file. Those commands will
+be executed in order.
+
+<br />
 
 <h2>Moment analysis using the command line</h2>
 

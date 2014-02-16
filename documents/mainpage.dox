@@ -24,6 +24,8 @@ and models</b>, or just perform <b>statistical analysis</b> on your data.
 
 <h3>Features</h3>
 
+Here is a list of the major features in the ALTA library (you can find
+the complete list in the \ref features page):
 <ul>
 	<li>Open common BRDF data formats (MERL, ASTM)</li>
 	<li>Non-linear fitting of BRDF (using third party packages)</li>
