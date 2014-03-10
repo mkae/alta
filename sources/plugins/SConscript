@@ -23,6 +23,7 @@ SConscript('nonlinear_shadowing_smith/SConscript')
 # Building rational functions
 SConscript('rational_function_legendre/SConscript')
 SConscript('rational_function_chebychev/SConscript')
+SConscript('rational_function_cosine/SConscript')
 
 # Building retro functions
 SConscript('nonlinear_function_retroblinn/SConscript')
