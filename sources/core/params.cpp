@@ -115,18 +115,18 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double theta = sqrt(invec[0]*invec[0] + invec[1]*invec[1]);
 			if(theta > 0.0)
 			{
-				outvec[3] = (invec[0]/theta)*sin(theta);
-				outvec[4] = (invec[1]/theta)*sin(theta);
+				outvec[0] = (invec[0]/theta)*sin(theta);
+				outvec[1] = (invec[1]/theta)*sin(theta);
 			}
 			else
 			{
-				outvec[3] = 0.0;
-				outvec[4] = 0.0;
+				outvec[0] = 0.0;
+				outvec[1] = 0.0;
 			}
-			outvec[5] = cos(theta);
-			outvec[0] = 0.0;
-			outvec[1] = 0.0;
-			outvec[2] = 1.0;
+			outvec[2] = cos(theta);
+			outvec[3] = 0.0;
+			outvec[4] = 0.0;
+			outvec[5] = 1.0;
 		}
 			break;
 
@@ -158,16 +158,16 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case ISOTROPIC_TL_TV_PROJ_DPHI:
 		{
 			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
-			if(theta > 0.0)
-			{
+//			if(theta > 0.0)
+//			{
 				outvec[0] = (invec[1]/theta)*sin(theta);
 				outvec[1] = (invec[2]/theta)*sin(theta);
-			}
-			else
-			{
-				outvec[0] = 0.0;
-				outvec[1] = 0.0;
-			}
+//			}
+//			else
+//			{
+//				outvec[0] = sin(theta);
+//				outvec[1] = 0.0;
+//			}
 			outvec[2] = cos(theta);
 			outvec[3] = sin(invec[0]);
 			outvec[4] = 0.0;
@@ -306,7 +306,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case ISOTROPIC_TV_PROJ_DPHI:
 		{
-			const double theta = acos(invec[5]);
+			const double theta = acos(invec[2]);
 			const double dphi  = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
 			outvec[0] = theta * cos(dphi);
 			outvec[1] = theta * sin(dphi);

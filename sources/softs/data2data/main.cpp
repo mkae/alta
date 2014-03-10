@@ -71,6 +71,10 @@ int main(int argc, char** argv)
 		std::cout << "                         parametrizations." << std::endl ;
 		std::cout << "  --data-correct-cosine  Divide the value of the data points by the product of" << std::endl;
 		std::cout << "                         the light and view vector dot product with the normal." << std::endl ;
+		std::cout << std::endl;
+		std::cout << "Helps:" << std::endl;
+		std::cout << "  --help                 Display this help." << std::endl;
+		std::cout << "  --help-params          Display the available input parametrizations." << std::endl;
 		return 0 ;
 	}
 	if(args.is_defined("help-params")) {
