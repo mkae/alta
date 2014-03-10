@@ -49,7 +49,6 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	const int _max_np = args.get_int("np", _min_np);
 	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
 
-    int k = 1;
     for(int i=_min_np; i<=_max_np; ++i)
 	{
 		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
@@ -88,6 +87,10 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		for(int j=0; j<nb_cores; ++j)
 		{
 			rational_function* rj = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+			//! \todo I need to do a check of compatibility here, but the 
+			//! signature of the check_compatibility function is not good.
+			rj->setParametrization(fit->input_parametrization());
+			rj->setParametrization(fit->output_parametrization());
 
 			rj->setDimX(d->dimX()) ;
 			rj->setDimY(d->dimY()) ;
