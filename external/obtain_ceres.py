@@ -15,7 +15,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
                 obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
             #end
 	    print '<<INSTALL>> configure and build GLOG v0.3.3'
-	    obtain.configure_build('glog-0.3.3')
+	    obtain.configure_build('glog-0.3.3', '--enable-static=yes --enable-shared=false --with-pic=true')
 	#end
 else:
 	print '<<INSTALL>> GLOG already installed'
@@ -33,9 +33,15 @@ print '<<WARNING>> CERES installation requires CMake. You need to run it yoursel
 ## the $ALTA/external/build directory. Then test for the
 ## presence of cmake.
 compile_test = not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ceres')
+
 with open(os.devnull, 'w') as fnull:
-        res = subprocess.call(['cmake', '--version'], stdout = fnull, stderr = fnull, shell=True)
-        compile_test = compile_test and res == 0
+	res = subprocess.call(['cmake', '--version'], stdout = fnull, stderr = fnull, shell=True)
+	if res != 0:
+		compile_test = False
+		print '<<ERROR>> cmake is not installed'
+	#end
+#end
+
 
 if  compile_test:
 	print '<<INSTALL>> configure and build CERES'
@@ -51,7 +57,7 @@ if  compile_test:
 		libname = 'libglog.dylib'
 	#end
 
-	cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=ON'
+	cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
 
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')

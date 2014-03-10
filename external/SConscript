@@ -13,17 +13,17 @@ else:
 	##
 	#   CERES dependancies
 	##
-	if env['CERES_INC'] == ['#external/build/include'] and env['CERES_DIR'] == ['#external/build/lib']:
+	if 'CERES_INC' in env and env['CERES_INC'] == ['#external/build/include'] and env['CERES_DIR'] == ['#external/build/lib']:
 		execfile('obtain_ceres.py')
 	#end
-
-	##
-	#   QuadProg++
-	##
-	qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
-	qp_base    = 'quadprog++' + os.sep
-	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
-	env.Append(CPPPATH = ['build' + os.sep + 'include'])
-	env.StaticLibrary(target = qp_target, source = qp_sources)
-
 #end
+
+##
+#   QuadProg++
+##
+qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
+qp_base    = 'quadprog++' + os.sep
+qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
+env.Append(CPPPATH = ['build' + os.sep + 'include'])
+env.StaticLibrary(target = qp_target, source = qp_sources)
+
