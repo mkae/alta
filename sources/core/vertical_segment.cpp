@@ -164,7 +164,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				if(args.is_defined("dt-relative"))
 				{
-                    v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 + min_dt) ;
+               v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 + min_dt) ;
 					v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
 				}
 				else
