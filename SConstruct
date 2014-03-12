@@ -80,5 +80,5 @@ if not env.GetOption('help'):
 	external = env.SConscript('external/SConscript')
 	sources  = env.SConscript('sources/SConscript')
 	
-	env.Depends(sources, external)
+	env.Requires(sources, external)
 #end

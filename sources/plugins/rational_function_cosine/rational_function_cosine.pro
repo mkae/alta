@@ -12,8 +12,3 @@ SOURCES         = rational_function.cpp
 
 LIBS           += -L../../build        \
 						-lcore
-
-#QMAKE_CXXFLAGS += -frounding-math \
-#                  -fPIC           \
-#						-g
-

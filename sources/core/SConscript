@@ -3,8 +3,6 @@ import sys
 
 Import('env')
 env = env.Clone()
-#env = Environment()
-#env.Append(CPPPATH = ['../../external/build/include'])
 
 # Library sources
 sources = ['common.cpp', 

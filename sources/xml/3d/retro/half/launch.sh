@@ -5,6 +5,7 @@
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_laf.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_beck.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_blinn.xml
+./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_rat.xml
 
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_abc.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_laf.xml
@@ -27,6 +28,7 @@ pdflatex yellow_retro_abc.tex
 pdflatex yellow_retro_laf.tex
 pdflatex yellow_retro_beck.tex
 pdflatex yellow_retro_blinn.tex
+pdflatex yellow_retro_rat.tex
 
 pdflatex gray_retro_abc.tex
 pdflatex gray_retro_laf.tex
