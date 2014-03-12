@@ -1,8 +1,8 @@
 Import('env')
 env = env.Clone()
 
-env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
 env.AppendUnique(CPPPATH = env['QUADPROG_INC'])
+env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
 env.AppendUnique(LIBS    = env['QUADPROG_LIBS'])
 env.AppendUnique(LIBS    = ['core'])
 
@@ -10,7 +10,7 @@ conf = Configure(env)
 
 sources = ['rational_fitter.cpp']
 
-if conf.CheckLib('quadprog++'):
+if conf.CheckLib(env['QUADPROG_LIBS']):
 	env.SharedLibrary('../../build/rational_fitter_quadprog', sources)
 #end
 conf.Finish()
