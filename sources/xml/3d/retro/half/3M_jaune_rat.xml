@@ -31,7 +31,8 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="/tmp/yellow_slice_inc30.dat" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_81.alta" />
+		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
 		<output name="./results/3d/retro/half/3M_jaune_rat.brdf" />
 
 		<!-- Define the function to use -->
@@ -40,7 +41,8 @@
 		<!-- Define the ftting procedure to use -->
 		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
 		<plugin type="fitter" name="rational_fitter_parallel" />
-		<parameter name="min-np" value="53" />
+		<parameter name="min-np" value="100" />
+		<!--<parameter name="min-np" value="53" />-->
 		<parameter name="min-nq" value="10" />
 		<parameter name="np" value="100" />
 		<parameter name="nq" value="100" />
@@ -56,6 +58,7 @@
 		<input  name="./results/3d/retro/half/3M_jaune_rat.brdf" />
 		<output name="./results/3d/retro/half/3M_jaune_rat.dat" />
 
-		<parameter name="data" value="/tmp/yellow_slice_inc30.dat" />
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_81.alta" />
+		<!--<parameter name="data" value="/tmp/yellow_slice_inc30.dat" />-->
 	</action>
 </alta>
