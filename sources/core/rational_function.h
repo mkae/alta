@@ -25,9 +25,24 @@ class rational_function_1d : public function
         rational_function_1d(const vec& a, const vec& b) ;
 		virtual ~rational_function_1d() {}
 
+
+        /* FUNCTION INHERITANCE */
+
 		// Overload the function operator
 		virtual vec value(const vec& x) const ;
 		virtual vec operator()(const vec& x) const { return value(x) ; }
+
+        // IO function to text files
+        virtual bool load(std::istream& in);
+
+        //! \brief Save the rational function expansion. It should
+        //! not be store in any variable (e.g. "y = rf(x);") as the
+        //! nD rational function can append factor to the 1D rational
+        //! function.
+        virtual void save_body(std::ostream&, const arguments&) const;
+
+
+        /* RATIONAL FUNCTION SPECIFIC */
 
 		// Get the numerator (p) and denominator (q) functions
 		virtual vec p(const vec& x) const ;
@@ -36,9 +51,6 @@ class rational_function_1d : public function
 		// Get the p_i and q_j function
 		virtual double p(const vec& x, int i) const ;
 		virtual double q(const vec& x, int j) const ;
-
-		// IO function to text files
-		virtual bool load(std::istream& in);
 
 		// Update the function
 		virtual void update(const vec& in_a, 
@@ -58,7 +70,6 @@ class rational_function_1d : public function
 		friend std::ostream& operator<< (std::ostream& out,
 		                                 const rational_function_1d& r) ;
 
-
 		//! Convert a 1D index into a vector of degree for a
 		//! multinomial coeffcient. The resulting vector v should
 		//! be used as prod_k x[k]^v[k] for the monomial basis
@@ -67,6 +78,7 @@ class rational_function_1d : public function
 	protected: // functions
 
 		static int estimate_dk(int k, int d);
+
 		static void populate(std::vector<int>& vec, int N, int M, int j);
 
 
@@ -76,10 +88,10 @@ class rational_function_1d : public function
 		// the functions to be polynomials.
         vec a, b ;
 
-		  //! Is the function separable with respect to its input dimensions?
-		  //! \todo Make possible to have only part of the dimensions
-		  //! separable.
-		  bool _separable;
+        //! Is the function separable with respect to its input dimensions?
+        //! \todo Make possible to have only part of the dimensions
+        //! separable.
+        bool _separable;
 } ;
 
 class rational_function : public function

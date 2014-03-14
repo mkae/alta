@@ -30,6 +30,69 @@ bool rational_function_1d::load(std::istream&)
 	return true;
 }
 
+void rational_function_1d::save_body(std::ostream& out, const arguments& args) const
+{
+    bool is_matlab = args["export"] == "matlab";
+    bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
+
+    if(is_alta)
+    {
+        for(int i=0; i<a.size(); ++i)
+        {
+            std::vector<int> index = this->index2degree(i) ;
+            for(unsigned int j=0; j<index.size(); ++j)
+            {
+                out << index[j] << "\t" ;
+            }
+            out << a[i] << std::endl ;
+        }
+
+        for(int i=0; i<b.size(); ++i)
+        {
+            std::vector<int> index = this->index2degree(i) ;
+            for(unsigned int j=0; j<index.size(); ++j)
+            {
+                out << index[j] << "\t" ;
+            }
+            out << b[i] << std::endl ;
+        }
+    }
+    else if(is_matlab)
+    {
+
+        out << "(";
+        for(int i=0; i<a.size(); ++i)
+        {
+            out << a[i];
+            std::vector<int> indices = this->index2degree(i);
+            for(int k=0; k<dimX(); ++k)
+            {
+                if(k != dimX()-1) { out << ".*"; }
+                out << "x(k).^" << indices[k];
+            }
+            if(i != a.size()-1) { out << " + "; }
+        }
+        out << ") / (";
+
+        for(int i=0; i<b.size(); ++i)
+        {
+            out << b[i] << "x.^" << i;
+            std::vector<int> indices = this->index2degree(i);
+            for(int k=0; k<dimX(); ++k)
+            {
+                if(k != dimX()-1) { out << ".*"; }
+                out << "x(k).^" << indices[k];
+            }
+            if(i != b.size()-1) { out << " + "; }
+        }
+        out << ")";
+    }
+    else
+    {
+        NOT_IMPLEMENTED();
+    }
+}
+
 void rational_function_1d::update(const vec& in_a,
                                   const vec& in_b)
 {
@@ -472,7 +535,7 @@ bool rational_function::load(std::istream& in)
 }
 
 
-void rational_function::save_call(std::ostream& out, const arguments&) const
+void rational_function::save_call(std::ostream& out, const arguments& args) const
 {
 	out << "#FUNC rational_function" << std::endl;
 	out << "#NP " << np << std::endl ;
@@ -483,28 +546,7 @@ void rational_function::save_call(std::ostream& out, const arguments&) const
 	for(int k=0; k<_nY; ++k)
 	{
         const rational_function_1d* rf = get(k);
-		vec a = rf->getP();
-		vec b = rf->getQ();
-
-		for(int i=0; i<np; ++i)
-		{
-			std::vector<int> index = rf->index2degree(i) ;
-			for(unsigned int j=0; j<index.size(); ++j)
-			{
-				out << index[j] << "\t" ;
-			}
-			out << a[i] << std::endl ;
-		}
-
-		for(int i=0; i<nq; ++i)
-		{
-			std::vector<int> index = rf->index2degree(i) ;
-			for(unsigned int j=0; j<index.size(); ++j)
-			{
-				out << index[j] << "\t" ;
-			}
-			out << b[i] << std::endl ;
-		}
+        rf->save_body(out, args);
 	}
 }
 

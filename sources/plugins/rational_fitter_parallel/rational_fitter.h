@@ -58,5 +58,8 @@ class rational_fitter_parallel : public fitter
 
 	protected: // data
 
+		//! Number of points used when starting the adaptive interpolation
+		//! procedure. By default, this value is 100.
+		int nb_starting_points;
 } ;
 

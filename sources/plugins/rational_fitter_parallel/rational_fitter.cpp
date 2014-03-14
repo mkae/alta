@@ -21,7 +21,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 	return new rational_fitter_parallel();
 }
 
-rational_fitter_parallel::rational_fitter_parallel()
+rational_fitter_parallel::rational_fitter_parallel() : nb_starting_points(100)
 {
 }
 rational_fitter_parallel::~rational_fitter_parallel() 
@@ -49,6 +49,9 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	const int _max_np = args.get_int("np", _min_np);
 	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
 
+	nb_starting_points = args.get_int("nb-starting-points", 100);
+	std::cout << "<<INFO>> number of data point used in start: " << nb_starting_points << std::endl;
+
     for(int i=_min_np; i<=_max_np; ++i)
 	{
 		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
@@ -56,153 +59,90 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		timer time ;
 		time.start() ;
 
-#ifdef NOT_WORKING
-		// Allocate enough processor to run fully in parallel, but account for
-		// the fact that each thread will require its own memory.
-		size_t need_memory = ((3*i+1)*d->size()*2 + 2*i + 2*d->dimY()*d->size()) * sizeof(double); 
-		size_t avai_memory = plugins_manager::get_system_memory();
-		int nb_cores = (60 * avai_memory) / (100 * need_memory) ;
-		nb_cores = std::min<int>(nb_cores, omp_get_num_procs());
-
-		if(nb_cores == 0)
-		{
-			std::cerr << "<<ERROR>> not enough memory to perform the fit" << std::endl ;
-#ifdef DEBUG
-			std::cout << "<<DEBUG>> " << need_memory / (1024*1024) << "MB required / " 
-				<< avai_memory / (1024*1024) << "MB available" << std::endl;
-#endif
-			//return false;
-			nb_cores = 1;
-		}
-#endif
-		int nb_cores = args.get_int("nbcores", omp_get_num_procs());
-
+        int nb_cores = args.get_int("nb-cores", omp_get_num_procs());
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
 #endif
 
 		omp_set_num_threads(nb_cores) ;
-		
-		std::vector<rational_function*> rs;
-		for(int j=0; j<nb_cores; ++j)
-		{
-			rational_function* rj = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
-			//! \todo I need to do a check of compatibility here, but the 
-			//! signature of the check_compatibility function is not good.
-			rj->setParametrization(fit->input_parametrization());
-			rj->setParametrization(fit->output_parametrization());
 
-			rj->setDimX(d->dimX()) ;
-			rj->setDimY(d->dimY()) ;
-			rj->setMin(d->min()) ;
-			rj->setMax(d->max()) ;
-
-			if(rj == NULL)
-			{
-				std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
-				return false;
-			}
-			rs.push_back(rj);
-		}
-
-		// Solution for the case of optimizing the L2 norm
-		double min_l2 = std::numeric_limits<double>::max();
-		rational_function* min_l2_fun = NULL;
-
-		// Solution for the case of optimizing the LINF norm
-		double min_linf = std::numeric_limits<double>::max();
-		rational_function* min_linf_fun = NULL;
 
 		double min_delta  = std::numeric_limits<double>::max();
 		double mean_delta = 0.0;
 		int nb_sol_found  = 0;
 		int nb_sol_tested = 0;
 
-		#pragma omp parallel for
-		for(int j=1; j<i; ++j)
-		{
-			int temp_np = i - j;
-			int temp_nq = j;
+        #pragma omp parallel for shared(nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
+        for(int j=1; j<i; ++j)
+        {
+            // Compute the number of coefficients in the numerator and in the denominator
+            // from the current number of coefficients i and the current index in the
+            // loop j.
+            int temp_np = i - j;
+            int temp_nq = j;
 
-			vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
-			rs[omp_get_thread_num()]->setSize(temp_np, temp_nq);
+            vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
 
-			double delta, linf_dist, l2_dist;
-			bool is_fitted = fit_data(d, temp_np, temp_nq, rs[omp_get_thread_num()], args, p, q, delta, linf_dist, l2_dist);
-			if(is_fitted)
-			{
-				#pragma omp critical
-				{
-					++nb_sol_found ;
-               mean_delta += delta ;
+            // Allocate a rational function and set it to the correct size, dimensions
+            // and parametrizations.
+            rational_function* rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+            rk->setParametrization(r->input_parametrization());
+            rk->setParametrization(r->output_parametrization());
+            rk->setDimX(r->dimX()) ;
+            rk->setDimY(r->dimY()) ;
+            rk->setMin(r->min()) ;
+            rk->setMax(r->max()) ;
+            if(rk == NULL)
+            {
+                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
+                throw;
+            }
 
-               std::cout << "<<INFO>> found a solution with np=" << temp_np << ", nq = " << temp_nq << std::endl;
-               std::cout << "<<INFO>> Linf error = " << linf_dist << std::endl;
-               std::cout << "<<INFO>> L2   error = " << l2_dist << std::endl;
-               std::cout << "<<INFO>>      delta = " << delta << std::endl;
-               std::cout << std::endl;
+            // Set the rational function size
+            rk->setSize(temp_np, temp_nq);
 
-               // Get the solution with the minimum delta
-					if(delta < min_delta)
-					{
-						min_delta   = delta ;
-						r->setSize(temp_np, temp_nq);
-						for(int y=0; y<r->dimY(); ++y)
-						{
-							r->update(y, rs[omp_get_thread_num()]->get(y));
-						}
-					}
+            double delta, linf_dist, l2_dist;
+            bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, p, q, delta, linf_dist, l2_dist);
+            if(is_fitted)
+            {
+                #pragma omp critical (nb_sol_found)
+                {
+                    ++nb_sol_found ;
+                    mean_delta += delta ;
 
-					// Get the solution with the minumum L2 norm
-					if(l2_dist < min_l2)
-					{
-						min_l2 = l2_dist;
-						min_l2_fun = rs[omp_get_thread_num()];
-					}
+                    std::cout << "<<INFO>> found a solution with np=" << temp_np << ", nq = " << temp_nq << std::endl;
+                    std::cout << "<<INFO>> Linf error = " << linf_dist << std::endl;
+                    std::cout << "<<INFO>> L2   error = " << l2_dist << std::endl;
+                    std::cout << "<<INFO>>      delta = " << delta << std::endl;
+                    std::cout << std::endl;
 
-					// Get the solution with the minumum LINF norm
-					if(linf_dist < min_linf)
-					{
-						min_linf = linf_dist;
-						min_linf_fun = rs[omp_get_thread_num()];
-					}
-				}
-			}
+                    // Get the solution with the minimum delta, and update the main
+                    // rational function r.
+                    if(delta < min_delta)
+                    {
+                        min_delta = delta ;
+                        r->setSize(temp_np, temp_nq);
+                        for(int y=0; y<r->dimY(); ++y)
+                        {
+                            r->update(y, rk->get(y));
+                        }
+                    }
+                }
+            }
 
-			#pragma omp critical
-			{
-				// Update the solution
-				nb_sol_tested++;
-				std::cout << "<<DEBUG>> nb solutions tested: " << nb_sol_tested << " / " << i << "\r";
-				std::cout.flush();
-			}
-		}
+            delete rk; // memory clean
 
-/*
-		// Clean memory
-		for(int j=0; j<nb_cores; ++j)
-		{
-			delete rs[j];
-		}
-*/
-		std::cout << "                                                                           \r";
-		if(min_l2 < std::numeric_limits<double>::max())
-		{
-			std::cout << "<<INFO>>  min L2 = " << min_l2 << std::endl;
-			std::cout << *min_l2_fun << std::endl;
-			std::cout << std::endl;
-		}
-//		delete min_l2_fun;
+            #pragma omp critical (nb_sol_tested)
+            {
+                // Update the solution
+                nb_sol_tested++;
 
-		if(min_linf < std::numeric_limits<double>::max())
-		{
-			std::cout << "<<INFO>>  min Linf = " << min_linf << std::endl;
-			std::cout << *min_linf_fun << std::endl;
-			std::cout << std::endl;
-		}
-//		delete min_linf_fun;
+                std::cout << "<<DEBUG>> nb solutions tested: " << nb_sol_tested << " / " << i << "\r";
+                std::cout.flush();
+            }
+        }
 
-		if(min_delta < std::numeric_limits<double>::max())
+        if(min_delta < std::numeric_limits<double>::max())
 		{
 			std::cout << "<<INFO>> mean delta = " << mean_delta/nb_sol_found << std::endl;
 			std::cout << "<<INFO>>  min delta = " << min_delta << std::endl;
@@ -261,8 +201,8 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
     quadratic_program qp(np, nq);
 
 
-    // Starting with only a 100 vertical segments (meaning a 200xn matrix)
-    const int di = (m-1) / 99;
+    // Starting with only a nb_starting_points vertical segments
+    const int di = (m-1) / (nb_starting_points-1);
     for(int i=0; i<m; i+=di)
 	{
 
@@ -274,7 +214,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 		qp.add_constraints(c2);
 	}
 
-	while(qp.nb_constraints() < 2*m)
+    while(qp.nb_constraints() < 2*m)
 	{
 #ifdef DEBUG
         std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
@@ -290,24 +230,6 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 #ifdef DEBUG
 				std::cout << "<<INFO>> got solution " << *r << std::endl ;
 #endif
-				/*
-					int current = 0, i=0;
-					while(i < 100 && current < m)
-					{
-
-					int next = quadratic_program::next_unmatching_constraint(current, ny, );
-
-				// Create two vector of constraints
-				vec c1(n), c2(n);
-				get_constraint(next, np, nq, ny, d, r, c1, c2);
-
-				qp.add_constraints(c1);
-				qp.add_constraints(c2);
-
-				++i;
-				current = next;
-				}
-				*/
 				return true;
             }
         }
@@ -319,7 +241,6 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 			return false;
 		}
 	}
-
 
 	return false;
 }

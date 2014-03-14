@@ -154,11 +154,14 @@ class quadratic_program
 			return solves_qp;
 		}
 
+#define PACANOWSKI2012
+
         //! \brief Test all the constraints of the data.
         //! Add the sample that is farest away from the function.
 		bool test_constraints(int ny, const rational_function_1d* r, const vertical_segment* data)
 		{
-			int nb_failed = 0;
+#ifdef PACANOWSKI2012
+            int nb_failed = 0;
             double max_dev = 0.0; // Maximum absolute distance of the current
                                   // solution to the data.
             vec cu, cl;
@@ -200,6 +203,26 @@ class quadratic_program
             {
                 return true;
             }
+#else
+            int n = next_unmatching_constraint(0, ny, r, data);
+            if(n < data->size())
+            {
+                vec x, yl, yu;
+                data->get(n, x, yl, yu);
+
+                vec cu, cl;
+                get_constraint(x, yl, yu, ny, r, cu, cl);
+
+                add_constraints(cu);
+                add_constraints(cl);
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+#endif
 		}
 
 		//! \brief Generate two constraint vectors from a vertical segment and a
@@ -257,7 +280,7 @@ int quadratic_program::next_unmatching_constraint(int i, int ny, const rational_
 		data->get(n, x, yl, yu);
 
 		vec y = r->value(x);
-		if(y[ny] < yl[ny] || y[ny] > yu[ny])
+        if(y[ny] < yl[ny] || y[ny] > yu[ny])
 		{
 			return n;
 		}

@@ -19,4 +19,5 @@ LIBS           += -L../../build       \
 						-lcore	
 
 #QMAKE_CXXFLAGS += -fPIC
+QMAKE_CXXFLAGS += -g
 

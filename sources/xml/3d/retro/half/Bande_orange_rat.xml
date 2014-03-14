@@ -11,19 +11,6 @@
 		<parameter name="lib-dir" value="./build" />
 	</configuration>
 
-	<!-- Extract only one slice of the BRDF data
-	  -->
-	<action name="data2data">
-
-		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
-		<output name="/tmp/yellow_slice_inc30.dat" />
-
-		<!-- Parameters -->
-		<parameter name="param" value="ISOTROPIC_TV_PROJ_DPHI" />
-		<parameter name="max" value="[0.3, 2, 2]" />
-	</action>
-
 	<!-- Fitting the lobe using a back parametrization:
 		  The ABC model uses the dot product between the back and the
 	     normal vectors.
@@ -31,9 +18,9 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_81.alta" />
 		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
-		<output name="./results/3d/retro/half/3M_jaune_rat.brdf" />
+		<output name="./results/3d/retro/half/Bande_orange_rat.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="rational_function_cosine" />
@@ -56,10 +43,10 @@
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/half/3M_jaune_rat.brdf" />
-		<output name="./results/3d/retro/half/3M_jaune_rat.dat" />
-
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<input  name="./results/3d/retro/half/Bande_orange_rat.brdf" />
+		<output name="./results/3d/retro/half/Bande_orange_rat.dat" />
+		
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
 		<!--<parameter name="data" value="/tmp/yellow_slice_inc30.dat" />-->
 	</action>
 </alta>
