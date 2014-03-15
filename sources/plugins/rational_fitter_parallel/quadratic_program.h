@@ -11,7 +11,9 @@ class quadratic_program
 {
 	public:
 		//! \brief Constructor need to specify the number of coefficients
-		quadratic_program(int np, int nq) : _np(np), _nq(nq), CI(0.0, _np+_nq, 0) { }
+        quadratic_program(int np, int nq) :
+        _np(np), _nq(nq), CI(0.0, _np+_nq, 0)
+        { }
 
 		//! \brief Remove the already defined constraints
 		void clear_constraints()
@@ -72,6 +74,12 @@ class quadratic_program
 		{
 			return CI.ncols();
 		}
+
+        //! Set the indices of the remaining data
+        void set_training_set(const std::list<unsigned int>& ts)
+        {
+            this->training_set = ts;
+        }
 
 		//! \brief Solves the quadratic program and update the p and 
 		//! q vector if necessary.
@@ -164,12 +172,14 @@ class quadratic_program
             int nb_failed = 0;
             double max_dev = 0.0; // Maximum absolute distance of the current
                                   // solution to the data.
+            std::list<unsigned int>::iterator max_ind;
             vec cu, cl;
 
-			for(int n=0; n<data->size(); ++n)
+            std::list<unsigned int>::iterator it;
+            for(it = training_set.begin(); it != training_set.end(); it++)
 			{
-				vec x, yl, yu;
-				data->get(n, x, yl, yu);
+                vec x, yl, yu;
+                data->get(*it, x, yl, yu);
 
 				vec y = r->value(x);
 				bool fail_upper = y[ny] > yu[ny];
@@ -184,6 +194,7 @@ class quadratic_program
                     {
                         get_constraint(x, yl, yu, ny, r, cu, cl);
                         max_dev = dev;
+                        max_ind = it;
                     }
 				}
 			}
@@ -196,6 +207,10 @@ class quadratic_program
             {
                 add_constraints(cu);
                 add_constraints(cl);
+                training_set.erase(max_ind);
+#ifdef DEBUG
+                std::cout << "<<DEBUG>> number of remaining training elements: " << training_set.size() << std::endl;
+#endif
 
                 return false;
             }
@@ -239,6 +254,10 @@ class quadratic_program
 	protected:
 		int _np, _nq;
 		QuadProgPP::Matrix<double> CI;
+
+        //! Contains the indices of the vertical segment unused during the
+        //! rational interpolation.
+        std::list<unsigned int> training_set;
 };
 		
 

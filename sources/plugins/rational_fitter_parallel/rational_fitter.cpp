@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <list>
 
 #include "quadratic_program.h"
 
@@ -200,21 +201,29 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 
     quadratic_program qp(np, nq);
 
-
     // Starting with only a nb_starting_points vertical segments
-    const int di = (m-1) / (nb_starting_points-1);
-    for(int i=0; i<m; i+=di)
+    std::list<unsigned int> training_set;
+    const int di = std::max((m-1) / (nb_starting_points-1), 1);
+    for(int i=0; i<m; ++i)
 	{
+        if(i % di == 0)
+        {
+            // Create two vector of constraints
+            vec c1(n), c2(n);
+            get_constraint(i, np, nq, ny, d, r, c1, c2);
 
-		// Create two vector of constraints
-		vec c1(n), c2(n);
-        get_constraint(i, np, nq, ny, d, r, c1, c2);
+            qp.add_constraints(c1);
+            qp.add_constraints(c2);
 
-		qp.add_constraints(c1);
-		qp.add_constraints(c2);
+        }
+        else
+        {
+            training_set.push_back(i);
+        }
 	}
+    qp.set_training_set(training_set);
 
-    while(qp.nb_constraints() < 2*m)
+    do
 	{
 #ifdef DEBUG
         std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
@@ -240,7 +249,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 #endif
 			return false;
 		}
-	}
+    } while(qp.nb_constraints() < 2*m);
 
 	return false;
 }
