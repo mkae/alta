@@ -28,6 +28,7 @@ list of possible parametrizations:
 	ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
 	CARTESIAN, // 6D (directions: 3d + 3d)
 	SPHERICAL_TL_PL_TV_PV
+	ISOTROPIC_TV_PROJ_DPHI  //2D Param. (theta_v * cos(|\delta \Phi|), theta_v * sin(|\delta \Phi)|)
 \endverbatim
 
 <h3> Output Parametrization </h3>
@@ -36,6 +37,12 @@ In the current version of ALTA, we cannot handle different output
 parametrizations (like LAB color space). Fitting will be performed
 independantly of the data and function output space. They only need
 to match in size.
+
+\verbatim
+	INV_STERADIAN, // A BRDF which unit is sr^{-1}
+	INV_STERADIAN_COSINE_FACTOR, // A BRDF multiplied by the cosine factor, unit is still sr^{-1} 
+\endverbatim
+
 
 <h2>Input file format</h2>
 
