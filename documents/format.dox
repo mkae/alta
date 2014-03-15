@@ -38,6 +38,12 @@ parametrizations (like LAB color space). Fitting will be performed
 independantly of the data and function output space. They only need
 to match in size.
 
+\verbatim
+	INV_STERADIAN, // A BRDF which unit is sr^{-1}
+	INV_STERADIAN_COSINE_FACTOR, // A BRDF multiplied by the cosine factor, unit is still sr^{-1} 
+\endverbatim
+
+
 <h2>Input file format</h2>
 
 For a text data file with <em>n</em> data entries where the input domain has <em>N</em> dimensions and a <em>input_param</em> parametrization and the output domain has <em>P</em> dimensions and a <em>output_param</em> parametrization, our file format is the following:
