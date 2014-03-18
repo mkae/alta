@@ -255,7 +255,11 @@ double solve_quadprog(Matrix<double>& G, Vector<double>& g0,
     iai[i] = i;
   
 l1:	iter++;
-	//std::cout << "iteration " << iter << std::endl ;
+	// Laurent: had to put this one since the program can go in an infinite loop
+	if(iter > 10000) 
+	{ 
+		return std::numeric_limits<double>::max();
+	}
 #ifdef TRACE_SOLVER
   print_vector("x", x);
 #endif
@@ -386,6 +390,7 @@ l2a:/* Step 2a: determine step direction */
     /* QPP is infeasible */
     // FIXME: unbounded to raise
     q = iq;
+
     return inf;
   }
   /* case (ii): step in dual space */

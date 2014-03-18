@@ -18,6 +18,22 @@
  *
  *  \details
  *  You can find QuadProg++ here: http://quadprog.sourceforge.net/
+ *  <br />
+ *
+ *  <h3>Plugin parameters</h3>
+ *
+ *  We provide the following command line arguments to manipulate this plugin:
+ *  <ul>
+ *		<li><b>--np</b> <em>[int]</em> controls the maximum number of total coefficients
+ *		an interpolation should have. By default, this number is 10.</li>
+ *		<li><b>--min-np</b> <em>[int]<em></li> controls the starting value for the 
+ *		number of coefficients for the rational function. by default, this number
+ *		is 10.</li>
+ *		<li><b>--np-step</b> <em>[int]</em> stepping for the number of coefficients
+ *		of the rational function. By default, this number is 1.</li>
+ *		<li><b>--nb-cores</b> <em>[int]</em> number of core allocated to perform
+ *		the seach. By default, this is equal to the number of processors.</li>
+ *  </ul>
  */
 class rational_fitter_parallel : public fitter
 {

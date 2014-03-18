@@ -1,9 +1,13 @@
 import os
 import sys
 
-## Import configuration from a config file
+## Add ALTA custom cmd configurations
 ##
 AddOption('--cfg', help='Specify a configuration file (see config.example')
+
+
+## Import configuration from a config file
+##
 configFile = GetOption('cfg')
 if configFile == None:
 	configFile = 'config.example'
@@ -77,8 +81,9 @@ env.AppendUnique(CPPPATH = ['#sources'])
 Export('env')
 
 if not env.GetOption('help'):
+
 	external = env.SConscript('external/SConscript')
+
 	sources  = env.SConscript('sources/SConscript')
-	
-	env.Requires(sources, external)
+	env.Depends(sources, external)
 #end
