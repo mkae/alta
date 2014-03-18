@@ -28,14 +28,14 @@
 		<!-- Define the ftting procedure to use -->
 		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
 		<plugin type="fitter" name="rational_fitter_parallel" />
-		<parameter name="min-np" value="20" />
+		<parameter name="min-np" value="60" />
 		<!--<parameter name="min-np" value="53" />-->
-		<parameter name="min-nq" value="20" />
+		<parameter name="min-nq" value="60" />
 		<parameter name="np" value="100" />
 		<parameter name="nq" value="100" />
-		<parameter name="dt" value="0.5" />
+		<parameter name="dt" value="0.1" />
 		<parameter name="data-positive" value="" />
-		<parameter name="nb-starting-points" value="3000" />
+		<parameter name="nb-starting-points" value="1000" />
 		<!--<parameter name="dt-relative" value="" />-->
 	</action>
 	

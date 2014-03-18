@@ -50,10 +50,12 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	const int _max_np = args.get_int("np", _min_np);
 	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
 
-	nb_starting_points = args.get_int("nb-starting-points", 100);
+	const int nb_starting_points = args.get_int("nb-starting-points", 100);
 	std::cout << "<<INFO>> number of data point used in start: " << nb_starting_points << std::endl;
 
-    for(int i=_min_np; i<=_max_np; ++i)
+	const int step = args.get_int("np-step", 1);
+
+    for(int i=_min_np; i<=_max_np; i+=step)
 	{
 		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
 		std::cout.flush() ;

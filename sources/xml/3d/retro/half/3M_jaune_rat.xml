@@ -11,19 +11,6 @@
 		<parameter name="lib-dir" value="./build" />
 	</configuration>
 
-	<!-- Extract only one slice of the BRDF data
-	  -->
-	<action name="data2data">
-
-		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
-		<output name="/tmp/yellow_slice_inc30.dat" />
-
-		<!-- Parameters -->
-		<parameter name="param" value="ISOTROPIC_TV_PROJ_DPHI" />
-		<parameter name="max" value="[0.3, 2, 2]" />
-	</action>
-
 	<!-- Fitting the lobe using a back parametrization:
 		  The ABC model uses the dot product between the back and the
 	     normal vectors.
@@ -41,15 +28,18 @@
 		<!-- Define the ftting procedure to use -->
 		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
 		<plugin type="fitter" name="rational_fitter_parallel" />
-		<parameter name="min-np" value="60" />
+		<parameter name="min-np" value="100" />
 		<!--<parameter name="min-np" value="53" />-->
 		<parameter name="min-nq" value="10" />
-		<parameter name="np" value="100" />
+		<parameter name="np" value="200" />
 		<parameter name="nq" value="100" />
-		<parameter name="dt" value="0.5" />
+		<parameter name='np-step' value='5' />
+
+		<parameter name="dt" value="0.1" />
 		<parameter name="data-positive" value="" />
-		<parameter name="nb-starting-points" value="2000" />
 		<!--<parameter name="dt-relative" value="" />-->
+		
+		<parameter name="nb-starting-points" value="1000" />
 	</action>
 	
 	<!-- Export the fit -->
