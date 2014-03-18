@@ -1,7 +1,7 @@
 TEMPLATE = lib
 CONFIG  *= static  \
            console \
-			  eigen
+           eigen
 CONFIG  -= qt
 
 DESTDIR  = ../build
