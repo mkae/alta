@@ -10,10 +10,108 @@
 	<configuration>
 		<parameter name="lib-dir" value="./build" />
 	</configuration>
+	
+	<!-- Rational interpolation of the Orange data in the classical parametrization.
+		  This will only interpolate vertical segments of the retro part of the
+			BRDF.
+	-->
+	<action name="data2brdf">
 
-	<!-- Fitting the lobe using a back parametrization:
-		  The ABC model uses the dot product between the back and the
-	     normal vectors.
+		<!-- Input arguments of the action -->
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0, 0,-2]" />
+		<parameter name="max" value="[2, 2, 2]" />
+		<parameter name="dt" value="0.5" />
+		<!--<parameter name="dt-relative" value="" />-->
+		<parameter name="dt-positive" value="" />
+
+		<!-- Output arguments of the action -->
+		<output name="./results/3d/retro/half/Bande_orange_half_cparam_rat.brdf" />
+
+		<!-- Define the function to use -->
+		<!--<function name="rational_function_cosine" />-->
+		<function name="rational_function_chebychev" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_parallel" />
+		<parameter name="min-np" value="45" />
+		<parameter name="np" value="100" />
+		<parameter name="np-step" value="5" />
+		<parameter name="nb-starting-points" value="1000" />
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/3d/retro/half/Bande_orange_half_cparam_rat.brdf" />
+		<output name="./results/3d/retro/half/Bande_orange_half_cparam_rat.dat" />
+		
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0, 0,-2]" />
+		<parameter name="max" value="[2, 2, 2]" />
+	</action>
+
+
+
+
+
+	<!-- Conversion of data to the Back parametrization.
+		  This will only export the retro reflective part of the data.
+	-->
+	<action name="data2data">
+
+		<!--- Input data file -->
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_81.alta" />
+		<parameter name="min" value="[0, 0,-2]" />
+		<parameter name="max" value="[2, 2, 2]" />
+
+		<!-- Output data file -->
+		<output name="/temp/Bande_orange_back.dat" />
+
+		<!-- Parameters -->
+		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
+	</action>
+	
+	<action name="data2brdf">
+
+		<!-- Input arguments of the action -->
+		<input name="/temp/Bande_orange_back.dat" />
+		<parameter name="dt" value="0.5" />
+		<!--<parameter name="dt-relative" value="" />-->
+		<parameter name="dt-positive" value="" />
+
+		<!-- Output arguments of the action -->
+		<output name="./results/3d/retro/half/Bande_orange_half_bparam_rat.brdf" />
+
+		<!-- Define the function to use -->
+		<!--<function name="rational_function_cosine" />-->
+		<function name="rational_function_chebychev" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_parallel" />
+		<parameter name="min-np" value="45" />
+		<parameter name="np" value="100" />
+		<parameter name="np-step" value="5" />
+		<parameter name="nb-starting-points" value="1000" />
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/3d/retro/half/Bande_orange_half_bparam_rat.brdf" />
+		<output name="./results/3d/retro/half/Bande_orange_half_bparam_rat.dat" />
+		
+		<parameter name="data" value="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0, 0,-2]" />
+		<parameter name="max" value="[2, 2, 2]" />
+	</action>
+
+
+
+
+	<!-- Full rational interpolation of the Orange cloth sample.
 	-->
 	<action name="data2brdf">
 

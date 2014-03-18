@@ -176,7 +176,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				// You can enforce the vertical segment to stay in the positive
 				// region using the --data-positive command line argument. Note
 				// that the data point is also clamped to zero if negative.
-				if(args.is_defined("data-positive"))
+				if(args.is_defined("dt-positive"))
 				{
 					v[dimX() +          i] = std::max(v[dimX() +          i], 0.0);
 					v[dimX() +   dimY()+i] = std::max(v[dimX() +   dimY()+i], 0.0);
