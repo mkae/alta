@@ -71,7 +71,7 @@ the complete list in the \ref features page):
 <h3>Obtain sources</h3>
 
 To access the sources of ALTA, you can download the alpha sources:
-<center><a href="https://gforge.inria.fr/frs/download.php/33337/alta-alpha.tar.gz">https://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz</a></center>
+<center><a href="http://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz">http://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz</a></center>
 
 <h3>Build</h3>
 
