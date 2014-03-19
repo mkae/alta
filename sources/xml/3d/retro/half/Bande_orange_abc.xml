@@ -31,8 +31,8 @@
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
 
 		<!-- Parameters -->
-		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.3,  2,  2]" />
+		<parameter name="min" value="[0.1, -2, -0.01]" />
+		<parameter name="max" value="[0.3,  2,  0.01]" />
 	</action>
 	<action name="data2brdf">
 
