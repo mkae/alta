@@ -62,12 +62,12 @@
 	<action name="data2data">
 
 		<!--- Input data file -->
-		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
 		<parameter name="min" value="[0, 0,-2]" />
 		<parameter name="max" value="[2, 2, 2]" />
 
 		<!-- Output data file -->
-		<output name="/temp/Bande_orange_back.dat" />
+		<output name="/tmp/Bande_orange_back.dat" />
 
 		<!-- Parameters -->
 		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
@@ -76,7 +76,7 @@
 	<action name="data2brdf">
 
 		<!-- Input arguments of the action -->
-		<input name="/temp/Bande_orange_back.dat" />
+		<input name="/tmp/Bande_orange_back.dat" />
 		<parameter name="dt" value="0.5" />
 		<!--<parameter name="dt-relative" value="" />-->
 		<parameter name="dt-positive" value="" />
@@ -115,26 +115,25 @@
 	-->
 	<action name="data2brdf">
 
-		<!-- Input and output arguments of the action -->
+		<!-- Input arguments of the action -->
 		<input name="../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" />
-		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
+		<parameter name="dt" value="0.1" />
+		<parameter name="data-positive" value="" />
+		<!--<parameter name="dt-relative" value="" />-->
+		
+		<!-- Output arguments of the action -->
 		<output name="./results/3d/retro/half/Bande_orange_rat.brdf" />
 
 		<!-- Define the function to use -->
-		<function name="rational_function_cosine" />
+		<!--<function name="rational_function_cosine" />-->
+		<function name="rational_function_chebychev" />
 
 		<!-- Define the ftting procedure to use -->
 		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
 		<plugin type="fitter" name="rational_fitter_parallel" />
-		<parameter name="min-np" value="60" />
-		<!--<parameter name="min-np" value="53" />-->
-		<parameter name="min-nq" value="60" />
+		<parameter name="min-np" value="70" />
 		<parameter name="np" value="100" />
-		<parameter name="nq" value="100" />
-		<parameter name="dt" value="0.1" />
-		<parameter name="data-positive" value="" />
 		<parameter name="nb-starting-points" value="1000" />
-		<!--<parameter name="dt-relative" value="" />-->
 	</action>
 	
 	<!-- Export the fit -->

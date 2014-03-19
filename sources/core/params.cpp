@@ -158,16 +158,19 @@ void params::to_cartesian(const double* invec, params::input intype,
 		case ISOTROPIC_TL_TV_PROJ_DPHI:
 		{
 			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
-//			if(theta > 0.0)
-//			{
+			// theta can equals zero. In that case, you should not
+			// divide by its value, and the relative orientation does
+			// not matter (normal direction).
+			if(theta > 0.0)
+			{
 				outvec[0] = (invec[1]/theta)*sin(theta);
 				outvec[1] = (invec[2]/theta)*sin(theta);
-//			}
-//			else
-//			{
-//				outvec[0] = sin(theta);
-//				outvec[1] = 0.0;
-//			}
+			}
+			else
+			{
+				outvec[0] = 0.0;
+				outvec[1] = 0.0;
+			}
 			outvec[2] = cos(theta);
 			outvec[3] = sin(invec[0]);
 			outvec[4] = 0.0;

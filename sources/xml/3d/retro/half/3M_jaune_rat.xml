@@ -18,24 +18,24 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_81.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
 		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
 		<output name="./results/3d/retro/half/3M_jaune_rat.brdf" />
 
 		<!-- Define the function to use -->
-		<function name="rational_function_legendre" />
+		<function name="rational_function_cosine" />
 
 		<!-- Define the ftting procedure to use -->
-		<plugin type="fitter" name="rational_fitter_quadprog" />
-		<!--<plugin type="fitter" name="rational_fitter_parallel" />-->
-		<parameter name="min-np" value="50" />
+		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
+		<plugin type="fitter" name="rational_fitter_parallel" />
+		<parameter name="min-np" value="60" />
 		<!--<parameter name="min-np" value="53" />-->
-		<parameter name="min-nq" value="50" />
+		<parameter name="min-nq" value="60" />
 		<parameter name="np" value="200" />
 		<parameter name="nq" value="200" />
 		<parameter name='np-step' value='5' />
 
-		<parameter name="dt" value="0.1" />
+		<parameter name="dt" value="0.5" />
 		<parameter name="dt-positive" value="" />
 		<!--<parameter name="dt-relative" value="" />-->
 		
