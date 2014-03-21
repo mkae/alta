@@ -34,7 +34,9 @@
  *		option <b>\-\-dt-relative</b> is not set, this size is absolute: \f$ [x,
  *		x - dt, x + dt] \f$. If the <b>\-\-dt-relative</b> option is set, the 
  *		vertical segment size is relative to the middle point value \f$ x \f$: 
- *		\f$ [x, x (1 - dt), x (1 + dt)] \f$.
+ *		\f$ [x, x (1 - dt), x (1 + dt)] \f$. You can specify the vertical
+ *		segment to be equal to the max of the relative and absolute sizes
+ *		using the <b>\-\-dt-max</b> option.
  *		<li><b>\-\-data-positive</b> for the vertical segment to stay in the 
  *		positive region. The negative values are replaced by zeros.
  *  </ul>
