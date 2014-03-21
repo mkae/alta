@@ -5,7 +5,7 @@
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_laf.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_beck.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_blinn.xml
-#./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_rat.xml
+./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_rat.xml
 
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_abc.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_laf.xml

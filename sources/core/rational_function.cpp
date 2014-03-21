@@ -99,7 +99,7 @@ void rational_function_1d::update(const vec& in_a,
 	a.resize(in_a.size()) ;
 	b.resize(in_b.size()) ;
 
-//#define NORMALIZE
+#define NORMALIZE
 
 #ifdef NORMALIZE
     const double b0 = (std::abs(in_b[0]) > 1.0E-16) ? in_b[0] : 1.0;
@@ -537,6 +537,8 @@ bool rational_function::load(std::istream& in)
 
 void rational_function::save_call(std::ostream& out, const arguments& args) const
 {
+	out.precision(64);
+	out << std::scientific;
 	out << "#FUNC rational_function" << std::endl;
 	out << "#NP " << np << std::endl ;
 	out << "#NQ " << nq << std::endl ;
