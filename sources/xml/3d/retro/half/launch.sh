@@ -5,7 +5,7 @@
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_laf.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_beck.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_blinn.xml
-#./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_rat.xml
+./scripts/xml_cmd.py ./xml/3d/retro/half/3M_jaune_rat.xml
 
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_abc.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_laf.xml
@@ -44,3 +44,6 @@ pdflatex orange_retro_blinn.tex
 pdflatex orange_retro_rat.tex
 
 rm *-inc.eps *.log *.tex *.aux *-to.pdf
+mv yellow_retro_*.pdf ../papers/retro/josa/fits
+mv gray_retro_*.pdf ../papers/retro/josa/fits
+mv orange_retro*.pdf ../papers/retro/josa/fits

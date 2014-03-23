@@ -167,6 +167,11 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
                v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 + min_dt) ;
 					v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
 				}
+				else if(args.is_defined("dt-max"))
+				{
+               v[dimX() +   dimY()+i] = v[dimX() + i] + std::max(v[dimX() + i] * min_dt, min_dt);
+					v[dimX() + 2*dimY()+i] = v[dimX() + i] + std::max(v[dimX() + i] * max_dt, max_dt);
+				}
 				else
 				{
 					v[dimX() +   dimY()+i] = v[dimX() + i] + min_dt ;
