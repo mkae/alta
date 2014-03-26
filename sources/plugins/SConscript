@@ -22,11 +22,14 @@ SConscript('nonlinear_shadowing_smith/SConscript')
 SConscript('rational_fitter_eigen/SConscript')
 SConscript('rational_fitter_quadprog/SConscript')
 SConscript('rational_fitter_parallel/SConscript')
+SConscript('rational_fitter_matlab/SConscript')
+
 
 # Building rational functions
 SConscript('rational_function_legendre/SConscript')
 SConscript('rational_function_chebychev/SConscript')
 SConscript('rational_function_cosine/SConscript')
+
 
 # Building retro functions
 SConscript('nonlinear_function_retroblinn/SConscript')

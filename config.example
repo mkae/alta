@@ -55,3 +55,8 @@ NLOPT_INC      = ['#external/build/include']
 NLOPT_DIR      = ['#external/build/lib']
 NLOPT_LIBS     = ['nlopt']
 NLOPT_OPT_LIBS = []
+
+# MATLAB library and Engine
+MATLAB_INC  = ['/home/pac/MATLAB/R2013b/extern/include/']
+MATLAB_DIR  = ['/home/pac/MATLAB/R2013b/bin/glnxa64/']
+MATLAB_LIBS = ['']

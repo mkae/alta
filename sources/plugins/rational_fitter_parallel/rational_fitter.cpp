@@ -14,6 +14,8 @@
 #include <cmath>
 #include <string>
 #include <list>
+#include <omp.h>
+
 
 #include "quadratic_program.h"
 

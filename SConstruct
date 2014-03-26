@@ -38,6 +38,10 @@ vars.Add('NLOPT_INC',         'NLOPT include directory')
 vars.Add('NLOPT_DIR',         'NLOPT libraries directory')
 vars.Add('NLOPT_LIBS',        'NLOPT libraries')
 vars.Add('NLOPT_OPT_LIBS',    'NLOPT optional libraries')
+vars.Add('MATLAB_INC',        'MATLAB include directory')
+vars.Add('MATLAB_DIR',        'MATLAB directory')
+vars.Add('MATLAB_LIBS',       'MATLAB libraries')
+
 
 env = Environment(variables = vars)
 
