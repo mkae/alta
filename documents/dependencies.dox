@@ -61,6 +61,14 @@ you to install Matlab and to provide a matlab.prf file or to create your
 scons configuration file with MATLAB_INC, MATLAB_LIB, and MATLAB_DIR
 variables.
 
+The resulting .prf file should however look similar to this on Linux:
+\verbatim
+INCLUDEPATH += /usr/local/MATLAB/$VERSION/extern/include
+LIBS        += -L/usr/local/MATLAB/$VERSION/bin/glnxa64  \
+               -leng -lmx -lmat
+\endverbatim
+On Windows or MacOS, the paths to include and libraries are different, but the dynamic libraries links remains. Also, note that the Matlab binary should be accessible from PATH during ALTA execution.
+
 <br />
 
 <h3>CGAL</h3>
