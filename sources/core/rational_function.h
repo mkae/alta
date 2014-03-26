@@ -44,12 +44,24 @@ class rational_function_1d : public function
 
         /* RATIONAL FUNCTION SPECIFIC */
 
-		// Get the numerator (p) and denominator (q) functions
+		//! Evaluate the numerator \f$p(\mathbf{x})\f$ of the rational
+		//! function. This function is provided to allow fast 
+		//! implementation. For example one can use the Clenshaw 
+		//! algorithm to efficiently evaluate recursively defined
+		//! polynomials. 
 		virtual vec p(const vec& x) const ;
+		//! Evaluate the denominator \f$q(\mathbf{x})\f$ of the rational
+		//! function. This function is provided to allow fast 
+		//! implementation. For example one can use the Clenshaw 
+		//! algorithm to efficiently evaluate recursively defined
+		//! polynomials. 
 		virtual vec q(const vec& x) const ;
 
-		// Get the p_i and q_j function
+		//! Evaluate the basis function \f$p_i(\mathbf{x})\f$ for the
+		//! numerator of the rational function.
 		virtual double p(const vec& x, int i) const ;
+		//! Evaluate the basis function \f$q_i(\mathbf{x})\f$ for the
+		//! denominator of the rational function.
 		virtual double q(const vec& x, int j) const ;
 
 		// Update the function

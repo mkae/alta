@@ -1,0 +1,7 @@
+env = Environment()
+env.Append(CPPPATH = ['../../../external/build/include', '../../'])
+env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+
+sources = ['rational_function.cpp']
+libs = ['core']
+env.SharedLibrary('../../build/rational_function_chebychev_opt', sources, LIBS=libs)
