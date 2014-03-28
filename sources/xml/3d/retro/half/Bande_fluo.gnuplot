@@ -24,4 +24,4 @@ set size square
 
 # output Lafotune fit
 set output "gray_retro_rat.tex"
-plot "../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D_dense__nbsgrid_162.alta" using (180/pi*$2):($3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Gray cloth data", "./results/3d/retro/half/Bande_fluo_raf.dat" using (180/pi*$2):($3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Rational interpolation"
+plot "../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR_dense__nbsgrid_162.alta" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.01 ? $4 : 1/0) title "Gray cloth data", "./results/3d/retro/half/Bande_fluo_rat.dat" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.01 ? $4 : 1/0) title "Rational interpolation"

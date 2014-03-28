@@ -10,7 +10,7 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'g++'
-CCFLAGS        = ['-O3', '-g', '-Wall', '-m64']
+CCFLAGS        = ['-O3', '-Wall', '-m64']
 LINKFLAGS      = []
 
 

@@ -18,8 +18,10 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />-->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
+		<parameter name="min" value="[0,  -2,-2]" />
+		<parameter name="max" value="[0.9, 2, 2]" />
 
 	
 		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
@@ -33,7 +35,7 @@
 		<plugin type="fitter" name="rational_fitter_parallel" />
 		<!--<plugin type="fitter" name="rational_fitter_matlab" />-->
 
-		<parameter name="min-np" value="30" />
+		<parameter name="min-np" value="50" />
 		<!--<parameter name="min-np" value="53" />-->
 		<parameter name="min-nq" value="30" />
 		<parameter name="np" value="1000" />
@@ -55,8 +57,8 @@
 		<input  name="./results/3d/retro/half/3M_jaune_rat.brdf" />
 		<output name="./results/3d/retro/half/3M_jaune_rat.dat" />
 
-		<!-- <parameter name="data"	 value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta"		/> -->
-		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/bande_orange_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />
+		<parameter name="data"	 value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<!--<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/bande_orange_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
 
 		<!--<parameter name="data" value="/tmp/yellow_slice_inc30.dat" />-->
 	</action>

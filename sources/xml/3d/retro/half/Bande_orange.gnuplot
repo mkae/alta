@@ -24,4 +24,4 @@ set size square
 
 # output Rational fit
 set output "orange_retro_rat.tex"
-plot "../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" using (180/pi*$2):($3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Orange cloth data", "./results/3d/retro/half/Bande_orange_rat.dat" using (180/pi*$2):($3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Rational interpolation"
+plot "../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Orange cloth data", "./results/3d/retro/half/Bande_orange_rat.dat" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Rational interpolation"

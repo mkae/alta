@@ -11,13 +11,13 @@
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_laf.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_beck.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_blinn.xml
-#./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_rat.xml
+./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_fluo_rat.xml
 
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_orange_abc.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_orange_laf.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_orange_beck.xml
 ./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_orange_blinn.xml
-#./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_orange_rat.xml
+./scripts/xml_cmd.py ./xml/3d/retro/half/Bande_orange_rat.xml
 
 # Generate latex files with figures
 gnuplot ./xml/3d/retro/half/3M_jaune.gnuplot

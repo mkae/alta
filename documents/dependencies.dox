@@ -67,7 +67,7 @@ INCLUDEPATH += /usr/local/MATLAB/$VERSION/extern/include
 LIBS        += -L/usr/local/MATLAB/$VERSION/bin/glnxa64  \
                -leng -lmx -lmat
 \endverbatim
-On Windows or MacOS, the paths to include and libraries are different, but the dynamic libraries links remains. Also, note that the Matlab binary should be accessible from PATH during ALTA execution.
+On Windows or MacOS, the paths to include and libraries are different, but the dynamic libraries links remain. Also, note that the Matlab binary should be accessible from PATH during ALTA execution.
 
 <br />
 
