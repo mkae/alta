@@ -23,5 +23,10 @@ set ylabel "BRDF x cosine"
 set size square
 
 # output Rational fit
-set output "orange_retro_rat.tex"
+set term unknown
 plot "../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D_dense__nbsgrid_162.alta" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Orange cloth data", "./results/3d/retro/half/Bande_orange_rat.dat" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.05 ? $4 : 1/0) title "Rational interpolation"
+
+set term epslatex standalone color font 8
+set output "gray_retro_rat.tex"
+set yrange [0:GPVAL_Y_MAX]
+replot
