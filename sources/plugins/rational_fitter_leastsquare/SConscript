@@ -1,0 +1,7 @@
+Import('env')
+env = env.Clone()
+
+sources = ['rational_fitter.cpp']
+libs = ['core']
+
+env.SharedLibrary('../../build/rational_fitter_leastsquare', sources, LIBS=libs)

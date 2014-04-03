@@ -40,6 +40,24 @@
  *		<li><b>\-\-data-positive</b> for the vertical segment to stay in the 
  *		positive region. The negative values are replaced by zeros.
  *  </ul>
+ *
+ *  The data of the vertical segment can be restricted to subpart of the
+ *  original data by specifying the bounding box of the input and output
+ *  domain:
+ *  <ul>
+ *		<li><b>\-\-min</b> <it>[vec]</it> specify the minimun input 
+ *		coordinate that should be loaded. All data with input coordinate
+ *		less than this vector will be discarded.
+ *		<li><b>\-\-max</b> <it>[vec]</it> specify the maximum input 
+ *		coordinate that should be loaded. All data with input coordinate
+ *		greater than this vector will be discarded.
+ *		<li><b>\-\-ymin</b> <it>[vec]</it> specify the minimun output 
+ *		coordinate that should be loaded. All data with associated value
+ *		less than this vector will be discarded.
+ *		<li><b>\-\-ymax</b> <it>[vec]</it> specify the maximum output 
+ *		coordinate that should be loaded. All data with associated value
+ *		greater than this vector will be discarded.
+ *	 </ul>
  */
 class vertical_segment : public data
 {

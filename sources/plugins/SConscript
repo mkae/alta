@@ -20,6 +20,7 @@ SConscript('nonlinear_shadowing_smith/SConscript')
 
 # Building rational fitters
 SConscript('rational_fitter_eigen/SConscript')
+SConscript('rational_fitter_leastsquare/SConscript')
 SConscript('rational_fitter_quadprog/SConscript')
 SConscript('rational_fitter_parallel/SConscript')
 SConscript('rational_fitter_matlab/SConscript')
