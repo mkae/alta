@@ -29,6 +29,8 @@
 		<plugin type="fitter" name="rational_fitter_parallel" />
 		<!--<plugin type="fitter" name="rational_fitter_matlab" />-->
 
+		<parameter name="ymin" value="[0.05]" />
+
 		<parameter name="min-np" value="30" />
 		<!--<parameter name="min-np" value="53" />-->
 		<parameter name="min-nq" value="30" />
