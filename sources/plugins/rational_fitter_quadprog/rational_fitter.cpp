@@ -52,7 +52,7 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 	int temp_np = _min_np, temp_nq = _min_nq ;
 	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
-        timer time ;
+      timer time ;
 		time.start() ;
 		
 		r->setSize(temp_np, temp_nq);
@@ -67,6 +67,8 @@ bool rational_fitter_quadprog::fit_data(const data* dat, function* fit, const ar
 
 		
 		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed" << std::endl  ;
+      time.stop() ;
+      std::cout << "<<INFO>> it took " << time << std::endl ;
 		std::cout.flush() ;
 
 		if(temp_np == _max_np && temp_nq == _max_nq)
