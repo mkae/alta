@@ -20,7 +20,6 @@ set output "orange_retro_laf.tex"
 plot "../papers/retro/mesures/original/Bande_orange/3d/633nm/Fichiers_definitifs/densify_helmholtz/Bande_orange_3D__BRDF_min_retro_lobe_dense.alta" using (180/pi*$2):($3 > 0.0 && $3 < 0.005 ? $4 : 1/0) title "Orange cloth data", "./results/3d/retro/half/Bande_orange_laf.dat" using (180/pi*$2):($3 > 0.0 && $3 < 0.005 ? $4 : 1/0) title "Lafortune fit"
 
 set ylabel "BRDF x cosine"
-set size square
 
 # output Rational fit
 set term unknown

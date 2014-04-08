@@ -20,7 +20,6 @@ set output "gray_retro_laf.tex"
 plot "../papers/retro/mesures/original/Bande_fluo_grise/3d/633nm/Fichiers\ definitifs/densityHelmholtz/Bande_grise_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" using (180/pi*$2):($3 > 0.0 && $3 < 0.005 ? $4 : 1/0) title "Gray cloth data", "./results/3d/retro/half/Bande_fluo_laf.dat" using (180/pi*$2):($3 > 0.0 && $3 < 0.005 ? $4 : 1/0) title "Lafortune fit"
 
 set ylabel "BRDF x cosine"
-set size square
 
 # output Lafotune fit
 set terminal unknown

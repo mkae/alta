@@ -21,7 +21,6 @@ set output "yellow_retro_laf.tex"
 plot "../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" using (180/pi*$2):($3 > 0.0 && $3 < 0.005 ? $4 : 1/0) title "Yellow cloth data", "./results/3d/retro/half/3M_jaune_laf.dat" using (180/pi*$2):($3 > 0.0 && $3 < 0.005 ? $4 : 1/0) title "Lafortune fit"
 
 set ylabel "BRDF x cosine"
-set size square
 
 # output rational fits
 set term unknown
