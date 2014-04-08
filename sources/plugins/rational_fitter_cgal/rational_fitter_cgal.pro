@@ -1,8 +1,8 @@
 TEMPLATE        = lib
-CONFIG         *= shared  \
-                  plugin  \
+CONFIG         += shared  \
 						eigen   \
 						cgal    
+CONFIG         -= qt
 
 DESTDIR         = ../../build
  
