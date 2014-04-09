@@ -173,7 +173,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
         rational_function* r, const arguments &args,
         vec& P, vec& Q, double& delta, double& linf_dist, double& l2_dist)
 {
-	// Fit the different outptu dimension independantly
+	// Fit the different output dimension independantly
 	for(int j=0; j<d->dimY(); ++j)
 	{
 		vec p(np), q(nq);
@@ -196,7 +196,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // dat is the data object, it contains all the points to fit
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
-// the function return a ration BRDF function and a boolean
+// the function returns a rational BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
                                         rational_function_1d* r, vec& p, vec& q, double& delta)
 {
@@ -267,7 +267,7 @@ void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny,
 	cu.resize(np+nq);
 	cl.resize(np+nq);
 
-	// Create two vector of constraints
+	// Create two vectors of constraints
 	for(int j=0; j<np+nq; ++j)
 	{
 		// Filling the p part
