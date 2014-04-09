@@ -14,8 +14,9 @@
 #include <cmath>
 #include <string>
 #include <list>
+#ifdef _OPENMP
 #include <omp.h>
-
+#endif
 
 #include "quadratic_program.h"
 
@@ -64,13 +65,14 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		timer time ;
 		time.start() ;
 
-        int nb_cores = args.get_int("nb-cores", omp_get_num_procs());
+#ifdef _OPENMP
+      const int nb_cores = args.get_int("nb-cores", omp_get_num_procs());
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
 #endif
 
 		omp_set_num_threads(nb_cores) ;
-
+#endif
 
 		double min_delta  = std::numeric_limits<double>::max();
 		double mean_delta = 0.0;
@@ -234,8 +236,10 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 
     do
 	{
+#ifdef _OPENMP
 #ifdef DEBUG
         std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
+#endif
 #endif
 		QuadProgPP::Vector<double> x(n);
 		bool solves_qp = qp.solve_program(x, delta, p, q);
