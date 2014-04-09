@@ -217,10 +217,11 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 			std::cout << "]" << std::endl ;
 	}
 #endif
-	
+
+/*
 	// Update the ci column with the delta parameter
 	// (See Celis et al. 2007 p.12)
-	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(eCI,  Eigen::ComputeThinU | Eigen::ComputeThinV);
+	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(eCI);
 	const double sigma_m = svd.singularValues()(std::min(2*M, N)-1) ;
 	const double sigma_M = svd.singularValues()(0) ;
 
@@ -235,6 +236,10 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 	
 	double delta = sigma_m / sigma_M ;
 
+#ifndef DEBUG
+	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
+#endif
+
 	if(isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
 	{
 		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
@@ -244,10 +249,9 @@ bool rational_fitter_quadprog::fit_data(const vertical_segment* d, int np, int n
 	{
 		delta = 1.0 ;
 	}
-
-#ifndef DEBUG
-	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
-#endif
+/*/
+	const double delta = 1.0;
+//*/
 	for(int i=0; i<2*M; ++i)	
 	{		
 		ci[i] = ci[i] * delta ; 

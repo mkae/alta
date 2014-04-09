@@ -4,15 +4,19 @@ env = env.Clone()
 env.AppendUnique(CPPPATH = env['QUADPROG_INC'])
 env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
 env.AppendUnique(LIBS    = env['QUADPROG_LIBS'])
-env.AppendUnique(CCFLAGS = env['OPENMP_FLAGS'])
-env.AppendUnique(LIBS    = env['OPENMP_LIBS'])
 env.AppendUnique(LIBS    = ['core'])
 
 conf = Configure(env)
 
 sources = ['rational_fitter.cpp']
 
-if conf.CheckLib(env['QUADPROG_LIBS']) and conf.CheckLib(env['OPENMP_LIBS']):
+if conf.CheckLib(env['QUADPROG_LIBS']):
+
+	env.AppendUnique(CCFLAGS = env['OPENMP_FLAGS'])
+	if conf.CheckLib(env['OPENMP_LIBS']):
+		env.AppendUnique(LIBS    = env['OPENMP_LIBS'])
+	#end
+
 	env.SharedLibrary('../../build/rational_fitter_parallel', sources)
 #end
 conf.Finish()
