@@ -15,17 +15,18 @@
 
 		<!-- Input and output arguments of the action -->
 
-		<!-- DATA NOT DENSE WIH NO VS -->
+		<!-- DATA DENSIFIED WIH NO VS -->
 		<input	 name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled-densified.alta" /> 
 	
 
-		<output name="./results/3d/retro/half/3M_jaune_rat.brdf" />
+		<output name="./results/3d/retro/pac_tests/3M_jaune_rat.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="rational_function_cosine" />
 
 		<!-- Define the ftting procedure to use -->
 		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
+		<!-- THis is the parallel version of the Rational Fitter -->
 		<plugin type="fitter" name="rational_fitter_parallel" />
 		<!--<plugin type="fitter" name="rational_fitter_matlab" />-->
 
@@ -49,8 +50,8 @@
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/half/3M_jaune_rat.brdf" />
-		<output name="./results/3d/retro/half/3M_jaune_rat.dat" />
+		<input  name="./results/3d/retro/pac_tests/3M_jaune_rat.brdf" />
+		<output name="./results/3d/retro/pac_tests/3M_jaune_rat.dat" />
 
 		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled-densified.alta" />
 

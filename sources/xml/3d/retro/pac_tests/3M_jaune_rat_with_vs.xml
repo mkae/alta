@@ -16,11 +16,10 @@
 		<!-- Input and output arguments of the action -->
 
 		<!-- DATA NOT DENSE WITH VS SPECIFIED INSIDE -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />
+		<!-- <input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_lsq.alta" />
 
-	
-
-		<output name="./results/3d/retro/half/3M_jaune_rat.brdf" />
+		<output name="./results/3d/retro/pac_tests/3M_jaune_rat.brdf" />
 
 		<!-- Define the function to use -->
 		<function name="rational_function_cosine" />
@@ -46,8 +45,8 @@
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/half/3M_jaune_rat.brdf" />
-		<output name="./results/3d/retro/half/3M_jaune_rat.dat" />
+		<input  name="./results/3d/retro/pac_tests/3M_jaune_rat.brdf" />
+		<output name="./results/3d/retro/pac_tests/3M_jaune_rat.dat" />
 
 		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/bande_orange_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />
 
