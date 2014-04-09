@@ -161,7 +161,7 @@ unsigned int timer::current_time() const
     return static_cast<unsigned int>(clock() / CLOCKS_PER_SEC);
 #else
     struct timespec res;
-    clock_gettime(CLOCK_MONOTONIC, &res);
+    clock_gettime(CLOCK_REALTIME, &res);
     return static_cast<unsigned int>(res.tv_sec);
 #endif
 }
