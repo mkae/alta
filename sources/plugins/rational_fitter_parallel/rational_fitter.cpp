@@ -77,7 +77,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		int nb_sol_found  = 0;
 		int nb_sol_tested = 0;
 
-        #pragma omp parallel for shared(nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
+        #pragma omp parallel for shared(args, nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
         for(int j=1; j<i; ++j)
         {
             // Compute the number of coefficients in the numerator and in the denominator
@@ -90,18 +90,22 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 
             // Allocate a rational function and set it to the correct size, dimensions
             // and parametrizations.
-            rational_function* rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+				rational_function* rk = NULL;
+            #pragma omp critical (args)
+            {
+					rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+				}
+				if(rk == NULL)
+            {
+                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
+                throw;
+            }
             rk->setParametrization(r->input_parametrization());
             rk->setParametrization(r->output_parametrization());
             rk->setDimX(r->dimX()) ;
             rk->setDimY(r->dimY()) ;
             rk->setMin(r->min()) ;
             rk->setMax(r->max()) ;
-            if(rk == NULL)
-            {
-                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
-                throw;
-            }
 
             // Set the rational function size
             rk->setSize(temp_np, temp_nq);
@@ -135,7 +139,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
                 }
             }
 
-            delete rk; // memory clean
+				if(rk != NULL)
+	            delete rk; // memory clean
 
             #pragma omp critical (nb_sol_tested)
             {
