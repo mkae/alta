@@ -127,8 +127,8 @@ void timer::stop()
 void timer::reset()
 {
     _elapsed = 0;
-    _start   = 0;
-    _stop    = 0;
+    _start   = current_time();
+    _stop    = _start;
 }
 
 int timer::elapsed() const
@@ -157,11 +157,8 @@ unsigned int timer::current_time() const
 	SYSTEMTIME res;
 	GetSystemTime(&res);
 	return (unsigned int)(res.wSecond + res.wMinute*60 + res.wHour*360);
-#elif __APPLE__
-    return static_cast<unsigned int>(clock() / CLOCKS_PER_SEC);
 #else
-    struct timespec res;
-    clock_gettime(CLOCK_REALTIME, &res);
-    return static_cast<unsigned int>(res.tv_sec);
+	time_t _t = time(NULL);
+	return (unsigned int)_t;
 #endif
 }

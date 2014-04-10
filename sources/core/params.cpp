@@ -178,7 +178,25 @@ void params::to_cartesian(const double* invec, params::input intype,
 		}
 			break;
 		case SCHLICK_TL_TK_PROJ_DPHI:
-			NOT_IMPLEMENTED();
+		{
+			// Set the light direction
+			outvec[3] = sin(invec[0]);
+			outvec[4] = 0.0;
+			outvec[5] = cos(invec[0]);
+
+			// The view direction is the symmetric of the reflected direction
+			// with respect to the back direction:
+			//     v = 2 |r.k| k - r
+			//     r = 2 |l.n| n - l = {-lx, -ly, lz }
+			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
+			const double Kx = (theta > 0.0) ? (invec[1]/theta)*sin(theta) : 0.0;
+			const double Ky = (theta > 0.0) ? (invec[2]/theta)*sin(theta) : 0.0;
+			const double Kz = cos(theta);
+			const double dotKR = outvec[5]*Kz - outvec[3]*Kx;
+			outvec[0] = 2.0*dotKR*Kx + outvec[3];
+			outvec[1] = 2.0*dotKR*Ky;
+			outvec[2] = 2.0*dotKR*Kz - outvec[5];
+		}
 			break;
 		case RETRO_TL_TVL_PROJ_DPHI:
 		{
