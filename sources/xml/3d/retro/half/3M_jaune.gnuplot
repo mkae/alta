@@ -24,7 +24,7 @@ set ylabel "BRDF x cosine"
 
 # output rational fits
 set term unknown
-plot "../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.01 ? $4 : 1/0) title "Yellow cloth data", "./results/3d/retro/half/3M_jaune_rat.dat" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.01) ? $4 : 1/0 title "rational interpolation"
+plot "../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.01 ? $4 : 1/0) title "Yellow cloth data", "./results/3d/retro/half/3M_jaune_rat_TK.dat" using (180/pi*$2):($2 > 0.0 && $3 > -0.01 && $3 < 0.01) ? $4 : 1/0 title "rational interpolation"
 
 set term epslatex standalone color font 8
 set output "yellow_retro_rat.tex"
