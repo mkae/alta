@@ -122,14 +122,16 @@ class quadratic_program
 			QuadProgPP::Vector<double> ci(0.0, n) ;
 			QuadProgPP::Matrix<double> CE(0.0, m, 0) ;
 			QuadProgPP::Vector<double> ce(0.0, 0) ;
-
+/*
 			// Update the ci column with the delta parameter
 			// (See Celis et al. 2007 p.12)
 			Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(Eigen::MatrixXd::Map(&CI[0][0], m, n));
 			const double sigma_m = svd.singularValues()(std::min(m, n)-1) ;
 			const double sigma_M = svd.singularValues()(0) ;
 			delta = sigma_M / sigma_m ;
-
+/*/
+			delta = 1.0;
+//*/
 			// Select the size of the result vector to
 			// be equal to the dimension of p + q
 			for(int i=0; i<m; ++i)

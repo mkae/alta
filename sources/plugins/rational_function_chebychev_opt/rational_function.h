@@ -17,7 +17,7 @@ class rational_function_chebychev_1d : public rational_function_1d
 public: // methods
 
     rational_function_chebychev_1d() ;
-    rational_function_chebychev_1d(int np, int nq) ;
+    rational_function_chebychev_1d(int nX, int nY, int np, int nq) ;
     rational_function_chebychev_1d(const vec& a, const vec& b) ;
     virtual ~rational_function_chebychev_1d() {}
 
@@ -52,17 +52,19 @@ public: // methods
 	 		
 	 // Update the function
 	virtual void update(const vec& in_a, 
-		                    const vec& in_b)
+	                    const vec& in_b)
 	{
 		rational_function_1d::update(in_a, in_b);
 
+		// Get the size of the input vector
 		const int np = in_a.size();
+		const int nq = in_b.size();
+
 		for(int k=0; k<np; ++k)
 		{
 			_p_coeffs[k].a = in_a[k];
 		}
 		
-		const int nq = in_b.size();
 		for(int k=0; k<nq; ++k)
 		{
 			_q_coeffs[k].a = in_b[k];

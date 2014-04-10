@@ -29,11 +29,11 @@ rational_function_chebychev_1d::rational_function_chebychev_1d()
 	setDimY(0);
 }
 
-rational_function_chebychev_1d::rational_function_chebychev_1d(int np, int nq) :
+rational_function_chebychev_1d::rational_function_chebychev_1d(int nX, int nY, int np, int nq) :
 	rational_function_1d(np, nq)
 {
-	setDimX(0);
-	setDimY(0);
+	setDimX(nX);
+	setDimY(nY);
 
 	this->resize(np, nq);
 }
@@ -115,9 +115,7 @@ rational_function_1d* rational_function_chebychev::get(int i)
 	{
 		if(rs[i] == NULL)
 		{
-			rs[i] = new rational_function_chebychev_1d(np, nq);
-			rs[i]->setDimX(dimX());
-			rs[i]->setDimY(dimY());
+			rs[i] = new rational_function_chebychev_1d(dimX(), dimY(), np, nq);
 
 			// Test if the input domain is not empty. If one dimension of
 			// the input domain is a point, I manually inflate this dimension

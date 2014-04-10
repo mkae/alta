@@ -1,6 +1,7 @@
 import os
 
 Import('env')
+env = env.Clone()
 
 if env.GetOption('clean'):
 	print "Nothing to do in external"	
