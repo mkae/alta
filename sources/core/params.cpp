@@ -205,19 +205,19 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double sin_vl   = sin(theta_vl);
 			const double cos_l    = cos(invec[0]);
 			const double sin_l    = sin(invec[0]);
-			const double cos_phi  = invec[0] / theta_vl;
-			const double sin_phi  = invec[1] / theta_vl;
+			const double cos_phi  = (theta_vl > 0.0) ? invec[1] / theta_vl : 0.0;
+			const double sin_phi  = (theta_vl > 0.0) ? invec[2] / theta_vl : 0.0;
 
 			// Compute the cosine of the outgoing vector using the
 			// spherical law of cosines
 			const double cos_v = cos_l*cos_vl + cos_phi*sin_l*sin_vl;
-			const double sin_v = sqrt(1.0 - cos_v*cos_v);
+			const double sin_v = sqrt(1.0 - std::min(cos_v*cos_v, 1.0));
 
 			if(sin_v != 0.0)
 			{
 				const double sin_dphi = (sin_vl*sin_phi) / sin_v;
 
-				outvec[0] = sin_v * sqrt(1.0 - sin_dphi*sin_dphi);
+				outvec[0] = sin_v * sqrt(1.0 - std::min(sin_dphi*sin_dphi, 1.0));
 				outvec[1] = sin_v * sin_dphi;
 			}
 			else
