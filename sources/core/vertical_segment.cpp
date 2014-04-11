@@ -268,7 +268,11 @@ vec vertical_segment::operator[](int i) const
 }
 vec vertical_segment::get(int i) const 
 {
-	return _data[i] ;
+    const int n = dimX() + dimY();
+    vec res(n);
+    for(int k=0; k<n; ++k) { res[k] = _data[i][k]; }
+
+    return res ;
 }
 
 //! \todo Check the vertical segment size and if the data
