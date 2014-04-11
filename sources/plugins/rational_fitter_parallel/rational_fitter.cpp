@@ -56,7 +56,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	const int nb_starting_points = args.get_int("nb-starting-points", 100);
 	std::cout << "<<INFO>> number of data point used in start: " << nb_starting_points << std::endl;
 
-	const int step = args.get_int("np-step", 1);
+	const int  step      = args.get_int("np-step", 1);
+	const bool use_delta = args.is_defined("use_delta");
 
     for(int i=_min_np; i<=_max_np; i+=step)
 	{
@@ -74,7 +75,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		omp_set_num_threads(nb_cores) ;
 #endif
 
-		double min_delta  = std::numeric_limits<double>::max();
+		double min_delta   = std::numeric_limits<double>::max();
+		double min_l2_dist = std::numeric_limits<double>::max();
 		double mean_delta = 0.0;
 		int nb_sol_found  = 0;
 		int nb_sol_tested = 0;
@@ -112,8 +114,9 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
             // Set the rational function size
             rk->setSize(temp_np, temp_nq);
 
-            double delta, linf_dist, l2_dist;
-            bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, p, q, delta, linf_dist, l2_dist);
+            double delta = 1.0;
+            double linf_dist, l2_dist;
+            bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, delta, linf_dist, l2_dist);
             if(is_fitted)
             {
                 #pragma omp critical (nb_sol_found)
@@ -127,11 +130,12 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
                     std::cout << "<<INFO>>      delta = " << delta << std::endl;
                     std::cout << std::endl;
 
-                    // Get the solution with the minimum delta, and update the main
-                    // rational function r.
-                    if(delta < min_delta)
+                    // Get the solution with the minimum delta or the minimum L2 distance, 
+						  // and update the main rational function r.
+                    if((use_delta && delta < min_delta) || (!use_delta && l2_dist < min_l2_dist))
                     {
-                        min_delta = delta ;
+                        min_delta   = delta ;
+                        min_l2_dist = l2_dist ;
                         r->setSize(temp_np, temp_nq);
                         for(int y=0; y<r->dimY(); ++y)
                         {
@@ -171,14 +175,14 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	return false ;
 }
 
-void rational_fitter_parallel::set_parameters(const arguments& args)
+void rational_fitter_parallel::set_parameters(const arguments&)
 {
 }
 
 
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, 
-        rational_function* r, const arguments &args,
-        vec& P, vec& Q, double& delta, double& linf_dist, double& l2_dist)
+                                        rational_function* r, const arguments &args,
+                                        double& delta, double& linf_dist, double& l2_dist)
 {
 	// Fit the different output dimension independantly
 	for(int j=0; j<d->dimY(); ++j)
@@ -186,7 +190,8 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 		vec p(np), q(nq);
 		rational_function_1d* rf = r->get(j);
 		rf->resize(np, nq);
-		if(!fit_data(d, np, nq, j, rf, p, q, delta))
+
+		if(!fit_data(d, np, nq, j, rf, args, p, q, delta))
 		{
 			return false ;
 		}
@@ -205,12 +210,13 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function returns a rational BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
-                                        rational_function_1d* r, vec& p, vec& q, double& delta)
+                                        rational_function_1d* r, const arguments& args,
+                                        vec& p, vec& q, double& delta)
 {
 	const int m = d->size(); // 2*m = number of constraints
 	const int n = np+nq;     // n = np+nq
 
-    quadratic_program qp(np, nq);
+    quadratic_program qp(np, nq, args.is_defined("use_delta"));
 
     // Starting with only a nb_starting_points vertical segments
     std::list<unsigned int> training_set;
