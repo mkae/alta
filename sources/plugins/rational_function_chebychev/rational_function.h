@@ -17,8 +17,7 @@ class rational_function_chebychev_1d : public rational_function_1d
 public: // methods
 
     rational_function_chebychev_1d() ;
-    rational_function_chebychev_1d(int np, int nq) ;
-    rational_function_chebychev_1d(const vec& a, const vec& b) ;
+    rational_function_chebychev_1d(int nX, int np, int nq) ;
     virtual ~rational_function_chebychev_1d() {}
 
     // Get the p_i and q_j function

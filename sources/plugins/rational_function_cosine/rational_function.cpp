@@ -12,16 +12,10 @@ rational_function_legendre_1d::rational_function_legendre_1d()
 {
 }
 
-rational_function_legendre_1d::rational_function_legendre_1d(int np, int nq, params::input param) :
-    rational_function_1d(np, nq)
+rational_function_legendre_1d::rational_function_legendre_1d(int nX, int np, int nq, params::input param) :
+    rational_function_1d(nX, np, nq)
 {
 	setParametrization(param);
-}
-
-rational_function_legendre_1d::rational_function_legendre_1d(const vec& a, 
-                                                             const vec& b) :
-    rational_function_1d(a, b)
-{
 }
 
 double rational_function_legendre_1d::legendre(double x, int i) const
