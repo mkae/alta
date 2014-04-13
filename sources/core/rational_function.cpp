@@ -12,17 +12,14 @@ rational_function_1d::rational_function_1d()
 {
 }
 
-rational_function_1d::rational_function_1d(int np, int nq, bool separable) 
+rational_function_1d::rational_function_1d(int nX, unsigned int np, unsigned int nq, 
+                                           bool separable) 
 {
-    resize(np, nq);
-	_separable = separable;
-}
+	setDimX(nX);
+	setDimY(1);
 
-rational_function_1d::rational_function_1d(const vec& a, 
-                                           const vec& b) : a(a), b(b)
-{
-    //update(a, b);
-    _separable = false;
+	resize(np, nq);
+	_separable = separable;
 }
 
 bool rational_function_1d::load(std::istream&)
@@ -34,70 +31,70 @@ void rational_function_1d::save_body(std::ostream& out, const arguments& args) c
 {
     bool is_matlab = args["export"] == "matlab";
     bool is_alta   = !args.is_defined("export") || args["export"] == "alta";
+		 
+	 const unsigned int np = _p_coeffs.size();
+	 const unsigned int nq = _q_coeffs.size();
 
-    if(is_alta)
-    {
-        for(int i=0; i<a.size(); ++i)
-        {
-            std::vector<int> index = this->index2degree(i) ;
-            for(unsigned int j=0; j<index.size(); ++j)
-            {
-                out << index[j] << "\t" ;
-            }
-            out << a[i] << std::endl ;
-        }
+	 if(is_alta)
+	 {
+		 for(unsigned int i=0; i<np; ++i)
+		 {
+			 for(int j=0; j<dimX(); ++j)
+			 {
+				 out << _p_coeffs[i].deg[j] << "\t" ;
+			 }
+			 out << _p_coeffs[i].a << std::endl ;
+		 }
 
-        for(int i=0; i<b.size(); ++i)
-        {
-            std::vector<int> index = this->index2degree(i) ;
-            for(unsigned int j=0; j<index.size(); ++j)
-            {
-                out << index[j] << "\t" ;
-            }
-            out << b[i] << std::endl ;
-        }
-    }
-    else if(is_matlab)
-    {
+		 for(unsigned int i=0; i<nq; ++i)
+		 {
+			 for(int j=0; j<dimX(); ++j)
+			 {
+				 out << _q_coeffs[i].deg[j] << "\t" ;
+			 }
+			 out << _q_coeffs[i].a << std::endl ;
+		 }
+	 }
+	 else if(is_matlab)
+	 {
 
-        out << "(";
-        for(int i=0; i<a.size(); ++i)
-        {
-            out << a[i];
-            std::vector<int> indices = this->index2degree(i);
-            for(int k=0; k<dimX(); ++k)
-            {
-                if(k != dimX()-1) { out << ".*"; }
-                out << "x(k).^" << indices[k];
-            }
-            if(i != a.size()-1) { out << " + "; }
-        }
-        out << ") / (";
+		 out << "(";
+		 for(unsigned int i=0; i<np; ++i)
+		 {
+			 out << _p_coeffs[i].a;
+			 for(int k=0; k<dimX(); ++k)
+			 {
+				 if(k != dimX()-1) { out << ".*"; }
+				 out << "x(k).^" << _q_coeffs[i].deg[k];
+			 }
+			 if(i != np-1) { out << " + "; }
+		 }
+		 out << ") / (";
 
-        for(int i=0; i<b.size(); ++i)
-        {
-            out << b[i] << "x.^" << i;
-            std::vector<int> indices = this->index2degree(i);
-            for(int k=0; k<dimX(); ++k)
-            {
-                if(k != dimX()-1) { out << ".*"; }
-                out << "x(k).^" << indices[k];
-            }
-            if(i != b.size()-1) { out << " + "; }
-        }
-        out << ")";
-    }
-    else
-    {
-        NOT_IMPLEMENTED();
-    }
+		 for(unsigned int i=0; i<nq; ++i)
+		 {
+			 out << _p_coeffs[i].a << "x.^" << i;
+			 for(int k=0; k<dimX(); ++k)
+			 {
+				 if(k != dimX()-1) { out << ".*"; }
+				 out << "x(k).^" << _q_coeffs[i].deg[k];
+			 }
+			 if(i != nq-1) { out << " + "; }
+		 }
+		 out << ")";
+	 }
+	 else
+	 {
+		 NOT_IMPLEMENTED();
+	 }
 }
 
 void rational_function_1d::update(const vec& in_a,
                                   const vec& in_b)
 {
-	a.resize(in_a.size()) ;
-	b.resize(in_b.size()) ;
+	// Get the size of the input vector
+	const int np = in_a.size();
+	const int nq = in_b.size();
 
 #define NORMALIZE
 
@@ -107,22 +104,45 @@ void rational_function_1d::update(const vec& in_a,
     const double b0 = 1.0;
 #endif
 
-    for(int i=0; i<a.size(); ++i) { a[i] = in_a[i] / b0; }
-    for(int i=0; i<b.size(); ++i) { b[i] = in_b[i] / b0; }
+	for(int k=0; k<np; ++k)
+	{
+		_p_coeffs[k].a = in_a[k] / b0;
+	}
+
+	for(int k=0; k<nq; ++k)
+	{
+		_q_coeffs[k].a = in_b[k] / b0;
+	}
 }
 
-void rational_function_1d::resize(int np, int nq)
+void rational_function_1d::resize(unsigned int np, unsigned int nq)
 {
-	const int old_np = a.size();
-	const int old_nq = b.size();
+	// It is not possible to resize the multi-dimensional vector
+	// if the input dimensions size is not defined. This can
+	// happen at the creation of the rational function object.
+	if(dimX() == 0) { return; }
 
-	// Resize the vector
-	a.resize(np);
-	b.resize(nq);
+	// Resize the numerator
+	if(_p_coeffs.size() != np)
+	{
+		_p_coeffs.resize(np);
+		for(unsigned int k=0; k<np; ++k)
+		{
+			std::vector<int> deg = index2degree(k);
+			_p_coeffs[k].deg = deg;
+		}
+	}
 
-	// Set the new coeffs to zero
-	for(int i=old_np; i<np; ++i) { a[i] = 0.0; }
-	for(int i=old_nq; i<nq; ++i) { b[i] = 0.0; }
+	// Resize the denominator
+	if(_q_coeffs.size() != nq)
+	{
+		_q_coeffs.resize(nq);
+		for(unsigned int k=0; k<nq; ++k)
+		{
+			std::vector<int> deg = index2degree(k);
+			_q_coeffs[k].deg = deg;
+		}
+	}
 }
 
 
@@ -130,40 +150,26 @@ void rational_function_1d::resize(int np, int nq)
 // Get the p_i and q_j function
 vec rational_function_1d::p(const vec& x) const
 {
-	vec res(_nY) ;
+	vec res(1) ;
 
-	unsigned int const np = a.size() / _nY ;
-
-	for(int k=0; k<_nY; ++k)
+	const unsigned int np = _p_coeffs.size() ;
+	for(unsigned int i=0; i<np; ++i)
 	{
-		double p = 0.0f ;
-
-		for(unsigned int i=0; i<np; ++i)
-		{
-			p += a[k*_nY + i]*this->p(x, i) ;
-		}
-
-		res[k] = p ;
+		res[0] += _p_coeffs[i].a * this->p(x, i) ;
 	}
+
 	return res ;
 }
 vec rational_function_1d::q(const vec& x) const 
 {
-	vec res(_nY) ;
+	vec res(1) ;
 
-	unsigned int const nq = b.size() / _nY ;
-
-	for(int k=0; k<_nY; ++k)
+	const unsigned int np = _q_coeffs.size() ;
+	for(unsigned int i=0; i<np; ++i)
 	{
-		double q = 0.0f ;
-
-		for(unsigned int i=0; i<nq; ++i)
-		{
-			q += b[k*_nY + i]*this->q(x, i) ;
-		}
-
-		res[k] = q ;
+		res[0] += _q_coeffs[i].a * this->p(x, i) ;
 	}
+
 	return res ;
 }
 
@@ -287,19 +293,25 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 // Get the p_i and q_j function
 double rational_function_1d::p(const vec& x, int i) const
 {
-	std::vector<int> deg = index2degree(i);
 	double res = 1.0;
 	for(int k=0; k<dimX(); ++k)
-    {
-        res *= pow(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]) ;
-        //res *= pow(x[k], deg[k]) ;
+	{
+		const double xp = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
+		res *= pow(xp, _p_coeffs[i].deg[k]) ;
 	}
 
 	return res ;
 }
 double rational_function_1d::q(const vec& x, int i) const 
 {
-	return p(x, i);
+	double res = 1.0;
+	for(int k=0; k<dimX(); ++k)
+	{
+		const double xp = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
+		res *= pow(xp, _q_coeffs[i].deg[k]) ;
+	}
+
+	return res ;
 }
 
 // Overload the function operator
@@ -307,20 +319,20 @@ vec rational_function_1d::value(const vec& x) const
 {
 	vec res(1) ;
 
-	unsigned int const np = a.size() / _nY ;
-	unsigned int const nq = b.size() / _nY ;
+	unsigned int const np = _p_coeffs.size();
+	unsigned int const nq = _q_coeffs.size();
 
 	double p = 0.0f ;
 	double q = 0.0f ;
 
 	for(unsigned int i=0; i<np; ++i)
 	{
-		p += a[i]*this->p(x, i) ;
+		p += _p_coeffs[i].a*this->p(x, i) ;
 	}
 
 	for(unsigned int i=0; i<nq; ++i)
 	{
-		q += b[i]*this->q(x, i) ;
+		q += _q_coeffs[i].a*this->q(x, i) ;
 	}
 
 	res[0] = p/q ;
@@ -330,25 +342,28 @@ vec rational_function_1d::value(const vec& x) const
 
 std::ostream& operator<< (std::ostream& out, const rational_function_1d& r) 
 {
+	const unsigned int np = r._p_coeffs.size();
+	const unsigned int nq = r._q_coeffs.size();
+
 	std::cout << "p = [" ;
-	for(int i=0; i<r.a.size(); ++i)
+	for(unsigned int i=0; i<np; ++i)
 	{
 		if(i != 0)
 		{
 			std::cout << ", " ;
 		}
-		std::cout << r.a[i] ;
+		std::cout << r._p_coeffs[i].a ;
 	}
 	std::cout << "]" << std::endl ;
 
 	std::cout << "q = [" ;
-	for(int i=0; i<r.b.size(); ++i)
+	for(unsigned int i=0; i<nq; ++i)
 	{
 		if(i != 0)
 		{
 			std::cout << ", " ;
 		}
-		std::cout << r.b[i] ;
+		std::cout << r._q_coeffs[i].a ;
 	}
 	std::cout << "]" << std::endl ;
 
@@ -384,9 +399,7 @@ rational_function_1d* rational_function::get(int i)
 	{
 		if(rs[i] == NULL)
 		{
-			rs[i] = new rational_function_1d(np, nq);
-			rs[i]->setDimX(dimX());
-			rs[i]->setDimY(dimY());
+			rs[i] = new rational_function_1d(dimX(), np, nq);
 
 			// Test if the input domain is not empty. If one dimension of
 			// the input domain is a point, I manually inflate this dimension

@@ -21,28 +21,28 @@ class rational_function_1d : public function
 	public: // methods
 
 		rational_function_1d() ;
-		rational_function_1d(int np, int nq, bool separable = false) ;
-        rational_function_1d(const vec& a, const vec& b) ;
+		rational_function_1d(int nX, unsigned int np, unsigned int nq, 
+									bool separable = false) ;
 		virtual ~rational_function_1d() {}
 
 
-        /* FUNCTION INHERITANCE */
+		/* FUNCTION INHERITANCE */
 
-		// Overload the function operator
+		//! Overload the function operator
 		virtual vec value(const vec& x) const ;
 		virtual vec operator()(const vec& x) const { return value(x) ; }
 
-        // IO function to text files
-        virtual bool load(std::istream& in);
+		//! IO function to text files
+		virtual bool load(std::istream& in);
 
-        //! \brief Save the rational function expansion. It should
-        //! not be store in any variable (e.g. "y = rf(x);") as the
-        //! nD rational function can append factor to the 1D rational
-        //! function.
-        virtual void save_body(std::ostream&, const arguments&) const;
+		//! \brief Save the rational function expansion. It should
+		//! not be store in any variable (e.g. "y = rf(x);") as the
+		//! nD rational function can append factor to the 1D rational
+		//! function.
+		virtual void save_body(std::ostream&, const arguments&) const;
 
 
-        /* RATIONAL FUNCTION SPECIFIC */
+      /* RATIONAL FUNCTION SPECIFIC */
 
 		//! Evaluate the numerator \f$p(\mathbf{x})\f$ of the rational
 		//! function. This function is provided to allow fast 
@@ -50,6 +50,7 @@ class rational_function_1d : public function
 		//! algorithm to efficiently evaluate recursively defined
 		//! polynomials. 
 		virtual vec p(const vec& x) const ;
+
 		//! Evaluate the denominator \f$q(\mathbf{x})\f$ of the rational
 		//! function. This function is provided to allow fast 
 		//! implementation. For example one can use the Clenshaw 
@@ -64,19 +65,41 @@ class rational_function_1d : public function
 		//! denominator of the rational function.
 		virtual double q(const vec& x, int j) const ;
 
-		// Update the function
+
+		//! Update the coefficient vectors with new values. The new values
+		//! are normalized by the first element of the denominator 
+		//! coefficients.
 		virtual void update(const vec& in_a, 
 		                    const vec& in_b) ;
 
-		// Resize the polynomial
-		virtual void resize(int np, int nq);
+		//! Resize the polynomial.
+		virtual void resize(unsigned int np, unsigned int nq);
 
-		// Get the coefficients
-		virtual double getP(int i) const { return a[i]; }
-		virtual double getQ(int i) const { return b[i]; }
 
-		virtual vec getP() const { return a; }
-		virtual vec getQ() const { return b; }
+		//! Get the i-th coefficient of the numerator.
+		virtual double getP(int i) const { return _p_coeffs[i].a; }
+
+		//! Get the i-th coefficient of the denominator.
+		virtual double getQ(int i) const { return _q_coeffs[i].a; }
+
+		//! Get the vector of coefficient for the numerator.
+		virtual vec getP() const 
+		{
+			const int np = _p_coeffs.size();
+			vec t(np);
+			for(int i=0; i<np; ++i) {t[i] = _p_coeffs[i].a; }
+			return t; 
+		}
+		
+		//! Get the vector of coefficient for the denominator.
+		virtual vec getQ() const 
+		{ 
+			const int nq = _q_coeffs.size();
+			vec t(nq);
+			for(int i=0; i<nq; ++i) {t[i] = _q_coeffs[i].a; }
+			return t; 
+		}
+
 
 		// STL stream ouput
 		friend std::ostream& operator<< (std::ostream& out,
@@ -96,14 +119,28 @@ class rational_function_1d : public function
 
 	protected: // data
 
-		// Store the coefficients for the moment, I assume
-		// the functions to be polynomials.
-        vec a, b ;
+		// Structure to store a multi-dimensional coefficient. The
+		// coeffcient, a, is associated with the vector of degree
+		// for each dimension.
+		struct coeff
+		{
+			coeff() {}
+			coeff(double a, std::vector<int> deg) :
+				a(a), deg(deg) { }
 
-        //! Is the function separable with respect to its input dimensions?
-        //! \todo Make possible to have only part of the dimensions
-        //! separable.
-        bool _separable;
+			double a;
+			std::vector<int> deg;
+		};
+
+		// Table of coefficients and indices, sorted with respect
+		// to the indices.
+		std::vector<coeff> _p_coeffs;
+		std::vector<coeff> _q_coeffs;
+
+		//! Is the function separable with respect to its input dimensions?
+		//! \todo Make possible to have only part of the dimensions
+		//! separable.
+		bool _separable;
 } ;
 
 class rational_function : public function
