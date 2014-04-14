@@ -167,7 +167,7 @@ vec rational_function_1d::q(const vec& x) const
 	const unsigned int np = _q_coeffs.size() ;
 	for(unsigned int i=0; i<np; ++i)
 	{
-		res[0] += _q_coeffs[i].a * this->p(x, i) ;
+		res[0] += _q_coeffs[i].a * this->q(x, i) ;
 	}
 
 	return res ;
