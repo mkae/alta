@@ -20,10 +20,12 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 class CeresFunctor : public ceres::CostFunction
 {
 	public:
-		CeresFunctor(nonlinear_function* f, const vec& xi, bool cos_fit = false) : _f(f), _xi(xi), _cos_fit(cos_fit)
+		CeresFunctor(nonlinear_function* f, const vec& xi, const arguments& args) : _f(f), _xi(xi)
 		{
 			set_num_residuals(f->dimY());
 			mutable_parameter_block_sizes()->push_back(f->nbParameters());
+
+			_log_fit = args.is_defined("log-fit");
 		}
 
 		virtual bool Evaluate(double const* const* x, double* y, double** dy) const 
@@ -51,23 +53,16 @@ class CeresFunctor : public ceres::CostFunction
 				_di[i] = _xi[_f->dimX() + i];
 			}
 
-			// Should add the resulting vector completely
-			double costerm = 1.0;
-			if(_cos_fit) 
-			{
-				double _x[6];
-				params::convert(&_xi[0], _f->input_parametrization(), params::CARTESIAN, _x);
-				costerm = _x[5]*_x[2];
-			}
-			vec _y = _di - _f->value(_xi);
+			const vec _yi = _f->value(_xi);
+			const vec _y = _di - _yi;
 			for(int i=0; i<_f->dimY(); ++i)
 			{
-				y[i] = _y[i];
+				y[i] = (_log_fit) ? log(1.0 + _di[i]) - log(1.0 + _yi[i]) : _y[i] ;
 			}
 
 			if(dy != NULL)
 			{
-				df(dy);
+				df(_di, dy);
 			}
 
 			return true;
@@ -75,7 +70,7 @@ class CeresFunctor : public ceres::CostFunction
 
 		// The parameter of the function _f should be set prior to this function
 		// call. If not it will produce undesirable results.
-		virtual void df(double ** fjac) const
+		virtual void df(const vec& di, double ** fjac) const
 		{
 			// Get the jacobian of the function at position x_i for the current
 			// set of parameters (set prior to function call)
@@ -88,16 +83,19 @@ class CeresFunctor : public ceres::CostFunction
 				// Fill the columns of the matrix
 				for(int j=0; j<_f->nbParameters(); ++j)
 				{
-                    fjac[0][i*_f->nbParameters() + j] = -_jac[i*_f->nbParameters() + j];
+                    fjac[0][i*_f->nbParameters() + j] = - ((_log_fit) ? _jac[i*_f->nbParameters() + j]/(1.0 + di[i]) : _jac[i*_f->nbParameters() + j]);
 				}
          }
 		}
 
 	protected:
 
-		bool _cos_fit;
-		const vec _xi;
+		// Data point and function to optimize
 		nonlinear_function* _f;
+		const vec _xi;
+
+		// Arguments of the fitting procedure
+		bool _log_fit;
 };
 
 nonlinear_fitter_ceres::nonlinear_fitter_ceres() 
@@ -123,9 +121,6 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
         return false;
     }
     nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
-
-	 // Should I include the cosine term during the fit ?
-	 const bool cos_fit = args.is_defined("cos-fit");
 
 #ifndef DEBUG
 	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
@@ -158,7 +153,7 @@ bool nonlinear_fitter_ceres::fit_data(const data* d, function* fit, const argume
 			 xf[nf->dimX() + k] = xi[d->dimX() + k];
 		 }
 
-		 problem.AddResidualBlock(new CeresFunctor(nf, xf, cos_fit), NULL, &p[0]);
+		 problem.AddResidualBlock(new CeresFunctor(nf, xf, args), NULL, &p[0]);
 	 }
 
 	 // Solves the NL problem
