@@ -29,8 +29,8 @@
 
 		<parameter name="ymin" value="[0.05]" />
 
-		<parameter name="min-np" value="30" />
-		<parameter name="min-nq" value="30" />
+		<parameter name="min-np" value="200" />
+		<parameter name="min-nq" value="200" />
 
 		<parameter name="np" value="1000" />
 		<parameter name="nq" value="1000" />
