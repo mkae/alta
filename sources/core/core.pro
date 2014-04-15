@@ -27,5 +27,4 @@ SOURCES  = common.cpp            \
            vertical_segment.cpp  \
 		     rational_function.cpp \
 		     params.cpp			   \
-           function.cpp          \
-#          clustering.cpp
+           function.cpp          

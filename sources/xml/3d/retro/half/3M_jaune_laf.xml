@@ -18,7 +18,7 @@
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe.alta" />
+		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR__BRDF_min_retro_lobe_dense.alta" />
 		<output name="./results/3d/retro/half/3M_jaune_laf.brdf" />
 
 		<!-- Define the function to use -->
@@ -31,7 +31,7 @@
 
 		<!-- Parameters -->
 		<parameter name="min" value="[0.1, -2, -2]" />
-		<parameter name="max" value="[0.9,  2,  2]" />
+		<parameter name="max" value="[1.7,  2,  2]" />
 	</action>
 	
 	<!-- Export the fit -->

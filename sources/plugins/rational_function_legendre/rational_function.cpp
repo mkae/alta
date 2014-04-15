@@ -12,14 +12,8 @@ rational_function_legendre_1d::rational_function_legendre_1d()
 {
 }
 
-rational_function_legendre_1d::rational_function_legendre_1d(int np, int nq) :
-    rational_function_1d(np, nq)
-{
-}
-
-rational_function_legendre_1d::rational_function_legendre_1d(const vec& a, 
-                                                             const vec& b) :
-    rational_function_1d(a, b)
+rational_function_legendre_1d::rational_function_legendre_1d(int nX, int np, int nq) :
+    rational_function_1d(nX, np, nq)
 {
 }
 

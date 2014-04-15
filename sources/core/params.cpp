@@ -178,7 +178,25 @@ void params::to_cartesian(const double* invec, params::input intype,
 		}
 			break;
 		case SCHLICK_TL_TK_PROJ_DPHI:
-			NOT_IMPLEMENTED();
+		{
+			// Set the light direction
+			outvec[3] = sin(invec[0]);
+			outvec[4] = 0.0;
+			outvec[5] = cos(invec[0]);
+
+			// The view direction is the symmetric of the reflected direction
+			// with respect to the back direction:
+			//     v = 2 |r.k| k - r
+			//     r = 2 |l.n| n - l = {-lx, -ly, lz }
+			const double theta = sqrt(invec[1]*invec[1] + invec[2]*invec[2]);
+			const double Kx = (theta > 0.0) ? (invec[1]/theta)*sin(theta) : 0.0;
+			const double Ky = (theta > 0.0) ? (invec[2]/theta)*sin(theta) : 0.0;
+			const double Kz = cos(theta);
+			const double dotKR = outvec[5]*Kz - outvec[3]*Kx;
+			outvec[0] = 2.0*dotKR*Kx + outvec[3];
+			outvec[1] = 2.0*dotKR*Ky;
+			outvec[2] = 2.0*dotKR*Kz - outvec[5];
+		}
 			break;
 		case RETRO_TL_TVL_PROJ_DPHI:
 		{
@@ -187,19 +205,19 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double sin_vl   = sin(theta_vl);
 			const double cos_l    = cos(invec[0]);
 			const double sin_l    = sin(invec[0]);
-			const double cos_phi  = invec[0] / theta_vl;
-			const double sin_phi  = invec[1] / theta_vl;
+			const double cos_phi  = (theta_vl > 0.0) ? invec[1] / theta_vl : 0.0;
+			const double sin_phi  = (theta_vl > 0.0) ? invec[2] / theta_vl : 0.0;
 
 			// Compute the cosine of the outgoing vector using the
 			// spherical law of cosines
 			const double cos_v = cos_l*cos_vl + cos_phi*sin_l*sin_vl;
-			const double sin_v = sqrt(1.0 - cos_v*cos_v);
+			const double sin_v = sqrt(1.0 - std::min(cos_v*cos_v, 1.0));
 
 			if(sin_v != 0.0)
 			{
 				const double sin_dphi = (sin_vl*sin_phi) / sin_v;
 
-				outvec[0] = sin_v * sqrt(1.0 - sin_dphi*sin_dphi);
+				outvec[0] = sin_v * sqrt(1.0 - std::min(sin_dphi*sin_dphi, 1.0));
 				outvec[1] = sin_v * sin_dphi;
 			}
 			else

@@ -214,7 +214,8 @@ function* plugins_manager::get_function(const std::string& filename)
 
 	// Parameters of the function object
 	int nX, nY;
-	params::input param_in; params::output param_out;
+	params::input param_in   = params::UNKNOWN_INPUT; 
+	params::output param_out = params::UNKNOWN_OUTPUT;
 	arguments args;
 
 	// Test for the first line of the file. Should be a ALTA FUNC HEADER
@@ -331,7 +332,7 @@ function* plugins_manager::get_function(const arguments& args)
     }
     else
     {
-        std::string filename = args["func"];
+        const std::string filename = args["func"];
         FunctionPrototype myFunction = open_library<FunctionPrototype>(filename, "provide_function");
         if(myFunction != NULL)
         {

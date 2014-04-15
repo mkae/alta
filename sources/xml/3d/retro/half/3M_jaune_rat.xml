@@ -12,24 +12,105 @@
 	</configuration>
 
 	<!-- Fitting the lobe using a back parametrization:
-		  The ABC model uses the dot product between the back and the
-	     normal vectors.
 	-->
+	<action name="data2data">
+		<!-- Input arguments of the action -->
+		<!--<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_81.alta" />-->
+		<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<!--<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled.alta" />-->
+		<parameter name="min" value="[0,   0,-2]" />
+		<parameter name="max" value="[1.5, 2, 2]" />
+		<!--<parameter name="ymin" value="[0.001]" />-->
+
+		<!-- Output arguments of the action -->
+		<output name="/tmp/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162_TK.alta" />
+		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
+	</action>
 	<action name="data2brdf">
 
 		<!-- Input and output arguments of the action -->
-		<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
-		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
-		<parameter name="min" value="[0,   0,-2]" />
-		<parameter name="max" value="[1.5, 2, 2]" />
+		<input name="/tmp/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162_TK.alta" />
 
+		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />-->
+		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
+		<!--<parameter name="min" value="[0,   0,-2]" />-->
+		<!--<parameter name="max" value="[1.5, 2, 2]" />-->
 	
 		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
-		<output name="./results/3d/retro/half/3M_jaune_rat.brdf" />
+		<output name="./results/3d/retro/half/3M_jaune_rat_TK.brdf" />
 
 		<!-- Define the function to use -->
 		<!--<function name="rational_function_cosine" />-->
-		<function name="rational_function_chebychev" />
+		<!--<function name="rational_function_chebychev" />-->
+		<function name="rational_function_chebychev_opt" />
+
+		<!-- Define the ftting procedure to use -->
+		<!--<plugin type="fitter" name="rational_fitter_quadprog" />-->
+		<plugin type="fitter" name="rational_fitter_parallel" />
+		<!--<plugin type="fitter" name="rational_fitter_matlab" />-->
+
+		<parameter name="min-np" value="48" />
+		<!--<parameter name="min-np" value="53" />-->
+		<parameter name="min-nq" value="30" />
+		<parameter name="np" value="1000" />
+		<parameter name="nq" value="1000" />
+		<parameter name='np-step' value='1' /> 
+
+		<parameter name="dt" value="0.5" />
+		<!-- <parameter name="dt-max" value="" /> -->
+		<parameter name="dt-positive" value="" /> 
+		<!-- <parameter name="dt-relative" value="" />-->
+		
+		<parameter name="nb-starting-points" value="10000" />
+	</action>
+	
+	<!-- Export the fit -->
+	<action name="brdf2gnuplot">
+		
+		<!-- Input and output arguments of the action -->
+		<input  name="./results/3d/retro/half/3M_jaune_rat_TK.brdf" />
+		<output name="./results/3d/retro/half/3M_jaune_rat_TK.dat" />
+
+		<!--<parameter name="data" value="/tmp/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162_TK.alta" />-->
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0,   0,-2]" />
+		<!--<parameter name="max" value="[1.5, 2, 2]" />-->
+	</action>
+
+
+	<!-- Fitting the lobe using a light-view parametrization:
+		  The ABC model uses the dot product between the back and the
+	     normal vectors.
+	-->
+	<action name="data2data">
+		<!-- Input arguments of the action -->
+		<!--<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_81.alta" />-->
+		<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<!--<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled.alta" />-->
+		<parameter name="min" value="[0,   0,-2]" />
+		<parameter name="max" value="[1.5, 2, 2]" />
+
+		<!-- Output arguments of the action -->
+		<output name="/tmp/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162_TVL.alta" />
+		<parameter name="param" value="RETRO_TL_TVL_PROJ_DPHI" />
+	</action>
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input name="/tmp/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162_TVL.alta" />
+		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />-->
+		<!--<input name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/3M_jaune_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
+		<!--<parameter name="min" value="[0,   0,-2]" />-->
+		<!--<parameter name="max" value="[1.5, 2, 2]" />-->
+		<!--<parameter name="ymin" value="[0.001]" />-->
+
+	
+		<!--<input name="/tmp/yellow_slice_inc30.dat" />-->
+		<output name="./results/3d/retro/half/3M_jaune_rat_TVL.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="rational_function_cosine" />
+		<!--<function name="rational_function_chebychev" />-->
 		<!--<function name="rational_function_chebychev_opt" />-->
 
 		<!-- Define the ftting procedure to use -->
@@ -37,31 +118,33 @@
 		<plugin type="fitter" name="rational_fitter_parallel" />
 		<!--<plugin type="fitter" name="rational_fitter_matlab" />-->
 
-		<parameter name="min-np" value="50" />
+		<parameter name="min-np" value="48" />
 		<!--<parameter name="min-np" value="53" />-->
 		<parameter name="min-nq" value="30" />
 		<parameter name="np" value="1000" />
 		<parameter name="nq" value="1000" />
-		<parameter name='np-step' value='5' /> 
+		<parameter name='np-step' value='1' /> 
 
 		<parameter name="dt" value="0.5" />
 		<!-- <parameter name="dt-max" value="" /> -->
 		<parameter name="dt-positive" value="" /> 
 		<!-- <parameter name="dt-relative" value="" />-->
 		
-		<parameter name="nb-starting-points" value="1000" />
+		<parameter name="nb-starting-points" value="10000" />
 	</action>
 	
 	<!-- Export the fit -->
 	<action name="brdf2gnuplot">
 		
 		<!-- Input and output arguments of the action -->
-		<input  name="./results/3d/retro/half/3M_jaune_rat.brdf" />
-		<output name="./results/3d/retro/half/3M_jaune_rat.dat" />
+		<input  name="./results/3d/retro/half/3M_jaune_rat_TVL.brdf" />
 
-		<parameter name="data"	 value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
-		<!--<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/bande_orange_iso_tvproj_brdfcc_rescaled_vs_relative_min_0.4_max_0.9.alta" />-->
+		<!-- Output arguments of the action -->
+		<output name="./results/3d/retro/half/3M_jaune_rat_TVL.dat" />
 
-		<!--<parameter name="data" value="/tmp/yellow_slice_inc30.dat" />-->
+		<!--<parameter name="data" value="/tmp/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162_TVL.alta" />-->
+		<parameter name="data" value="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0,   0,-2]" />
+		<!--<parameter name="max" value="[1.5, 2, 2]" />-->
 	</action>
 </alta>

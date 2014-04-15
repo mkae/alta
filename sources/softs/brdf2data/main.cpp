@@ -8,6 +8,7 @@
  */
 #include <core/args.h>
 #include <core/data.h>
+#include <core/vertical_segment.h>
 #include <core/params.h>
 #include <core/function.h>
 #include <core/fitter.h>
@@ -64,6 +65,21 @@ int main(int argc, char** argv)
 		d->load(args["data-file"]);
 	}
 
+    // Get the output object. In the case where it is not a VS file, we use
+    // the load object.
+    data* d_out = NULL;
+    if(dynamic_cast<vertical_segment*>(d) == NULL)
+    {
+        d_out = d;
+    }
+    else
+    {
+        d_out = new vertical_segment();
+        d_out->setDimX(d->dimX());
+        d_out->setDimY(d->dimY());
+        d_out->setParametrization(d->input_parametrization());
+    }
+
 	// Get the function file
 	function* f = NULL;
 	f = plugins_manager::get_function(args["input"]);
@@ -88,10 +104,10 @@ int main(int argc, char** argv)
 				x[d->dimX() + j] = y[j];
 			}
 
-			d->set(x);
+            d_out->set(x);
 		}	
 
-		d->save(args["output"]);
+        d_out->save(args["output"]);
 	}	
 	else
 	{

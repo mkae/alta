@@ -14,8 +14,9 @@
 #include <cmath>
 #include <string>
 #include <list>
+#ifdef _OPENMP
 #include <omp.h>
-
+#endif
 
 #include "quadratic_program.h"
 
@@ -55,7 +56,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	const int nb_starting_points = args.get_int("nb-starting-points", 100);
 	std::cout << "<<INFO>> number of data point used in start: " << nb_starting_points << std::endl;
 
-	const int step = args.get_int("np-step", 1);
+	const int  step      = args.get_int("np-step", 1);
+	const bool use_delta = args.is_defined("use_delta");
 
     for(int i=_min_np; i<=_max_np; i+=step)
 	{
@@ -64,20 +66,22 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		timer time ;
 		time.start() ;
 
-        int nb_cores = args.get_int("nb-cores", omp_get_num_procs());
+#ifdef _OPENMP
+      const int nb_cores = args.get_int("nb-cores", omp_get_num_procs());
 #ifdef DEBUG
 		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
 #endif
 
 		omp_set_num_threads(nb_cores) ;
+#endif
 
-
-		double min_delta  = std::numeric_limits<double>::max();
+		double min_delta   = std::numeric_limits<double>::max();
+		double min_l2_dist = std::numeric_limits<double>::max();
 		double mean_delta = 0.0;
 		int nb_sol_found  = 0;
 		int nb_sol_tested = 0;
 
-        #pragma omp parallel for shared(nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
+        #pragma omp parallel for shared(args, nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
         for(int j=1; j<i; ++j)
         {
             // Compute the number of coefficients in the numerator and in the denominator
@@ -90,24 +94,29 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 
             // Allocate a rational function and set it to the correct size, dimensions
             // and parametrizations.
-            rational_function* rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+				rational_function* rk = NULL;
+            #pragma omp critical (args)
+            {
+					rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+				}
+				if(rk == NULL)
+            {
+                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
+                throw;
+            }
             rk->setParametrization(r->input_parametrization());
             rk->setParametrization(r->output_parametrization());
             rk->setDimX(r->dimX()) ;
             rk->setDimY(r->dimY()) ;
             rk->setMin(r->min()) ;
             rk->setMax(r->max()) ;
-            if(rk == NULL)
-            {
-                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
-                throw;
-            }
 
             // Set the rational function size
             rk->setSize(temp_np, temp_nq);
 
-            double delta, linf_dist, l2_dist;
-            bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, p, q, delta, linf_dist, l2_dist);
+            double delta = 1.0;
+            double linf_dist, l2_dist;
+            bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, delta, linf_dist, l2_dist);
             if(is_fitted)
             {
                 #pragma omp critical (nb_sol_found)
@@ -121,11 +130,12 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
                     std::cout << "<<INFO>>      delta = " << delta << std::endl;
                     std::cout << std::endl;
 
-                    // Get the solution with the minimum delta, and update the main
-                    // rational function r.
-                    if(delta < min_delta)
+                    // Get the solution with the minimum delta or the minimum L2 distance, 
+						  // and update the main rational function r.
+                    if((use_delta && delta < min_delta) || (!use_delta && l2_dist < min_l2_dist))
                     {
-                        min_delta = delta ;
+                        min_delta   = delta ;
+                        min_l2_dist = l2_dist ;
                         r->setSize(temp_np, temp_nq);
                         for(int y=0; y<r->dimY(); ++y)
                         {
@@ -135,7 +145,8 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
                 }
             }
 
-            delete rk; // memory clean
+				if(rk != NULL)
+	            delete rk; // memory clean
 
             #pragma omp critical (nb_sol_tested)
             {
@@ -164,22 +175,23 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 	return false ;
 }
 
-void rational_fitter_parallel::set_parameters(const arguments& args)
+void rational_fitter_parallel::set_parameters(const arguments&)
 {
 }
 
 
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, 
-        rational_function* r, const arguments &args,
-        vec& P, vec& Q, double& delta, double& linf_dist, double& l2_dist)
+                                        rational_function* r, const arguments &args,
+                                        double& delta, double& linf_dist, double& l2_dist)
 {
-	// Fit the different outptu dimension independantly
+	// Fit the different output dimension independantly
 	for(int j=0; j<d->dimY(); ++j)
 	{
 		vec p(np), q(nq);
 		rational_function_1d* rf = r->get(j);
 		rf->resize(np, nq);
-		if(!fit_data(d, np, nq, j, rf, p, q, delta))
+
+		if(!fit_data(d, np, nq, j, rf, args, p, q, delta))
 		{
 			return false ;
 		}
@@ -196,14 +208,15 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // dat is the data object, it contains all the points to fit
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
-// the function return a ration BRDF function and a boolean
+// the function returns a rational BRDF function and a boolean
 bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
-                                        rational_function_1d* r, vec& p, vec& q, double& delta)
+                                        rational_function_1d* r, const arguments& args,
+                                        vec& p, vec& q, double& delta)
 {
 	const int m = d->size(); // 2*m = number of constraints
 	const int n = np+nq;     // n = np+nq
 
-    quadratic_program qp(np, nq);
+    quadratic_program qp(np, nq, args.is_defined("use_delta"));
 
     // Starting with only a nb_starting_points vertical segments
     std::list<unsigned int> training_set;
@@ -229,8 +242,10 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 
     do
 	{
+#ifdef _OPENMP
 #ifdef DEBUG
         std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
+#endif
 #endif
 		QuadProgPP::Vector<double> x(n);
 		bool solves_qp = qp.solve_program(x, delta, p, q);
@@ -267,7 +282,7 @@ void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny,
 	cu.resize(np+nq);
 	cl.resize(np+nq);
 
-	// Create two vector of constraints
+	// Create two vectors of constraints
 	for(int j=0; j<np+nq; ++j)
 	{
 		// Filling the p part

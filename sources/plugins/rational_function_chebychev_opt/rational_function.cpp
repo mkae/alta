@@ -29,40 +29,11 @@ rational_function_chebychev_1d::rational_function_chebychev_1d()
 	setDimY(0);
 }
 
-rational_function_chebychev_1d::rational_function_chebychev_1d(int np, int nq) :
-	rational_function_1d(np, nq)
+rational_function_chebychev_1d::rational_function_chebychev_1d(int nX, int np, int nq) :
+	rational_function_1d(nX, np, nq)
 {
-	setDimX(0);
-	setDimY(0);
-
 	this->resize(np, nq);
 }
-
-rational_function_chebychev_1d::rational_function_chebychev_1d(const vec& a,
-                                                               const vec& b) :
-	rational_function_1d(a, b)
-{
-	setDimX(0);
-	setDimY(0);
-
-	const int np = a.size();
-	const int nq = b.size();
-
-	this->resize(np, nq);
-
-	// Update the numerator coefficient array
-	for(int k=0; k<np; ++k)
-	{
-		_p_coeffs[k].a = a[k];
-	}
-	
-	// Update the denominator coefficient array
-	for(int k=0; k<nq; ++k)
-	{
-		_q_coeffs[k].a = b[k];
-	}
-}
-		
 
 double chebychev(double x, int i)
 {
@@ -115,9 +86,7 @@ rational_function_1d* rational_function_chebychev::get(int i)
 	{
 		if(rs[i] == NULL)
 		{
-			rs[i] = new rational_function_chebychev_1d(np, nq);
-			rs[i]->setDimX(dimX());
-			rs[i]->setDimY(dimY());
+			rs[i] = new rational_function_chebychev_1d(dimX(), np, nq);
 
 			// Test if the input domain is not empty. If one dimension of
 			// the input domain is a point, I manually inflate this dimension

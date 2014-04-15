@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 		}
 
 		if(d != NULL)
-		{
+        {
 			for(int i=0; i<d->size(); ++i)
 			{
 				vec v = d->get(i) ;

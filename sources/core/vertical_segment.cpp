@@ -102,11 +102,33 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 		}
 		else
 		{
-
+			// Read the data point x and y coordinates
 			vec v = vec::Zero(dimX() + 3*dimY()) ;
-			for(int i=0; i<dimX(); ++i)
+			for(int i=0; i<dimX()+dimY(); ++i) 
+			{
 				linestream >> v[i] ;
+			}
 
+			// If data is not in the interval of fit
+			bool is_in = true ;
+			for(int i=0; i<dimX(); ++i)
+			{
+				if(v[i] < min[i] || v[i] > max[i])
+				{
+					is_in = false ;
+				}
+			}
+			for(int i=0; i<dimY(); ++i)
+			{
+				if(v[dimX()+i] < ymin[i] || v[dimX()+i] > ymax[i])
+				{
+					is_in = false ;
+				}
+			}
+			if(!is_in)
+			{
+				continue ;
+			}
 
 //			/*
 			// Correction of the data by 1/cosine(theta_L)
@@ -118,6 +140,10 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				if(cart[5] > 0.0 && cart[2] > 0.0)
 				{
 					factor = 1.0/cart[5]*cart[2];
+					for(int i=0; i<dimY(); ++i) 
+					{
+						v[i + dimX()] /= factor;
+					}
 				}
 				else
 				{
@@ -126,12 +152,6 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			}
 			// End of correction
 //			*/
-
-			for(int i=0; i<dimY(); ++i)
-			{
-				linestream >> v[dimX() + i];
-				v[dimX() + i] /= factor;
-			}
 
 			// Check if the data containt a vertical segment around the mean
 			// value.
@@ -193,27 +213,6 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 #endif
 			}
 
-			// If data is not in the interval of fit
-			bool is_in = true ;
-			for(int i=0; i<dimX(); ++i)
-			{
-				if(v[i] < min[i] || v[i] > max[i])
-				{
-					is_in = false ;
-				}
-			}
-			for(int i=0; i<dimY(); ++i)
-			{
-				if(v[dimX()+i] < ymin[i] || v[dimX()+i] > ymax[i])
-				{
-					is_in = false ;
-				}
-			}
-			if(!is_in)
-			{
-				continue ;
-			}
-
 			_data.push_back(v) ;
 
 			// Update min and max
@@ -268,7 +267,11 @@ vec vertical_segment::operator[](int i) const
 }
 vec vertical_segment::get(int i) const 
 {
-	return _data[i] ;
+    const int n = dimX() + dimY();
+    vec res(n);
+    for(int k=0; k<n; ++k) { res[k] = _data[i][k]; }
+
+    return res ;
 }
 
 //! \todo Check the vertical segment size and if the data

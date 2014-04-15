@@ -17,8 +17,7 @@ class rational_function_legendre_1d : public rational_function_1d
 	public: // methods
 
 		rational_function_legendre_1d() ;
-		rational_function_legendre_1d(int np, int nq, params::input params) ;
-		rational_function_legendre_1d(const vec& a, const vec& b) ;
+		rational_function_legendre_1d(int nX, int np, int nq, params::input params) ;
 		virtual ~rational_function_legendre_1d() {}
 
 		// Get the p_i and q_j function
@@ -47,9 +46,7 @@ class rational_function_legendre : public rational_function
 			{
 				if(rs[i] == NULL)
 				{
-					rs[i] = new rational_function_legendre_1d(np, nq, input_parametrization());
-					rs[i]->setDimX(dimX());
-					rs[i]->setDimY(dimY());
+					rs[i] = new rational_function_legendre_1d(dimX(), np, nq, input_parametrization());
 					
 					vec _min = min();
 					vec _max = max();

@@ -12,16 +12,10 @@ rational_function_legendre_1d::rational_function_legendre_1d()
 {
 }
 
-rational_function_legendre_1d::rational_function_legendre_1d(int np, int nq, params::input param) :
-    rational_function_1d(np, nq)
+rational_function_legendre_1d::rational_function_legendre_1d(int nX, int np, int nq, params::input param) :
+    rational_function_1d(nX, np, nq)
 {
 	setParametrization(param);
-}
-
-rational_function_legendre_1d::rational_function_legendre_1d(const vec& a, 
-                                                             const vec& b) :
-    rational_function_1d(a, b)
-{
 }
 
 double rational_function_legendre_1d::legendre(double x, int i) const
@@ -33,6 +27,30 @@ double rational_function_legendre_1d::legendre(double x, int i) const
 	else if(i == 1)
 	{
 		return x;
+	}
+	else if (i == 2)
+	{
+		return (3*x*x - 1) * 0.5;
+	}
+	else if (i == 3)
+	{
+		return ( (5*x*x - 3) * x ) * 0.5;
+	}
+	else if (i == 4)
+	{
+		return ((7*x*x - 6) * 5*x*x + 3) * 0.125;
+	}
+	else if (i== 5)
+	{
+		return  (((63*x*x - 70)*x*x + 15)*x)*0.125; 
+	}
+	else if (i== 6)
+	{
+		return (((231*x*x-315)*x*x + 105)*x*x - 5) * 0.0625;
+	}
+	else if (i==7)
+	{
+		return ((((429*x*x-693)*x*x + 315)*x*x - 35)*x) * 0.0625;
 	}
 	else
 	{
