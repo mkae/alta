@@ -151,6 +151,17 @@ int main(int argc, char** argv)
 		}
 
 
+		// Get the minimum element of the dataset
+		vec _d_min = d->get(0);
+		for(int i=1; i<d->size(); ++i)
+		{
+			const vec y = d->get(i);
+			for(int j=0; j<nY; ++j)
+			{
+				_d_min[nX + j] = std::min(_d_min[nX + j], y[nX + j]);
+			}
+		}
+
 		// Compute the volume in which we integrate and then compute the
 		// dt to apply for each element.
 		double dt = 1.0;
@@ -219,6 +230,8 @@ int main(int argc, char** argv)
 			vec y = d->value(x);
 			for(int k=0; k<nY; ++k)
 			{
+				y[k] -= _d_min[nX + k];
+
 				double val = y[k] * dt;
 
 				m_0[k]  += val ;
