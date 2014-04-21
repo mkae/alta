@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<alta>
+	<!-- This script file compute the fitting of the retro-reflecting materials 
+		  present in the ALTA library. This script file should be executed in 
+		  the sources directory of repository as all directories are relative.
+
+		  It is also necessary to create a results/3d/retro directory to store 
+		  the resulting fits and exports to BRDF-explorer and matlab.
+	-->
+	<configuration>
+		<parameter name="lib-dir" value="./build" />
+	</configuration>
+
+	<!-- Converting data to the back parametrization:
+	-->
+	<action name="data2data">
+		<!-- Input arguments of the action -->
+		<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0,   0,-2]" />
+		<parameter name="max" value="[1.5, 2, 2]" />
+
+		<!-- Output arguments of the action -->
+		<output name="/tmp/yellow_back.alta" />
+		<parameter name="param" value="SCHLICK_TL_TK_PROJ_DPHI" />
+	</action>
+
+	<!-- Converting data to the retro parametrization:
+	-->
+	<action name="data2data">
+		<!-- Input arguments of the action -->
+		<input  name="../papers/retro/mesures/original/3M_jaune/3d/633nm/Fichiers\ definitifs/densify_helmholtz/3M_jaune_3D+3DS+3DR_dense__nbsgrid_162.alta" />
+		<parameter name="min" value="[0,   0,-2]" />
+		<parameter name="max" value="[1.5, 2, 2]" />
+
+		<!-- Output arguments of the action -->
+		<output name="/tmp/yellow_retro.alta" />
+		<parameter name="param" value="RETRO_TL_TVL_PROJ_DPHI" />
+	</action>
+</alta>
