@@ -6,16 +6,16 @@ SUBDIRS  = \
 				rational_fitter_parallel					\
 				rational_fitter_eigen						\
 				rational_fitter_leastsquare				\	
-#            rational_fitter_matlab						\
-#           rational_fitter_dca							\
+            rational_fitter_matlab						\
+            rational_fitter_dca							\
 				rational_function_chebychev				\
 				rational_function_chebychev_opt			\
 				rational_function_legendre					\
 				rational_function_cosine					\
 				nonlinear_fitter_eigen                 \
             nonlinear_fitter_ceres						\
-#            nonlinear_fitter_ipopt						\
-#            nonlinear_fitter_nlopt						\
+            nonlinear_fitter_ipopt						\
+            nonlinear_fitter_nlopt						\
 				nonlinear_fresnel_schlick					\
 				nonlinear_fresnel_normalized_schlick	\
 				nonlinear_fresnel_retroschlick			\

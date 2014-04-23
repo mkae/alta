@@ -1,0 +1,25 @@
+Import('env')
+env = env.Clone()
+
+sources = ['fitter.cpp']
+libs    = ['core'] + env['IPOPT_LIBS']
+
+env.AppendUnique(CPPPATH = env['IPOPT_INC'])
+env.AppendUnique(LIBPATH = env['IPOPT_DIR'])
+
+conf = Configure(env)
+# Main dependencies of the CERES plugins: CEREs and GLOG
+# GOMP, LAPACK and BLAS are also tested and added if found. If not
+# CERES might not have been compiled with those dependencies.
+if conf.CheckLib(env['IPOPT_LIBS']):
+
+	if len(env['IPOPT_OPT_LIBS']) > 0 and conf.CheckLib(env['IPOPT_OPT_LIBS']):
+		libs.append(env['IPOPT_OPT_LIBS'])
+	#end
+
+	env.SharedLibrary('../../build/nonlinear_fitter_ipopt', sources, LIBS=libs)
+
+#end
+
+env = conf.Finish()
+

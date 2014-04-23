@@ -56,6 +56,17 @@ NLOPT_DIR      = ['#external/build/lib']
 NLOPT_LIBS     = ['nlopt']
 NLOPT_OPT_LIBS = []
 
+
+## coin IpOpt library
+##
+## You have to specify the directory of the IpOpt library
+##
+IPOPT_INC      = ['#external/build/include']
+IPOPT_DIR      = ['#external/build/lib']
+IPOPT_LIBS     = ['ipopt']
+IPOPT_OPT_LIBS = []
+
+
 ## MATLAB library and Engine
 ##
 MATLAB_INC  = ['/home/pac/MATLAB/R2013b/extern/include/']
