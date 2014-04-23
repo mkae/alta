@@ -6,6 +6,7 @@ SConscript('data_interpolant/SConscript')
 # Building nonlinear fitters
 SConscript('nonlinear_fitter_ceres/SConscript')
 SConscript('nonlinear_fitter_nlopt/SConscript')
+SConscript('nonlinear_fitter_ipopt/SConscript')
 SConscript('nonlinear_fitter_eigen/SConscript')
 
 # Building nonlinear functions

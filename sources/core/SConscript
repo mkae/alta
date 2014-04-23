@@ -2,7 +2,6 @@ import os
 import sys
 
 Import('env')
-env = env.Clone()
 
 # Library sources
 sources = ['common.cpp', 
@@ -21,8 +20,9 @@ if(os.name == 'posix'):
 ## on OSX, the shared libraries and the softwares cannot share vtables. This
 ## impact the use of dynamic_cast in shared libraries.
 ##
+ccflags = []
 if sys.platform == 'darwin':
-	env.AppendUnique(CCFLAGS = ['-fvisibility=hidden'])
+	ccflags = ['-fvisibility=hidden']
 #end
 
-env.StaticLibrary('../build/core', sources, LIBS=libs)
+env.StaticLibrary('../build/core', sources, LIBS=libs, CCFLAGS=ccflags)
