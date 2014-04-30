@@ -44,6 +44,6 @@ pdflatex orange_retro_blinn.tex
 pdflatex orange_retro_rat.tex
 
 rm *-inc.eps *.log *.tex *.aux *-to.pdf
-mv yellow_retro_*.pdf ../papers/retro/josa/fits
-mv gray_retro_*.pdf ../papers/retro/josa/fits
-mv orange_retro*.pdf ../papers/retro/josa/fits
+#mv yellow_retro_*.pdf ../papers/retro/josa/fits
+#mv gray_retro_*.pdf ../papers/retro/josa/fits
+#mv orange_retro*.pdf ../papers/retro/josa/fits

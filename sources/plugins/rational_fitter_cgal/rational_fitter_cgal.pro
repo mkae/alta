@@ -1,5 +1,5 @@
 TEMPLATE        = lib
-CONFIG         += shared  \
+CONFIG         += plugin  \
 						eigen   \
 						cgal    
 CONFIG         -= qt
