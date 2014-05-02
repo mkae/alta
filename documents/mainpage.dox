@@ -82,12 +82,14 @@ is lightweight and only requires Python to be installed (ALTA uses Python for
 its high level scripting mechanism). To build using scons, go to the root
 directory of ALTA and type:
 \verbatim
- $ scons -i
+ $ scons --cfg [filename] -i
 \endverbatim
 
-This should obtain some of ALTA's dependencies (such as Eigen) and compile the
-main package of the library (i.e. the core, the command line tools, and some
-plugins).
+You need to provide a plateform dependant configuration file. You will find
+examples of such configuration files in the $ALTA/configs/scons directory.
+Running this command should obtain some of ALTA's dependencies (such as Eigen)
+and compile the main package of the library (i.e. the core, the command line
+tools, and some plugins).
 
 To use QMake, or for a more detailed view of ALTA's building scripts and
 dependencies, please refer to \ref install.

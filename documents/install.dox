@@ -101,19 +101,13 @@ Using scons, the compilation of ALTA is straightforward:
 
 \verbatim
 $ cd $ALTA
-$ scons -i
+$ scons --cfg [filename] -i
 \endverbatim
 
-This compilation command automatically download the dependencies of ALTA
-core and plugins. If you already have one of the dependencies installed on
-your system, you can use a configuration file in the scons call:
-
-\verbatim
-$ scons --cfg config.file
-\endverbatim
-
-An example of the configuration file is provided at <em>$ALTA/config.example
-</em>.
+You need to provide a system dependant configuration file. You will find
+examples of such configuration files in the <em>$ALTA/configs/scons</em>
+directory.  This compilation command automatically download the dependencies of
+ALTA core and plugins. 
 
 All the resulting elements of ALTA (binaries, dynamic and static libraries)
 are outputted in: <em>$ALTA/sources/build</em> directory. The dependencies

@@ -10,7 +10,10 @@ AddOption('--cfg', help='Specify a configuration file (see config.example')
 ##
 configFile = GetOption('cfg')
 if configFile == None:
-	configFile = 'config.example'
+	print '<<ERROR>> You need to specify a configuration file using:'
+	print '<<ERROR>>    scons --cfg [filename]'
+	print '<<ERROR>> Please find example of configuration files in ${ALTA}/configs/scons/'
+	Exit(1)
 #end
 
 if not os.path.exists(configFile):
