@@ -10,11 +10,20 @@ else:
 	#   NlOpt dependancies
 	##
 	execfile('obtain_nlopt.py')
+	
+	##
+	#   Eigen dependancies
+	##
+	execfile('obtain_eigen.py')
 
 	##
 	#   CERES dependancies
 	##
-	if 'CERES_INC' in env and env['CERES_INC'] == ['#external/build/include'] and env['CERES_DIR'] == ['#external/build/lib']:
+	if 'CERES_INC' in env:
+		if env['CERES_INC'] == ['#external/build/include'] and env['CERES_DIR'] == ['#external/build/lib']:
+			execfile('obtain_ceres.py')
+		#end
+	else:
 		execfile('obtain_ceres.py')
 	#end
 #end
