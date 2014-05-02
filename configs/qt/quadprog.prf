@@ -1,0 +1,6 @@
+# Configuration file for the QuadProg++ package present in the
+# ${ALTA}/external/quadprog++ directory provided with the ALTA
+# library. You need to have the env variable ALTA defined.
+
+INCLUDEPATH += $$(ALTA)/external/quadprog++
+LIBS += -L$$(ALTA)/external/build/lib -lquadprog++
