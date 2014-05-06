@@ -47,16 +47,28 @@ template<class T> class ptr
 			_counter->decrement();
 			if(_counter->value() == 0)
 			{
-				delete _ptr;
+				if(_ptr != NULL) { delete _ptr; }
 				delete _counter;
 			}
 		}
 
 		//! Evaluation operator. This operator should be inlined for 
 		//! performance reasons.
-		inline T* operator-> ()
+		inline T* operator-> () const
 		{
 			return _ptr;
+		}
+
+		//! Raw acces to the pointer. It is sometimes needed to 
+		inline T* get() const
+		{
+			return _ptr;
+		}
+
+		//! Is the underlying pointer NULL.
+		inline bool is_null() const
+		{
+			return _ptr == NULL;
 		}
 
 	private:

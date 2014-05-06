@@ -47,6 +47,13 @@ class plugins_manager
 		static
 #endif
 		function* get_function(const arguments& args) ;
+		
+		//! \brief get an instance of the function that is defined in the plugin with
+		//! filename n. Return null if no one exist.
+#ifdef USING_STATIC
+		static
+#endif
+		ptr<function> get_function(const arguments& args) ;
 
 		//! \brief load a function from the ALTA input file.
 #ifdef USING_STATIC
