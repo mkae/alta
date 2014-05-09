@@ -1,3 +1,30 @@
+#pragma once
+
+/*! \class ptr
+ *  
+ *  Define a shared pointer class for automatic memory cleaning
+ *  when dealing with objects created by plugins. All plugins should
+ *  provide a ptr<object> instead of a object* so that the user won't
+ *  have to worry about allocation/deallocation.
+ *
+ *  ALTA provide a weak implementation of the ptr class. If a C++11
+ *  compatible is used, it will try to use the STL version of shared
+ *  pointer.
+ */
+
+/* Checking for the presence of C++11 features like smart pointers. There
+ * is no clean way to do it for all compilers. This method is supposed to
+ * work with CLANG and GCC > 4.3.
+ *
+ * See htpp://stackoverflow.com/questions/11886288/ 
+ */
+#if __cplusplus >= 201103L
+
+#include <memory>
+template<class T> using ptr = std::shared_ptr<T>;
+
+#else
+
 /*  Define a counter class. This class should not be used by any other part of
  *  ALTA code.
  */
@@ -23,8 +50,6 @@ struct ptr_counter
 	unsigned int _count;
 };
 
-/*! \brief Define a shared pointer class.
- */
 template<class T> class ptr
 {
 	public:
@@ -75,3 +100,4 @@ template<class T> class ptr
 		T* _ptr;
 		ptr_counter* _counter;
 };
+#endif

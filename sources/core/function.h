@@ -24,6 +24,11 @@ class function : public parametrized
 {
 	public: // methods
 
+		/* NEEDED FUNCTIONS */
+
+		//! \brief Destructor function needed when using shared_ptr
+		virtual ~function() {}
+
 		/* INTERFACE */
 
 		// Overload the function operator
@@ -81,8 +86,6 @@ class function : public parametrized
 		//! hemisphere.
 		double Linf_distance(const data* d) const ;
 
-
-	protected: // data
 };
 
 /*! \brief Non-linear function interface
