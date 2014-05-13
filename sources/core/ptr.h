@@ -14,7 +14,7 @@
 
 /* Checking for the presence of C++11 features like smart pointers. There
  * is no clean way to do it for all compilers. This method is supposed to
- * work with CLANG and GCC > 4.3.
+ * work with CLANG and GCC.
  *
  * See htpp://stackoverflow.com/questions/11886288/ 
  */
