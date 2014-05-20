@@ -1,10 +1,22 @@
 import os
+import shutil
 
 Import('env')
 env = env.Clone()
 
 if env.GetOption('clean'):
-	print "Nothing to do in external"	
+	print "Removing all the third party packages"
+
+	# Removing the output build directory
+	shutil.rmtree('build', True)
+
+	# Removing the TP directories
+	shutil.rmtree('ceres-solver-1.7.0', True)
+	shutil.rmtree('eigen-eigen-ffa86ffb5570', True)
+	shutil.rmtree('glog-0.3.3', True)
+	shutil.rmtree('Ipopt-3.11.8', True)
+	shutil.rmtree('nlopt-2.4.1', True)
+	
 else:
 	##
 	#   NlOpt dependancies
@@ -26,14 +38,19 @@ else:
 	else:
 		execfile('obtain_ceres.py')
 	#end
+	
+	print "<<INFO>> External libraries are compiled as shared librarie."
+	print "<<INFO>> Please update your environment variable before running ALTA commands."
+
+	##
+	#   QuadProg++
+	##
+	qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
+	qp_base    = 'quadprog++' + os.sep
+	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
+	env.Append(CPPPATH = ['build' + os.sep + 'include'])
+	env.StaticLibrary(target = qp_target, source = qp_sources)
+
 #end
 
-##
-#   QuadProg++
-##
-qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
-qp_base    = 'quadprog++' + os.sep
-qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
-env.Append(CPPPATH = ['build' + os.sep + 'include'])
-env.StaticLibrary(target = qp_target, source = qp_sources)
 

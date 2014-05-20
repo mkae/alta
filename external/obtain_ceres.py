@@ -15,7 +15,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
                 obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
             #end
 	    print '<<INSTALL>> configure and build GLOG v0.3.3'
-	    obtain.configure_build('glog-0.3.3', '--enable-static=yes --enable-shared=false --with-pic=true')
+            obtain.configure_build('glog-0.3.3', '--enable-static=no --enable-shared=true --with-pic=true')
 	#end
 else:
 	print '<<INSTALL>> GLOG already installed'
@@ -50,14 +50,15 @@ if  compile_test:
 
 	libname = ''
 	if os.name == 'posix':
-		libname = 'libglog.a'
+		libname = 'libglog.so'
 	elif os.name == 'nt':
 		libname = 'glog.lib'
 	else:
 		libname = 'libglog.dylib'
 	#end
 
-	cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
+	#cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
+	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=ON -DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=ON'
 
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
