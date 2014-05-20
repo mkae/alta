@@ -1,0 +1,9 @@
+# This configuration file is part of ALTA library
+#
+# It provides Qt with the configuration necessary to compile plugins
+# using ILM's OpenEXR library. This .prf file works under Ubuntu/debian,
+# but must be updated for other OS/distributions.
+#
+
+INCLUDEPATH += /usr/include/OpenEXR/
+LIBS += -L/usr/lib/x86_64-linux-gnu -lHalf -lIlmThread -lIlmImf

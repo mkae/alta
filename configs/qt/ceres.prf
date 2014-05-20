@@ -1,0 +1,9 @@
+# This configuration file is part of ALTA library
+#
+# Configuration file for Google's CERES library present in the
+# ${ALTA}/external/ceres* directory once the obtain_ceres.py script has
+# been runned. You need to have the env variable ALTA defined.
+
+INCLUDEPATH += $$(ALTA)/external/build/include
+LIBS        += -L$$(ALTA)/external/build/lib \
+               -lceres -lglog

@@ -1,0 +1,9 @@
+# This configuration file is part of ALTA library
+#
+# It provides Qt with the configuration necessary to compile plugins
+# using OpenMP. This .prf file works under Ubuntu/debian, but must 
+# be updated for other OS/distributions.
+#
+
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -lgomp
