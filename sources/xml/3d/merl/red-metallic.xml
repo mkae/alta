@@ -3,10 +3,27 @@
 	<configuration>
 		<parameter name="lib-dir" value="./build" />
 	</configuration>
+	<!--	
+	<action name="data2data">
+		<input  name="../data/3d/matusik_from_merl/red-metallic.dat" />
+		<output name="./results/3d/merl/red-metallic.dat" />
 
+
+		<parameter name="in-data" value="./build/libdata_merl.so" />
+	</action>
+	-->!
 	<action name="data2brdf">
 		<!-- Input and output arguments of the action -->
-		<input  name="../data/3d/matusik_from_merl/red-metallic.dat" />
+		<input name="./results/3d/merl/red-metallic.dat" />
+		<!--
+		<input name="./results/2d/merl/red-metallic.exr" />
+		<plugin type="data" name="data_brdf_slice" />
+		-->
+		<!--
+		<input name="../data/3d/matusik_from_merl/red-metallic.dat" />
+		<plugin type="data" name="data_merl" />
+		-->
+
 		<output name="./results/3d/merl/red-metallic.brdf" />
 
 		<!-- Define the function to use -->
@@ -16,15 +33,17 @@
 		
 		<!-- Define the ftting procedure to use -->
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+		<!--<plugin type="fitter" name="nonlinear_fitter_nlopt" />-->
 		<!--<plugin type="fitter" name="nonlinear_fitter_eigen" />-->
 
 		<!-- Parameter -->
-		<parameter name="max" value="[2.0, 0.01, 0.01]" />
-		<parameter name="ceres-debug" value="true" /> 
+		<!--<parameter name="max" value="[2.0, 0.01, 0.01]" />-->
+		<parameter name="ymin" value="[0.0, 0.0, 0.0]" />
+		<!--<parameter name="ceres-debug" value="true" />-->
 	</action>
 	<action name="data2brdf">
 		<!-- Input and output arguments of the action -->
-		<input  name="../data/3d/matusik_from_merl/red-metallic.dat" />
+		<input name="./results/3d/merl/red-metallic.dat" />
 		<output name="./results/3d/merl/red-metallic.brdf" />
 
 		<!-- Define the function to use -->
@@ -38,10 +57,8 @@
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
 
 		<!-- Parameter -->
-		<parameter name="min" value="[1.4, 0.0, 0.00]" /> 
-		<parameter name="max" value="[2.0, 2.0, 0.01]" /> 
-		<parameter name="ceres-debug" value="true" /> 
-		<parameter name="cos-fit" value="true" /> 
+		<!--<parameter name="ceres-debug" value="true" /> -->
+		<!--<parameter name="cos-fit" value="true" /> -->
 	</action>
 
 	<action name="brdf2brdf">
@@ -51,5 +68,33 @@
 
 		<!-- Parameter -->
 		<parameter name="export" value="explorer" />
+	</action>
+	
+	
+	
+	<action name="data2brdf">
+		<!-- Input and output arguments of the action -->
+		<!--<input name="./results/3d/merl/red-metallic.dat" />-->
+		<input name="./results/2d/merl/red-metallic.exr" />
+		<plugin type="data" name="data_brdf_slice" />
+		<!--
+		<input name="../data/3d/matusik_from_merl/red-metallic.dat" />
+		<plugin type="data" name="data_merl" />
+		-->
+
+		<output name="./results/3d/merl/red-metallic-rat.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="rational_function_legendre" />
+		
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_parallel" />
+		<parameter name="min-np" value="10"  />
+		<parameter name="np"     value="100" />
+
+		<!-- Parameter -->
+		<!--<parameter name="max" value="[2.0, 0.01, 0.01]" />-->
+		<parameter name="ymin" value="[0.0, 0.0, 0.0]" />
+		<!--<parameter name="ceres-debug" value="true" />-->
 	</action>
 </alta>

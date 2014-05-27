@@ -35,11 +35,32 @@ rational_fitter_parallel::~rational_fitter_parallel()
 bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
-	if(r == NULL || d == NULL)
+	if(r == NULL)
 	{
-		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
+		std::cerr << "<<ERROR>> not passing the correct function class to the fitter: must be a rational_function" << std::endl ;
 		return false ;
+	}
+
+	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
+	if(d == NULL)
+	{
+		std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
+		std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
+
+		vertical_segment* vs = new vertical_segment();
+		for(int i=0; i<dat->size(); ++i) 
+		{
+			const vec x = dat->get(i);
+			vec y(dat->dimX() + 3*dat->dimY());
+
+			for(int k=0; k<x.size()   ; ++k) { y[k]                          = x[k]; }
+			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size()]               = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX() +   dat->dimY()]; }
+			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() + dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX() + 2*dat->dimY()]; }
+
+			vs->set(y);
+		}
+
+		d = vs;
 	}
 
 	// I need to set the dimension of the resulting function to be equal

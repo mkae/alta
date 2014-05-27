@@ -2,5 +2,5 @@ core    = SConscript('core/SConscript')
 plugins = SConscript('plugins/SConscript')
 softs   = SConscript('softs/SConscript')
 
-Requires(plugins, core)
-Requires(softs, core)
+#Requires(plugins, core)
+#Requires(softs, core)
