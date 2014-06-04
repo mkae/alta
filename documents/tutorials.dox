@@ -19,16 +19,13 @@ First, download the Kirby2 dataset in ALTA format: <a href="http://alta.gforge.i
  $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 \endverbatim
 
-The result can be exported using the \a brdf2gnuplot or \a brdf2data
-commands.
+The result can be exported using the \a brdf2data commands.
 
 \verbatim
- $ ./build/data2gnuplot --input Kirby.brdf --output Kirby.dat --data ../data/1d/NIST/Kirby2/Kirby2.dat 
+ $ ./build/data2gnuplot --input Kirby.brdf --output Kirby.dat --in-data ../data/1d/NIST/Kirby2/Kirby2.dat 
 \endverbatim
 
-The \a brdf2gnuplot allows you to export in a gnuplot compliant format
-the evaluation of a function at the positions indicated in a data file
-(here the original Kirby2 file).
+The \a brdf2data allows you to export a function into a data file. If no data plugin is specified, the ALTA format is used which is gnuplot compliant. The position of evaluation for the function are taken from a specified data file (here the original Kirby2 file).
 
 You should obtain gnuplot data files like the following image:
 
