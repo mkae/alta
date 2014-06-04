@@ -1,0 +1,406 @@
+extern "C" %{
+/*
+ * Copyright (c) 2010-2013 The University of Tennessee and The University
+ *                         of Tennessee Research Foundation. All rights
+ *                         reserved.
+ * Copyright (c) 2013      Inria. All rights reserved.
+ * $COPYRIGHT
+ *
+ *
+ * @precisions normal z -> s d c
+ *
+ */
+#include <math.h>
+#include <lapacke.h>
+#include "dplasmajdf.h"
+#include "data_dist/matrix/matrix.h"
+#include "gesvdm.h"
+
+#define UPDATE( __nb, __value )                                         \
+    if (__value != 0. ){                                                \
+        if ( scale < __value ) {                                        \
+            sumsq = __nb + (sumsq) * ( scale / __value ) * ( scale / __value ); \
+            scale = __value;                                            \
+        } else {                                                        \
+            sumsq = sumsq + __nb * ( __value / scale ) *  ( __value / scale ); \
+        }                                                               \
+    }
+
+%}
+
+args   [type = "gesvdm_args_t*"]
+A      [type = "dague_ddesc_t *"]
+dataCI [type = "dague_ddesc_t *" aligned=A]
+qrtree [type = "dplasma_qrtree_t"]
+ib     [type = "int"]
+
+descA  [type = "tiled_matrix_desc_t" hidden = on default = "*((tiled_matrix_desc_t*)A)"]
+descCI [type = "tiled_matrix_desc_t" hidden = on default = "*((tiled_matrix_desc_t*)dataCI)"]
+minMN  [type = "int" hidden = on default = "dague_imin(descA.mb, descA.n)" ]
+
+p_work [type = "dague_memory_pool_t *" size = "(sizeof(PLASMA_Complex64_t)*ib*(descA.nb))"]
+p_tau  [type = "dague_memory_pool_t *" size = "(sizeof(PLASMA_Complex64_t)   *(descA.nb))"]
+
+/* fill_cip(m) */
+/*   /\* Execution space *\/ */
+/*   m  = 0 .. descA.mt-1 */
+
+/*   /\* Locality *\/ */
+/*   : dataCI(m, 0) */
+
+/*   WRITE CIp-> CIp rownorm( m, 0 .. descCI.nt-1 ) */
+
+/* BODY */
+/* { */
+/*     int tempmm = m == descCI.mt-1 ? descCI.m - m*descCI.mb : descCI.mb; */
+
+/*     args->fill_p( m * descCI.mb, tempmm, args->np, CIp, descCI.mb, */
+/*                   args->data, args->rptr ); */
+
+/* } */
+/* END */
+
+/* fill_ciq(m) */
+/*   /\* Execution space *\/ */
+/*   m  = 0 .. descA.mt-1 */
+
+/*   /\* Locality *\/ */
+/*   : dataCI(m, 0) */
+
+/*   WRITE CIq-> CIq rownorm( m, 0 .. descCI.nt-1 ) */
+
+/* BODY */
+/* { */
+/*     int tempmm = m == descCI.mt-1 ? descCI.m - m*descCI.mb : descCI.mb; */
+
+/*     args->fill_q( m * descCI.mb, tempmm, args->np, CIp, descCI.mb, */
+/*                   args->data, args->rptr, args->ny ); */
+/* } */
+/* END */
+
+
+/*
+ * Computes norm 2 of each rows, and create the backup of A, to restore it after factorization
+ */
+rownorm(m, n)
+  /* Execution space */
+  m  = 0 .. descA.mt-1
+  n  = 0 .. descA.nt-1
+  im   = inline_c %{ return qrtree.geti(    &qrtree, 0, m ); %}
+  type = inline_c %{ return qrtree.gettype( &qrtree, 0, m ); %}
+
+  /* Locality */
+  : A(m, n)
+
+  /* Coefficient Matrix CI or An,m as in Pacanowski 2012 TVCG */
+  RW    A  <- A(m, n)
+           -> A(m, n)
+           -> (m == 0) ? CIm solve( n )
+
+  /* Copy of the coefficient matrix that will be destroyed by the SVD computation */
+  WRITE B  -> (type != 0 ) ? A  zgelqt( n, im )
+           -> (type == 0 ) ? A2 zttlqt( n, m  )
+
+  /* Coefficient vector */
+  RW    CI <- dataCI(m, n)        [type = VECTOR]
+           -> CI postzgesvd(m, n) [type = VECTOR]
+
+  CTL  ctl -> ctlm solve(n)
+
+BODY
+{
+    double *lA = (double*)A;
+    double *lCI = (double*)CI;
+    double scale, sumsq, tmp;
+
+    int tempmm = (m==(descA.mt-1)) ? (descA.m - m * descA.mb) : descA.mb;
+    int tempnn = (n==(descA.nt-1)) ? (descA.n - n * descA.nb) : descA.nb;
+    int ldam = BLKLDD(descA, m);
+    int i, j;
+
+    assert(ib >= 2);
+
+    args->fillp( m * descCI.mb, tempmm, args->np, lA, ldam,
+                 args->data, args->rptr );
+
+    args->fillq( m * descCI.mb, tempmm, args->nq, lA + ldam * args->np, ldam,
+                 args->data, args->rptr, args->ny );
+
+    LAPACKE_zlacpy_work(
+        LAPACK_COL_MAJOR, 'A', tempmm, tempnn, A, ldam, B, descA.mb );
+
+    for(i=0; i<tempmm; i++, lCI++) {
+        scale = 1.;
+        sumsq = 0.;
+
+        for(j=0; j<tempnn; j++) {
+            lA = ((dague_complex64_t*)B) + i + j * descA.mb;
+
+            tmp = fabs(*lA);
+            UPDATE( 1., tmp );
+
+#if defined(PRECISION_z) || defined(PRECISION_c)
+            lA++;
+            tmp = fabs(*lA);
+            UPDATE( 1., tmp );
+#endif
+        }
+
+        *lCI = scale * dplasma_dsqrt( sumsq );
+    }
+}
+END
+
+/**
+ * zgelqt()
+ *
+ * There are dplasma_qr_getnbgeqrf( pivfct, k, descA.mt ) geqrt applyed at step
+ * k on the rows indexed by m.
+ * nextm is the first row that will be killed by the row m at step k.
+ * nextm = descA.mt if the row m is never used as a killer.
+ *
+ */
+zgelqt(n, i)
+  /* Execution space */
+  n = 0 .. descA.nt-1
+  i = 0 .. inline_c %{ return qrtree.getnbgeqrf( &qrtree, 0 ) - 1; %}
+  m      = inline_c %{ return qrtree.getm(       &qrtree, 0, i); %}
+  nextm  = inline_c %{ return qrtree.nextpiv(    &qrtree, 0, m, descA.mt); %}
+
+  /* Locality */
+  : A(m, n)
+
+  RW    A <- B rownorm(m, n)
+
+          ->  (descA.mt == 1) ? A zgesvd(n)
+          -> ((descA.mt >  1) & (nextm != descA.mt)) ? A1 zttlqt(n, nextm) [type = UPPER_TILE]
+          -> ((descA.mt >  1) & (nextm == descA.mt)) ? A2 zttlqt(n, m)     [type = UPPER_TILE]
+
+BODY
+{
+    int tempmm = (m == (descA.mt-1)) ? (descA.m - m * descA.mb) : descA.mb;
+
+    printlog("thread %d VP %d CORE_zgelqt(%d, %d)\n"
+             "\t(tempmm, tempkn, ib, A(%d,%d)[%p], ldam, TS(%d,%d)[%p], TS.mb, p_elem_A, p_elem_B)\n",
+             context->th_id, context->virtual_process->vp_id, n, m, m, n, A, m, n, T);
+
+#if !defined(DAGUE_DRY_RUN)
+
+    void *p_elem_A = dague_private_memory_pop( p_tau  );
+    void *p_elem_B = dague_private_memory_pop( p_work );
+    void *p_elem_T = dague_private_memory_pop( p_work );
+    memset( p_elem_T, 0, descA.nb * ib * sizeof(dague_complex64_t) );
+
+    if ( descA.m < descA.nb ) {
+        CORE_zgelqt(tempmm, descA.nb, ib,
+                    A /* A(m,n)  */, descA.mb,
+                    p_elem_T, ib,
+                    p_elem_A, p_elem_B );
+    } else {
+        CORE_zgeqrt(tempmm, descA.nb, ib,
+                    A /* A(m,n)  */, descA.mb,
+                    p_elem_T, ib,
+                    p_elem_A, p_elem_B );
+    }
+    dague_private_memory_push( p_tau,  p_elem_A );
+    dague_private_memory_push( p_work, p_elem_B );
+    dague_private_memory_push( p_work, p_elem_T );
+
+#endif /* !defined(DAGUE_DRY_RUN) */
+}
+END
+
+/**
+ * zttlqt()
+ *
+ * The row p kills the row m.
+ * nextp is the row that will be killed by p at next stage of the reduction.
+ * prevp is the row that has been killed by p at the previous stage of the reduction.
+ * prevm is the row that has been killed by m at the previous stage of the reduction.
+ * type defines the operation to perform: TS if 0, TT otherwise
+ * ip is the index of the killer p in the sorted set of killers for the step k.
+ * im is the index of the killer m in the sorted set of killers for the step k.
+ *
+ */
+zttlqt(n, m)
+  /* Execution space */
+  n = 0 .. descA.nt-1
+  m = 1 .. descA.mt-1
+  p =     inline_c %{ return qrtree.currpiv( &qrtree, 0, m);    %}
+  nextp = inline_c %{ return qrtree.nextpiv( &qrtree, 0, p, m); %}
+  prevp = inline_c %{ return qrtree.prevpiv( &qrtree, 0, p, m); %}
+  prevm = inline_c %{ return qrtree.prevpiv( &qrtree, 0, m, m); %}
+  type  = inline_c %{ return qrtree.gettype( &qrtree, 0, m );   %}
+  ip    = inline_c %{ return qrtree.geti(    &qrtree, 0, p );   %}
+  im    = inline_c %{ return qrtree.geti(    &qrtree, 0, m );   %}
+
+  : A(m, n)
+
+  RW   A1 <- (   prevp == descA.mt ) ? A  zgelqt(n, ip) : A1 zttlqt(n, prevp) [type = UPPER_TILE]
+          -> (   nextp != descA.mt ) ? A1 zttlqt(n, nextp)                    [type = UPPER_TILE]
+          -> ( ( nextp == descA.mt ) & (p == 0) ) ? A zgesvd(n)               [type = UPPER_TILE]
+          -> ( ( nextp == descA.mt ) & (p != 0) ) ? A2 zttlqt(n, p)           [type = UPPER_TILE]
+
+  RW   A2 <-   (type == 0) ? B rownorm(m, n)                                                      /* TS case */
+          <- ( (type != 0) && (prevm == descA.mt ) ) ? A  zgelqt(n, im )      [type = UPPER_TILE] /* TT case */
+          <- ( (type != 0) && (prevm != descA.mt ) ) ? A1 zttlqt(n, prevm )   [type = UPPER_TILE] /* TT case */
+
+BODY
+{
+    int tempmm = (m == (descA.mt-1)) ? (descA.m - m * descA.mb) : descA.mb;
+
+    printlog("thread %d VP %d CORE_zttlqt(%d, %d)\n"
+             "\t(tempmm, tempkn, ib, A(%d,%d)[%p], A.mb, A(%d,%d)[%p], ldam, TT(%d,%d)[%p], descTT.mb, p_elem_A, p_elem_B)\n",
+             context->th_id, context->virtual_process->vp_id, n, m, p, n, A1, m, n, A2, m, n, T);
+
+#if !defined(DAGUE_DRY_RUN)
+    void *p_elem_A = dague_private_memory_pop( p_tau  );
+    void *p_elem_B = dague_private_memory_pop( p_work );
+    void *p_elem_T = dague_private_memory_pop( p_work );
+
+    memset( p_elem_T, 0, descA.mb * ib * sizeof(dague_complex64_t) );
+
+    if ( type == DPLASMA_QR_KILLED_BY_TS ) {
+        CORE_ztsqrt(
+            tempmm, descA.mb, ib,
+            A1 /* A(p, n) */, descA.mb,
+            A2 /* A(m, n) */, descA.mb,
+            p_elem_T, ib,
+            p_elem_A, p_elem_B );
+    } else {
+        CORE_zttqrt(
+            tempmm, descA.mb, ib,
+            A1 /* A(p, n) */, descA.mb,
+            A2 /* A(m, n) */, descA.mb,
+            p_elem_T, ib,
+            p_elem_A, p_elem_B );
+    }
+    dague_private_memory_push( p_tau , p_elem_A );
+    dague_private_memory_push( p_work, p_elem_B );
+    dague_private_memory_push( p_work, p_elem_T );
+#endif /* !defined(DAGUE_DRY_RUN) */
+}
+END
+
+/*
+ * All n systems have been reduced to Q * R, with R of size descA.mb * descA.mb
+ */
+zgesvd(n)
+  n = 0 .. descA.nt-1
+  prevp = inline_c %{ return qrtree.prevpiv( &qrtree, 0, 0, 0 ); %}
+
+  : A(0, n)
+
+  RW    A <- (descA.mt == 1) ? A  zgelqt(n, 0)
+          <- (descA.mt >  1) ? A1 zttlqt(n, prevp)  [type = UPPER_TILE]
+
+  WRITE S -> S postzgesvd(0 .. descA.mt-1, n)       [type = VECTOR]
+
+BODY
+{
+    int tempmm = (descA.mt == 1) ? descA.m : descA.mb;
+    void *p_elem_work = dague_private_memory_pop( p_work );
+    void *p_elem_taup = dague_private_memory_pop( p_tau  );
+    void *p_elem_tauq = dague_private_memory_pop( p_tau  );
+
+    if ( descA.m < descA.nb ) {
+        assert(tempmm <= descA.nb);
+
+        /* Zero out above L */
+        CORE_zlaset( PlasmaUpper, descA.mb-1, descA.nb-1,
+                     0., 0., ((dague_complex64_t*)A)+descA.mb, descA.mb );
+    }
+    else {
+        assert(tempmm == descA.mb);
+
+        /* Zero out below R */
+        CORE_zlaset( PlasmaLower, descA.mb-1, descA.nb-1,
+                     0., 0., ((dague_complex64_t*)A)+1, descA.mb );
+    }
+
+    /* Bidiagonalize R/L */
+    LAPACKE_zgebrd( LAPACK_COL_MAJOR, tempmm, descA.nb,
+                    A, descA.mb, S, p_elem_work, p_elem_tauq, p_elem_taup );
+
+    /* Perform bidiagonal QR iteration */
+    LAPACKE_zbdsqr( LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), tempmm,
+                    0, 0, 0, S, p_elem_work, NULL, 1, NULL, 1, NULL, 1 );
+
+    dague_private_memory_push( p_tau,  p_elem_taup );
+    dague_private_memory_push( p_tau,  p_elem_tauq );
+    dague_private_memory_push( p_work, p_elem_work );
+
+    /* if ( n == 0 ) */
+    /* { */
+    /*     double *lS = (double*)S; */
+    /*     int i; */
+    /*     fprintf(stderr, "<<DEBUG>> SVD = [ "); */
+    /*     for (i=0; i<minMN; i++) { */
+    /*         fprintf(stderr, "%e, ", lS[i]); */
+    /*     } */
+    /*     fprintf(stderr, "]\n"); */
+
+    /*     fprintf(stdout, "<<DEBUG>> delta factor: %e / %e = %e\n", */
+    /*             lS[minMN-1], lS[0], lS[minMN-1] / lS[0] ); ; */
+    /* } */
+
+    fprintf(stdout, "<<DEBUG>> delta factor (%d): %e / %e = %e\n",
+            n, ((double*)S)[minMN-1], ((double*)S)[0], ((double*)S)[minMN-1] / ((double*)S)[0] );
+}
+END
+
+postzgesvd(m, n)
+  m = 0 .. descA.mt-1
+  n = 0 .. descA.nt-1
+
+  : dataCI(m, n)
+
+  RW    CI <- CI rownorm(m, n)        [type = VECTOR]
+           -> dataCI(m, n)            [type = VECTOR]
+           -> (m == 0) ? CIv solve(n) [type = VECTOR]
+
+  READ  S  <- S zgesvd(n)            [type = VECTOR]
+
+  CTL  ctl -> ctlv solve(n)
+
+BODY
+{
+    int tempmm = (m==(descA.mt-1)) ? (descA.m - m * descA.mb) : descA.mb;
+    double *lS = (double*)S;
+    double delta = lS[minMN-1] / lS [0];
+
+    if( isnan(delta) || isinf(delta) )
+    {
+        fprintf(stderr, "<<ERROR>> delta factor is NaN of Inf for problem %d\n", m);
+    }
+    else if(delta <= 0.0)
+    {
+        delta = 1.0 ;
+    }
+
+    cblas_zdscal( tempmm, -delta, CI, 1 );
+    /* if (m == 0) { */
+    /*     memcpy( CI, S, tempmm * sizeof(double)); */
+    /* } */
+}
+END
+
+
+solve(n)
+  n = 0 .. descA.nt-1
+
+  : dataCI(0, n)
+
+  RW  CIm  <- A rownorm(0, n)
+
+  RW  CIv  <- CI postzgesvd(0, n)  [type = VECTOR]
+
+  CTL ctlm <- ctl rownorm(    0 .. descA.mt-1, n )
+  CTL ctlv <- ctl postzgesvd( 0 .. descA.mt-1, n )
+
+BODY
+{
+    args->rc = args->solve(args->np, args->nq, descCI.m,
+                           CIm, CIv, args->rptr );
+}
+END

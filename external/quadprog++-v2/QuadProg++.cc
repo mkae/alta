@@ -49,13 +49,6 @@ namespace QuadProgPP{
     bool add_constraint(Matrix<double>& R, Matrix<double>& J, Vector<double>& d, int& iq, double& rnorm);
     void delete_constraint(Matrix<double>& R, Matrix<double>& J, Vector<int>& A, Vector<double>& u, int n, int p, int& iq, int l);
 
-    // Utility functions for computing the Cholesky decomposition and solving
-    // linear systems
-    void cholesky_decomposition(Matrix<double>& A);
-    void cholesky_solve(const Matrix<double>& L, Vector<double>& x, const Vector<double>& b);
-    void forward_elimination(const Matrix<double>& L, Vector<double>& y, const Vector<double>& b);
-    void backward_elimination(const Matrix<double>& U, Vector<double>& x, const Vector<double>& y);
-
     // Utility functions for computing the scalar product and the euclidean
     // distance between two numbers
     double scalar_product(const Vector<double>& x, const Vector<double>& y);
@@ -135,12 +128,12 @@ namespace QuadProgPP{
 	double t, t1, t2; /* t is the step lenght, which is the minimum of the partial step length t1
 			   * and the full step length t2 */
 	Vector<int> A(m + p), A_old(m + p), iai(m + p);
-	int q, iq, iter = 0;
+	int iq, iter = 0;
 	Vector<bool> iaexcl(m + p);
 
 	/* p is the number of equality constraints */
 	/* m is the number of inequality constraints */
-	q = 0;  /* size of the active set A (containing the indices of the active constraints) */
+
 #ifdef TRACE_SOLVER
 	std::cout << std::endl << "Starting solve_quadprog" << std::endl;
 	print_matrix("G", G);
@@ -156,39 +149,16 @@ namespace QuadProgPP{
 	 */
 
 	/* compute the trace of the original matrix G */
-	c1 = 0.0;
-	for (i = 0; i < n; i++)
-	    {
-		c1 += G[i][i];
-	    }
-	/* decompose the matrix G in the form L^T L */
-	cholesky_decomposition(G);
-#ifdef TRACE_SOLVER
-	print_matrix("G", G);
-#endif
-	/* initialize the matrix R */
-	for (i = 0; i < n; i++)
-	    {
-		d[i] = 0.0;
-		for (j = 0; j < n; j++)
-		    R[i][j] = 0.0;
-	    }
+	c1 = n;
+
+	/* initialize the matrix R and vector d */
+	d = 0.;
+	R = 0.;
 	R_norm = 1.0; /* this variable will hold the norm of the matrix R */
 
 	/* compute the inverse of the factorized matrix G^-1, this is the initial value for H */
-	c2 = 0.0;
-	for (i = 0; i < n; i++)
-	    {
-		d[i] = 1.0;
-		forward_elimination(G, z, d);
-		for (j = 0; j < n; j++)
-		    J[i][j] = z[j];
-		c2 += z[i];
-		d[i] = 0.0;
-	    }
-#ifdef TRACE_SOLVER
-	print_matrix("J", J);
-#endif
+	c2 = n;
+	J = G;
 
 	/* c1 * c2 is an estimate for cond(G) */
 
@@ -197,11 +167,11 @@ namespace QuadProgPP{
 	 * this is a feasible point in the dual space
 	 * x = G^-1 * g0
 	 */
-	cholesky_solve(G, x, g0);
-	for (i = 0; i < n; i++)
-	    x[i] = -x[i];
+	x = -g0;
+
 	/* and compute the current solution value */
 	f_value = 0.5 * scalar_product(g0, x);
+
 #ifdef TRACE_SOLVER
 	std::cout << "Unconstrained solution: " << f_value << std::endl;
 	print_vector("x", x);
@@ -213,9 +183,16 @@ namespace QuadProgPP{
 	    {
 		for (j = 0; j < n; j++)
 		    np[j] = CE[j][i];
+
+		/* d = H^t * np */
 		compute_d(d, J, np);
+
+		/* z = H(:,iq:n) * d = H(:,iq:n) * H^t * np */
 		update_z(z, J, d, iq);
+
+		/* R * r = d */
 		update_r(R, r, d, iq);
+
 #ifdef TRACE_SOLVER
 		print_matrix("R", R, n, iq);
 		print_vector("z", z);
@@ -223,8 +200,9 @@ namespace QuadProgPP{
 		print_vector("d", d);
 #endif
 
-		/* compute full step length t2: i.e., the minimum step in primal space s.t. the contraint
-		   becomes feasible */
+		/* compute full step length t2: i.e., the minimum step
+		   in primal space s.t. the contraint becomes feasible
+		*/
 		t2 = 0.0;
 		if (fabs(scalar_product(z, z)) > std::numeric_limits<double>::epsilon()) // i.e. z != 0
 		    t2 = (-scalar_product(np, x) - ce0[i]) / scalar_product(z, np);
@@ -294,9 +272,6 @@ namespace QuadProgPP{
 
 	if (fabs(psi) <= m * std::numeric_limits<double>::epsilon() * c1 * c2* 100.0)
 	    {
-		/* numerically there are not infeasibilities anymore */
-		q = iq;
-
 		return f_value;
 	    }
 
@@ -321,8 +296,6 @@ namespace QuadProgPP{
 	    }
 	if (ss >= 0.0)
 	    {
-		q = iq;
-
 		return f_value;
 	    }
 
@@ -389,8 +362,6 @@ namespace QuadProgPP{
 	    {
 		/* QPP is infeasible */
 		// FIXME: unbounded to raise
-		q = iq;
-
 		return inf;
 	    }
 	/* case (ii): step in dual space */
@@ -499,6 +470,9 @@ namespace QuadProgPP{
 	goto l2a;
     }
 
+    /*
+     * GEMV( "T", n, n, 1., J, n, np, 1, 0., d, 1 )
+     */
     inline void compute_d(Vector<double>& d, const Matrix<double>& J, const Vector<double>& np)
     {
 	register int i, j, n = d.size();
@@ -514,6 +488,9 @@ namespace QuadProgPP{
 	    }
     }
 
+    /*
+     * GEMV( "N", n, n-iq, 1., J + n*iq, n, d + iq, 1, 0., z, 1 )
+     */
     inline void update_z(Vector<double>& z, const Matrix<double>& J, const Vector<double>& d, int iq)
     {
 	register int i, j, n = z.size();
@@ -527,6 +504,10 @@ namespace QuadProgPP{
 	    }
     }
 
+    /*
+     * r = d;
+     * TRSV( "U", "N", "N", n, R, n, r, 1 );
+     */
     inline void update_r(const Matrix<double>& R, Vector<double>& r, const Vector<double>& d, int iq)
     {
 	register int i, j;/*, n = d.size();*/
@@ -751,45 +732,6 @@ namespace QuadProgPP{
 		    }
 		for (k = i + 1; k < n; k++)
 		    A[i][k] = A[k][i];
-	    }
-    }
-
-    void cholesky_solve(const Matrix<double>& L, Vector<double>& x, const Vector<double>& b)
-    {
-	int n = L.nrows();
-	Vector<double> y(n);
-
-	/* Solve L * y = b */
-	forward_elimination(L, y, b);
-	/* Solve L^T * x = y */
-	backward_elimination(L, x, y);
-    }
-
-    inline void forward_elimination(const Matrix<double>& L, Vector<double>& y, const Vector<double>& b)
-    {
-	register int i, j, n = L.nrows();
-
-	y[0] = b[0] / L[0][0];
-	for (i = 1; i < n; i++)
-	    {
-		y[i] = b[i];
-		for (j = 0; j < i; j++)
-		    y[i] -= L[i][j] * y[j];
-		y[i] = y[i] / L[i][i];
-	    }
-    }
-
-    inline void backward_elimination(const Matrix<double>& U, Vector<double>& x, const Vector<double>& y)
-    {
-	register int i, j, n = U.nrows();
-
-	x[n - 1] = y[n - 1] / U[n - 1][n - 1];
-	for (i = n - 2; i >= 0; i--)
-	    {
-		x[i] = y[i];
-		for (j = i + 1; j < n; j++)
-		    x[i] -= U[i][j] * x[j];
-		x[i] = x[i] / U[i][i];
 	    }
     }
 
