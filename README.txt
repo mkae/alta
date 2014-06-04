@@ -29,10 +29,11 @@ directory.
 Dependencies:
  ALTA core: Eigen
  Plugin rational_eigen:     Eigen 3.x
- Plugin rational_quadprog:  Quadprog++ 
+ Plugin rational_quadprog:  Quadprog++
  Plugin rational_cgal:      The CGAL library
  Plugin rational_parallel:  The OpenMP library, Quadprog++ library and Eigen
  Plugin rational_matlab:    Matlab engine (matlab.prf required)
+ Plugin rational_parsec_*:  PLASMA coreblas, PaRSEC runtime
  Plugin nonlinear_eigen:    Eigen
  Plugin nonlinear_ceres:    CERES library and its dependencies
  Plugin nonlinear_nlopt:    NLOpt library and its dependencies
