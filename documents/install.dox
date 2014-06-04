@@ -101,7 +101,7 @@ Using scons, the compilation of ALTA is straightforward:
 
 \verbatim
 $ cd $ALTA
-$ scons --cfg [filename] -i
+$ scons --cfg=[filename]
 \endverbatim
 
 You need to provide a system dependant configuration file. You will find

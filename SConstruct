@@ -91,10 +91,10 @@ env.AppendUnique(CPPPATH = ['#sources'])
 ##
 Export('env')
 
-if not env.GetOption('help'):
+external = env.SConscript('external/SConscript')
 
-	external = env.SConscript('external/SConscript')
-
-	sources  = env.SConscript('sources/SConscript')
-	#env.Depends(sources, external)
-#end
+core    = env.SConscript('sources/core/SConscript')
+plugins = env.SConscript('sources/plugins/SConscript')
+softs   = env.SConscript('sources/softs/SConscript')
+#sources  = env.SConscript('sources/SConscript')
+#env.Depends(sources, external)

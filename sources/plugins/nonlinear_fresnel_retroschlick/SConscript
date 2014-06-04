@@ -1,6 +1,5 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+Import('env')
+env = env.Clone()
 
 sources = ['function.cpp']
 libs = ['core']
