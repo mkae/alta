@@ -1,16 +1,10 @@
-import sys
-
 Import('env')
 env = env.Clone()
+
+# Special linking flags, defined in the OS dependant configuration file
+env.AppendUnique(LIBS = env['SOFT_LIB'])
 
 # Soft Sources
 sources = ['main.cpp']
 
-libs = ['core']
-if sys.platform == 'linux2':
-	libs.append(['rt', 'dl'])
-elif sys.platform == 'darwin':
-	libs.append(['dl'])
-#end
-
-env.Program('../../build/data2brdf', sources, LIBS=libs, LIBPATH=['../../build'])
+env.Program('../../build/data2brdf', sources)

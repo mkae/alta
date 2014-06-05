@@ -14,17 +14,31 @@ CCFLAGS        = ['-O3', '-Wall', '-m64']
 LINKFLAGS      = []
 
 
+## ALTA internal flags
+##
+CORE_LIBS      = ['dl']
+SOFT_LIBS      = ['core', 'dl']
+PLUGINS_LIB    = ['core']
+
+
 ## OpenMP flags
 ##
-OPENMP_FLAGS  = ['-fopenmp']
-OPENMP_LIBS   = ['gomp']
+OPENMP_FLAG   = ['-fopenmp']
+OPENMP_LIB    = ['gomp']
 
 
 ## OpenEXR library
 ##
-#OPENEXR_INC    = ['/usr/include/OpenEXR']
-#OPENEXR_DIR    = ['/usr/lib']
-#OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
+OPENEXR_INC    = ['/usr/include/OpenEXR']
+OPENEXR_DIR    = ['/usr/lib']
+OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
+
+
+## FLANN library
+##
+FLANN_INC    = ['/usr/include/flann']
+FLANN_DIR    = ['/usr/lib/x86_64_linux-gnu']
+FLANN_LIB    = ['flann']
 
 
 ## QUADPROG library
@@ -33,7 +47,7 @@ OPENMP_LIBS   = ['gomp']
 ##
 QUADPROG_INC      = ['#external/quadprog++']
 QUADPROG_DIR      = ['#external/build/lib']
-QUADPROG_LIBS     = ['quadprog++']
+QUADPROG_LIB      = ['quadprog++']
 
 
 ## CERES library
@@ -43,8 +57,8 @@ QUADPROG_LIBS     = ['quadprog++']
 ##
 CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
-CERES_LIBS     = ['ceres', 'glog']
-CERES_OPT_LIBS = ['gomp', 'lapack', 'blas']
+CERES_LIB      = ['ceres', 'glog']
+CERES_OPT_LIB  = ['gomp', 'lapack', 'blas']
 
 
 ## NlOpt library
@@ -53,8 +67,8 @@ CERES_OPT_LIBS = ['gomp', 'lapack', 'blas']
 ##
 NLOPT_INC      = ['#external/build/include']
 NLOPT_DIR      = ['#external/build/lib']
-NLOPT_LIBS     = ['nlopt']
-NLOPT_OPT_LIBS = []
+NLOPT_LIB      = ['nlopt']
+NLOPT_OPT_LIB  = []
 
 
 ## coin IpOpt library
@@ -63,12 +77,12 @@ NLOPT_OPT_LIBS = []
 ##
 IPOPT_INC      = ['#external/build/include']
 IPOPT_DIR      = ['#external/build/lib']
-IPOPT_LIBS     = ['ipopt']
-IPOPT_OPT_LIBS = []
+IPOPT_LIB      = ['ipopt']
+IPOPT_OPT_LIB  = []
 
 
 ## MATLAB library and Engine
 ##
 MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
 MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
-MATLAB_LIBS = ['eng', 'mex','mat']
+MATLAB_LIB  = ['eng', 'mex','mat']

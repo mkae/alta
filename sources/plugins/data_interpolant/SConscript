@@ -1,13 +1,16 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../build'])
+Import('env')
+env = env.Clone()
 
 conf = Configure(env)
-if conf.CheckLib('flann'):
+if conf.CheckLib(env['FLANN_LIB']):
+
+	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+	env.AppendUnique(LIBS    = env['FLANN_LIB'])
+	env.AppendUnique(LIBPATH = env['FLANN_DIR'])
+	env.AppendUnique(CPPPATH = env['FLANN_INC'])
 
 	sources = ['data.cpp']
-	libs = ['flann', 'core']
-	env.SharedLibrary('../../build/data_interpolant', sources, LIBS=libs)
+	env.SharedLibrary('../../build/data_interpolant', sources)
 
 #end
 env = conf.Finish()

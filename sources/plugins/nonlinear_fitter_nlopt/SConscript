@@ -1,16 +1,21 @@
 Import('env')
 env = env.Clone()
 
-env.AppendUnique(CPPPATH = ['../../../external/build/include', '../../'])
-env.AppendUnique(LIBPATH = ['../../../external/build/lib', '../../build'])
-
-sources = ['fitter.cpp']
-libs = ['nlopt', 'core']
-
 conf = Configure(env)
-if conf.CheckLib('nlopt'):
 
-	env.SharedLibrary('../../build/nonlinear_fitter_nlopt', sources, LIBS=libs)
+if conf.CheckLib(env['NLOPT_LIB']):
+
+	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+	env.AppendUnique(LIBS    = env['NLOPT_LIB'])
+	env.AppendUnique(LIBPATH = env['NLOPT_DIR'])
+	env.AppendUnique(CPPPATH = env['NLOPT_INC'])
+	if conf.CheckLib(env['NLOPT_OPT_LIB']):
+		env.AppendUnique(LIBS = env['NLOPT_OPT_LIB'])
+	#end
+
+	sources = ['fitter.cpp']
+	env.SharedLibrary('../../build/nonlinear_fitter_nlopt', sources)
+
 #end
 
 env = conf.Finish()

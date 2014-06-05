@@ -1,7 +1,7 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../../external/build/include/Eigen', '../../'])
-env.Append(LIBPATH = ['../../build'])
+Import('env')
+env = env.Clone()
+
+env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
 sources = ['fitter.cpp']
-libs = ['core']
-env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources, LIBS=libs)
+env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources)

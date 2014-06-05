@@ -1,13 +1,16 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../', '/usr/include/OpenEXR/'])
-env.Append(LIBPATH = ['../../build'])
+Import('env')
+env = env.Clone()
 
 conf = Configure(env)
-if conf.CheckLib('IlmImf') and conf.CheckLib('IlmThread'):
+if conf.CheckLib(env['OPENEXR_LIB']):
+
+	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+	env.AppendUnique(LIBS    = env['OPENEXR_LIB'])
+	env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
+	env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 
 	sources = ['data.cpp']
-	libs = ['core', 'Half', 'IlmImf', 'IlmThread']
-	env.SharedLibrary('../../build/data_brdf_slice', sources, LIBS=libs)
+	env.SharedLibrary('../../build/data_brdf_slice', sources)
 
 #end
 env = conf.Finish()

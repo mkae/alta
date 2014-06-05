@@ -1,16 +1,16 @@
 Import('env')
 env = env.Clone()
 
-env.AppendUnique(CPPPATH = env['MATLAB_INC'])
-env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
-env.AppendUnique(LIBS    = env['MATLAB_LIBS'])
-env.AppendUnique(LIBS    = ['core'])
-
 conf = Configure(env)
 
-sources = ['rational_fitter.cpp']
+if conf.CheckLib(env['MATLAB_LIB']):
 
-if conf.CheckLib(env['MATLAB_LIBS']):
+	env.AppendUnique(CPPPATH = env['MATLAB_INC'])
+	env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
+	env.AppendUnique(LIBS    = env['MATLAB_LIB'])
+	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+
+	sources = ['rational_fitter.cpp']
 	env.SharedLibrary('../../build/rational_fitter_matlab', sources)
 #end
 conf.Finish()

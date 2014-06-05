@@ -12,9 +12,8 @@ sources = ['common.cpp',
            'rational_function.cpp', 
            'vertical_segment.cpp']
 
-if(os.name == 'posix'):
-	env.AppendUnique(LIBS = ['rt', 'dl'])
-#end
+# Special linking flags, defined in the OS dependant configuration file
+env.AppendUnique(env['CORE_LIB'])
 
 ## Known compilation issue. If the core is not compiled with -fvisibility-hidden
 ## on OSX, the shared libraries and the softwares cannot share vtables. This

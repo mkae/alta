@@ -1,7 +1,8 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../build'])
+Import('env')
+env = env.Clone()
+
+# Special linking flags, defined in the OS dependant configuration file
+env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
 sources = ['data.cpp']
-libs = ['core']
-env.SharedLibrary('../../build/data_merl', sources, LIBS=libs)
+env.SharedLibrary('../../build/data_merl', sources)
