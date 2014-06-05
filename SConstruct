@@ -99,7 +99,7 @@ Export('env')
 
 external = env.SConscript('external/SConscript')
 core    = env.SConscript('sources/core/SConscript')
-plugins = env.SConscript('sources/plugins/SConscript')
+#plugins = env.SConscript('sources/plugins/SConscript')
 softs   = env.SConscript('sources/softs/SConscript')
 #sources  = env.SConscript('sources/SConscript')
 #env.Depends(sources, external)

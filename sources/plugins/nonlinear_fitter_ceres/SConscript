@@ -1,14 +1,15 @@
 Import('env')
 env = env.Clone()
+	
+env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS    = env['CERES_LIB'])
+env.AppendUnique(LIBPATH = env['CERES_DIR'])
+env.AppendUnique(CPPPATH = env['CERES_INC'])
 
 conf = Configure(env)
 
-if conf.CheckLib(env['CERES_LIB']):
+if conf.CheckLibWithHeader(env['CERES_LIB'], 'ceres/ceres.h', 'c++'):
 
-	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-	env.AppendUnique(LIBS    = env['CERES_LIB'])
-	env.AppendUnique(LIBPATH = env['CERES_DIR'])
-	env.AppendUnique(CPPPATH = env['CERES_INC'])
 	if conf.CheckLib(env['CERES_OPT_LIB']):
 		env.AppendUnique(LIBS = env['CERES_OPT_LIB'])
 	#end

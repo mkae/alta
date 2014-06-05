@@ -2,7 +2,7 @@ Import('env')
 env = env.Clone()
 
 conf = Configure(env)
-if conf.CheckLib(env['FLANN_LIB']):
+if conf.CheckLibWithHeader(env['FLANN_LIB'], 'flann/flann.hpp', 'CXX'):
 
 	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 	env.AppendUnique(LIBS    = env['FLANN_LIB'])

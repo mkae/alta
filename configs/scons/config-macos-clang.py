@@ -3,7 +3,11 @@ import os, sys
 ##----------------------------------------------------------------##
 ## This file describes required and optional arguments to ALTA    ##
 ## compilation. If you want to manualy tune the use of an already ##
-## present library, uncomment the according lines.                ##
+## present library, update the according lines                    ##
+##                                                                ##
+## This configuration file is made of a MacOS X operating system  ##
+## version 10.9, with clang and OpenEXR and FLANN libraries       ##
+## installed using Ports.                                         ##
 ##----------------------------------------------------------------##
 
 
@@ -18,7 +22,7 @@ LINKFLAGS      = []
 ##
 CORE_LIB       = ['dl']
 SOFT_LIB       = ['core', 'dl']
-PLUGINS_LIB    = ['core']
+PLUGIN_LIB     = ['core']
 
 
 ## OpenMP flags
@@ -29,15 +33,15 @@ OPENMP_LIB    = []
 
 ## OpenEXR library
 ##
-OPENEXR_INC    = ['/usr/include/OpenEXR']
-OPENEXR_DIR    = ['/usr/lib']
+OPENEXR_INC    = ['/opt/local/include/OpenEXR']
+OPENEXR_DIR    = ['/opt/local/lib']
 OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
 
 
 ## FLANN library
 ##
-FLANN_INC    = ['/usr/include/flann']
-FLANN_DIR    = ['/usr/lib/x86_64_linux-gnu']
+FLANN_INC    = ['/opt/local/include']
+FLANN_DIR    = ['/opt/local/lib']
 FLANN_LIB    = ['flann']
 
 

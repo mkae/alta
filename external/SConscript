@@ -8,14 +8,14 @@ if env.GetOption('clean'):
 	print "Removing all the third party packages"
 
 	# Removing the output build directory
-	shutil.rmtree('build', True)
+	#shutil.rmtree('build', True)
 
 	# Removing the TP directories
-	shutil.rmtree('ceres-solver-1.7.0', True)
-	shutil.rmtree('eigen-eigen-ffa86ffb5570', True)
-	shutil.rmtree('glog-0.3.3', True)
-	shutil.rmtree('Ipopt-3.11.8', True)
-	shutil.rmtree('nlopt-2.4.1', True)
+	#shutil.rmtree('ceres-solver-1.7.0', True)
+	#shutil.rmtree('eigen-eigen-ffa86ffb5570', True)
+	#shutil.rmtree('glog-0.3.3', True)
+	#shutil.rmtree('Ipopt-3.11.8', True)
+	#shutil.rmtree('nlopt-2.4.1', True)
 	
 else:
 	##
