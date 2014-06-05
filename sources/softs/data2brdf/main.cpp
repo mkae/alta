@@ -81,7 +81,8 @@ int main(int argc, char** argv)
     fitter* fit = plugins_manager::get_fitter(args["fitter"]) ;
     if(fit == NULL)
     {
-        fit = plugins_manager::get_fitter() ;
+        std::cerr << "<<ERROR>> unable to load the fitter plugin \"" << args["fitter"] << "\"" << std::endl;
+        return 1;
     }
 
     if(args.is_defined("available_params"))

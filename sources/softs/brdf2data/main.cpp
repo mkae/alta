@@ -96,8 +96,15 @@ int main(int argc, char** argv)
 		{
 			// Copy the input vector
 			vec x = d->get(i);
-			params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
-
+			// Convert the data to the function's input space.
+            if(f->input_parametrization() == params::UNKNOWN_INPUT)
+            {
+            	memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
+            }
+            else
+            {
+				params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
+			}
 			vec y = f->value(temp);
 
 			for(int j=0; j<d->dimY(); ++j)

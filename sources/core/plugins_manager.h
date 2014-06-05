@@ -10,8 +10,6 @@
 #include "args.h"
 #include "clustering.h"
 
-#define USING_STATIC
-
 /*! \brief This class handles the loading of plugins and insure that they can
  *  talk to each others through coordinates transforms.
  *
@@ -21,52 +19,20 @@ class plugins_manager
 {
 	public: //functions
 
-		//! \brief Create the object, parse the argument and load all the plugins
-		plugins_manager(const arguments& args) ;
-
-
-		//! \brief Get instances of the function, the data and the fitter. Select 
-		//! the first in the map,
-#ifdef USING_STATIC
-		static
-#endif
-		function* get_function() ;
-#ifdef USING_STATIC
-		static
-#endif
-		data*     get_data() ;
-#ifdef USING_STATIC
-		static
-#endif
-		fitter*   get_fitter() ;
-
-
 		//! \brief get an instance of the function that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-#ifdef USING_STATIC
-		static
-#endif
-		function* get_function(const arguments& args) ;
+		static function* get_function(const arguments& args) ;
 
 		//! \brief load a function from the ALTA input file.
-#ifdef USING_STATIC
-		static
-#endif
-		function* get_function(const std::string& filename);
+		static function* get_function(const std::string& filename);
 			
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-#ifdef USING_STATIC
-		static
-#endif
-		data*     get_data(const std::string& n) ;
+		static data*     get_data(const std::string& n) ;
 		
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-#ifdef USING_STATIC
-		static
-#endif
-		fitter*   get_fitter(const std::string& n) ;
+		static fitter*   get_fitter(const std::string& n) ;
 
 
 		//! \brief check if a data object and a function object are compatibles.

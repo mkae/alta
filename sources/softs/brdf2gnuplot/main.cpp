@@ -1,6 +1,7 @@
 #include <core/args.h>
 #include <core/data.h>
 #include <core/function.h>
+#include <core/vertical_segment.h>
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
@@ -21,16 +22,18 @@ int main(int argc, char** argv)
 		std::cout << "   ->  input, and output parameters are mandatory parameters" << std::endl ;
 		std::cout << std::endl;
 		std::cout << "Options:" << std::endl;
-		std::cout << "  --data [filename]   produce a data by using the abcissas of the [filename]" << std::endl;
-		std::cout << "                      data file." << std::endl;
-		std::cout << "  --polar-plot        produce a polar data by sampling regularly the elevation" << std::endl;
-		std::cout << "                      angle. Use parameter --inc-angle to define the incoming" << std::endl;
-		std::cout << "                      angle. Use parameter --samples to define the number of" << std::endl;
-		std::cout << "                      samples on this domain." << std::endl;
-		std::cout << "  --inc-angle [float] set the incoming light elevation in radian for the polar" << std::endl;
-		std::cout << "                      plot export." << std::endl;
-		std::cout << "  --samples [int]     set the points used for the polar plot export." << std::endl;
-		std::cout << "  --cos-plot          export the BRDF*cosine instead of the BRDF alone." << std::endl;
+		std::cout << "  --data [filename]      data plugin module used to define the abcissas for the." << std::endl;
+		std::cout << "                         export, or to load the --in-data file.." << std::endl;
+		std::cout << "  --data-file [filename] produce a data by using the abcissas of the [filename]" << std::endl;
+		std::cout << "                         data file." << std::endl;
+		std::cout << "  --polar-plot           produce a polar data by sampling regularly the elevation" << std::endl;
+		std::cout << "                         angle. Use parameter --inc-angle to define the incoming" << std::endl;
+		std::cout << "                         angle. Use parameter --samples to define the number of" << std::endl;
+		std::cout << "                         samples on this domain." << std::endl;
+		std::cout << "  --inc-angle [float]    set the incoming light elevation in radian for the polar" << std::endl;
+		std::cout << "                         plot export." << std::endl;
+		std::cout << "  --samples [int]        set the points used for the polar plot export." << std::endl;
+		std::cout << "  --cos-plot             export the BRDF*cosine instead of the BRDF alone." << std::endl;
 		return 0;
 	}
 	
@@ -65,11 +68,13 @@ int main(int argc, char** argv)
 
 	// Load a data file
 	data* d = NULL ;
-	if(args.is_defined("data"))
+	if(args.is_defined("data") || args.is_defined("in-data"))
 	{
-		std::cout << "<<INFO>> Using data file \"" << args["data"] << "\"" << std::endl ;
-		d = plugins_manager::get_data() ;
-		d->load(args["data"], args) ;
+		d = plugins_manager::get_data(args["data"]);
+		if(dynamic_cast<vertical_segment*>(d) != NULL)
+		{
+			d->load(args["in-data"]);
+		}
 
 		// Print the distance to the data to check if it correspond to the value
 		// computed prior.
