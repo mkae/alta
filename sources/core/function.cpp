@@ -138,7 +138,7 @@ void function::save_call(std::ostream&, const arguments&) const
 }
 
 //! \brief L2 norm to data.
-double function::L2_distance(const ptr<data> d) const
+double function::L2_distance(const ptr<data>& d) const
 {
 	double l2_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)
@@ -163,7 +163,7 @@ double function::L2_distance(const ptr<data> d) const
 }
 
 //! \brief Linf norm to data.
-double function::Linf_distance(const ptr<data> d) const
+double function::Linf_distance(const ptr<data>& d) const
 {
 	vec mean = vec::Zero(dimY());
 	vec var  = vec::Zero(dimY());

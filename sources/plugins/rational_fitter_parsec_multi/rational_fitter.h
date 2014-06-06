@@ -58,10 +58,10 @@ class rational_fitter_parallel : public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const vertical_segment* d, int np, int nq, 
+		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, 
 		                      rational_function* fit, const arguments &args, 
                               double& delta, double& linf_dist,double& l2_dist) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, 
+		virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq, 
 		                      int ny, rational_function_1d* fit, const arguments& args, 
 									 vec& p, vec& q, double& delta) ;
 
@@ -71,7 +71,7 @@ class rational_fitter_parallel : public fitter
 		//! corresponding to the lower constraint and the upper constraint
 		//! of the vertical segment.
 		virtual void get_constraint(int i, int np, int nq, int ny, 
-		                            const vertical_segment* data, 
+		                            const ptr<vertical_segment>& data, 
 											 const rational_function_1d* func, 
 											 vec& cu, vec& cl);
 

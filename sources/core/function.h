@@ -77,14 +77,14 @@ class function : public parametrized
 		//! If the measurement points are not uniformly distributed, then the
 		//! metric does not represent the real difference integrated over the
 		//! hemisphere.
-		double L2_distance(const ptr<data> d) const ;
+		double L2_distance(const ptr<data>& d) const ;
 
 		//! \brief Linf norm to data.
 		//! \note This distance is only valid with respect to the data sampling.
 		//! If the measurement points are not uniformly distributed, then the
 		//! metric does not represent the real difference integrated over the
 		//! hemisphere.
-		double Linf_distance(const ptr<data> d) const ;
+		double Linf_distance(const ptr<data>& d) const ;
 
 };
 
