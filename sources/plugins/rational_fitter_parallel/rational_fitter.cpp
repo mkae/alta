@@ -32,7 +32,7 @@ rational_fitter_parallel::~rational_fitter_parallel()
 {
 }
 
-bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const arguments &args)
+bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	if(r == NULL)
@@ -41,13 +41,13 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 		return false ;
 	}
 
-	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
-	if(d == NULL)
+	ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
+	if(!d)
 	{
 		std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
 		std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
-		vertical_segment* vs = new vertical_segment();
+		ptr<vertical_segment> vs(new vertical_segment());
 		for(int i=0; i<dat->size(); ++i) 
 		{
 			const vec x = dat->get(i);
@@ -115,7 +115,7 @@ bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const ar
 
             // Allocate a rational function and set it to the correct size, dimensions
             // and parametrizations.
-				rational_function* rk = NULL;
+			rational_function* rk = NULL;
             #pragma omp critical (args)
             {
 					rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
@@ -201,7 +201,7 @@ void rational_fitter_parallel::set_parameters(const arguments&)
 }
 
 
-bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, 
+bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq, 
                                         rational_function* r, const arguments &args,
                                         double& delta, double& linf_dist, double& l2_dist)
 {
@@ -220,8 +220,8 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 		rf->update(p, q);
 	}
 
-	linf_dist = r->Linf_distance(d);
-	l2_dist   = r->L2_distance(d);
+	linf_dist = r->Linf_distance(dynamic_pointer_cast<data>(d));
+	l2_dist   = r->L2_distance(dynamic_pointer_cast<data>(d));
 
 	return true ;
 }
@@ -230,7 +230,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function returns a rational BRDF function and a boolean
-bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int nq, int ny,
+bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny,
                                         rational_function_1d* r, const arguments& args,
                                         vec& p, vec& q, double& delta)
 {
@@ -295,7 +295,7 @@ bool rational_fitter_parallel::fit_data(const vertical_segment* d, int np, int n
 }
 
 void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, 
-		                                        const vertical_segment* data, 
+		                                        const ptr<vertical_segment>& data, 
 															 const rational_function_1d* func,
 															 vec& cu, vec& cl)
 {

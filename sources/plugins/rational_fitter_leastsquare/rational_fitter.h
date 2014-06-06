@@ -21,7 +21,7 @@ class rational_fitter_leastsquare : public fitter
 
 		// Fitting a data object
 		//
-		virtual bool fit_data(const data* d, function* fit, const arguments& args) ;
+		virtual bool fit_data(const ptr<data> d, function* fit, const arguments& args) ;
 
 		// Provide user parameters to the fitter
 		//
@@ -29,15 +29,15 @@ class rational_fitter_leastsquare : public fitter
 
 		// Obtain associated data and functions
 		//
-		virtual data*     provide_data() const ;
+		virtual ptr<data>     provide_data() const ;
 		virtual function* provide_function() const ;
 
 	protected: // function
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const vertical_segment* d, int np, int nq, rational_function* fit) ;
-		virtual bool fit_data(const vertical_segment* dat, int np, int nq, int ny, rational_function_1d* fit) ;
+		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, rational_function* fit) ;
+		virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq, int ny, rational_function_1d* fit) ;
 
 	protected: // data
 

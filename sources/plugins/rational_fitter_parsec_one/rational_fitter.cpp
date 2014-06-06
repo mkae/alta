@@ -53,7 +53,7 @@ rational_fitter_parsec_one::~rational_fitter_parsec_one()
     dague_fini(&dague);
 }
 
-bool rational_fitter_parsec_one::fit_data(const data* dat, function* fit, const arguments &args)
+bool rational_fitter_parsec_one::fit_data(const ptr<data> dat, function* fit, const arguments &args)
 {
     rational_function* r = dynamic_cast<rational_function*>(fit) ;
     const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;

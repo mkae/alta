@@ -32,7 +32,7 @@ rational_fitter_parallel::~rational_fitter_parallel()
 {
 }
 
-bool rational_fitter_parallel::fit_data(const data* dat, function* fit, const arguments &args)
+bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	if(r == NULL)

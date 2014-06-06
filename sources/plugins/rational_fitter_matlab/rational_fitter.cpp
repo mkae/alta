@@ -34,7 +34,7 @@ rational_fitter_matlab::~rational_fitter_matlab()
 	engClose(ep); 
 }
 
-bool rational_fitter_matlab::fit_data(const data* dat, function* fit, const arguments &args)
+bool rational_fitter_matlab::fit_data(const ptr<data> dat, function* fit, const arguments &args)
 {
 	rational_function* r = dynamic_cast<rational_function*>(fit) ;
 	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
