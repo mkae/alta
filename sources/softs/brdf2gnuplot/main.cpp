@@ -67,13 +67,19 @@ int main(int argc, char** argv)
 
 
 	// Load a data file
-	ptr<data> d = NULL ;
 	if(args.is_defined("data") || args.is_defined("in-data"))
 	{
-		d = plugins_manager::get_data(args["data"]);
-		if(dynamic_pointer_cast<vertical_segment>(d))
+		ptr<data> d = plugins_manager::get_data(args["data"]);
+
+		// Load data file if the plugin manager created a plugin object.
+		if(d)
 		{
-			d->load(args["in-data"]);
+			d->load(args["data-file"]);
+		}
+		else
+		{
+			std::cerr << "<<ERROR>> unable to load the data plugin" << std::endl;
+			return 1;
 		}
 
 		// Print the distance to the data to check if it correspond to the value
@@ -97,67 +103,60 @@ int main(int argc, char** argv)
 			linear_plot = true;
 		}
 
-		if(d)
-        {
-			for(int i=0; i<d->size(); ++i)
+		for(int i=0; i<d->size(); ++i)
+		{
+			vec v = d->get(i) ;
+			vec x(f->dimX());
+
+			// Convert the data to the function's input space.
+			if(f->input_parametrization() == params::UNKNOWN_INPUT)
 			{
-				vec v = d->get(i) ;
-				vec x(f->dimX());
+				memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
+			}
+			else
+			{
+				params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+			}
 
-				// Convert the data to the function's input space.
-                if(f->input_parametrization() == params::UNKNOWN_INPUT)
-                {
-                    memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
-                }
-                else
-                {
-                    params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
-                }
+			// Evaluate the function. I can add the cosine term to the BRDF
+			// value.
+			double costerm = 1.0;
+			if(cos_plot) 
+			{
+				double cart[6];
+				params::convert(&x[0], f->input_parametrization(), params::CARTESIAN, cart);
+				costerm = cart[5]*cart[2];
+			}
+			vec y2 = costerm * f->value(x) ;
 
-				// Evaluate the function. I can add the cosine term to the BRDF
-				// value.
-				double costerm = 1.0;
-				if(cos_plot) 
+
+			if(!linear_plot)
+			{
+				for(int u=0; u<d->dimX(); ++u)
+					file << v[u] << "\t" ;
+			}
+			else
+			{
+				file << i << "\t" ;
+			}
+
+			for(int u=0; u<d->dimY(); ++u)
+			{
+				if(plot_error)
 				{
-					double cart[6];
-					params::convert(&x[0], f->input_parametrization(), params::CARTESIAN, cart);
-					costerm = cart[5]*cart[2];
+					file << (v[d->dimX() + u] - y2[u]) << "\t" ;
 				}
-				vec y2 = costerm * f->value(x) ;
-
-
-				if(!linear_plot)
+				else if(linear_plot)
 				{
-					for(int u=0; u<d->dimX(); ++u)
-						file << v[u] << "\t" ;
+					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
 				}
 				else
 				{
-					file << i << "\t" ;
+					file << y2[u] << "\t" ;
 				}
-
-				for(int u=0; u<d->dimY(); ++u)
-				{
-					if(plot_error)
-					{
-						file << (v[d->dimX() + u] - y2[u]) << "\t" ;
-					}
-					else if(linear_plot)
-					{
-						file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
-					}
-					else
-					{
-						file << y2[u] << "\t" ;
-					}
-				}
-
-				file << std::endl ;
 			}
-		}	
-		else
-		{
-			std::cerr << "<<ERROR>> data argument is incorrectly defined" << std::endl ;
+
+			file << std::endl ;
 		}
 	}
 	else if(args.is_defined("polar-plot"))

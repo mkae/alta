@@ -58,8 +58,7 @@ int main(int argc, char** argv)
 	}
 	
 	// Get the associated data object and load the file is any
-	ptr<data> d = NULL ;
-	d = plugins_manager::get_data(args["data"]) ;
+	ptr<data> d = plugins_manager::get_data(args["data"]) ;
 	if(args.is_defined("data-file"))
 	{
 		d->load(args["data-file"]);
@@ -67,14 +66,9 @@ int main(int argc, char** argv)
 
     // Get the output object. In the case where it is not a VS file, we use
     // the load object.
-    ptr<data> d_out = NULL;
-    if(!dynamic_pointer_cast<vertical_segment>(d))
+    ptr<data> d_out = plugins_manager::get_data(args["data"]);
+    if(dynamic_pointer_cast<vertical_segment>(d))
     {
-        d_out = d;
-    }
-    else
-    {
-        d_out = ptr<data>(new vertical_segment());
         d_out->setDimX(d->dimX());
         d_out->setDimY(d->dimY());
         d_out->setParametrization(d->input_parametrization());
