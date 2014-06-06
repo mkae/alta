@@ -12,7 +12,7 @@ class clustering : public data
 
         //! \brief constructor loading a full dimension data and clustering
         //! it into a low dimension one.
-        clustering::clustering(const data* d, const arguments& args);
+        clustering::clustering(const ptr<data> d, const arguments& args);
 
         //! \brief the clustering class can save a clustering to a file.
         virtual void save(const std::string& filename);

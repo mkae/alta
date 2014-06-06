@@ -6,7 +6,7 @@
 
 /*--- Functions implementation ----*/
 
-void function::bootstrap(const data*, const arguments& args)
+void function::bootstrap(const ptr<data>, const arguments& args)
 {
     // If the bootstrap option contains a filename, load it
     if(args.is_defined("bootstrap") && !args["bootstrap"].empty())
@@ -138,7 +138,7 @@ void function::save_call(std::ostream&, const arguments&) const
 }
 
 //! \brief L2 norm to data.
-double function::L2_distance(const data* d) const
+double function::L2_distance(const ptr<data> d) const
 {
 	double l2_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)
@@ -163,7 +163,7 @@ double function::L2_distance(const data* d) const
 }
 
 //! \brief Linf norm to data.
-double function::Linf_distance(const data* d) const
+double function::Linf_distance(const ptr<data> d) const
 {
 	vec mean = vec::Zero(dimY());
 	vec var  = vec::Zero(dimY());
@@ -305,7 +305,7 @@ void nonlinear_function::save_call(std::ostream& out, const arguments& args) con
 	function::save_call(out, args);
 }
 
-void nonlinear_function::bootstrap(const data* d, const arguments& args)
+void nonlinear_function::bootstrap(const ptr<data> d, const arguments& args)
 {
     if(args.is_vec("bootstrap"))
     {
@@ -487,7 +487,7 @@ void compound_function::setParametrization(params::output new_param)
 	}
 }
 
-void compound_function::bootstrap(const ::data* d, const arguments& args)
+void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 {
 	const bool global_bootstrap = args.is_defined("bootstrap");
 
@@ -904,7 +904,7 @@ void product_function::save_call(std::ostream& out, const arguments& args) const
 	function::save_call(out, args);
 }
 
-void product_function::bootstrap(const data* d, const arguments& args)
+void product_function::bootstrap(const ptr<data> d, const arguments& args)
 {
 	const bool global_bootstrap = args.is_defined("bootstrap");
 

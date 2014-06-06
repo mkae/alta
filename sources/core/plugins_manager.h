@@ -9,6 +9,7 @@
 #include "fitter.h"
 #include "args.h"
 #include "clustering.h"
+#include "ptr.h"
 
 /*! \brief This class handles the loading of plugins and insure that they can
  *  talk to each others through coordinates transforms.
@@ -28,18 +29,18 @@ class plugins_manager
 			
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-		static data*     get_data(const std::string& n) ;
+		static ptr<data> get_data(const std::string& n) ;
 		
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-		static fitter*   get_fitter(const std::string& n) ;
+		static ptr<fitter> get_fitter(const std::string& n) ;
 
 
 		//! \brief check if a data object and a function object are compatibles.
 		//! this has to be done before fitting to ensure that the
 		//! parametrizations spaces are the same.
 		//! \todo specify an output parametrization for the function ?
-		static void check_compatibility(data*& d, function*& f,
+		static void check_compatibility(ptr<data>& d, function*& f,
 				const arguments& args) ;
 
 
@@ -54,10 +55,4 @@ class plugins_manager
 		typedef function* (*FunctionPrototype)();
 		typedef fitter*   (*FitterPrototype)();
 		typedef data*     (*DataPrototype)();
-
-		// Map associating a filename to a provider. This is used to store a list of
-		// accessible provider to make automatic type testing.
-		std::map<std::string, function*> _functions ;
-		std::map<std::string, data*>     _datas ;
-		std::map<std::string, fitter*>   _fitters ;
 } ;

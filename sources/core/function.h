@@ -40,7 +40,7 @@ class function : public parametrized
 		//! \details
 		//! Can be used to set the diffuse component of the function for
 		//! example. The default behaviour is to load a function file.
-		virtual void bootstrap(const data*, const arguments& args);
+		virtual void bootstrap(const ptr<data>, const arguments& args);
 
 		/* IMPORT/EXPORT FUNCTIONS */
 
@@ -77,14 +77,14 @@ class function : public parametrized
 		//! If the measurement points are not uniformly distributed, then the
 		//! metric does not represent the real difference integrated over the
 		//! hemisphere.
-		double L2_distance(const data* d) const ;
+		double L2_distance(const ptr<data> d) const ;
 
 		//! \brief Linf norm to data.
 		//! \note This distance is only valid with respect to the data sampling.
 		//! If the measurement points are not uniformly distributed, then the
 		//! metric does not represent the real difference integrated over the
 		//! hemisphere.
-		double Linf_distance(const data* d) const ;
+		double Linf_distance(const ptr<data> d) const ;
 
 };
 
@@ -111,7 +111,7 @@ class nonlinear_function: public function
 		//! The nonllinear_function overload the function bootstrap call to
 		//! allows for loading the parameters vector directly from the command
 		//! line: --bootstrap [p1, p2, ..., pn]
-		virtual void bootstrap(const data*, const arguments& args);
+		virtual void bootstrap(const ptr<data>, const arguments& args);
 
 		//! Number of parameters to this non-linear function
 		virtual int nbParameters() const = 0;
@@ -199,7 +199,7 @@ class compound_function: public nonlinear_function
 		//!
 		//! <u>Local/Global policy:</u></br />
 		//! Local bootstrap can not overload the global bootstrap.
-		virtual void bootstrap(const ::data* d, const arguments& args);
+		virtual void bootstrap(const ::ptr<data> d, const arguments& args);
 
 		//! Set the dimension of the input space of the function
 		virtual void setDimX(int nX);
@@ -316,7 +316,7 @@ class product_function : public nonlinear_function
 		
 
 		//! \brief Provide a first rough fit of the function. 
-		virtual void bootstrap(const data* d, const arguments& args);
+		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		// Set the dimension of the input/output space of the function
 		virtual void setDimX(int nX);

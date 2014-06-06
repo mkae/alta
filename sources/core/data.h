@@ -10,6 +10,7 @@
 #include "args.h"
 #include "params.h"
 #include "clustering.h"
+#include "ptr.h"
 
 /*! \brief A data object. Allows to load data from files.
  *  \ingroup core
@@ -17,6 +18,9 @@
 class data : public parametrized
 {
 	public: // methods
+
+		// Virtual destructor
+		virtual ~data() {} 
 
 		// Load data from a file
 		virtual void load(const std::string& filename) = 0 ;
@@ -98,7 +102,7 @@ class data_params : public data
 
 		//! \brief contructor requires the definition of a base class that
 		//! has a parametrization, and a new parametrization.
-		data_params(const data* d, params::input new_param,
+		data_params(const ptr<data> d, params::input new_param,
 		            data_params::clustrering method = data_params::NONE) :
 			_clustering_method(method)
 		{
@@ -109,7 +113,8 @@ class data_params : public data
 			_nY = d->dimY();
 
 			std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
-			clustering<data>(d, _nY, d->parametrization(), new_param, _data);
+			//TODO
+			//clustering<data>(d, _nY, d->parametrization(), new_param, _data);
 
 			std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
 			save(std::string("cluster.gnuplot"));

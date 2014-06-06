@@ -59,6 +59,12 @@ template<class T> class ptr
 			_counter = new ptr_counter();
 		}
 
+		//! Counter copy constructor
+		ptr(T* ptr, ptr_counter* counter) : _ptr(ptr), _counter(counter)
+		{
+			_counter->increment();	
+		}
+
 		//! Copy constructor
 		ptr(const ptr<T>& p) : _ptr(p._ptr), _counter(p._counter)
 		{
@@ -90,14 +96,33 @@ template<class T> class ptr
 			return _ptr;
 		}
 
-		//! Is the underlying pointer NULL.
-		inline bool is_null() const
+		//! Is the underlying pointer not NULL.
+		inline operator bool() const
 		{
-			return _ptr == NULL;
+			return _ptr != NULL;
+		}
+
+		template<class U> 
+		friend ptr<U> dynamic_pointer_cast(const ptr<T>& ptr_t)
+		{
+			U* u = dynamic_cast<U*>(ptr_t._ptr);
+			if(u == NULL)
+			{
+				return ptr<U>(NULL);
+			}
+			else
+			{
+				ptr<U> ptr_u = ptr<U>(u, ptr_t._counter);
+				return ptr_u;
+			}
 		}
 
 	private:
+
 		T* _ptr;
 		ptr_counter* _counter;
+
 };
+
+
 #endif

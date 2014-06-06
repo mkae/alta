@@ -78,8 +78,8 @@ int main(int argc, char** argv)
 		return 0 ;
 	}
 
-    fitter* fit = plugins_manager::get_fitter(args["fitter"]) ;
-    if(fit == NULL)
+    ptr<fitter> fit = plugins_manager::get_fitter(args["fitter"]) ;
+    if(!fit)
     {
         std::cerr << "<<ERROR>> unable to load the fitter plugin \"" << args["fitter"] << "\"" << std::endl;
         return 1;
@@ -100,13 +100,10 @@ int main(int argc, char** argv)
         return 1 ;
     }
 
-    //	if(fitters.size() > 0 && datas.size() > 0 && functions.size() > 0)
-    if(fit != NULL)
-    {
         fit->set_parameters(args) ;
 
         function* f = plugins_manager::get_function(args);
-        data*     d = plugins_manager::get_data(args["data"]);
+        ptr<data> d = plugins_manager::get_data(args["data"]);
         d->load(args["input"], args);
 
         if(f == NULL || d == NULL)
@@ -160,11 +157,6 @@ int main(int argc, char** argv)
             return 1;
         }
 
-    }
-    else
-    {
-        std::cout << "<<ERROR>> no fitter loaded, please check your command line arguments" << std::endl ;
-    }
 
     return 0 ;
 }

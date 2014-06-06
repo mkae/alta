@@ -271,7 +271,7 @@ function* plugins_manager::get_function(const arguments& args)
 */			
     return func;
 }
-data* plugins_manager::get_data(const std::string& n)
+ptr<data> plugins_manager::get_data(const std::string& n)
 {
     if(n.empty())
     {
@@ -295,14 +295,14 @@ data* plugins_manager::get_data(const std::string& n)
         return new vertical_segment() ;
     }
 }
-fitter* plugins_manager::get_fitter(const std::string& n)
+ptr<fitter> plugins_manager::get_fitter(const std::string& n)
 {
     if(n.empty())
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no fitter plugin specified, returning null" << std::endl;
 #endif
-        return NULL;
+        return ptr<NULL>;
     }
 
     FitterPrototype myFitter = open_library<FitterPrototype>(n, "provide_fitter");
@@ -311,16 +311,16 @@ fitter* plugins_manager::get_fitter(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
 #endif
-        return myFitter();
+        return ptr<myFitter()>;
     }
     else
     {
         std::cerr << "<<ERROR>> no fitter provider found in file \"" << n << "\"" << std::endl;
-        return NULL ;
+        return ptr<NULL> ;
     }
 }
 
-void plugins_manager::check_compatibility(data*& d, function*& f,
+void plugins_manager::check_compatibility(ptr<data>& d, function*& f,
                                           const arguments& args)
 {
 	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
