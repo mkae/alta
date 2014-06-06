@@ -34,7 +34,7 @@ class diffuse_function : public nonlinear_function
 
 
 		//! \brief Boostrap the function by defining the diffuse term
-		virtual void bootstrap(const data* d, const arguments& args);
+		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		//! \brief Load function specific files
         virtual bool load(std::istream& in) ;

@@ -58,7 +58,7 @@ class schlick_fresnel : public nonlinear_function
 		virtual vec parametersJacobian(const vec& x) const ;
 
 		//! \brief Boostrap the function by defining the diffuse term
-		virtual void bootstrap(const data* d, const arguments& args);
+		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		//! \brief resize the parameter vector
 		virtual void setDimY(int nY)

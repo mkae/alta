@@ -161,7 +161,7 @@ vec beckmann_function::parametersJacobian(const vec& x) const
     return jac;
 }
 		
-void beckmann_function::bootstrap(const data* d, const arguments& args)
+void beckmann_function::bootstrap(const ptr<data> d, const arguments& args)
 {
 	for(int i=0; i<dimY(); ++i)
 	{

@@ -20,7 +20,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 
 struct EigenFunctor: Eigen::DenseFunctor<double>
 {
-	EigenFunctor(nonlinear_function* f, const data* d, bool use_cosine) :
+	EigenFunctor(nonlinear_function* f, const ptr<data> d, bool use_cosine) :
 		Eigen::DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
@@ -130,7 +130,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 
 	nonlinear_function* _f;
-	const data* _d;
+	const ptr<data> _d;
 
 	// Flags
 	bool _cosine;
@@ -138,7 +138,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 
 struct CompoundFunctor: Eigen::DenseFunctor<double>
 {
-	CompoundFunctor(compound_function* f, int index, const data* d, bool use_cosine) :
+	CompoundFunctor(compound_function* f, int index, const ptr<data> d, bool use_cosine) :
 		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), _f(f), _index(index), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
@@ -261,7 +261,7 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 
 
 	compound_function* _f;
-	const data* _d;
+	const ptr<data> _d;
 
 	// Flags
 	bool _cosine;
@@ -275,7 +275,7 @@ nonlinear_fitter_eigen::~nonlinear_fitter_eigen()
 {
 }
 
-bool nonlinear_fitter_eigen::fit_data(const data* d, function* fit, const arguments &args)
+bool nonlinear_fitter_eigen::fit_data(const ptr<data> d, function* fit, const arguments &args)
 {
     // I need to set the dimension of the resulting function to be equal
     // to the dimension of my fitting problem

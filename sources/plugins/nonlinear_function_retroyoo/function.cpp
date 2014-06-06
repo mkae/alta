@@ -118,7 +118,7 @@ vec yoo_function::parametersJacobian(const vec& x) const
 	return jac;
 }
 		
-void yoo_function::bootstrap(const data*, const arguments&)
+void yoo_function::bootstrap(const ptr<data>, const arguments&)
 {
 	for(int i=0; i<dimY(); ++i)
 	{

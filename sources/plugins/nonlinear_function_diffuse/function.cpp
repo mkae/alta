@@ -159,7 +159,7 @@ vec diffuse_function::parametersJacobian(const vec& x) const
 }
 
 
-void diffuse_function::bootstrap(const data* d, const arguments& args)
+void diffuse_function::bootstrap(const ptr<data> d, const arguments& args)
 {
 	// Set the diffuse component
 	if(params::is_cosine_weighted(d->output_parametrization()) || args.is_defined("cos-fit"))

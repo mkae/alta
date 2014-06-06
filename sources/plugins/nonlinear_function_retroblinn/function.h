@@ -30,7 +30,7 @@ class retroblinn_function : public nonlinear_function
 
 		 //! \brief Boostrap the function. This initialize the lobe width
 		 //! and the specular coefficient to one.
-		 virtual void bootstrap(const data* d, const arguments& args);
+		 virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		 //! \brief Load function specific files
          virtual bool load(std::istream& filename) ;

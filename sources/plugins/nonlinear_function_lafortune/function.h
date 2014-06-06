@@ -49,7 +49,7 @@ class lafortune_function : public nonlinear_function
         void save_call(std::ostream& out, const arguments& args) const;
 
 		//! \brief Boostrap the function by defining the diffuse term
-		virtual void bootstrap(const data* d, const arguments& args);
+		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const ;

@@ -23,7 +23,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 class altaNLP : public Ipopt::TNLP
 {
 	public:
-		altaNLP(nonlinear_function* f, const data* d) : TNLP(), _f(f), _d(d)
+		altaNLP(nonlinear_function* f, const ptr<data> d) : TNLP(), _f(f), _d(d)
 		{
 		}
 
@@ -209,7 +209,7 @@ class altaNLP : public Ipopt::TNLP
 
 	protected:
 
-		const data* _d;
+		const ptr<data> _d;
 		nonlinear_function* _f;
 };
 
@@ -220,7 +220,7 @@ nonlinear_fitter_ipopt::~nonlinear_fitter_ipopt()
 {
 }
 
-bool nonlinear_fitter_ipopt::fit_data(const data* d, function* fit, const arguments &args)
+bool nonlinear_fitter_ipopt::fit_data(const ptr<data> d, function* fit, const arguments &args)
 {
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem

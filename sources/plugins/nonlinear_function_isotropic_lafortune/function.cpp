@@ -233,7 +233,7 @@ vec isotropic_lafortune_function::parametersJacobian(const vec& x) const
     return jac;
 }
 		
-void isotropic_lafortune_function::bootstrap(const data* d, const arguments& args)
+void isotropic_lafortune_function::bootstrap(const ptr<data> d, const arguments& args)
 {
     // Check the arguments for the number of lobes
     this->setNbLobes(args.get_int("lobes", 1));

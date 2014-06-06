@@ -179,7 +179,7 @@ vec schlick_fresnel::parametersJacobian(const vec& x) const
 }
 
 
-void schlick_fresnel::bootstrap(const data* d, const arguments& args)
+void schlick_fresnel::bootstrap(const ptr<data> d, const arguments& args)
 {
     for(int i=0; i<dimY(); ++i) { R[i] = 0.5; }
 }

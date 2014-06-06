@@ -44,7 +44,7 @@ class beckmann_function : public nonlinear_function
 		//! \brief Boostrap the function by defining the diffuse term
 		//!
 		//! \details
-		virtual void bootstrap(const data* d, const arguments& args);
+		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const ;

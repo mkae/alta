@@ -154,7 +154,7 @@ vec blinn_function::parametersJacobian(const vec& x) const
 }
 
 
-void blinn_function::bootstrap(const data* d, const arguments& args)
+void blinn_function::bootstrap(const ptr<data> d, const arguments& args)
 {
     for(int i=0; i<dimY(); ++i)
     {

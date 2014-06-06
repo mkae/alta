@@ -178,7 +178,7 @@ vec schlick_masking::parametersJacobian(const vec& x) const
 }
 
 
-void schlick_masking::bootstrap(const data*, const arguments&)
+void schlick_masking::bootstrap(const ptr<data>, const arguments&)
 {
 	// Start with a non occluding value for k
 	for(int i=0; i<dimY(); ++i) { w[i] = 0.0; }
