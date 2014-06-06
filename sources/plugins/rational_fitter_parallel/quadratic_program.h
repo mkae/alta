@@ -169,7 +169,7 @@ class quadratic_program
 
         //! \brief Test all the constraints of the data.
         //! Add the sample that is farest away from the function.
-		bool test_constraints(int ny, const rational_function_1d* r, const vertical_segment* data)
+		bool test_constraints(int ny, const rational_function_1d* r, const ptr<vertical_segment>& data)
 		{
 #ifdef PACANOWSKI2012
             int nb_failed = 0;

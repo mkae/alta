@@ -302,7 +302,7 @@ ptr<fitter> plugins_manager::get_fitter(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no fitter plugin specified, returning null" << std::endl;
 #endif
-        return ptr<NULL>;
+        return NULL;
     }
 
     FitterPrototype myFitter = open_library<FitterPrototype>(n, "provide_fitter");
@@ -311,12 +311,12 @@ ptr<fitter> plugins_manager::get_fitter(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
 #endif
-        return ptr<myFitter()>;
+        return myFitter();
     }
     else
     {
         std::cerr << "<<ERROR>> no fitter provider found in file \"" << n << "\"" << std::endl;
-        return ptr<NULL> ;
+        return NULL ;
     }
 }
 

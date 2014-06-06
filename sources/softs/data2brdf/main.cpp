@@ -106,7 +106,7 @@ int main(int argc, char** argv)
         ptr<data> d = plugins_manager::get_data(args["data"]);
         d->load(args["input"], args);
 
-        if(f == NULL || d == NULL)
+        if(f == NULL || !d)
         {
             std::cerr << "<<ERROR>> no function or data object correctly defined" << std::endl;
             return 1;
