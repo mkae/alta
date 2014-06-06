@@ -68,10 +68,10 @@ int main(int argc, char** argv)
 	}
 
 	// Import data
-	data* d = NULL ;
+	ptr<data> d = NULL ;
 	d = plugins_manager::get_data(args["data"]) ;
 
-	if(dynamic_cast<const vertical_segment*>(d) != NULL) {
+	if(dynamic_pointer_cast<vertical_segment>(d)) {
 		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;
 		return 1;
 	}
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 
-	if(d != NULL)
+	if(d)
 	{
 		// Data parametrization
 		params::input data_param = d->parametrization();

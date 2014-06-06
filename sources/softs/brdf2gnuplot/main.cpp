@@ -67,11 +67,11 @@ int main(int argc, char** argv)
 
 
 	// Load a data file
-	data* d = NULL ;
+	ptr<data> d = NULL ;
 	if(args.is_defined("data") || args.is_defined("in-data"))
 	{
 		d = plugins_manager::get_data(args["data"]);
-		if(dynamic_cast<vertical_segment*>(d) != NULL)
+		if(dynamic_pointer_cast<vertical_segment>(d))
 		{
 			d->load(args["in-data"]);
 		}
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 			linear_plot = true;
 		}
 
-		if(d != NULL)
+		if(d)
         {
 			for(int i=0; i<d->size(); ++i)
 			{

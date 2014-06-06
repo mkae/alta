@@ -99,20 +99,20 @@ int main(int argc, char** argv)
 	
 	
 	// Import data
-	data* d_in = NULL ;
+	ptr<data> d_in = NULL ;
 	d_in = plugins_manager::get_data(args["in-data"]) ;
 	d_in->load(args["input"], args);
 
-	data* d_out = NULL;
+	ptr<data> d_out = NULL;
 	d_out = plugins_manager::get_data(args["out-data"]) ;
 	
-	if(d_in == NULL && d_out == NULL)
+	if(!d_in && !d_out)
 	{
 		std::cerr << "<<ERROR>> cannot import or export data" << std::endl ;
 		return 1;
 	}
 
-	if(dynamic_cast<vertical_segment*>(d_out) != NULL)
+	if(dynamic_pointer_cast<vertical_segment>(d_out))
 	{
 		params::input param = params::parse_input(args["param"]);
         if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)

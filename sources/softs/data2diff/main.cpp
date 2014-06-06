@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	}
 
 	// Import data
-	data* d = NULL ;
+	ptr<data> d = NULL ;
     d = plugins_manager::get_data(args["data"]) ;
 	d->load(args["input"]);
 
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 	}	
 
 	// Get the output data object
-    data* out_d = plugins_manager::get_data(args["data"]);
+    ptr<data> out_d = plugins_manager::get_data(args["data"]);
 
 	if(d != NULL)
 	{

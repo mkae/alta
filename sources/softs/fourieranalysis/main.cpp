@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 
-	data* d = NULL ;
+	ptr<data> d = NULL ;
 	d = manager.get_data(args["loader"]) ;
 	d->load(args["input"]);
 
