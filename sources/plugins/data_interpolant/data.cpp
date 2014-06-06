@@ -25,16 +25,13 @@ Delaunay_d* D;
 int dD;
 #endif
 
-data_interpolant::data_interpolant()
+data_interpolant::data_interpolant() : _data(new vertical_segment())
 {
-	_data = new vertical_segment();
-
 	_knn = 3;
 }
 
 data_interpolant::~data_interpolant()
 {
-	delete _data;
 #ifndef USE_DELAUNAY
 	if(_kdtree != NULL)
 		delete _kdtree;
@@ -192,7 +189,7 @@ vec data_interpolant::value(vec x) const
 // Get data size, e.g. the number of samples to fit
 int data_interpolant::size() const 
 {
-	assert(_data != NULL);
+	assert(_data);
 	return _data->size();
 }
 

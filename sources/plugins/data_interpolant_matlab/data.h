@@ -42,6 +42,6 @@ class data_interpolant : public data
 	private: // data
 		
 		// The data object used to load sparse points sets
-		data* _data;
+		ptr<data> _data;
 		Engine *ep;		
 } ;

@@ -97,10 +97,8 @@ vec data_astm::max() const
 	return res ;
 }
 
-data* provide_data()
+ALTA_DLL_EXPORT data* provide_data()
 {
     return new data_astm();
 }
-
-Q_EXPORT_PLUGIN2(data_astm, data_astm)
 

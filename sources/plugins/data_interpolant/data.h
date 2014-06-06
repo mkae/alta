@@ -45,7 +45,7 @@ class data_interpolant : public data
 	private: // data
 		
 		// The data object used to load sparse points sets
-		data* _data;
+		ptr<data> _data;
 
 		// Interpolation 
 		flann::Index< flann::L2<double> >* _kdtree;
