@@ -9,16 +9,16 @@ import os, sys
 
 ## Compilators build flags
 ##
-CXX            = 'g++'
+CXX            = 'gcc'
 CCFLAGS        = ['-O3', '-Wall', '-m64']
 LINKFLAGS      = []
 
 
 ## ALTA internal flags
 ##
-CORE_LIBS      = ['dl']
-SOFT_LIBS      = ['core', 'dl']
-PLUGINS_LIB    = ['core']
+CORE_LIB       = ['dl']
+SOFT_LIB       = ['core', 'dl']
+PLUGINSLIB     = ['core']
 
 
 ## OpenMP flags

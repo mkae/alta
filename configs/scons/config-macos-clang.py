@@ -20,8 +20,8 @@ LINKFLAGS      = []
 
 ## ALTA internal flags
 ##
-CORE_LIB       = ['dl']
-SOFT_LIB       = ['core', 'dl']
+CORE_LIB       = ['dl', 'stdc++']
+SOFT_LIB       = ['core', 'dl', 'stdc++']
 PLUGIN_LIB     = ['core']
 
 
