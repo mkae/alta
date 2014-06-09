@@ -1,21 +1,26 @@
 Import('env')
 env = env.Clone()
 
+env.AppendUnique(CPPPATH = env['QUADPROG_INC'])
+env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
+env.AppendUnique(LIBS    = env['QUADPROG_LIB'])
+env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+
 conf = Configure(env)
 
-if conf.CheckLib(env['QUADPROG_LIB']):
+build_lib = False
 
-	env.AppendUnique(CPPPATH = env['QUADPROG_INC'])
-	env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
-	env.AppendUnique(LIBS    = env['QUADPROG_LIB'])
-	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+if conf.CheckLib(env['QUADPROG_LIB']):	
 
 	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
 	if conf.CheckLib(env['OPENMP_LIB']):
 		env.AppendUnique(LIBS    = env['OPENMP_LIB'])
 	#end
 
-	sources = ['rational_fitter.cpp']
-	env.SharedLibrary('../../build/rational_fitter_parallel', sources)
+	build_lib = True
 #end
 conf.Finish()
+
+if build_lib:
+	sources = ['rational_fitter.cpp']
+	env.SharedLibrary('../../build/rational_fitter_parallel', sources)

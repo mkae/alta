@@ -1,9 +1,9 @@
-# Building data plugins
+# # Building data plugins
 SConscript('data_merl/SConscript')
 SConscript('data_brdf_slice/SConscript')
 SConscript('data_interpolant/SConscript')
 
-# Building nonlinear fitters
+# # Building nonlinear fitters
 SConscript('nonlinear_fitter_ceres/SConscript')
 SConscript('nonlinear_fitter_nlopt/SConscript')
 SConscript('nonlinear_fitter_ipopt/SConscript')
@@ -19,7 +19,7 @@ SConscript('nonlinear_function_isotropic_lafortune/SConscript')
 # Building nonlinear masking functions
 SConscript('nonlinear_shadowing_smith/SConscript')
 
-# Building rational fitters
+# # Building rational fitters
 SConscript('rational_fitter_eigen/SConscript')
 SConscript('rational_fitter_leastsquare/SConscript')
 SConscript('rational_fitter_quadprog/SConscript')
@@ -27,7 +27,7 @@ SConscript('rational_fitter_parallel/SConscript')
 SConscript('rational_fitter_matlab/SConscript')
 
 
-# Building rational functions
+# # Building rational functions
 SConscript('rational_function_legendre/SConscript')
 SConscript('rational_function_chebychev/SConscript')
 SConscript('rational_function_chebychev_opt/SConscript')

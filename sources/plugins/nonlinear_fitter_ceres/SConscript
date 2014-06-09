@@ -6,6 +6,8 @@ env.AppendUnique(LIBS    = env['CERES_LIB'])
 env.AppendUnique(LIBPATH = env['CERES_DIR'])
 env.AppendUnique(CPPPATH = env['CERES_INC'])
 
+build_lib = False
+
 conf = Configure(env)
 
 if conf.CheckLibWithHeader(env['CERES_LIB'], 'ceres/ceres.h', 'c++'):
@@ -14,9 +16,12 @@ if conf.CheckLibWithHeader(env['CERES_LIB'], 'ceres/ceres.h', 'c++'):
 		env.AppendUnique(LIBS = env['CERES_OPT_LIB'])
 	#end
 
-	sources = ['fitter.cpp']
-	env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources)
+	build_lib = True
 
 #end
-
 env = conf.Finish()
+
+if build_lib:
+	sources = ['fitter.cpp']
+	env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources)
+#end

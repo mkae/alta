@@ -3,13 +3,18 @@ env = env.Clone()
 
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
+build_lib = False
+
 conf = Configure(env)
 
 if conf.CheckCXXHeader('unsupported/Eigen/LevenbergMarquardt'):
 
-	sources = ['fitter.cpp']
-	env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources)
+	build_lib = True
 
 #end
-
 env = conf.Finish()
+
+if build_lib:
+	sources = ['fitter.cpp']
+	env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources)
+#end

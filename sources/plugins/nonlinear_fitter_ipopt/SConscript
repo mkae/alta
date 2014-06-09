@@ -1,21 +1,27 @@
 Import('env')
 env = env.Clone()
 
+env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS    = env['IPOPT_LIB'])
+env.AppendUnique(LIBPATH = env['IPOPT_DIR'])
+env.AppendUnique(CPPPATH = env['IPOPT_INC'])
+
+build_lib = False
+
 conf = Configure(env)
 
 if conf.CheckLib(env['IPOPT_LIB']):
 
-	env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-	env.AppendUnique(LIBS    = env['IPOPT_LIB'])
-	env.AppendUnique(LIBPATH = env['IPOPT_DIR'])
-	env.AppendUnique(CPPPATH = env['IPOPT_INC'])
 	if conf.CheckLib(env['IPOPT_OPT_LIB']):
 		env.AppendUnique(LIBS = env['IPOPT_OPT_LIB'])
 	#end
 
+	build_lib = True
+	
+#end
+env = conf.Finish()
+
+if build_lib:
 	sources = ['fitter.cpp']
 	env.SharedLibrary('../../build/nonlinear_fitter_ipopt', sources)
-
 #end
-
-env = conf.Finish()
