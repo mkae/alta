@@ -97,10 +97,10 @@ env.AppendUnique(CPPPATH = ['#sources'])
 ##l
 Export('env')
 
-external = env.SConscript('external/SConscript')
-#core     = env.SConscript('sources/core/SConscript')
-#plugins  = env.SConscript('sources/plugins/SConscript')
-#softs    = env.SConscript('sources/softs/SConscript')
-env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
+#external = env.SConscript('external/SConscript')
+core     = env.SConscript('sources/core/SConscript')
+plugins  = env.SConscript('sources/plugins/SConscript')
+softs    = env.SConscript('sources/softs/SConscript')
+#env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
 
 #env.NoClean(external)

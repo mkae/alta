@@ -50,6 +50,11 @@ struct ptr_counter
 	unsigned int _count;
 };
 
+template<class T> class ptr;
+
+template<class T, class U> 
+ptr<U> dynamic_pointer_cast(const ptr<T>& ptr_t);
+
 template<class T> class ptr
 {
 	public:
@@ -123,6 +128,8 @@ template<class T> class ptr
 		ptr_counter* _counter;
 
 };
+
+
 
 
 #endif

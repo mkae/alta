@@ -1,6 +1,7 @@
 Import('env')
 env = env.Clone()
 
+env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+
 sources = ['function.cpp']
-libs = ['core']
-env.SharedLibrary('../../build/nonlinear_fresnel_retroschlick', sources, LIBS=libs)
+env.SharedLibrary('../../build/nonlinear_fresnel_retroschlick', sources)

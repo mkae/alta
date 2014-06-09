@@ -14,15 +14,15 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'clang'
-CCFLAGS        = ['-O3', '-Wall', '-m64']
-LINKFLAGS      = []
+CCFLAGS        = ['-O3', '-Wall', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
+LINKFLAGS      = ['-headerpad_max_install_names', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
 
 
 ## ALTA internal flags
 ##
 CORE_LIB       = ['dl', 'stdc++']
 SOFT_LIB       = ['core', 'dl', 'stdc++']
-PLUGIN_LIB     = ['core']
+PLUGIN_LIB     = ['core', 'stdc++']
 
 
 ## OpenMP flags

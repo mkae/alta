@@ -1,7 +1,7 @@
 Import('env')
 env = env.Clone()
 
+env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 sources = ['rational_fitter.cpp']
-libs = ['core']
 
-env.SharedLibrary('../../build/rational_fitter_eigen', sources, LIBS=libs)
+env.SharedLibrary('../../build/rational_fitter_eigen', sources)
