@@ -48,14 +48,18 @@ bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, cons
 		std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
 		ptr<vertical_segment> vs(new vertical_segment());
+		vs->setDimX(dat->dimX());
+		vs->setDimY(dat->dimY());
+		vs->setMin(dat->min()) ;
+		vs->setMax(dat->max()) ;
 		for(int i=0; i<dat->size(); ++i)
 		{
 			const vec x = dat->get(i);
 			vec y(dat->dimX() + 3*dat->dimY());
 
-			for(int k=0; k<x.size()   ; ++k) { y[k]                            = x[k]; }
-			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() +   dat->dimY()] = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
-			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() + 2*dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
+			for(int k=0; k<x.size()   ; ++k) { y[k]                               = x[k]; }
+			for(int k=0; k<dat->dimY(); ++k) { y[k + dat->dimX() +   dat->dimY()] = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
+			for(int k=0; k<dat->dimY(); ++k) { y[k + dat->dimX() + 2*dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
 
 			vs->set(y);
 		}

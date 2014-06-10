@@ -278,7 +278,7 @@ vec vertical_segment::get(int i) const
 //! is not already present.
 void vertical_segment::set(vec x)
 {
-	assert(x.size() == dimX() + dimY());
+//	assert(x.size() == dimX() + dimY() || x.size() == dimX() + 3*dimY());
 	_data.push_back(x);
 }
 

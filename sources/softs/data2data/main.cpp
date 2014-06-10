@@ -7,7 +7,7 @@
  *  or to perform interpolation of sample values (i.e. to fill gaps).
  *
  *  <h3>Usage</h3>
- *  \verbatim
+ *  \verbatim	
        data2data --input data.file --output data.file --out-data exporter.so --in-data importer.so
     \endverbatim
  *
@@ -96,14 +96,14 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 	*/
-
-
+	
+	
 	// Import data
 	ptr<data> d_in = plugins_manager::get_data(args["in-data"]) ;
 	d_in->load(args["input"], args);
 
 	ptr<data> d_out = plugins_manager::get_data(args["out-data"]) ;
-
+	
 	if(!d_in && !d_out)
 	{
 		std::cerr << "<<ERROR>> cannot import or export data" << std::endl ;
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 			// Copy the input vector
 			vec x = d_in->get(i);
 			params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
-
+			
 			for(int j=0; j<d_in->dimY(); ++j)
 			{
 				temp[d_out->dimX() + j] = x[d_in->dimX() + j];
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 
 			d_out->set(temp);
 
-		}
+		}	
 	}
 	else
 	{
@@ -168,8 +168,8 @@ int main(int argc, char** argv)
 			}
 
 			d_out->set(x);
-		}
-	}
+		}	
+	}	
 	d_out->save(args["output"]);
 	return 0 ;
 }

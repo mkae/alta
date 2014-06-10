@@ -81,7 +81,7 @@ template<class T> class ptr
 		~ptr()
 		{
 			_counter->decrement();
-			if(_counter->value() == 0)
+			if(_counter->value() < 1 || _ptr == NULL)
 			{
 				if(_ptr != NULL) { delete _ptr; }
 				delete _counter;
@@ -93,6 +93,27 @@ template<class T> class ptr
 		inline T* operator-> () const
 		{
 			return _ptr;
+		}
+
+		//! Assignment operator. If a valid pointer is already present, its
+		//! counter is decremented and the pointer and counter might be
+		//! deleted in case the counter reach zero. Then, the elements of
+		//! a, both counter and pointer, are copied to this and the counter
+		//! is incremented.
+		ptr<T>& operator=(const ptr<T>& a)
+		{
+			_counter->decrement();
+			if(_counter->value() < 1)
+			{
+				if(_ptr != NULL) { delete _ptr; }
+				delete _counter;
+			}
+
+			_counter = a._counter;
+			_ptr     = a._ptr;
+			_counter->increment();
+
+			return *this;
 		}
 
 		//! Raw acces to the pointer. It is sometimes needed to 
