@@ -46,23 +46,23 @@ distribution).
 
 <h3>2D Rational interpolation of BRDFs</h3>
 
-In this example, we will show how to perform data conversion and vertical segments interpolation of the <em>gold-metallic-paint</em> material from the MERL database using the command line programs on an OSX platform. First download the binary file <a href="http:///">gold-met.binary</a> and copy it to the <em>$ALTA/data/3d/merl</em> directory.
+In this example, we will show how to perform data conversion and vertical segments interpolation of the <em>gold-metallic-paint</em> material from the MERL database using the command line programs on an OSX platform. First download the binary file <a href="http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary">gold-metallic-paint.binary</a> and copy it to the <em>$ALTA/data/3d/merl</em> directory.
 
 The first command we will execute will convert the three dimensional data in a 2D slice in the halfway vector parametrization:
 \verbatim
- $ ./build/data2data --input ../data/3d/merl/gold-met.binary --in-data ./build/libdata_merl.dylib --output ../data/2d/merl/gold-met.exr --out-data ./build/libdata_brdf_slice.dylib
+ $ ./build/data2data --input ../data/3d/merl/gold-metallic-paint.binary --in-data ./build/libdata_merl.dylib --output ../data/2d/merl/gold-met.exr --out-data ./build/libdata_brdf_slice.dylib
 \endverbatim
 
-The \a data_merl plugin permits to represent BRDF slices using HDR image files (.exr format). The output of this command should look like:
+The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image files (.exr format), while the \a data_merl plugin opens MERL's binary format. This is the format used by Pacanowski <em>et al.</em> <a href="http://hal.inria.fr/hal-00678885/en">[2012]</a> to perform fitting. The output of this command should look like:
 
 \image html gold-met-merl.png "gold-metallic-paint slice"
 
-Then, we perform fitting of this 2D BRDF slice:
+Then, we search for a fit of this 2D BRDF slice using the \a rational_fitter_parallel and a Chebychev basis for 60 to 100 coefficients in total:
 \verbatim
  $ ./build/data2brdf --input ../data/2d/merl/gold-met.exr --data ./build/libdata_brdf_slice.dylib --output gold-met.brdf --fitter ./build/librational_fitter_parallel.dylib --func ./build/librational_function_chebychev.dylib --min-np 60 -- np 100
 \endverbatim
 
-This outputs a BRDF file which cannot be displayed directly. To seen the result of our fitting, we can export this BRDF into the BRDF image slice format:
+This outputs a BRDF file which cannot be displayed directly. To see the result of our fitting, we can export this BRDF into the BRDF image slice format:
 \verbatim
  $ ./build/brdf2data --input gold-met.brdf --output gold-met-rat.exr --data ./build/libdata_brdf_slice.dylib
 \endverbatim
