@@ -50,7 +50,7 @@ In this example, we will show how to perform data conversion and vertical segmen
 
 The first command we will execute will convert the three dimensional data in a 2D slice in the halfway vector parametrization:
 \verbatim
- $ ./build/data2data --input ../data/3d/merl/gold-met.binary --in-data ./build/libdata_merl.dylib --output ../data/2d/merl/gold-met.exr --out-data ./build/lib
+ $ ./build/data2data --input ../data/3d/merl/gold-met.binary --in-data ./build/libdata_merl.dylib --output ../data/2d/merl/gold-met.exr --out-data ./build/libdata_brdf_slice.dylib
 \endverbatim
 
 The \a data_merl plugin permits to represent BRDF slices using HDR image files (.exr format). The output of this command should look like:
