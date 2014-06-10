@@ -28,7 +28,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 rational_fitter_parallel::rational_fitter_parallel() : nb_starting_points(100)
 {
 }
-rational_fitter_parallel::~rational_fitter_parallel() 
+rational_fitter_parallel::~rational_fitter_parallel()
 {
 }
 
@@ -48,14 +48,14 @@ bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, cons
 		std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
 		ptr<vertical_segment> vs(new vertical_segment());
-		for(int i=0; i<dat->size(); ++i) 
+		for(int i=0; i<dat->size(); ++i)
 		{
 			const vec x = dat->get(i);
 			vec y(dat->dimX() + 3*dat->dimY());
 
-			for(int k=0; k<x.size()   ; ++k) { y[k]                          = x[k]; }
-			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size()]               = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX() +   dat->dimY()]; }
-			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() + dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX() + 2*dat->dimY()]; }
+			for(int k=0; k<x.size()   ; ++k) { y[k]                            = x[k]; }
+			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() +   dat->dimY()] = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
+			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() + 2*dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
 
 			vs->set(y);
 		}
@@ -151,7 +151,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, cons
                     std::cout << "<<INFO>>      delta = " << delta << std::endl;
                     std::cout << std::endl;
 
-                    // Get the solution with the minimum delta or the minimum L2 distance, 
+                    // Get the solution with the minimum delta or the minimum L2 distance,
 						  // and update the main rational function r.
                     if((use_delta && delta < min_delta) || (!use_delta && l2_dist < min_l2_dist))
                     {
@@ -201,7 +201,7 @@ void rational_fitter_parallel::set_parameters(const arguments&)
 }
 
 
-bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq, 
+bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq,
                                         rational_function* r, const arguments &args,
                                         double& delta, double& linf_dist, double& l2_dist)
 {
@@ -294,8 +294,8 @@ bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, 
 	return false;
 }
 
-void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, 
-		                                        const ptr<vertical_segment>& data, 
+void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny,
+		                                        const ptr<vertical_segment>& data,
 															 const rational_function_1d* func,
 															 vec& cu, vec& cl)
 {
