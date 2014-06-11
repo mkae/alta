@@ -105,7 +105,7 @@ nonlinear_fitter_ceres::~nonlinear_fitter_ceres()
 {
 }
 
-bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, const ptr<function>& fit, const arguments &args)
+bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
     // I need to set the dimension of the resulting function to be equal
     // to the dimension of my fitting problem

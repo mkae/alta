@@ -1,0 +1,6 @@
+# This configuration file is part of ALTA library
+#
+# Configuration file for the Eigen package required for the CORE and
+# some PLUGINS. You need to have the env variable ALTA defined.
+
+INCLUDEPATH += $$(ALTA)/external/build/include $$(ALTA)/external/build/include/Eigen
