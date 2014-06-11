@@ -1,7 +1,7 @@
 /*! \package data2brdf
  *  \ingroup commands
  *  \brief
- *  This command allows to convert a \ref data object to a \ref function 
+ *  This command allows to convert a \ref data object to a \ref function
  *  object.
  *  \details
  *
@@ -11,14 +11,14 @@
  *
  *  <h3>Parameters</h3>
  *  <ul>
- *		<li><b>\-\-help</b> print the help and exit. 
- *		<li><b>\-\-input <i>filename</i></b> data file to be loaded using 
- *		the data plugin specified by the <b>\-\-data <i>filename</i></b> 
- *		option. If no plugin is specified, the data file will be loaded 
+ *		<li><b>\-\-help</b> print the help and exit.
+ *		<li><b>\-\-input <i>filename</i></b> data file to be loaded using
+ *		the data plugin specified by the <b>\-\-data <i>filename</i></b>
+ *		option. If no plugin is specified, the data file will be loaded
  *		using a \ref vertical_segment data object.</li>
- *		<li><b>\-\-output <i>filename</i></b> function file to be exported 
+ *		<li><b>\-\-output <i>filename</i></b> function file to be exported
  *		in the format specified by <b>\-\-export</b>. If no export argument
- *		is given, the function will be exported in ALTA \ref format. 
+ *		is given, the function will be exported in ALTA \ref format.
  *  </ul>
  *
  *  <h3>Plugins</h3>
@@ -26,12 +26,12 @@
  *		<li><b>\-\-fitter <i>plugin.lib</i></b> \ref fitter library to be used.
  *		Note that the fitter plugin must be compatible with the \a function
  *		to be used. We make the convention that the filename of the plugin
- *		expose its compatibility. For example, 
+ *		expose its compatibility. For example,
  *		<i>rational_function_legendre.lib</i> expose a rational function,
  *		compatible with a rational fitter and will not be compatible with
  *		nonlinear fitters.
  *		<li><b>\-\-data <i>plugin.lib</i></b> \ref data library to be used.
- *		<li><b>\-\-func <i>plugin.lib</i></b> \ref function library to be 
+ *		<li><b>\-\-func <i>plugin.lib</i></b> \ref function library to be
  *		used.
  *  </ul>
  */
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 #ifdef __linux__
 	feenableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
 #endif
-	
+
 	 if(args.is_defined("help")) {
 		std::cout << "Usage: data2brdf [options] --input data.file --output data.file" << std::endl ;
 		std::cout << "Convert a data object to a function object using a fitting procedure."<< std::endl ;
@@ -102,11 +102,11 @@ int main(int argc, char** argv)
 
         fit->set_parameters(args) ;
 
-        function* f = plugins_manager::get_function(args);
-        ptr<data> d = plugins_manager::get_data(args["data"]);
+        ptr<function> f = plugins_manager::get_function(args);
+        ptr<data> d     = plugins_manager::get_data(args["data"]);
         d->load(args["input"], args);
 
-        if(f == NULL || !d)
+        if(!f || !d)
         {
             std::cerr << "<<ERROR>> no function or data object correctly defined" << std::endl;
             return 1;

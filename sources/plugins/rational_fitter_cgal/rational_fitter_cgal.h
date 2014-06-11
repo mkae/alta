@@ -25,7 +25,7 @@ class rational_fitter_cgal : public fitter
 
 		// Fitting a data object
 		//
-        virtual bool fit_data(const ptr<data> d, function* fit, const arguments& args) ;
+        virtual bool fit_data(const ptr<data>& d, ptr<function>& fit, const arguments& args) ;
 
 		// Provide user parameters to the fitter
 		//
@@ -35,7 +35,7 @@ class rational_fitter_cgal : public fitter
 
 		// Fitting a data object using np elements in the numerator and nq 
 		// elements in the denominator
-		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, rational_function* fit) ;
+		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& fit) ;
         virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq, int ny, rational_function_1d* fit) ;
 
 		// min and Max usable np and nq values for the fitting

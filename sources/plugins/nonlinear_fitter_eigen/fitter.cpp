@@ -20,7 +20,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 
 struct EigenFunctor: Eigen::DenseFunctor<double>
 {
-	EigenFunctor(nonlinear_function* f, const ptr<data> d, bool use_cosine) :
+	EigenFunctor(const ptr<nonlinear_function>& f, const ptr<data> d, bool use_cosine) :
 		Eigen::DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
@@ -73,7 +73,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 				_di[i] = _x[_f->dimX() + i];
 
 			// Should add the resulting vector completely
-			vec _y = _di - cos*(*_f)(x);
+			vec _y = _di - cos*_f->value(x);
 			for(int i=0; i<_f->dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
 
@@ -129,7 +129,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 	}
 
 
-	nonlinear_function* _f;
+	const ptr<nonlinear_function>& _f;
 	const ptr<data> _d;
 
 	// Flags
@@ -139,7 +139,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 struct CompoundFunctor: Eigen::DenseFunctor<double>
 {
 	CompoundFunctor(compound_function* f, int index, const ptr<data> d, bool use_cosine) :
-		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), _f(f), _index(index), _d(d), _cosine(use_cosine)
+		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _index(index), _cosine(use_cosine)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
@@ -275,7 +275,7 @@ nonlinear_fitter_eigen::~nonlinear_fitter_eigen()
 {
 }
 
-bool nonlinear_fitter_eigen::fit_data(const ptr<data> d, function* fit, const arguments &args)
+bool nonlinear_fitter_eigen::fit_data(const ptr<data>& d, const ptr<function>& fit, const arguments &args)
 {
     // I need to set the dimension of the resulting function to be equal
     // to the dimension of my fitting problem
@@ -285,12 +285,12 @@ bool nonlinear_fitter_eigen::fit_data(const ptr<data> d, function* fit, const ar
     fit->setMax(d->max()) ;
 
 	 // Convert the function and bootstrap it with the data
-    if(dynamic_cast<nonlinear_function*>(fit) == NULL)
+    if(!dynamic_pointer_cast<nonlinear_function>(fit))
     {
         std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
         return false;
     }
-    nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
+    ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(fit);
 	 nf->bootstrap(d, args);
 
 #ifndef DEBUG
@@ -305,16 +305,15 @@ bool nonlinear_fitter_eigen::fit_data(const ptr<data> d, function* fit, const ar
     vec nf_x = nf->parameters();
 
     int info;
-
+#ifdef OLD
 	 if(args.is_defined("fit-compound"))
 	 {
-		 if(dynamic_cast<compound_function*>(nf) == NULL)
+		 ptr<compound_function> compound = dynamic_pointer_cast<compound_function>(nf);
+		 if(!compound_function)
 		 {
 			 std::cerr << "<<ERROR>> you should use --fit-compound with a compound function" << std::endl;
 			 return false;
 		 }
-
-		 compound_function* compound = dynamic_cast<compound_function*>(nf);
 
 		 // Register how many parameter are already fitted
 		 int already_fit = 0;
@@ -363,6 +362,7 @@ bool nonlinear_fitter_eigen::fit_data(const ptr<data> d, function* fit, const ar
 		 }
 	 }
 	 else
+#endif
 	 {
 		 Eigen::VectorXd x(nf->nbParameters());
 		 for(int i=0; i<nf->nbParameters(); ++i)

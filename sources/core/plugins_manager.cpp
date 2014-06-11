@@ -38,7 +38,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     }
 #else
     void* handle = dlopen(filename.c_str(), RTLD_GLOBAL | RTLD_LAZY);
-    
+
 	 if(handle != NULL)
 	 {
 		 void (*res)();
@@ -79,7 +79,7 @@ function* plugins_manager::get_function(const std::string& filename)
 
 	// Parameters of the function object
 	int nX, nY;
-	params::input param_in   = params::UNKNOWN_INPUT; 
+	params::input param_in   = params::UNKNOWN_INPUT;
 	params::output param_out = params::UNKNOWN_OUTPUT;
 	arguments args;
 
@@ -170,7 +170,7 @@ function* plugins_manager::get_function(const arguments& args)
         //! create a <em>compound</em> class to store multiple
         //! functions in it.
 		  compound_function* compound = new compound_function();
-	
+
           //! For each args_vec element, create a function object and add
           //! it to the compound one.
           for(unsigned int i=0; i<args_vec.size(); ++i)
@@ -268,14 +268,14 @@ function* plugins_manager::get_function(const arguments& args)
 		 func = new product_function(cosine, dynamic_cast<nonlinear_function*>(func));
 	 }
 	 // End of correction
-*/			
+*/
     return func;
 }
 ptr<data> plugins_manager::get_data(const std::string& n)
 {
     if(n.empty())
     {
-#ifdef DEBUG
+#ifndef DEBUG
         std::cout << "<<DEBUG>> no data plugin specified, returning a vertial_segment loader" << std::endl;
 #endif
         return new vertical_segment();
@@ -320,7 +320,7 @@ ptr<fitter> plugins_manager::get_fitter(const std::string& n)
     }
 }
 
-void plugins_manager::check_compatibility(ptr<data>& d, function*& f,
+void plugins_manager::check_compatibility(ptr<data>& d, const ptr<function>& f,
                                           const arguments& args)
 {
 	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
@@ -344,8 +344,8 @@ void plugins_manager::check_compatibility(ptr<data>& d, function*& f,
 		{
 			std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->input_parametrization()) << std::endl;
             std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
-			data_params* dd = new data_params(d, f->input_parametrization());
-			d = dd ;
+			ptr<data_params> dd = new data_params(d, f->input_parametrization());
+			d = dynamic_pointer_cast<data>(dd) ;
 		}
 		else
 		{
@@ -367,7 +367,7 @@ void plugins_manager::check_compatibility(ptr<data>& d, function*& f,
 	}
 	*/
 }
-		
+
 // \todo implement the Darwin (MACOS) version.
 #ifdef WIN32
 #include <windows.h>

@@ -34,7 +34,7 @@ void print_nlopt_error(nlopt_result res, const std::string& string)
 
 // The parameter of the function _f should be set prior to this function
 // call. If not it will produce undesirable results.
-void df(double* fjac, const nonlinear_function* f, const ptr<data> d)
+void df(double* fjac, const nonlinear_function* f, const data* d)
 {
 	// Clean memory
 	memset(fjac, 0.0, f->nbParameters()*sizeof(double));
@@ -77,7 +77,7 @@ void df(double* fjac, const nonlinear_function* f, const ptr<data> d)
 double f(unsigned n, const double* x, double* dy, void* dat)
 {
 	nonlinear_function* _f = (nonlinear_function*)(((void**)dat)[0]);
-	const ptr<data> _d = *(const ptr<data>*)(((void**)dat)[1]);
+	const data* _d = (const data*)(((void**)dat)[1]);
 
 	// Update the parameters vector
 	vec _p(_f->nbParameters());
@@ -125,7 +125,7 @@ nonlinear_fitter_nlopt::~nonlinear_fitter_nlopt()
 {
 }
 
-bool nonlinear_fitter_nlopt::fit_data(const ptr<data> d, function* fit, const arguments &args)
+bool nonlinear_fitter_nlopt::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem
@@ -135,12 +135,12 @@ bool nonlinear_fitter_nlopt::fit_data(const ptr<data> d, function* fit, const ar
 	fit->setMax(d->max()) ;
 
 	// Convert the function and bootstrap it with the data
-	if(dynamic_cast<nonlinear_function*>(fit) == NULL)
+	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(fit);
+	if(!nf)
 	{
 		std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
 		return false;
 	}
-	nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
 	nf->bootstrap(d, args);
 
 #ifndef DEBUG
@@ -233,8 +233,8 @@ bool nonlinear_fitter_nlopt::fit_data(const ptr<data> d, function* fit, const ar
 
 	// Create the problem
 	void* dat[2];
-	dat[0] = (void*)nf;
-	dat[1] = (void*)&d;
+	dat[0] = (void*)nf.get();
+	dat[1] = (void*)d.get();
 	res = nlopt_set_min_objective(opt, f, dat);
 	if(res < 0)
 	{

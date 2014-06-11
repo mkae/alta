@@ -23,7 +23,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 class altaNLP : public Ipopt::TNLP
 {
 	public:
-		altaNLP(nonlinear_function* f, const ptr<data> d) : TNLP(), _f(f), _d(d)
+		altaNLP(const ptr<nonlinear_function>& f, const ptr<data>& d) : TNLP(), _f(f), _d(d)
 		{
 		}
 
@@ -209,8 +209,8 @@ class altaNLP : public Ipopt::TNLP
 
 	protected:
 
-		const ptr<data> _d;
-		nonlinear_function* _f;
+		const ptr<data>& _d;
+		const ptr<nonlinear_function>& _f;
 };
 
 nonlinear_fitter_ipopt::nonlinear_fitter_ipopt() 
@@ -220,7 +220,7 @@ nonlinear_fitter_ipopt::~nonlinear_fitter_ipopt()
 {
 }
 
-bool nonlinear_fitter_ipopt::fit_data(const ptr<data> d, function* fit, const arguments &args)
+bool nonlinear_fitter_ipopt::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
 	// I need to set the dimension of the resulting function to be equal
 	// to the dimension of my fitting problem
@@ -230,12 +230,12 @@ bool nonlinear_fitter_ipopt::fit_data(const ptr<data> d, function* fit, const ar
 	fit->setMax(d->max()) ;
 
 	// Convert the function and bootstrap it with the data
-	if(dynamic_cast<nonlinear_function*>(fit) == NULL)
+	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(fit);
+	if(!nf)
 	{
 		std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
 		return false;
 	}
-	nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
 	nf->bootstrap(d, args);
 
 #ifndef DEBUG

@@ -17,16 +17,6 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
     return new rational_fitter_leastsquare();
 }
 
-ptr<data> rational_fitter_leastsquare::provide_data() const
-{
-	return new vertical_segment() ;
-}
-
-function* rational_fitter_leastsquare::provide_function() const 
-{
-	return new rational_function() ;
-}
-
 rational_fitter_leastsquare::rational_fitter_leastsquare() 
 {
 }
@@ -34,11 +24,11 @@ rational_fitter_leastsquare::~rational_fitter_leastsquare()
 {
 }
 
-bool rational_fitter_leastsquare::fit_data(const ptr<data> dat, function* fit, const arguments &args)
+bool rational_fitter_leastsquare::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
 {
-	rational_function* r = dynamic_cast<rational_function*>(fit) ;
+	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
 	const ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(r == NULL || !d)
+	if(!r || !d)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;
@@ -80,7 +70,7 @@ void rational_fitter_leastsquare::set_parameters(const arguments& args)
   _max_iter = args.get_float("max-iter", 1) ;
 }
 		
-bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int np, int nq, rational_function* r) 
+bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& r) 
 {
     // For each output dimension (color channel for BRDFs) perform
     // a separate fit on the y-1D rational function.

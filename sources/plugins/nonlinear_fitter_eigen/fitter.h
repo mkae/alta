@@ -45,7 +45,7 @@ class nonlinear_fitter_eigen: public fitter
 
 		// Fitting a data object
 		//
-		virtual bool fit_data(const ptr<data> d, function* fit, const arguments& args) ;
+		virtual bool fit_data(const ptr<data>& d, const ptr<function>& fit, const arguments& args) ;
 
 		// Provide user parameters to the fitter
 		//

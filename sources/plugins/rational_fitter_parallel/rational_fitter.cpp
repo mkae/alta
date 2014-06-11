@@ -32,10 +32,10 @@ rational_fitter_parallel::~rational_fitter_parallel()
 {
 }
 
-bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, const arguments &args)
+bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
 {
-	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	if(r == NULL)
+	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
+	if(!r)
 	{
 		std::cerr << "<<ERROR>> not passing the correct function class to the fitter: must be a rational_function" << std::endl ;
 		return false ;
@@ -119,12 +119,12 @@ bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, cons
 
             // Allocate a rational function and set it to the correct size, dimensions
             // and parametrizations.
-			rational_function* rk = NULL;
+			   ptr<rational_function> rk(NULL);
             #pragma omp critical (args)
             {
-					rk = dynamic_cast<rational_function*>(plugins_manager::get_function(args));
+					rk = dynamic_pointer_cast<rational_function>(ptr<function>(plugins_manager::get_function(args)));
 				}
-				if(rk == NULL)
+				if(!rk)
             {
                 std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
                 throw;
@@ -170,9 +170,6 @@ bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, cons
                 }
             }
 
-				if(rk != NULL)
-	            delete rk; // memory clean
-
             #pragma omp critical (nb_sol_tested)
             {
                 // Update the solution
@@ -187,7 +184,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data> dat, function* fit, cons
 		{
 			std::cout << "<<INFO>> mean delta = " << mean_delta/nb_sol_found << std::endl;
 			std::cout << "<<INFO>>  min delta = " << min_delta << std::endl;
-			std::cout << *r<< std::endl;
+			std::cout << *(r.get()) << std::endl;
 
 			time.stop();
 			std::cout << "<<INFO>> got a fit using N = " << i << std::endl ;
@@ -206,7 +203,7 @@ void rational_fitter_parallel::set_parameters(const arguments&)
 
 
 bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq,
-                                        rational_function* r, const arguments &args,
+                                        const ptr<rational_function>& r, const arguments &args,
                                         double& delta, double& linf_dist, double& l2_dist)
 {
 	// Fit the different output dimension independantly
@@ -281,7 +278,7 @@ bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, 
 			if(qp.test_constraints(ny, r, d))
 			{
 #ifdef DEBUG
-				std::cout << "<<INFO>> got solution " << *r << std::endl ;
+				std::cout << "<<INFO>> got solution " << *(r.get()) << std::endl ;
 #endif
 				return true;
             }

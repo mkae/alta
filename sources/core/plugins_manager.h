@@ -26,11 +26,11 @@ class plugins_manager
 
 		//! \brief load a function from the ALTA input file.
 		static function* get_function(const std::string& filename);
-			
+
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
 		static ptr<data> get_data(const std::string& n) ;
-		
+
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
 		static ptr<fitter> get_fitter(const std::string& n) ;
@@ -40,7 +40,7 @@ class plugins_manager
 		//! this has to be done before fitting to ensure that the
 		//! parametrizations spaces are the same.
 		//! \todo specify an output parametrization for the function ?
-		static void check_compatibility(ptr<data>& d, function*& f,
+		static void check_compatibility(ptr<data>& d, const ptr<function>& f,
 				const arguments& args) ;
 
 

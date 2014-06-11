@@ -24,15 +24,16 @@ rational_fitter_eigen::~rational_fitter_eigen()
 {
 }
 
-bool rational_fitter_eigen::fit_data(const ptr<data> dat, function* fit, const arguments &args)
+bool rational_fitter_eigen::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments&)
 {
-	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(r == NULL)
+	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
+	if(!r)
 	{
 		std::cerr << "<<ERROR>> not passing the correct function object to the fitter" << std::endl ;
 		return false ;
 	} 
+	
+	ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
 	if(!d)
 	{
 		std::cerr << "<<ERROR>> not passing the correct data object to the fitter" << std::endl ;
@@ -74,7 +75,7 @@ void rational_fitter_eigen::set_parameters(const arguments& args)
 	_nq = args.get_float("nq", 10) ;
 }
 		
-bool rational_fitter_eigen::fit_data(const ptr<vertical_segment> d, int np, int nq, rational_function* r) 
+bool rational_fitter_eigen::fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& r) 
 {
     // For each output dimension (color channel for BRDFs) perform
     // a separate fit on the y-1D rational function.
@@ -94,7 +95,7 @@ bool rational_fitter_eigen::fit_data(const ptr<vertical_segment> d, int np, int 
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_eigen::fit_data(const ptr<vertical_segment> d, int np, int nq, int ny, rational_function_1d* r)
+bool rational_fitter_eigen::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny, rational_function_1d* r)
 {
 	// Each constraint (fitting interval or point
 	// add another dimension to the constraint

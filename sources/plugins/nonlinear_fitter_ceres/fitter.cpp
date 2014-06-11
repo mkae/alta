@@ -20,7 +20,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 class CeresFunctor : public ceres::CostFunction
 {
 	public:
-		CeresFunctor(nonlinear_function* f, const vec& xi, const arguments& args) : _f(f), _xi(xi)
+		CeresFunctor(const ptr<nonlinear_function>& f, const vec& xi, const arguments& args) : _f(f), _xi(xi)
 		{
 			set_num_residuals(f->dimY());
 			mutable_parameter_block_sizes()->push_back(f->nbParameters());
@@ -28,7 +28,7 @@ class CeresFunctor : public ceres::CostFunction
 			_log_fit = args.is_defined("log-fit");
 		}
 
-		virtual bool Evaluate(double const* const* x, double* y, double** dy) const 
+		virtual bool Evaluate(double const* const* x, double* y, double** dy) const
 		{
 			// Check that the parameters used are within the bounds defined
 			// by the function
@@ -91,21 +91,21 @@ class CeresFunctor : public ceres::CostFunction
 	protected:
 
 		// Data point and function to optimize
-		nonlinear_function* _f;
+		const ptr<nonlinear_function>& _f;
 		const vec _xi;
 
 		// Arguments of the fitting procedure
 		bool _log_fit;
 };
 
-nonlinear_fitter_ceres::nonlinear_fitter_ceres() 
+nonlinear_fitter_ceres::nonlinear_fitter_ceres()
 {
 }
-nonlinear_fitter_ceres::~nonlinear_fitter_ceres() 
+nonlinear_fitter_ceres::~nonlinear_fitter_ceres()
 {
 }
 
-bool nonlinear_fitter_ceres::fit_data(const ptr<data> d, function* fit, const arguments &args)
+bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, const ptr<function>& fit, const arguments &args)
 {
     // I need to set the dimension of the resulting function to be equal
     // to the dimension of my fitting problem
@@ -115,12 +115,13 @@ bool nonlinear_fitter_ceres::fit_data(const ptr<data> d, function* fit, const ar
     fit->setMax(d->max()) ;
 
 	 // Convert the function and bootstrap it with the data
-    if(dynamic_cast<nonlinear_function*>(fit) == NULL)
+   ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(fit);
+    if(!nf)
     {
         std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
         return false;
     }
-    nonlinear_function* nf = dynamic_cast<nonlinear_function*>(fit);
+
 
 #ifndef DEBUG
 	 std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;

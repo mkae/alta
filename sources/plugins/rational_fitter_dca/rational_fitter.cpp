@@ -19,28 +19,18 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
     return new rational_fitter_dca();
 }
 
-ptr<data> rational_fitter_dca::provide_data() const
-{
-	return new vertical_segment() ;
-}
-
-function* rational_fitter_dca::provide_function() const 
-{
-	return new rational_function() ;
-}
-
-rational_fitter_dca::rational_fitter_dca() : QObject()
+rational_fitter_dca::rational_fitter_dca()
 {
 }
 rational_fitter_dca::~rational_fitter_dca() 
 {
 }
 
-bool rational_fitter_dca::fit_data(const ptr<data> dat, function* fit, const arguments &args)
+bool rational_fitter_dca::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
 {
-	rational_function* r = dynamic_cast<rational_function*>(fit) ;
-	const vertical_segment* d = dynamic_cast<const vertical_segment*>(dat) ;
-	if(r == NULL || d == NULL)
+	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
+	const ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
+	if(!r || !d)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;
@@ -85,7 +75,7 @@ void rational_fitter_dca::set_parameters(const arguments& args)
 {
 }
 
-double distance(const rational_function* f, const ptr<data> d)
+double distance(const ptr<rational_function>& f, const ptr<data>& d)
 {
 	double distance = 0.0;
 	for(int i=0; i<d->size(); ++i)
@@ -107,7 +97,7 @@ double distance(const rational_function* f, const ptr<data> d)
 }
 
 // Bootstrap the DCA algorithm with an already done fit
-void rational_fitter_dca::bootstrap(const ptr<data> d, int& np, int& nq, rational_function* fit, double& delta, const arguments& args)
+void rational_fitter_dca::bootstrap(const ptr<data>& d, int& np, int& nq, const ptr<rational_function>& fit, double& delta, const arguments& args)
 {
 	
 	if(args.is_defined("bootstrap"))
@@ -146,7 +136,7 @@ void rational_fitter_dca::bootstrap(const ptr<data> d, int& np, int& nq, rationa
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_dca::fit_data(const ptr<data> d, rational_function* r, const arguments& args)
+bool rational_fitter_dca::fit_data(const ptr<data>& d, const ptr<rational_function>& r, const arguments& args)
 {
     int np, nq;
 
@@ -348,7 +338,7 @@ bool rational_fitter_dca::fit_data(const ptr<data> d, rational_function* r, cons
 
 		r->update(a, b) ;
 #ifdef DEBUG
-		std::cout << "<<DEBUG>> current rational function: " <<  *r << std::endl ;
+		std::cout << "<<DEBUG>> current rational function: " <<  *(r.get()) << std::endl ;
 #endif
 
 		// Compute the new delta_k, the distance to the data points
@@ -386,5 +376,3 @@ bool rational_fitter_dca::fit_data(const ptr<data> d, rational_function* r, cons
 		return true;
 	}
 }
-
-Q_EXPORT_PLUGIN2(rational_fitter_dca, rational_fitter_dca)

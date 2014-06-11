@@ -19,12 +19,12 @@
  *
  *  \details
  *  <h3>Third party requirements</h3>
- *  
+ *
  *  You will need three external libraries to compile this plugin:
  *  <ul>
- *		<li><a href="https://ceres-solver.googlesource.com/ceres-solver">CERES</a> 
+ *		<li><a href="https://ceres-solver.googlesource.com/ceres-solver">CERES</a>
  *		library, version 1.5.0</li>
- *		<li><a href="http://code.google.com/p/google-glog">Google glog</a> library 
+ *		<li><a href="http://code.google.com/p/google-glog">Google glog</a> library
  *		version 0.3.1</li>
  *		<li><a href="http://eigen.tuxfamily.org/">Eigen library</a> version 3</li>
  *  </ul>
@@ -61,7 +61,7 @@ class nonlinear_fitter_ceres: public fitter
 
 		// Fitting a data object
 		//
-		virtual bool fit_data(const ptr<data> d, function* fit, const arguments& args) ;
+		virtual bool fit_data(const ptr<data>& d, const ptr<function>& fit, const arguments& args) ;
 
 		// Provide user parameters to the fitter
 		//
@@ -72,4 +72,3 @@ class nonlinear_fitter_ceres: public fitter
         // Fitter options
         ceres::Solver::Options options;
 } ;
-

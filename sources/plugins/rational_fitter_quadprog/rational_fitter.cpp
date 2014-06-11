@@ -29,11 +29,11 @@ rational_fitter_quadprog::~rational_fitter_quadprog()
 {
 }
 
-bool rational_fitter_quadprog::fit_data(const ptr<data> dat, function* fit, const arguments &args)
+bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
 {
-	rational_function* r = dynamic_cast<rational_function*>(fit) ;
+	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
 	const ptr<vertical_segment>& d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(r == NULL || !d)
+	if(!r || !d)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;
@@ -102,7 +102,7 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 }
 		
 
-bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, rational_function* r)
+bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& r)
 {
     // For each output dimension (color channel for BRDFs) perform
     // a separate fit on the y-1D rational function.
