@@ -30,7 +30,6 @@ SConscript('rational_fitter_matlab/SConscript')
 # # Building rational functions
 SConscript('rational_function_legendre/SConscript')
 SConscript('rational_function_chebychev/SConscript')
-SConscript('rational_function_chebychev_opt/SConscript')
 SConscript('rational_function_cosine/SConscript')
 
 
