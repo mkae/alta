@@ -1,6 +1,7 @@
 TEMPLATE        = lib
-CONFIG         *=  plugin \
-						 eigen
+CONFIG         *=  plugin	\
+						 eigen	\
+						 flann
 
 DESTDIR         = ../../build
 

@@ -1,4 +1,5 @@
 CONFIG         += eigen
+CONFIG         -= app_bundle
 
 INCLUDEPATH    += ../../
 DESTDIR         = ../../build

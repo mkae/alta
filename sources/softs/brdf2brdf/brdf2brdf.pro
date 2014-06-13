@@ -1,5 +1,7 @@
 CONFIG         += console \
-						eigen
+                  eigen
+CONFIG         -= app_bundle
+
 
 DESTDIR         = ../../build
 INCLUDEPATH    += ../../ 

@@ -1,0 +1,9 @@
+# This configuration file is part of ALTA library
+#
+# Configuration file for MIT's NlOpt library present in the
+# ${ALTA}/external/nlopt* directory once the obtain_nlopt.py script has
+# been runned. You need to have the env variable ALTA defined.
+
+INCLUDEPATH += $$(ALTA)/external/build/include
+LIBS        += -L$$(ALTA)/external/build/lib \
+               -lnlopt

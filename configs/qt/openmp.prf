@@ -5,7 +5,9 @@
 # be updated for other OS/distributions.
 #
 
-CONFIG += openmp
+unix:!macx {
+	CONFIG += openmp
 
-QMAKE_CXXFLAGS += -fopenmp
-LIBS += -lgomp
+	QMAKE_CXXFLAGS += -fopenmp
+	LIBS += -lgomp
+}

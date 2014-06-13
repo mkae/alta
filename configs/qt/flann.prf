@@ -1,0 +1,16 @@
+# This configuration file is part of ALTA library
+#
+# It provides Qt with the configuration necessary to compile plugins
+# using FLANN library. This .prf file works under Ubuntu/debian,
+# but must be updated for other OS/distributions.
+#
+
+unix:!macx{
+  INCLUDEPATH += /usr/include/
+  LIBS += -L/usr/lib/x86_64-linux-gnu -lflann
+}
+
+macx{
+  INCLUDEPATH += /opt/local/include
+  LIBS += -L/opt/local/lib -lflann
+}

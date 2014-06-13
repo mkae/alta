@@ -1,5 +1,6 @@
 CONFIG         += console \
 						eigen
+CONFIG         -= app_bundle
 
 DESTDIR         = ../../build
 INCLUDEPATH    += ../../ ../../libs/rational_1d \
