@@ -71,6 +71,11 @@ class rational_function_1d : public function
 		//! coefficients.
 		virtual void update(const vec& in_a, 
 		                    const vec& in_b) ;
+		
+		//! Update the 1D rational function with another one. Note that
+		//! this function can change the dimensions of the coefficients
+		//! vectors.
+		virtual void update(const rational_function_1d* r) ;
 
 		//! Resize the polynomial.
 		virtual void resize(unsigned int np, unsigned int nq);
@@ -159,6 +164,16 @@ class rational_function : public function
 		virtual bool load(std::istream& in) ;
 
 		// Update the function
+		virtual void update(const ptr<rational_function>& r) 
+		{
+			assert(r->dimX() == dimX());
+			assert(r->dimY() == dimY());
+
+			for(int k=0; k<dimY(); ++k) 
+			{
+				get(k)->update(r->get(k));
+			}
+		}
 		virtual void update(int i, rational_function_1d* r) ;
 
 		//! Get the 1D function associated with color channel i. If no one exist, 

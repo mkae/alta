@@ -106,7 +106,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
 		int nb_sol_found  = 0;
 		int nb_sol_tested = 0;
 
-        #pragma omp parallel for shared(args, nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
+        #pragma omp parallel for shared(r, args, nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
         for(int j=1; j<i; ++j)
         {
             // Compute the number of coefficients in the numerator and in the denominator
@@ -115,7 +115,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
             int temp_np = i - j;
             int temp_nq = j;
 
-            vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
+            //vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
 
             // Allocate a rational function and set it to the correct size, dimensions
             // and parametrizations.
@@ -144,12 +144,13 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
             bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, delta, linf_dist, l2_dist);
             if(is_fitted)
             {
-                #pragma omp critical (nb_sol_found)
+                #pragma omp critical (r)
                 {
                     ++nb_sol_found ;
                     mean_delta += delta ;
 
-                    std::cout << "<<INFO>> found a solution with np=" << temp_np << ", nq = " << temp_nq << std::endl;
+                    std::cout << "<<INFO>> found a solution with np=" << temp_np 
+							         << ", nq = " << temp_nq << std::endl;
                     std::cout << "<<INFO>> Linf error = " << linf_dist << std::endl;
                     std::cout << "<<INFO>> L2   error = " << l2_dist << std::endl;
                     std::cout << "<<INFO>>      delta = " << delta << std::endl;
@@ -162,10 +163,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
                         min_delta   = delta ;
                         min_l2_dist = l2_dist ;
                         r->setSize(temp_np, temp_nq);
-                        for(int y=0; y<r->dimY(); ++y)
-                        {
-                            r->update(y, rk->get(y));
-                        }
+								r->update(rk);
                     }
                 }
             }

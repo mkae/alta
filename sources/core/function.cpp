@@ -168,8 +168,9 @@ double function::Linf_distance(const ptr<data>& d) const
 	vec mean = vec::Zero(dimY());
 	vec var  = vec::Zero(dimY());
 
-
+#ifdef DEBUG
 	std::cout << "<<DEBUG>> input param here = " << params::get_name(input_parametrization()) << std::endl;
+#endif
 
 	double linf_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)

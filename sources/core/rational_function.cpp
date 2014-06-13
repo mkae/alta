@@ -114,6 +114,25 @@ void rational_function_1d::update(const vec& in_a,
 		_q_coeffs[k].a = in_b[k] / b0;
 	}
 }
+		
+void rational_function_1d::update(const rational_function_1d* r)
+{
+	// Get the size of the input vector
+	const unsigned int np = r->_p_coeffs.size();
+	const unsigned int nq = r->_q_coeffs.size();
+
+	// Resize the rational function
+	resize(np, nq);
+
+	for(unsigned int k=0; k<np; ++k) {
+		_p_coeffs[k].a = r->_p_coeffs[k].a;
+	}
+
+	for(unsigned int k=0; k<nq; ++k) {
+		_q_coeffs[k].a = r->_q_coeffs[k].a;
+	}
+
+}
 
 void rational_function_1d::resize(unsigned int np, unsigned int nq)
 {
@@ -388,7 +407,7 @@ rational_function::~rational_function()
 
 void rational_function::update(int i, rational_function_1d* r)
 {
-	rs[i] = r;
+	rs[i]->update(r);
 }
 
 

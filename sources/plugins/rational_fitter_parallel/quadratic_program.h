@@ -185,11 +185,11 @@ class quadratic_program
                 data->get(*it, x, yl, yu);
 
 				vec y = r->value(x);
-				bool fail_upper = y[ny] > yu[ny];
-				bool fail_lower = y[ny] < yl[ny];
+				bool fail_upper = y[0] > yu[ny];
+				bool fail_lower = y[0] < yl[ny];
 				if(fail_lower || fail_upper)
 				{
-                    const double dev = std::abs(0.5*(yu[ny]+yl[ny]) - y[ny]);
+                    const double dev = std::abs(0.5*(yu[ny]+yl[ny]) - y[0]);
 
 					nb_failed++;
 
@@ -303,7 +303,7 @@ int quadratic_program::next_unmatching_constraint(int i, int ny, const rational_
 		data->get(n, x, yl, yu);
 
 		vec y = r->value(x);
-        if(y[ny] < yl[ny] || y[ny] > yu[ny])
+        if(y[0] < yl[ny] || y[0] > yu[ny])
 		{
 			return n;
 		}
