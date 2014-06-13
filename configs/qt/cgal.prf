@@ -1,0 +1,16 @@
+# This configuration file is part of ALTA library
+#
+# Configuration file for CGAL library in the case where it is installed in
+# the default location for your configuration.
+
+macx {
+	INCLUDEPATH += /opt/local/include
+	LIBS        += -L/opt/local/lib
+}
+
+win32 {
+	INCLUDEPATH += "C:\Program Files\CGAL-4.4\include"
+	LIBS        += -L"C:\Program Files\CGAL-4.4\lib"
+}
+	
+LIBS += -lCGAL -lCGAL_Core

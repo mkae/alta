@@ -54,14 +54,17 @@ bool rational_fitter_cgal::fit_data(const ptr<data>& dat, ptr<function>& fit, co
 	int temp_np = _min_np, temp_nq = _min_nq ;
 	while(temp_np <= _max_np || temp_nq <= _max_nq)
 	{
-        timer time ;
+		timer time ;
 		time.start() ;
+
+		r->setSize(temp_np, temp_nq);
 		
 		if(fit_data(d, temp_np, temp_nq, r))
 		{
-            time.stop();
-			std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
-            std::cout << "<<INFO>> it took " << time  << std::endl ;
+			time.stop();
+			std::cout << "<<INFO>> got a fit using np = " << temp_np 
+			          << " & nq =  " << temp_nq << "      " << std::endl
+			          << "<<INFO>> it took " << time  << std::endl ;
 
 			return true ;
 		}
@@ -97,8 +100,6 @@ bool rational_fitter_cgal::fit_data(const ptr<vertical_segment>& d, int np, int 
     for(int j=0; j<d->dimY(); ++j)
     {
         rational_function_1d* rs = r->get(j);
-        rs->resize(np, nq);
-
         if(!fit_data(d, np, nq, j, rs))
         {
             return false ;
