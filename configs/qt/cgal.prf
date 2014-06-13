@@ -3,6 +3,8 @@
 # Configuration file for CGAL library in the case where it is installed in
 # the default location for your configuration.
 
+CONFIG += cgal
+
 macx {
 	INCLUDEPATH += /opt/local/include
 	LIBS        += -L/opt/local/lib

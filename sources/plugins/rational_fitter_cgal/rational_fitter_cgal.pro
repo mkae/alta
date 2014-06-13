@@ -1,19 +1,22 @@
 TEMPLATE        = lib
-CONFIG         += plugin  \
-						eigen   \
-						cgal    
+CONFIG         += plugin
 CONFIG         -= qt
 
-DESTDIR         = ../../build
+load(eigen)
+load(cgal)
+
+packagesExist(eigen, cgal) {
+	DESTDIR         = ../../build
  
-INCLUDEPATH    += ../.. 
+	INCLUDEPATH    += ../.. 
 
-HEADERS         = rational_fitter_cgal.h
-SOURCES         = rational_fitter_cgal.cpp
+	HEADERS         = rational_fitter_cgal.h
+	SOURCES         = rational_fitter_cgal.cpp
 
-LIBS           += -L../../build        \
-						-lcore
+	LIBS           += -L../../build        \
+							-lcore
 
-unix {
-	QMAKE_CXXFLAGS += -frounding-math 
+	unix {
+		QMAKE_CXXFLAGS += -frounding-math 
+	}
 }

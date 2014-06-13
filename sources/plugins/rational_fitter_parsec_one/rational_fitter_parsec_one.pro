@@ -1,21 +1,25 @@
-TARGET          = rational_fitter_parsec_one
-TEMPLATE        = lib
-CONFIG         *= plugin        \
-		eigen           \
-		quadprog        \
-                parsec          \
-                coreblas
+TARGET    = rational_fitter_parsec_one
+TEMPLATE  = lib
+CONFIG   *= plugin
 
-DESTDIR         = ../../build
+load(eigen)
+load(quadprog)
+load(parsec)
+load(coreblas)
 
-INCLUDEPATH    += ../rational_function \
-                  ../rational_data     \
-                  ../..
+packagesExist(eigen, quadprog, parsec, coreblas) {
 
-HEADERS         = rational_fitter.h
-SOURCES         = rational_fitter.cpp
+	DESTDIR         = ../../build
 
-LIBS           += -L../../build        \
-                -lcore
+	INCLUDEPATH    += ../rational_function \
+		               ../rational_data     \
+			            ../..
 
-QMAKE_CXXFLAGS += -g3 -O0
+	HEADERS         = rational_fitter.h
+	SOURCES         = rational_fitter.cpp
+
+	LIBS           += -L../../build        \
+	                  -lcore
+	
+	QMAKE_CXXFLAGS += -g3 -O0
+}

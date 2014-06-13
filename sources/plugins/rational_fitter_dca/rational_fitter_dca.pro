@@ -1,18 +1,19 @@
 TARGET          = rational_fitter_dca
 TEMPLATE        = lib
-CONFIG         *= qt      \
-                  plugin  \
-						eigen   \
-						matlab  
 
-DESTDIR         = ../../build
+load(eigen)
+load(matlab)
+
+packagesExist(eigen, matlab) {
+	DESTDIR         = ../../build
  
-INCLUDEPATH    += ../rational_function \
-                  ../rational_data     \
-                  ../.. 
+	INCLUDEPATH    += ../rational_function \
+	                  ../rational_data     \
+	                  ../.. 
 
-HEADERS         = rational_fitter.h
-SOURCES         = rational_fitter.cpp
+	HEADERS         = rational_fitter.h
+	SOURCES         = rational_fitter.cpp
 
-LIBS           += -L../../build \
-                  -lcore
+	LIBS           += -L../../build \
+	                  -lcore
+}

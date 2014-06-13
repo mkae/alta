@@ -5,5 +5,14 @@
 # but must be updated for other OS/distributions.
 #
 
-INCLUDEPATH += /usr/include/OpenEXR/
-LIBS += -L/usr/lib/x86_64-linux-gnu -lHalf -lIlmThread -lIlmImf
+CONFIG += openexr
+
+unix:!macx {
+	INCLUDEPATH += /usr/include/OpenEXR/
+	LIBS        += -L/usr/lib/x86_64-linux-gnu -lHalf -lIlmThread -lIlmImf
+}
+
+macx {
+	INCLUDEPATH += /opt/local/include/OpenEXR
+	LIBS        += -L/opt/local/lib -lHalf -lIlmThread -lIlmImf
+}

@@ -3,4 +3,6 @@
 # Configuration file for the Eigen package required for the CORE and
 # some PLUGINS. You need to have the env variable ALTA defined.
 
+CONFIG += eigen
+
 INCLUDEPATH += $$(ALTA)/external/build/include $$(ALTA)/external/build/include/Eigen

@@ -4,6 +4,7 @@
 # ${ALTA}/external/ceres* directory once the obtain_ceres.py script has
 # been runned. You need to have the env variable ALTA defined.
 
+CONFIG      += ceres
 INCLUDEPATH += $$(ALTA)/external/build/include
 LIBS        += -L$$(ALTA)/external/build/lib \
                -lceres -lglog

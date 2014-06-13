@@ -1,24 +1,26 @@
-TARGET   = rational_fitter_parsec_multi
-TEMPLATE = lib
-CONFIG	 *= plugin      \
-	eigen           \
-	quadprog        \
-	parsec          \
-	coreblas
+TARGET    = rational_fitter_parsec_multi
+TEMPLATE  = lib
+CONFIG	*= plugin
 
-DESTDIR         = ../../build
+load(eigen)
+load(quadprog)
+load(parsec)
+load(coreblas)
 
-INCLUDEPATH    += ../rational_function \
-                  ../rational_data     \
-                  ../..
+packagesExist(eigen, quadprog, parsec, coreblas) {
+	DESTDIR         = ../../build
 
-HEADERS         = rational_fitter.h   \
-                  quadratic_program.h
-SOURCES         = rational_fitter.cpp
+	INCLUDEPATH    += ../rational_function \
+	                  ../rational_data     \
+	                  ../..
 
-LIBS           += -L../../build       \
-		-lcore
+	HEADERS         = rational_fitter.h   \
+	                  quadratic_program.h
+	SOURCES         = rational_fitter.cpp
 
-#QMAKE_CXXFLAGS += -fPIC
-QMAKE_CXXFLAGS += -fPIC -g
+	LIBS           += -L../../build       \
+	               -lcore
 
+	!debug:QMAKE_CXXFLAGS += -fPIC
+	debug:QMAKE_CXXFLAGS += -fPIC -g
+}
