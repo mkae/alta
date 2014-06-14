@@ -83,6 +83,6 @@ IPOPT_OPT_LIB  = []
 
 ## MATLAB library and Engine
 ##
-MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
-MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
+MATLAB_INC  = ['']
+MATLAB_DIR  = ['']
 MATLAB_LIB  = ['eng', 'mex','mat']
