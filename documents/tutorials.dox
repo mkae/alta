@@ -131,14 +131,15 @@ a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
 </alta>
 \endverbatim
 
+In this XML example, it is possible to perform fit using a compound function by concatenating multiple function plugins. This is equivalent to providing a list of plugins to the <code>\-\-func</code> argument: <code>\-\-func [libnonlinear_function_diffuse.so, libnonlinear_function_lafortune.so]</code>.
+
 You can perform this action using the following command, assuming that the
 xml script is in file <em>script.xml</em>:
 \verbatim
  $ ./scripts/xml_cmd.py script.xml
 \endverbatim
 
-You can put multiple <action> commands in the xml file. Those commands will
-be executed in order.
+You can put multiple <code>\<action\></code> commands in the xml file. Those commands will be executed in order.
 
 <br />
 
@@ -151,4 +152,61 @@ function along its different axis.
 \verbatim
  $ ./build/data2moments --input ../data/1d/NIST/Kirby2/Kirby2.dat --data ./build/libdata_interpolant.so
 \endverbatim
+
+<br />
+
+<h2>Using the C++ interface</h2>
+
+It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (<code>libcore.a</code> on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
+
+The following program produces slices of data files and outputs it on a gnuplot compliant data file. It requires an interpolant data format such as \ref data_merl, \ref data_interpolant (our internal data format is not):
+
+\verbatim
+#include <core/args.h>
+#include <core/data.h>
+#include <core/function.h>
+#include <core/fitter.h>
+#include <core/plugins_manager.h>
+#include <core/common.h>
+
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char** argv) {
+	arguments args(argc, argv);
+
+	ptr<data> d = plugins_manager::get_data(args["data"]);
+	d->load(args["data-file"]);
+
+	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+
+	double theta_in = -(M_PI/180) * (double)args.get_float("theta", 0.0f);
+	double phi_in   =  (M_PI/180) * (double)args.get_float("phi", 0.0f);
+	vec cart(6);
+	cart[0] = cos(phi_in)*sin(theta_in);
+	cart[1] = sin(phi_in)*sin(theta_in);
+	cart[2] = cos(theta_in);
+
+	const int N = 1000;
+	for(int i=0; i<N; ++i) {
+		const double theta_out = M_PI * (i / (double)(N-1) - 0.5);
+		const double phi_out   = 0.0;
+		cart[3] = cos(phi_out)*sin(theta_out);
+		cart[4] = sin(phi_out)*sin(theta_out);
+		cart[5] = cos(theta_out);
+
+		params::convert(&cart[0], params::CARTESIAN, d->parametrization(), &x[0]);
+		vec v = d->value(x) ;
+
+		file << theta_out << "\t";
+		for(int u=0; u<d->dimY(); ++u) {
+			file << v[u] << "\t" ;
+		}
+		file << std::endl ;
+	}
+}
+\endverbatim
+
+The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
+
 */
