@@ -13,6 +13,7 @@ rm -rf sources/xml
 rm -rf sources/scripts/unitary*
 rm -rf sources/plugins/*retro*
 rm -rf sources/plugins/shifted_gamma_function
+rm -rf sources/plugins/rational_fitter_parsec_*
 rm -rf sources/softs/tests
 rm -rf sources/softs/rational_1d
 rm -rf sources/softs/generate_data
@@ -28,7 +29,7 @@ find ./sources/ -regex ".*\.\(h\|cpp\)$" | while read FILE; do
 	cat LICENSE.C $FILE > $FILE.temp;
 	mv $FILE.temp $FILE;
 done
-rm -rf LICENSE.C
+#rm -rf LICENSE.C
 
 
 # Create the archive
