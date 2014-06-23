@@ -7,11 +7,11 @@ cd ../alta-alpha
 # Remove unecessary parts (data, retro plugins, ...)
 rm -rf data
 rm -rf papers
+rm -rf external/quadprog++-v2
 rm -rf sources/tests
 rm -rf sources/matlab
 rm -rf sources/xml
 rm -rf sources/scripts/unitary*
-rm -rf sources/external/quadprog++-v2
 rm -rf sources/plugins/*retro*
 rm -rf sources/plugins/shifted_gamma_function
 rm -rf sources/plugins/rational_fitter_parsec_*

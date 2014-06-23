@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
 
 	// Load a data file
-	if(args.is_defined("data") || args.is_defined("in-data"))
+	if(args.is_defined("data") || args.is_defined("data-file"))
 	{
 		ptr<data> d = plugins_manager::get_data(args["data"]);
 

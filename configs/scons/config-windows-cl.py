@@ -23,7 +23,7 @@ PLUGIN_LIB     = ['core']
 
 ## OpenMP flags
 ##
-OPENMP_FLAG   = []
+OPENMP_FLAG   = ['/openmp']
 OPENMP_LIB    = []
 
 
