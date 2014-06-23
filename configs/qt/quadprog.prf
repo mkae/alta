@@ -4,6 +4,6 @@
 # ${ALTA}/external/quadprog++ directory provided with the ALTA
 # library. You need to have the env variable ALTA defined.
 
-CONFIG     _+= quadprog
+CONFIG      += quadprog
 INCLUDEPATH += $$(ALTA)/external/quadprog++
 LIBS        += -L$$(ALTA)/external/build/lib -lquadprog++

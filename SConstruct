@@ -103,4 +103,6 @@ plugins  = env.SConscript('sources/plugins/SConscript')
 softs    = env.SConscript('sources/softs/SConscript')
 #env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
 
+env.Depends(plugins, core)
+env.Depends(softs, core)
 #env.NoClean(external)

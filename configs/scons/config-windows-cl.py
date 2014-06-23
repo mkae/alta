@@ -9,22 +9,22 @@ import os, sys
 
 ## Compilators build flags
 ##
-CXX            = 'gcc'
-CCFLAGS        = ['-O3', '-Wall', '-m64']
+CXX            = 'cl'
+CCFLAGS        = []
 LINKFLAGS      = []
 
 
 ## ALTA internal flags
 ##
-CORE_LIB       = ['dl']
-SOFT_LIB       = ['core', 'dl']
+CORE_LIB       = []
+SOFT_LIB       = ['core']
 PLUGIN_LIB     = ['core']
 
 
 ## OpenMP flags
 ##
-OPENMP_FLAG   = ['-fopenmp']
-OPENMP_LIB    = ['gomp']
+OPENMP_FLAG   = []
+OPENMP_LIB    = []
 
 
 ## OpenEXR library
@@ -85,4 +85,4 @@ IPOPT_OPT_LIB  = []
 ##
 MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
 MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
-MATLAB_LIB  = ['eng', 'mx','mat']
+MATLAB_LIB  = ['eng', 'mex','mat']
