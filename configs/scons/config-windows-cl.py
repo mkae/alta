@@ -3,45 +3,41 @@ import os, sys
 ##----------------------------------------------------------------##
 ## This file describes required and optional arguments to ALTA    ##
 ## compilation. If you want to manualy tune the use of an already ##
-## present library, update the according lines                    ##
-##                                                                ##
-## This configuration file is made of a MacOS X operating system  ##
-## version 10.9, with clang and OpenEXR and FLANN libraries       ##
-## installed using Ports.                                         ##
+## present library, uncomment the according lines.                ##
 ##----------------------------------------------------------------##
 
 
 ## Compilators build flags
 ##
-CXX            = 'clang'
-CCFLAGS        = ['-O3', '-Wall', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
-LINKFLAGS      = ['-headerpad_max_install_names', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
+CXX            = 'cl'
+CCFLAGS        = []
+LINKFLAGS      = []
 
 
 ## ALTA internal flags
 ##
-CORE_LIB       = ['dl', 'stdc++']
-SOFT_LIB       = ['core', 'dl', 'stdc++']
-PLUGIN_LIB     = ['core', 'stdc++']
+CORE_LIB       = []
+SOFT_LIB       = ['core']
+PLUGIN_LIB     = ['core']
 
 
 ## OpenMP flags
 ##
-OPENMP_FLAG   = []
+OPENMP_FLAG   = ['/openmp']
 OPENMP_LIB    = []
 
 
 ## OpenEXR library
 ##
-OPENEXR_INC    = ['/opt/local/include/OpenEXR']
-OPENEXR_DIR    = ['/opt/local/lib']
+OPENEXR_INC    = ['/usr/include/OpenEXR']
+OPENEXR_DIR    = ['/usr/lib']
 OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
 
 
 ## FLANN library
 ##
-FLANN_INC    = ['/opt/local/include']
-FLANN_DIR    = ['/opt/local/lib']
+FLANN_INC    = ['/usr/include/flann']
+FLANN_DIR    = ['/usr/lib/x86_64_linux-gnu']
 FLANN_LIB    = ['flann']
 
 
@@ -62,7 +58,7 @@ QUADPROG_LIB      = ['quadprog++']
 CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
 CERES_LIB      = ['ceres', 'glog']
-CERES_OPT_LIB  = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse']
+CERES_OPT_LIB  = ['gomp', 'lapack', 'blas']
 
 
 ## NlOpt library
@@ -89,4 +85,4 @@ IPOPT_OPT_LIB  = []
 ##
 MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
 MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
-MATLAB_LIB  = ['eng', 'mx','mat']
+MATLAB_LIB  = ['eng', 'mex','mat']

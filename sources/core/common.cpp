@@ -153,12 +153,17 @@ std::ostream& operator<<(std::ostream& out, const timer& t)
 
 unsigned int timer::current_time() const
 {
-#ifdef _WIN32
+#if defined(_WIN32)
 	SYSTEMTIME res;
 	GetSystemTime(&res);
 	return (unsigned int)(res.wSecond + res.wMinute*60 + res.wHour*360);
-#else
-	time_t _t = time(NULL);
-	return (unsigned int)_t;
+#elif defined(__APPLE__)
+	struct timespec _time;
+	gettimeofday(&_time, NULL);
+	return (unsigned int)_time.tv_sec;
+#else	
+	struct timespec _time;
+	clock_gettime(CLOCK_MONOTONIC, &_time);
+	return (unsigned int)_time.tv_sec;
 #endif
 }

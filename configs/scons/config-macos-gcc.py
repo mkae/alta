@@ -18,7 +18,7 @@ LINKFLAGS      = []
 ##
 CORE_LIB       = ['dl']
 SOFT_LIB       = ['core', 'dl']
-PLUGINSLIB     = ['core']
+PLUGIN_LIB     = ['core']
 
 
 ## OpenMP flags
@@ -85,4 +85,4 @@ IPOPT_OPT_LIB  = []
 ##
 MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
 MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
-MATLAB_LIB  = ['eng', 'mex','mat']
+MATLAB_LIB  = ['eng', 'mx','mat']

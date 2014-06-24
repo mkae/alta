@@ -1,2 +1,3 @@
 TEMPLATE = subdirs
-SUBDIRS  = quadprog++-v2
+SUBDIRS  = quadprog++    \
+#           quadprog++-v2

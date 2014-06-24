@@ -7,6 +7,7 @@ cd ../alta-alpha
 # Remove unecessary parts (data, retro plugins, ...)
 rm -rf data
 rm -rf papers
+rm -rf external/quadprog++-v2
 rm -rf sources/tests
 rm -rf sources/matlab
 rm -rf sources/xml

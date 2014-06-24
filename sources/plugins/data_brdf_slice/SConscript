@@ -9,12 +9,14 @@ env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 build_lib = False
 
 conf = Configure(env)
-if conf.CheckLib(env['OPENEXR_LIB']):
+if conf.CheckLibWithHeader(env['OPENEXR_LIB'], 'ImfRgbaFile.h', 'c++'):
 
 	build_lib = True
 
 #end
 env = conf.Finish()
 
-sources = ['data.cpp']
-env.SharedLibrary('../../build/data_brdf_slice', sources)
+if build_lib:
+	sources = ['data.cpp']
+	env.SharedLibrary('../../build/data_brdf_slice', sources)
+#end
