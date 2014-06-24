@@ -26,8 +26,13 @@ else:
 execfile('obtain_eigen.py')
  
 # Download CERES
-obtain.obtain('CERES v1.7.0', 'ceres-solver-1.7.0', 'http://ceres-solver.googlecode.com/files/ceres-solver-1.7.0.tar.gz', 'ceres-solver-1.7.0.tar.gz')
-print '<<WARNING>> CERES installation requires CMake. You need to run it yourself'
+version   = '1.9.0'
+base      = 'ceres-solver'
+name      = 'CERES v' + version
+directory = base + '-' + version
+url       = 'http://ceres-solver.org/ceres-solver-' + version + '.tar.gz'
+filename  = 'ceres-solver-' + version + '.tar.gz'
+obtain.obtain(name, directory, url, filename)
 
 ## Test for the presence of already compiled ceres version in
 ## the $ALTA/external/build directory. Then test for the
@@ -45,7 +50,7 @@ with open(os.devnull, 'w') as fnull:
 
 if  compile_test:
 	print '<<INSTALL>> configure and build CERES'
-	os.chdir('.' + os.sep + 'ceres-solver-1.7.0')
+	os.chdir('.' + os.sep + 'ceres-solver-' + version)
 	build_dir = os.pardir + os.sep + 'build' + os.sep
 
 	libname = ''
@@ -59,7 +64,7 @@ if  compile_test:
 
 	#cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
 	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=ON -DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=ON'
-
+	
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
 		ret = os.system('nmake install')
