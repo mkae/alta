@@ -8,3 +8,8 @@ CONFIG      += ceres
 INCLUDEPATH += $$(ALTA)/external/build/include
 LIBS        += -L$$(ALTA)/external/build/lib \
                -lceres -lglog
+
+macx {
+LIBS        += -lamd -lcamd -lcolamd -lcholmod -lcxsparse
+LIBS        *= -lblas -llapack
+}

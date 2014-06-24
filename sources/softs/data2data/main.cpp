@@ -101,8 +101,16 @@ int main(int argc, char** argv)
 	// Import data
 	ptr<data> d_in = plugins_manager::get_data(args["in-data"]) ;
 	d_in->load(args["input"], args);
+	if(!d_in) 
+	{
+		std::cout << "<<INFO>> input data will be treated as ALTA format" << std::endl;
+	}
 
 	ptr<data> d_out = plugins_manager::get_data(args["out-data"]) ;
+	if(!d_out) 
+	{
+		std::cout << "<<INFO>> data will be outputed to ALTA format" << std::endl;
+	}
 	
 	if(!d_in && !d_out)
 	{
