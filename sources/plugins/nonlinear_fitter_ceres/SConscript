@@ -12,8 +12,10 @@ conf = Configure(env)
 
 if conf.CheckLibWithHeader(env['CERES_LIB'], 'ceres/ceres.h', 'c++'):
 
-	if conf.CheckLib(env['CERES_OPT_LIB']):
-		env.AppendUnique(LIBS = env['CERES_OPT_LIB'])
+	for lib in env['CERES_OPT_LIB']:
+		if conf.CheckLib(lib):
+			env.AppendUnique(LIBS = lib)
+		#end
 	#end
 
 	build_lib = True

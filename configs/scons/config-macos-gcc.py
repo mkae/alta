@@ -58,7 +58,7 @@ QUADPROG_LIB      = ['quadprog++']
 CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
 CERES_LIB      = ['ceres', 'glog']
-CERES_OPT_LIB  = ['gomp', 'lapack', 'blas']
+CERES_OPT_LIB  = ['gomp', 'lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse']
 
 
 ## NlOpt library
