@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <winbase.h>
 #else
+#include <sys/time.h>
 #include <sys/times.h>
 #include <sys/types.h>
 #include <limits.h>
@@ -158,9 +159,9 @@ unsigned int timer::current_time() const
 	GetSystemTime(&res);
 	return (unsigned int)(res.wSecond + res.wMinute*60 + res.wHour*360);
 #elif defined(__APPLE__)
-	struct timespec _time;
-	gettimeofday(&_time, NULL);
-	return (unsigned int)_time.tv_sec;
+    struct timeval _time;
+    gettimeofday(&_time, NULL);
+    return (unsigned int)_time.tv_sec;
 #else	
 	struct timespec _time;
 	clock_gettime(CLOCK_MONOTONIC, &_time);
