@@ -51,12 +51,15 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 		for(int i=0; i<inputs(); ++i) { _p[i] = x(i); }
 		_f->setParameters(_p);
 
+		const int nx = _f->dimX();
+		const int ny = _f->dimY();
+
 		for(int s=0; s<_d->size(); ++s)
 		{
 			vec _x  = _d->get(s);
 		
 			// Convert the sample point into the function space
-			vec x(_f->dimX());
+			vec x(nx);
 			params::convert(&_x[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
@@ -68,13 +71,13 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 				cos = cart[5];
 			}
 
-			vec _di = vec(_f->dimY());
-			for(int i=0; i<_f->dimY(); ++i)
-				_di[i] = _x[_f->dimX() + i];
+			vec _di = vec(ny);
+			for(int i=0; i<ny; ++i)
+				_di[i] = _x[_d->dimX() + i];
 
 			// Should add the resulting vector completely
 			vec _y = _di - cos*_f->value(x);
-			for(int i=0; i<_f->dimY(); ++i)
+			for(int i=0; i<ny; ++i)
 				y(i*_d->size() + s) = _y[i];
 
 		}
