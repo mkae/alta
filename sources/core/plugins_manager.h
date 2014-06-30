@@ -11,10 +11,13 @@
 #include "clustering.h"
 #include "ptr.h"
 
-/*! \brief This class handles the loading of plugins and insure that they can
- *  talk to each others through coordinates transforms.
+/*! \class plugins_manager
+ *  \brief This class permits to load plugin from shared library files.
+ *  \ingroup core
  *
  *  \details
+ *  This class handles the loading of plugins and insure that they can
+ *  talk to each others through coordinates transforms.
  */
 class plugins_manager
 {
@@ -22,6 +25,10 @@ class plugins_manager
 
 		//! \brief get an instance of the function that is defined in the plugin with
 		//! filename n. Return null if no one exist.
+		//!
+		//! \details
+		//! This function try to load the shared object file specified in the
+		//! <code>--func filename</code>.
 		static function* get_function(const arguments& args) ;
 
 		//! \brief load a function from the ALTA input file.
