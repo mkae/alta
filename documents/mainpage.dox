@@ -8,7 +8,8 @@ You can <a href="contacts.html">contact us</a> to get more information
 about its features, roadmap, and missing documentation.
 </center>
 
-<h2>Description</h2>
+<h3>Description</h3>
+
 ALTA is a multi-platform software library to analyze, fit and understand
 BRDFs. It provides a set of command line softwares to fit measured data to
 analytical forms, tools to understand models and data. You can find an
