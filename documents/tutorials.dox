@@ -39,7 +39,7 @@ you will need the following command:
 
 \a brdf2brdf converts an ALTA brdf file into another format such as
 Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
-convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann
+convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann
 distribution).
 
 <br />
