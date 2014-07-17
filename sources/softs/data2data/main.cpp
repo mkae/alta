@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 		std::cout << "                         If none is provided, the exporter will export in ALTA" << std::endl ;
 		std::cout << "                         by default." << std::endl ;
 		std::cout << "  --in-data  [filename]  Name of the plugin used to load the input data file" << std::endl ;
-		std::cout << "                         If none is provided, the exporter will export in ALTA" << std::endl ;
+		std::cout << "                         If none is provided, the exporter will import in ALTA" << std::endl ;
 		std::cout << "                         by default." << std::endl ;
 		std::cout << "  --param    [NAME]      Name of the parametrization used to output data when" << std::endl;
 		std::cout << "                         No output data plugin is specified. Please see " << std::endl;
@@ -121,16 +121,16 @@ int main(int argc, char** argv)
 	if(dynamic_pointer_cast<vertical_segment>(d_out))
 	{
 		params::input param = params::parse_input(args["param"]);
-        if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
+    if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
 		{
-            std::cout << "<<DEBUG>> using the input file input param for the output file." << std::endl;
-            param = d_in->input_parametrization();
+	    std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
+	    param = d_in->input_parametrization();
 		}
-        else if(param == params::UNKNOWN_INPUT)
-        {
-            std::cerr << "<<ERROR>> not parametrization defined for input and output files." << std::endl;
-            return -1;
-        }
+    else if(param == params::UNKNOWN_INPUT)
+    {
+	    std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
+	    return -1;
+    }
 
 		d_out->setParametrization(param);
 		d_out->setDimX(params::dimension(param));
