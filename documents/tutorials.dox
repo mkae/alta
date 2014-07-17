@@ -116,8 +116,7 @@ a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
 
 		<!-- Define the function to use -->
 		<function name="nonlinear_function_diffuse" />
-		<function name="nonlinear_function_beckmann">
-		</function>
+		<function name="nonlinear_function_beckmann" />
 
 		<!-- Define the ftting procedure to use -->
 		<plugin type="fitter" name="nonlinear_fitter_ceres" />
