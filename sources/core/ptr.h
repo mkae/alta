@@ -102,6 +102,13 @@ template<class T> class ptr
 		//! is incremented.
 		ptr<T>& operator=(const ptr<T>& a)
 		{
+		  //RP:  Check and avoid assignment to itself 
+	    if ( (void*) this == (void *) &a)
+	    {
+	        return *this;
+	    }
+
+
 			_counter->decrement();
 			if(_counter->value() < 1)
 			{
