@@ -37,58 +37,59 @@ class params
 		 //!   * The reflected vector is \f$\vec{r} = 2\mbox{dot}(\vec{v}, \vec{n})\vec{n} - \vec{v}\f$
 		 enum input
 		 {
-             RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described in [Rusinkiewicz'98] */
-             RUSIN_TH_PH_TD,
-             RUSIN_TH_TD_PD,
-             RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
-             RUSIN_VH_VD,           /*!< Half-angle parametrization in vector format. Coordinates are:
-				                             [\f$\vec{h}_x, \vec{h}_y, \vec{h}_z, \vec{d}_x, \vec{d}_y, 
-													  \vec{d}_z \f$].*/
-             RUSIN_VH,              /*!< Half-angle parametrization with no difference direction in 
-												     vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
-													  \vec{h}_z\f$]. */
-             COS_TH_TD,
-             COS_TH,
+       RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described in [Rusinkiewicz'98] */
+       RUSIN_TH_PH_TD,
+       RUSIN_TH_TD_PD,
+       RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
+       RUSIN_VH_VD,           /*!< Half-angle parametrization in vector format. Coordinates are:
+                               [\f$\vec{h}_x, \vec{h}_y, \vec{h}_z, \vec{d}_x, \vec{d}_y, 
+  									  \vec{d}_z \f$].*/
+       RUSIN_VH,              /*!< Half-angle parametrization with no difference direction in 
+  								     vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
+  									  \vec{h}_z\f$]. */
+       COS_TH_TD,      /*!< Cosine of the RUSIN_TH_TD parametrization: Coordinates are in 
+                         $[\cos_\theta_h,\cos_\theta_d]$. */
+       COS_TH,
 
-             SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
-             SCHLICK_VK,            /*!< Schlick's back vector */
-				 SCHLICK_TL_TK_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected and
-				                            the parametrization is centered around the back direction.
-													 \f$[\theta_L, x, y] = [\theta_L, \theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
-             COS_TK,                /*!< Schlick's back vector dot product with the normal */
-
-
-				 RETRO_TL_TVL_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected and
-				                             the parametrization is centered around the retro direction
-													  \f$[x, y] = [\theta_{VL} \cos(\Delta\phi), \theta_{VL} 
-													  \sin(\Delta\phi)]\f$.*/
-
-             STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
+       SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
+       SCHLICK_VK,            /*!< Schlick's back vector */
+       SCHLICK_TL_TK_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected and
+                              the parametrization is centered around the back direction.
+  									 \f$[\theta_L, x, y] = [\theta_L, \theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
+       COS_TK,                /*!< Schlick's back vector dot product with the normal */
 
 
-             SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
-				 COS_TLV,               /*!< Dot product between the Light and View vector */
-				 COS_TLR,               /*!< Dot product between the Light and Reflected vector */
-             ISOTROPIC_TV_TL,       /*!< Light and View vectors represented in spherical coordinates, */
-             ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
-                                         with the difference of azimutal coordinates in the last component  */
-				 ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
-				                             Coordinates are: [\f$\theta_v \cos(\Delta\phi), \theta_v 
-													  \sin(\Delta\phi).\f$]*/
-				 ISOTROPIC_TL_TV_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected.
-				                                Coordinates are: [\f$\theta_l, \theta_v \cos(\Delta\phi), 
-														  \theta_v \sin(\Delta\phi).\f$]*/
-             ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
+       RETRO_TL_TVL_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected and
+                               the parametrization is centered around the retro direction
+  									  \f$[x, y] = [\theta_{VL} \cos(\Delta\phi), \theta_{VL} 
+  									  \sin(\Delta\phi)]\f$.*/
 
-				 BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined in Stark et al. [2004].
-				                               Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
-														 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
+       STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
 
-             CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
-				                             We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
-													  v.z, l.x, l.y, l.z] \f$*/
 
-             UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data */
+       SPHERICAL_TL_PL_TV_PV, /*!< Light and View vectors represented in spherical coordinates */
+       COS_TLV,               /*!< Dot product between the Light and View vector */
+       COS_TLR,               /*!< Dot product between the Light and Reflected vector */
+       ISOTROPIC_TV_TL,       /*!< Light and View vectors represented in spherical coordinates, */
+       ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
+                                   with the difference of azimutal coordinates in the last component  */
+       ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
+                               Coordinates are: [\f$\theta_v \cos(\Delta\phi), \theta_v 
+  									  \sin(\Delta\phi).\f$]*/
+       ISOTROPIC_TL_TV_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected.
+                                  Coordinates are: [\f$\theta_l, \theta_v \cos(\Delta\phi), 
+  										  \theta_v \sin(\Delta\phi).\f$]*/
+       ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
+
+       BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined in Stark et al. [2004].
+                                 Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
+  										 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
+
+       CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
+                               We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
+  									  v.z, l.x, l.y, l.z] \f$*/
+
+       UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data */
 		 };
 
 		 //! \brief list of all supported parametrization for the output space.
