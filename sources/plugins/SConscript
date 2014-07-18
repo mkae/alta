@@ -19,6 +19,10 @@ SConscript('nonlinear_function_isotropic_lafortune/SConscript')
 # Building nonlinear masking functions
 SConscript('nonlinear_shadowing_smith/SConscript')
 
+# Building nonlinear Fresnel functions
+SConscript('nonlinear_fresnel_schlick/SConscript')
+SConscript('nonlinear_fresnel_normalized_schlick/SConscript')
+
 # # Building rational fitters
 SConscript('rational_fitter_eigen/SConscript')
 SConscript('rational_fitter_leastsquare/SConscript')

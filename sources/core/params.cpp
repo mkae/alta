@@ -23,13 +23,14 @@ std::map<params::input, const param_info> create_map()
 
 	/* 2D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TH_TD, param_info("COS_TH_TD", 2, "Cosines of the elevation angles of the Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_TL_DPHI, param_info("ISOTROPIC_TV_TL_DPHI", 3, "Isotropic Light/View angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_VH, param_info("RUSIN_VH", 3, "Vector representation of the Half angle only")));
-    _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
+  _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TL_TV_PROJ_DPHI, param_info("ISOTROPIC_TL_TV_PROJ_DPHI", 3, "Isoptropic projected phi parametrization.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_TL_TK_PROJ_DPHI, param_info("SCHLICK_TL_TK_PROJ_DPHI", 3, "Isoptropic projected phi parametrization centered around the back vector.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RETRO_TL_TVL_PROJ_DPHI, param_info("RETRO_TL_TVL_PROJ_DPHI", 3, "Isoptropic retro projected phi parametrization.")));
@@ -498,6 +499,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 }
 params::input params::parse_input(const std::string& txt)
 {
+
 	for(std::map<params::input, const param_info>::const_iterator it=input_map.begin(); it != input_map.end(); ++it)
 	{
 		if(txt.compare(it->second.name) == 0)
