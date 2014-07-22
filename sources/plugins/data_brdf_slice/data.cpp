@@ -10,12 +10,13 @@ data_brdf_slice::data_brdf_slice()
 {
 	// Allocate data
 	width = 512; height = 512;
-	_data = new double[3*width*height];
+	slice = 1;
+	_data = new double[3*width*height*slice];
 
     // Set the input and output parametrization
-    _in_param  = params::RUSIN_TH_TD;
+    _in_param  = params::RUSIN_TH_TD_PD;
     _out_param = params::RGB_COLOR;
-    _nX = 2;
+    _nX = 3;
     _nY = 3;
 }
 
@@ -37,7 +38,7 @@ void data_brdf_slice::load(const std::string& filename, const arguments&)
 
 void data_brdf_slice::save(const std::string& filename) const 
 {
-	if(!t_EXR_IO<double>::SaveEXR(filename.c_str(), width, height, _data))
+	if(!t_EXR_IO<double>::SaveEXR(filename.c_str(), width, slice*height, _data))
 	{
 		std::cerr << "<<ERROR>> unable to save image file" << std::endl;
 	}
@@ -46,16 +47,18 @@ void data_brdf_slice::save(const std::string& filename) const
 // Acces to data
 vec data_brdf_slice::get(int id) const 
 {
-	vec res(5) ;
+	vec res(6) ;
 	const int i = id % width;
-	const int j = id / width;
+	const int k = id / (width*height);
+	const int j = (id - k*width*height) / width;
 
 	res[0] = 0.5*M_PI*(i+0.5) / double(width);
 	res[1] = 0.5*M_PI*(j+0.5) / double(height);
+	res[2] = 0.5*M_PI*(k+0.5) / double(slice);
 
-	res[2] = _data[3*id + 0];
-	res[3] = _data[3*id + 1];
-	res[4] = _data[3*id + 2];
+	res[3] = _data[3*id + 0];
+	res[4] = _data[3*id + 1];
+	res[5] = _data[3*id + 2];
 
 	return res ;
 }
@@ -67,18 +70,18 @@ vec data_brdf_slice::operator[](int i) const
 //! \todo Test this function
 void data_brdf_slice::set(vec x)
 {
-	assert(x.size() == 5);
+	assert(x.size() == 6);
 	assert(x[0] <= 0.5*M_PI && x[0] >= 0.0);
 	assert(x[1] <= 0.5*M_PI && x[1] >= 0.0);
 
-	const int i  = floor(x[0] * width / (0.5*M_PI));
+	const int i  = floor(x[0] * width  / (0.5*M_PI));
 	const int j  = floor(x[1] * height / (0.5*M_PI));
+	const int k  = floor(x[2] * slice  / (0.5*M_PI));
+	const int id = i + j*width + k*width*height;
 
-	const int id = i + j*width;
-
-	_data[3*id + 0] = x[2];
-	_data[3*id + 1] = x[3];
-	_data[3*id + 2] = x[4];
+	_data[3*id + 0] = x[3];
+	_data[3*id + 1] = x[4];
+	_data[3*id + 2] = x[5];
 }
 
 vec data_brdf_slice::value(vec, vec) const
@@ -91,9 +94,10 @@ vec data_brdf_slice::value(vec x) const
 	assert(x[0] <= 0.5*M_PI && x[0] >= 0.0);
 	assert(x[1] <= 0.5*M_PI && x[1] >= 0.0);
 
-	const int i  = floor(x[0] * width / (0.5*M_PI));
+	const int i  = floor(x[0] * width  / (0.5*M_PI));
 	const int j  = floor(x[1] * height / (0.5*M_PI));
-	const int id = i + j*width;
+	const int k  = floor(x[2] * slice  / (0.5*M_PI));
+	const int id = (i + j*width)*k;
 
 	if(i < 0 || i >= width)  { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
 	if(j < 0 || j >= height) { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
@@ -108,7 +112,7 @@ vec data_brdf_slice::value(vec x) const
 // Get data size, e.g. the number of samples to fit
 int data_brdf_slice::size() const 
 {
-	return width*height;
+	return width*height*slice;
 }
 
 // Get min and max input space values
@@ -117,6 +121,7 @@ vec data_brdf_slice::min() const
 	vec res(2);
 	res[0] = 0.0 ;
 	res[1] = 0.0 ;
+	res[2] = 0.0 ;
 	return res ;
 }
 vec data_brdf_slice::max() const
@@ -124,12 +129,13 @@ vec data_brdf_slice::max() const
 	vec res(2);
 	res[0] = M_PI / 2 ;
 	res[1] = M_PI / 2 ;
+	res[2] = M_PI / 2;
 	return res ;
 }
 
 int data_brdf_slice::dimX() const 
 { 
-	return 2 ; 
+	return 3 ; 
 }
 int data_brdf_slice::dimY() const 
 { 

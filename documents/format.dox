@@ -1,37 +1,58 @@
 /*!
 \page format Format
 
-<h2>Common notations</h2>
+_Warning: this document is currently not up to date and should not be followed._
+
+
+Common notations
+----------------
 
 Data and function files have the same format. They are text file very close to dump.
-Each file starts with a header containing :
+Each file starts with a header containing information about the input and output space described. Every header line starts by a '#' symbol. The following information are described:
 
-<h3> Parametrization format </h3>
+ - Whether the file describe a function or a data,
+ - Command line used to generate the file (optional),
+ - Input and output domain dimensions,
+ - Input domain parametrization,
+ - And output domain parametrization.
 
-<ul>
- <li> \verbatim #PARAM_IN   input_parametrization_name  \endverbatim </li>
- <li> \verbatim #PARAM_OUT  output_parametrization_name \endverbatim </li>
-</ul>
+Here is an exemple of a BRDF header:
+
+    #ALTA FUNC HEADER
+    #CMD  --L2 0.0282467 --Linf 0.0935969 --fitter ./librational_fitter_parallel.dylib --input ../../data/1d/NIST/Kirby2/Kirby2.dat --output ../Kirb2.brdf
+    #DIM 1 1
+    #PARAM_IN   UNKNOWN_INPUT
+    #PARAM_OUT  UNKNOWN_OUTPUT
+    #ALTA HEADER END
+
+
+Parametrization format
+----------------------
+
+ - `#PARAM_IN   input_parametrization_name`
+ - `#PARAM_OUT  output_parametrization_name`
  
 
-<h3>Input Parametrization</h3>
+Input Parametrization
+---------------------
 
 ALTA can automaticaly convert samples (either data sample or BRDF 
 evaluation) into a different coordinate system. Here is a non-complete
 list of possible parametrizations:
 
-\verbatim
-	RUSIN_TH_PH_TD,
-	RUSIN_TH_TD_PD,
-	RUSIN_TH_PH_TD_PD,
-	COS_TH_TD, // cosine theta_h, cosine theta_d
-	ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
-	CARTESIAN, // 6D (directions: 3d + 3d)
-	SPHERICAL_TL_PL_TV_PV
-	ISOTROPIC_TV_PROJ_DPHI  //2D Param. (theta_v * cos(|\delta \Phi|), theta_v * sin(|\delta \Phi)|)
-\endverbatim
 
-<h3> Output Parametrization </h3>
+    RUSIN_TH_PH_TD,
+    RUSIN_TH_TD_PD,
+    RUSIN_TH_PH_TD_PD,
+    COS_TH_TD, // cosine theta_h, cosine theta_d
+    ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
+    CARTESIAN, // 6D (directions: 3d + 3d)
+    SPHERICAL_TL_PL_TV_PV
+    ISOTROPIC_TV_PROJ_DPHI  //2D Param. (theta_v * cos(|\delta \Phi|), theta_v * sin(|\delta \Phi)|)
+
+
+Output Parametrization
+----------------------
 
 In the current version of ALTA, we cannot handle different output 
 parametrizations (like LAB color space). Fitting will be performed

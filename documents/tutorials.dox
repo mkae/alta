@@ -102,7 +102,7 @@ Here is the script to perform the same fitting as the previous example. It
 performs the fitting of the blue metallic paint from the MERL database using
 a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
 
-\verbatim
+~~~{.xml}
 <?xml version="1.0"?>
 <alta>
 	<configuration>
@@ -128,7 +128,7 @@ a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
 		<parameter name="export" value="explorer" />
 	</action>
 </alta>
-\endverbatim
+~~~
 
 In this XML example, it is possible to perform fit using a compound function by concatenating multiple function plugins. This is equivalent to providing a list of plugins to the <code>\-\-func</code> argument: <code>\-\-func [libnonlinear_function_diffuse.so, libnonlinear_function_lafortune.so]</code>.
 
@@ -156,11 +156,11 @@ function along its different axis.
 
 <h2>Using the C++ interface</h2>
 
-It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (<code>libcore.a</code> on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
+It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (`libcore.a` on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
 
 The following program produces slices of data files and outputs it on a gnuplot compliant data file. It requires an interpolant data format such as \ref data_merl, \ref data_interpolant (our internal data format is not):
 
-\verbatim
+~~~{.cpp}
 #include <core/args.h>
 #include <core/data.h>
 #include <core/function.h>
@@ -172,12 +172,12 @@ The following program produces slices of data files and outputs it on a gnuplot 
 #include <cmath>
 
 int main(int argc, char** argv) {
-	arguments args(argc, argv);
+    arguments args(argc, argv);
 
-	ptr<data> d = plugins_manager::get_data(args["data"]);
-	d->load(args["data-file"]);
+    ptr<data> d = plugins_manager::get_data(args["data"]);
+    d->load(args["data-file"]);
 
-	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+    std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
 
 	double theta_in = -(M_PI/180) * (double)args.get_float("theta", 0.0f);
 	double phi_in   =  (M_PI/180) * (double)args.get_float("phi", 0.0f);
@@ -204,7 +204,7 @@ int main(int argc, char** argv) {
 		file << std::endl ;
 	}
 }
-\endverbatim
+~~~
 
 The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
 

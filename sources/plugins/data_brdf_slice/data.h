@@ -40,5 +40,6 @@ class data_brdf_slice : public data
 	private: // data
 		double* _data;
 		int width, height;
+		int slice;
 
 } ;

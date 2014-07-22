@@ -148,8 +148,15 @@ class rational_function_1d : public function
 		bool _separable;
 } ;
 
+/*! \brief Rational function define a BRDF model using a ratio of polynomials
+ *  \ingroup core
+ *
+ *  \details
+ *  A rational function define a BRDF model using a ratio of polynomials.
+ */
 class rational_function : public function
 {
+
 	public: // methods
 
 		rational_function() ;
