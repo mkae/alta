@@ -1,17 +1,19 @@
 TARGET          = nonlinear_fitter_ceres
 TEMPLATE        = lib
-CONFIG         *= plugin  \
-						ceres   \
-                  eigen
+CONFIG         *= plugin
 
-DESTDIR         = ../../build
+load(ceres)
+load(eigen)
+
+packagesExist(ceres, eigen) {
+	DESTDIR         = ../../build
  
-INCLUDEPATH    += ../.. 
+	INCLUDEPATH    += ../.. 
 
-HEADERS         = fitter.h
-SOURCES         = fitter.cpp
+	HEADERS         = fitter.h
+	SOURCES         = fitter.cpp
 
-LIBS           += -L../../build \
-                  -lcore
-
+	LIBS           += -L../../build \
+		               -lcore
+}
 

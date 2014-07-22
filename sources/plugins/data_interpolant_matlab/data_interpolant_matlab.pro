@@ -1,15 +1,17 @@
 TEMPLATE        = lib
-CONFIG         *=  plugin \
-						 eigen  \
-                   matlab  
+CONFIG         *=  plugin 
 
-DESTDIR         = ../../build
+load(matlab)
+load(eigen)
 
-INCLUDEPATH    += ../..
-HEADERS         = data.h
-SOURCES         = data.cpp
+packagesExist(matlab, eigen) {
+	DESTDIR         = ../../build
+
+	INCLUDEPATH    += ../..
+	HEADERS         = data.h
+	SOURCES         = data.cpp
 
 
-LIBS           += -L../../build \
-						-lcore        
-
+	LIBS           += -L../../build \
+							-lcore        
+}

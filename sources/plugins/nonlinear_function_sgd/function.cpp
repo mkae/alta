@@ -9,6 +9,11 @@
 
 #define one_pi 0.31830988618
 
+ALTA_DLL_EXPORT function* provide_function()
+{
+    return new shifted_gamma_function();
+}
+
 // Overload the function operator
 vec shifted_gamma_function::operator()(const vec& x) const 
 {
@@ -19,7 +24,7 @@ vec shifted_gamma_function::value(const vec& x) const
 	// shading
 	vec lv(3); lv[0] = x[0]; lv[1] = x[1]; lv[2] = x[2];
 	vec n(3); n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
-	vec ev(3); ev[0] = x[3]; ev[1] = x[4]; ev = x[5];
+	vec ev(3); ev[0] = x[3]; ev[1] = x[4]; ev[2] = x[5];
 	vec halfVector = normalize(lv + ev);
 	
 	double v_h = dot(ev, halfVector);
@@ -68,7 +73,11 @@ vec shifted_gamma_function::parametersJacobian(const vec& x) const
 		
 vec shifted_gamma_function::Fresnel(const vec& F0, const vec& F1, double V_H) const
 {
-	return F0 - V_H * F1  + (1. - F0)*pow(1. - V_H, 5.);
+	vec F(dimY());
+	for(int i=0; i<dimY(); ++i) {
+		F[i] = F0[i] - V_H*F1[i] + (1.0 - F0[i])*pow(1.0 - V_H, 5.0);
+	}
+	return F;
 }
 
 vec shifted_gamma_function::D(const vec& _alpha, const vec& _p, 
@@ -76,22 +85,26 @@ vec shifted_gamma_function::D(const vec& _alpha, const vec& _p,
 {
 	double cos2 = cos_h*cos_h;
 	double tan2 = (1.-cos2)/cos2;
-	vec ax = _alpha + tan2/_alpha;
-	vec exp_pow(3) ;
-	exp_pow[0] = exp(-ax[0]) / pow(ax[0], _p[0]);
-	exp_pow[1] = exp(-ax[1]) / pow(ax[1], _p[1]);
-	exp_pow[2] = exp(-ax[2]) / pow(ax[2], _p[2]);
 
-	return (one_pi / (cos2 * cos2)) * _K;
+	vec D(dimY());
+	for(int i=0; i<dimY(); ++i) {
+		const double ax      = _alpha[i] + tan2/_alpha[i];
+		const double exp_pow = exp(-ax) / pow(ax, _p[i]);
+
+		const double P22 = exp_pow;
+
+		D[i] = P22 * (one_pi / (cos2 * cos2)) * _K[i];
+	}
+	return D;
 }
 
 vec shifted_gamma_function::G1(double theta) const
 {
 	vec exp_shc(3);
-   exp_shc[0] = exp(sh_c[0] * pow(std::max<double>(acos(theta) - sh_theta0[0],0.), sh_k[0]));
-   exp_shc[1] = exp(sh_c[1] * pow(std::max<double>(acos(theta) - sh_theta0[1],0.), sh_k[1]));
-   exp_shc[2] = exp(sh_c[2] * pow(std::max<double>(acos(theta) - sh_theta0[2],0.), sh_k[2]));
-	return 1.0 + sh_lambda * (1.0 - exp_shc);
+	vec G1(dimY());
+	for(int i=0; i<dimY(); ++i)
+	{
+		const double exp_shc = exp(sh_c[i] * pow(std::max<double>(acos(theta) - sh_theta0[i],0.), sh_k[i]));
+		G1[i] =  1.0 + sh_lambda[i] * (1.0 - exp_shc);
+	}
 }
-
-Q_EXPORT_PLUGIN2(shifted_gamma_function, shifted_gamma_function)

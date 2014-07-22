@@ -1,19 +1,17 @@
 TEMPLATE        = lib
-CONFIG         *=  plugin	\
-						 eigen	\
-						 flann
+CONFIG         *=  plugin
 
-DESTDIR         = ../../build
+load(flann)
+load(eigen)
 
-INCLUDEPATH    += ../..
-HEADERS         = data.h
-SOURCES         = data.cpp
+packagesExist(flann, eigen) {
+	DESTDIR         = ../../build
+
+	INCLUDEPATH    += ../..
+	HEADERS         = data.h
+	SOURCES         = data.cpp
 
 
-LIBS           += -L../../build \
-						-lcore        \
-						-lCGAL
-
-unix {
-	QMAKE_CXXFLAGS += -frounding-math 
+	LIBS           += -L../../build \
+							-lcore
 }

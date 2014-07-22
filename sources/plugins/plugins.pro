@@ -25,6 +25,7 @@ SUBDIRS  = \
 	nonlinear_function_diffuse					\
 #	nonlinear_function_microfacets					\
 	nonlinear_function_abc						\
+	nonlinear_function_sgd						\
 	nonlinear_function_beckmann					\
 	nonlinear_function_retrobeckmann				\
 	nonlinear_function_blinn					\
@@ -37,6 +38,6 @@ SUBDIRS  = \
 	data_merl							\
 	data_brdf_slice							\
 	data_interpolant						\
-#	data_interpolant_matlab						\
-#	data_astm
+	data_interpolant_matlab						\
+	data_astm
 

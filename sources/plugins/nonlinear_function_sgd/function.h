@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/rational_function.h>
 #include <core/data.h>
@@ -13,11 +12,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
-class shifted_gamma_function : public nonlinear_function, public QObject
+class shifted_gamma_function : public nonlinear_function
 {
-	Q_OBJECT
-	Q_INTERFACES(function)
-
 	public: // methods
 
 		// Overload the function operator
@@ -29,6 +25,14 @@ class shifted_gamma_function : public nonlinear_function, public QObject
 
 		//! Save the current function to a specific file type
 		virtual void save(const std::string& filename, const arguments& args) const ;
+		
+		//! \brief Export function
+		virtual void save_call(std::ostream& out, const arguments& args) const {
+			NOT_IMPLEMENTED();
+		}
+		virtual void save_body(std::ostream& out, const arguments& args) const {
+			NOT_IMPLEMENTED();
+		}
 		
 		//! Number of parameters to this non-linear function
 		virtual int nbParameters() const ;

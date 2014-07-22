@@ -8,7 +8,6 @@ INCLUDEPATH    += ../..
 HEADERS         = function.h
 SOURCES         = function.cpp
 
-
 LIBS           += -L../../build  \
 						-lcore
 
