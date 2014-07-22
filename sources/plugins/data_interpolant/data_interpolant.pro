@@ -1,11 +1,11 @@
 TEMPLATE        = lib
 CONFIG         *=  plugin
+DESTDIR         = ../../build
 
 load(flann)
 load(eigen)
 
 packagesExist(flann, eigen) {
-	DESTDIR         = ../../build
 
 	INCLUDEPATH    += ../..
 	HEADERS         = data.h

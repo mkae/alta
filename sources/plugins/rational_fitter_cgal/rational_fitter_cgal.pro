@@ -1,13 +1,17 @@
-TEMPLATE        = lib
-CONFIG         += plugin
-CONFIG         -= qt
 
-load(eigen)
 load(cgal)
+load(eigen)
 
-packagesExist(eigen, cgal) {
+
+!contains(CONFIG, eigen)|!contains(CONFIG, cgal) {
+	unset(TARGET)
+} else {
+	TARGET          = rational_fitter_cgal
+	TEMPLATE        = lib
+	CONFIG         += plugin
+	CONFIG         -= qt
 	DESTDIR         = ../../build
- 
+
 	INCLUDEPATH    += ../.. 
 
 	HEADERS         = rational_fitter_cgal.h

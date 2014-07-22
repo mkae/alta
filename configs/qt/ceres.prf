@@ -4,12 +4,20 @@
 # ${ALTA}/external/ceres* directory once the obtain_ceres.py script has
 # been runned. You need to have the env variable ALTA defined.
 
-CONFIG      += ceres
-INCLUDEPATH += $$(ALTA)/external/build/include
-LIBS        += -L$$(ALTA)/external/build/lib \
-               -lceres -lglog
+EXTERNAL     = $$(ALTA)/external/
+EXTERNAL_INC = $${EXTERNAL}/build/include
+EXTERNAL_LIB = $${EXTERNAL}/build/lib
 
-macx {
-LIBS        += -lamd -lcamd -lcolamd -lcholmod -lcxsparse
-LIBS        *= -lblas -llapack
+exists($${EXTERNAL_INC}/ceres/ceres.h) {
+	CONFIG      += ceres
+	INCLUDEPATH += $$(ALTA)/external/build/include
+	LIBS        += -L$$(ALTA)/external/build/lib \
+                  -lceres -lglog
+
+	macx {
+		LIBS     *= -lamd -lcamd -lcolamd -lcholmod -lcxsparse
+		LIBS     *= -lblas -llapack
+	}
+} else {
+	warning("Did not find ceres.h in $${EXTERNAL_INC}/ceres")
 }

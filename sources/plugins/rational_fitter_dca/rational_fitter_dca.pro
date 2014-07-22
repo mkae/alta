@@ -1,10 +1,13 @@
-TARGET          = rational_fitter_dca
-TEMPLATE        = lib
 
 load(eigen)
 load(matlab)
 
-packagesExist(eigen, matlab) {
+!contains(CONFIG, eigen)|!contains(CONFIG, matlab) {
+	unset(TARGET)
+} else {
+	TARGET          = rational_fitter_dca
+	TEMPLATE        = lib
+	CONFIG         *= plugin
 	DESTDIR         = ../../build
  
 	INCLUDEPATH    += ../rational_function \

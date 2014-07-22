@@ -1,11 +1,13 @@
 TEMPLATE        = lib
 CONFIG         *=  plugin 
+DESTDIR         = ../../build
 
 load(matlab)
 load(eigen)
 
-packagesExist(matlab, eigen) {
-	DESTDIR         = ../../build
+!contains(CONFIG, eigen)|!contains(CONFIG, matlab) {
+	unset(TARGET)
+} else {
 
 	INCLUDEPATH    += ../..
 	HEADERS         = data.h

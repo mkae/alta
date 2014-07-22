@@ -16,3 +16,5 @@ win32 {
 }
 	
 LIBS += -lCGAL -lCGAL_Core
+
+message("$${CONFIG}")
