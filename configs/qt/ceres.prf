@@ -12,7 +12,7 @@ exists($${EXTERNAL_INC}/ceres/ceres.h) {
 	CONFIG      += ceres
 	INCLUDEPATH += $$(ALTA)/external/build/include
 	LIBS        += -L$$(ALTA)/external/build/lib \
-                  -lceres -lglog -lminiglog
+                  -lceres -lminiglog
 
 	macx {
 		LIBS     *= -lamd -lcamd -lcolamd -lcholmod -lcxsparse

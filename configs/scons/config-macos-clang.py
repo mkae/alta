@@ -61,7 +61,7 @@ QUADPROG_LIB      = ['quadprog++']
 ##
 CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
-CERES_LIB      = ['ceres', 'glog']
+CERES_LIB      = ['ceres', 'miniglog']
 CERES_OPT_LIB  = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse']
 
 

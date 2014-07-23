@@ -1,5 +1,6 @@
 load(ceres)
 load(eigen)
+load(openmp)
 
 requires(contains(CONFIG, ceres)) 
 requires(contains(CONFIG, eigen))
