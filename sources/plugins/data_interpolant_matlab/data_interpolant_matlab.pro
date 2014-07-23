@@ -1,19 +1,17 @@
+load(matlab)
+load(eigen)
+
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, matlab)) 
+
 TEMPLATE        = lib
 CONFIG         *=  plugin 
 DESTDIR         = ../../build
 
-load(matlab)
-load(eigen)
+INCLUDEPATH    += ../..
+HEADERS         = data.h
+SOURCES         = data.cpp
 
-!contains(CONFIG, eigen)|!contains(CONFIG, matlab) {
-	unset(TARGET)
-} else {
+LIBS           += -L../../build \
+                  -lcore        
 
-	INCLUDEPATH    += ../..
-	HEADERS         = data.h
-	SOURCES         = data.cpp
-
-
-	LIBS           += -L../../build \
-							-lcore        
-}

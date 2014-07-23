@@ -1,20 +1,21 @@
-
 load(eigen)
 load(matlab)
 
-!contains(CONFIG, eigen)|!contains(CONFIG, matlab) {
-	unset(TARGET)
-} else {
-	TARGET          = rational_fitter_matlab
-	TEMPLATE        = lib
-	CONFIG         *= plugin  
-	DESTDIR         = ../../build
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, matlab)) 
 
-	INCLUDEPATH    += ../.. 
 
-	HEADERS         = rational_fitter.h
-	SOURCES         = rational_fitter.cpp
+TARGET          = rational_fitter_matlab
+TEMPLATE        = lib
+CONFIG         *= plugin
+CONFIG         -= qt
 
-	LIBS           += -L../../build        \
-		               -lcore
-}
+DESTDIR         = ../../build
+
+INCLUDEPATH    += ../.. 
+
+HEADERS         = rational_fitter.h
+SOURCES         = rational_fitter.cpp
+
+LIBS           += -L../../build        \
+	               -lcore

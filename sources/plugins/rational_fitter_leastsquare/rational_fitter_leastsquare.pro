@@ -1,8 +1,12 @@
+load(eigen)
+
+requires(contains(CONFIG, eigen))
+
+
 TARGET          = rational_fitter_leastsquare
 
 TEMPLATE        = lib
-CONFIG         *= plugin  \
-                  eigen
+CONFIG         *= plugin
 
 DESTDIR         = ../../build
  
@@ -15,8 +19,3 @@ SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build           \
                   -lcore
-
-
-#QMAKE_CXXFLAGS += -fPIC
-
-

@@ -1,17 +1,18 @@
+load(flann)
+load(eigen)
+
+requires(contains(CONFIG, flann))
+requires(contains(CONFIG, eigen))
+
 TEMPLATE        = lib
 CONFIG         *=  plugin
 DESTDIR         = ../../build
 
-load(flann)
-load(eigen)
-
-packagesExist(flann, eigen) {
-
-	INCLUDEPATH    += ../..
-	HEADERS         = data.h
-	SOURCES         = data.cpp
+INCLUDEPATH    += ../..
+HEADERS         = data.h
+SOURCES         = data.cpp
 
 
-	LIBS           += -L../../build \
-							-lcore
-}
+LIBS           += -L../../build \
+                  -lcore
+
