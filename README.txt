@@ -1,4 +1,12 @@
-This is the repository for the ALTA Project
+This is the repository for the ALTA library. ALTA is a set of cross-platform
+command line executables and shared object plugins allowing to analyze, fit 
+and understand BRDF data and models.
+
+ALTA targets: people working on BRDFs and willing to benchmark new BRDF models
+and compare them with state-of-the-art BRDF models and  data easily; people 
+working on optical measurements and wanting to experiment different fitting 
+procedures and models; or people wanting to perform statistical analysis on
+your BRDF data.
 
 
 1. Repository Organization

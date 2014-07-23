@@ -19,6 +19,11 @@ if env.GetOption('clean'):
 	
 else:
 	##
+	#   IpOpt dependancies
+	##
+	execfile('obtain_ipopt.py')
+
+	##
 	#   NlOpt dependancies
 	##
 	execfile('obtain_nlopt.py')

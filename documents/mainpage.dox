@@ -24,6 +24,7 @@ ALTA is part of the [ANR 11-BS02-006][alta-anr], a research project on light tra
 
 You are working on BRDFs and you want to **benchmark new BRDF models** and compare them with state-of-the-art BRDF models and data easily. You have working on optical measurements and you want **experiment different fitting procedures and models**, or just perform **statistical analysis** on your data.
 
+
 ### Features
 
 Here is a list of the major features in the ALTA library (you can find the complete list in the \ref features page):
@@ -44,7 +45,9 @@ Here is a list of the major features in the ALTA library (you can find the compl
 </center>
 
 
-## Download and install
+
+Download and install
+--------------------
 
 ### Obtain sources
 
@@ -53,6 +56,7 @@ To access the sources of ALTA, you can download the alpha sources:
 <center>
 http://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz
 </center>
+
 
 ### Build
 
@@ -64,6 +68,7 @@ You can build ALTA using either [qmake](http://qt-project.org) or [scons](http:/
 You need to provide a platform dependant configuration file. You will find examples of such configuration files in the $ALTA/configs/scons directory. Running this command should obtain some of ALTA's dependencies (such as Eigen) and compile the main package of the library (i.e. the core, the programs, and some plugins).
 
 To use qmake, or for a more detailed view of ALTA's building scripts and dependencies, please refer to \ref install.
+
 
 
 ### How to use it
@@ -88,6 +93,7 @@ To convert this brdf file (in ALTA \ref format), you will need another command:
 \a brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann distribution).
 
 You can find more examples of how to use ALTA on the \ref tutorials page.
+
 
 
 ### Contribute
