@@ -34,40 +34,72 @@ vec shifted_gamma_function::value(const vec& x) const
 	if (n_l < 0.0) inLight = 0.0;
 	double n_v = dot(n, ev);
 
-	return one_pi * inLight * (n_l * rho_d + rho_s * 
-          D(alpha, p, n_h, K_ap) * G1(n_l) * G1 (n_v) * 
-			 Fresnel(F_0, F_1, v_h));
-}
-
-//! Load function specific files
-void shifted_gamma_function::load(const std::string& filename) 
-{
-}
-
-//! Save the current function to a specific file type
-void shifted_gamma_function::save(const std::string& filename, const arguments& args) const 
-{
+	return one_pi * inLight * (n_l * rho_d + rho_s.cwiseProduct(D(alpha, p, n_h, K_ap)).cwiseProduct(G1(n_l)).cwiseProduct(G1 (n_v)).cwiseProduct(Fresnel(F_0, F_1, v_h)));
 }
 
 //! Number of parameters to this non-linear function
 int shifted_gamma_function::nbParameters() const 
 {
+	return 11*dimY();
 }
 
 //! Get the vector of parameters for the function
 vec shifted_gamma_function::parameters() const 
 {
+	const int n = dimY();
+
+	vec res(nbParameters());
+	for(int i=0; i<n; ++i) {
+		res[i +  0*n] = sh_c[i];
+		res[i +  1*n] = sh_theta0[i];
+		res[i +  2*n] = sh_k[i];
+		res[i +  3*n] = sh_lambda[i];
+		res[i +  4*n] = p[i];
+		res[i +  5*n] = F_0[i];
+		res[i +  6*n] = F_1[i];
+		res[i +  7*n] = K_ap[i];
+		res[i +  8*n] = rho_d[i];
+		res[i +  9*n] = rho_s[i];
+		res[i + 10*n] = alpha[i];
+	}
+
+	return res;
 }
 
 //! Update the vector of parameters for the function
-void shifted_gamma_function::setParameters(const vec& p) 
+void shifted_gamma_function::setParameters(const vec& pi) 
 {
+	const int n = dimY();
+	for(int i=0; i<n; ++i) {
+		sh_c[i]      = pi[i +  0*n];
+		sh_theta0[i] = pi[i +  1*n];
+		sh_k[i]      = pi[i +  2*n];
+		sh_lambda[i] = pi[i +  3*n];
+		p[i]         = pi[i +  4*n];
+		F_0[i]       = pi[i +  5*n];
+		F_1[i]       = pi[i +  6*n];
+		K_ap[i]      = pi[i +  7*n];
+		rho_d[i]     = pi[i +  8*n];
+		rho_s[i]     = pi[i +  9*n];
+		alpha[i]     = pi[i + 10*n];
+	}
+
 }
 
 //! Obtain the derivatives of the function with respect to the 
-//! parameters. 
-vec shifted_gamma_function::parametersJacobian(const vec& x) const 
-{
+//! parameters. \TODO
+vec shifted_gamma_function::parametersJacobian(const vec& x) const {
+	
+	const int n = dimY();
+    vec jac(n*nbParameters());
+
+	 for(int i=0; i<n; ++i) {
+		 for(int j=0; j<nbParameters(); ++j) {
+		 	jac[i + j*n] = 0.0;
+		 }
+	 }
+
+    return jac;
 }
 
 		
@@ -100,11 +132,11 @@ vec shifted_gamma_function::D(const vec& _alpha, const vec& _p,
 
 vec shifted_gamma_function::G1(double theta) const
 {
-	vec exp_shc(3);
 	vec G1(dimY());
 	for(int i=0; i<dimY(); ++i)
 	{
 		const double exp_shc = exp(sh_c[i] * pow(std::max<double>(acos(theta) - sh_theta0[i],0.), sh_k[i]));
 		G1[i] =  1.0 + sh_lambda[i] * (1.0 - exp_shc);
 	}
+	return G1;
 }
