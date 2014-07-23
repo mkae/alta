@@ -85,10 +85,6 @@ p.endtd {
 
 /* @end */
 
-caption {
-	font-weight: bold;
-}
-
 span.legend {
         font-size: 70%;
         text-align: center;
@@ -755,20 +751,19 @@ address {
 }
 
 table.doxtable {
+	font-size:90%;
 	border-collapse:collapse;
-        margin-top: 4px;
-        margin-bottom: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 table.doxtable td, table.doxtable th {
-	border: 1px solid #2D4068;
+	font-weight:normal;
 	padding: 3px 7px 2px;
 }
 
 table.doxtable th {
-	background-color: #374F7F;
-	color: #FFFFFF;
-	font-size: 110%;
+	color: #000000;
 	padding-bottom: 4px;
 	padding-top: 5px;
 }
@@ -835,7 +830,6 @@ table.fieldtable {
         border-top-right-radius: 4px;
         border-bottom: 1px solid #A8B8D9;
 }
-
 
 .tabsearch {
 	top: 0px;
@@ -1076,7 +1070,8 @@ dl.section dd {
 
 .caption
 {
-	font-weight: bold;
+	font-size:90%;	
+	font-weight: normal;
 }
 
 div.zoom

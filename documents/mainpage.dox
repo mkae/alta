@@ -8,79 +8,53 @@ You can <a href="contacts.html">contact us</a> to get more information
 about its features, roadmap, and missing documentation.
 </center>
 
-<h3>Description</h3>
 
-ALTA is a multi-platform software library to analyze, fit and understand
-BRDFs. It provides a set of command line softwares to fit measured data to
-analytical forms, tools to understand models and data. You can find an
-overview presentation of ALTA <a href="http://hal.inria.fr/hal-01016531">here</a>.
+### Description
 
-ALTA is part of the <a href="http://maverick.inria.fr/Projets/ALTA/ ">
-ANR 11-BS02-006</a>, a research project on light transport analysis.
+ALTA is a multi-platform software library to analyze, fit and understand BRDFs. It provides a set of command line softwares to fit measured data to analytical forms, tools to understand models and data. You can find an overview presentation of ALTA [here][alta-wk].
 
-<h3>Target audience</h3>
-You are working on BRDFs and you want to  <b>benchmark new BRDF models</b> and
-compare them with state-of-the-art BRDF models and data easily. You have working
-on optical measurements and you want <b>experiment different fitting procedures
-and models</b>, or just perform <b>statistical analysis</b> on your data.
+  [alta-wk]: http://hal.inria.fr/hal-01016531
 
-<h3>Features</h3>
+ALTA is part of the [ANR 11-BS02-006][alta-anr], a research project on light transport analysis.
 
-Here is a list of the major features in the ALTA library (you can find
-the complete list in the \ref features page):
+  [alta-anr]: http://hal.inria.fr/hal-01016531
+
+
+### Target audience
+
+You are working on BRDFs and you want to **benchmark new BRDF models** and compare them with state-of-the-art BRDF models and data easily. You have working on optical measurements and you want **experiment different fitting procedures and models**, or just perform **statistical analysis** on your data.
+
+### Features
+
+Here is a list of the major features in the ALTA library (you can find the complete list in the \ref features page):
 
  + Open common BRDF data formats (MERL, ASTM)
-
  + Non-linear fitting of BRDF (using third party packages)
-
  + Rational interpolation of BRDF
-
  + Analytic BRDF models (see \ref functions)
-
  + Scripting mechanism to automatize fitting
 
 
-<h3>Sample results</h3>
+### Sample results
 
 <center>
-	<table  border="0" style='text-align:center'>
-	<tr>
-		<td>
-		\image html sample_result_01.png 
-		</td>
-		<td>
-		\image html sample_result_02.png 
-		</td>
-		<td>
-		\image html sample_result_03.png 
-		</td>
-	</tr>
-	<tr>
-		<td>
-		Lafortune lobe 
-		</td>
-		<td>
-		Blinn lobe
-		</td>
-		<td>
-		Beckmann lobe
-		</td>
-	</tr>
-	</table>
-	<caption>Fitting the MERL database with nonlinear lobe functions</caption>
+|          `blue-metallic-paint`          |       `gold-metallic-paint`          |             `black-phenolic`           |
+|---------------------------------------- | ------------------------------------ | -------------------------------------- |
+| ![Lafortune lobe](sample_result_01.png) | ![Blinn lobe](sample_result_02.png)  | ![Beckmann lobe](sample_result_03.png) |
 </center>
 
-<br />
 
-<h2>Download and install</h2>
+## Download and install
 
-<h3>Obtain sources</h3>
+### Obtain sources
 
 To access the sources of ALTA, you can download the alpha sources:
 
- <center>[http://alta.gforge.inria.fr/downloads/alta-alpha.zip](http://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz)</center>
+<center>
+http://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz
+</center>
 
-<h3>Build</h3>
+### Build
 
 You can build ALTA using either [qmake](http://qt-project.org) or [scons](http://www.scons.org). To start, we advise to use scons as it is lightweight and only requires Python to be installed (ALTA uses Python for its high level scripting mechanism). To build using scons, go to the root directory of ALTA and type:
 
@@ -91,9 +65,8 @@ You need to provide a platform dependant configuration file. You will find examp
 
 To use qmake, or for a more detailed view of ALTA's building scripts and dependencies, please refer to \ref install.
 
-<br />
 
-<h2>How to use it</h2>
+### How to use it
 
 ALTA uses command line programs to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions which correspond to BRDF models, \ref datas which correspond to BRDF measurments, and \ref fitters which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
 
@@ -112,17 +85,18 @@ To convert this brdf file (in ALTA \ref format), you will need another command:
     $ ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
 
 
-\a brdf2brdf converts an ALTA brdf file into another format such as
-Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann distribution).
+\a brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann distribution).
 
 You can find more examples of how to use ALTA on the \ref tutorials page.
 
-<br />
 
-<h2>Contribute</h2>
+### Contribute
 
 There are many ways in which you can extend ALTA. Please refer to 
 \ref contribute for more information.
+
+
+
 
 <br />
 <center>
