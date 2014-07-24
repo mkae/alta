@@ -5,7 +5,7 @@ requires(contains(CONFIG, flann))
 requires(contains(CONFIG, eigen))
 
 TEMPLATE        = lib
-CONFIG         *=  plugin
+CONFIG         *= plugin
 DESTDIR         = ../../build
 
 INCLUDEPATH    += ../..
