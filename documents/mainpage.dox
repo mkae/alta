@@ -65,13 +65,14 @@ You can build ALTA using either [qmake](http://qt-project.org) or [scons](http:/
     $ scons --cfg=[filename] -i
 
 
-You need to provide a platform dependant configuration file. You will find examples of such configuration files in the $ALTA/configs/scons directory. Running this command should obtain some of ALTA's dependencies (such as Eigen) and compile the main package of the library (i.e. the core, the programs, and some plugins).
+You need to provide a platform dependant configuration file. You will find examples of such configuration files in the `$ALTA/configs/scons` directory. Running this command should obtain some of ALTA's dependencies (such as Eigen) and compile the main package of the library (i.e. the core, the programs, and some plugins).
 
 To use qmake, or for a more detailed view of ALTA's building scripts and dependencies, please refer to \ref install.
 
 
 
-### How to use it
+How to use it
+-------------
 
 ALTA uses command line programs to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions which correspond to BRDF models, \ref datas which correspond to BRDF measurments, and \ref fitters which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
 
@@ -81,7 +82,7 @@ After compiling the different programss and plugins, go to the sources directory
 
 Tada! You have produced your first fit. The produced output is a 1D rational function, using a monomial basis, interpolating the [Kirby2](http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml) dataset. You can find an ALTA compatible version of this dataset [here](http://alta.gforge.inria.fr/data/Kirby2.dat). Note that this fit is not a BRDF.
 
-\image html Kirby2.png
+![Fitting the Kirby2 dataset with a rational polynomial](Kirby2.png) 
 
 The \a data2brdf is one of many \ref commands available in ALTA. It allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
 
@@ -96,12 +97,11 @@ You can find more examples of how to use ALTA on the \ref tutorials page.
 
 
 
-### Contribute
+Contribute
+----------
 
 There are many ways in which you can extend ALTA. Please refer to 
 \ref contribute for more information.
-
-
 
 
 <br />
