@@ -6,11 +6,15 @@
 #
 
 unix:!macx{
-  INCLUDEPATH += /usr/include/
-  LIBS += -L/usr/lib/x86_64-linux-gnu -lflann
+	CONFIG      *= flann
+	INCLUDEPATH *= /usr/include/
+	LIBS        *= -L/usr/lib/x86_64-linux-gnu
+	LIBS        *= -lflann
 }
 
 macx{
-  INCLUDEPATH += /opt/local/include
-  LIBS += -L/opt/local/lib -lflann
+	CONFIG      *= flann
+	INCLUDEPATH *= /opt/local/include
+	LIBS        *= -L/opt/local/lib
+	LIBS        *= -lflann
 }

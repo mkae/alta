@@ -4,6 +4,16 @@
 # ${ALTA}/external/nlopt* directory once the obtain_nlopt.py script has
 # been runned. You need to have the env variable ALTA defined.
 
-INCLUDEPATH += $$(ALTA)/external/build/include
-LIBS        += -L$$(ALTA)/external/build/lib \
-               -lnlopt
+EXTERNAL     = $$(ALTA)/external/
+EXTERNAL_INC = $${EXTERNAL}/build/include
+EXTERNAL_LIB = $${EXTERNAL}/build/lib
+
+exists($${EXTERNAL_INC}/nlopt.h) {
+	CONFIG      += nlopt
+
+	INCLUDEPATH += $$(ALTA)/external/build/include
+	LIBS        += -L$$(ALTA)/external/build/lib \
+		            -lnlopt
+} else {
+	warning("Did not find nlopt.h in $${EXTERNAL_INC}")
+}

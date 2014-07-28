@@ -1,7 +1,10 @@
+load(eigen)
+
+requires(contains(CONFIG, eigen))
+
 TARGET          = nonlinear_fitter_eigen
 TEMPLATE        = lib
-CONFIG         *= plugin  \
-                  eigen
+CONFIG         *= plugin
 
 DESTDIR         = ../../build
  

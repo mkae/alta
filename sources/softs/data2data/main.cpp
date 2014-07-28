@@ -118,6 +118,9 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->input_parametrization())
+	          << " to " << params::get_name(d_out->input_parametrization()) << std::endl;
+
 	if(dynamic_pointer_cast<vertical_segment>(d_out))
 	{
 		params::input param = params::parse_input(args["param"]);
@@ -156,9 +159,17 @@ int main(int argc, char** argv)
 	}
 	else
 	{
+		if(d_out->output_parametrization() != d_in->output_parametrization())
+		{
+			std::cerr << "<<WARNING>> data types have different output parametrizations." << std::endl;
+			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
+		}
+
 		if(d_out->dimY() != d_in->dimY())
 		{
-			std::cerr << "<<ERROR>> data types have incompatible output dimensions" << std::endl;
+			std::cerr << "<<WARNING>> data types have different output dimensions (" << d_in->dimY() 
+			          << " and " << d_out->dimY() << ")." << std::endl;
+			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
 		}
 
 		vec temp(d_in->dimX());
@@ -169,11 +180,7 @@ int main(int argc, char** argv)
 			params::convert(&x[0], d_out->parametrization(), d_in->parametrization(), &temp[0]);
 
 			vec y = d_in->value(temp);
-
-			for(int j=0; j<d_in->dimY(); ++j)
-			{
-				x[d_out->dimX() + j] = y[j];
-			}
+			params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
 
 			d_out->set(x);
 		}	

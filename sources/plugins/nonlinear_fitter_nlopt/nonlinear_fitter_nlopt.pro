@@ -1,19 +1,19 @@
-TARGET          = nonlinear_fitter_nlopt
-TEMPLATE        = lib
-CONFIG         *= plugin
-
 load(eigen)
 load(nlopt)
 
-packagesExist(eigen, nlopt) {
-	DESTDIR         = ../../build
- 
-	INCLUDEPATH    += ../.. 
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, nlopt))
 
-	HEADERS         = fitter.h
-	SOURCES         = fitter.cpp
 
-	LIBS           += -L../../build \
-	                  -lcore
-}
+TARGET          = nonlinear_fitter_nlopt
+TEMPLATE        = lib
+CONFIG         *= plugin
+DESTDIR         = ../../build
 
+INCLUDEPATH    += ../.. 
+
+HEADERS         = fitter.h
+SOURCES         = fitter.cpp
+
+LIBS           += -L../../build \
+                  -lcore

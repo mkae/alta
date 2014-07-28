@@ -1,15 +1,16 @@
 TEMPLATE        = lib
-CONFIG         *=  qt     \
-                   plugin
-
+CONFIG         *= plugin
 DESTDIR         = ../../build
 
-INCLUDEPATH    += ../..
-HEADERS         = data.h
-SOURCES         = data.cpp
+load(eigen)
+
+packagesExist(ceres, eigen) {
+
+	INCLUDEPATH    += ../..
+	HEADERS         = data.h
+	SOURCES         = data.cpp
 
 
-LIBS           += -L../../build \
-						-lcore
-
-
+	LIBS           += -L../../build \
+							-lcore
+}

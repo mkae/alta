@@ -5,7 +5,6 @@
 #include <string>
 
 // Interface
-#include <QObject>
 #include <core/function.h>
 #include <core/rational_function.h>
 #include <core/data.h>
@@ -13,22 +12,27 @@
 #include <core/args.h>
 #include <core/common.h>
 
-class shifted_gamma_function : public nonlinear_function, public QObject
+class shifted_gamma_function : public nonlinear_function
 {
-	Q_OBJECT
-	Q_INTERFACES(function)
-
 	public: // methods
+
+		shifted_gamma_function()
+		{
+			setParametrization(params::CARTESIAN);
+			setDimX(6);
+		}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;
 
-		//! Load function specific files
-		virtual void load(const std::string& filename) ;
-
-		//! Save the current function to a specific file type
-		virtual void save(const std::string& filename, const arguments& args) const ;
+		//! \brief Export function
+		virtual void save_call(std::ostream& out, const arguments& args) const {
+			NOT_IMPLEMENTED();
+		}
+		virtual void save_body(std::ostream& out, const arguments& args) const {
+			NOT_IMPLEMENTED();
+		}
 		
 		//! Number of parameters to this non-linear function
 		virtual int nbParameters() const ;
@@ -42,6 +46,24 @@ class shifted_gamma_function : public nonlinear_function, public QObject
 		//! Obtain the derivatives of the function with respect to the 
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
+
+		//! Update the parameter vectors
+		void setDimY(int nY) {
+    		nonlinear_function::setDimY(nY);
+
+    		// Update the length of the vectors
+    		sh_c      = vec::Zero(nY);
+    		sh_theta0 = vec::Zero(nY);
+    		sh_k      = vec::Zero(nY);
+    		sh_lambda = vec::Zero(nY);
+    		p         = vec::Zero(nY);
+    		F_0       = vec::Zero(nY);
+    		F_1       = vec::Zero(nY);
+    		K_ap      = vec::Zero(nY);
+    		rho_d     = vec::Zero(nY);
+    		rho_s     = vec::Zero(nY);
+    		alpha     = vec::Zero(nY); alpha.fill(1.0);
+		}
 
 	private:
 		//! Fresnel term of the microfacet distribution

@@ -1,20 +1,19 @@
-TARGET          = nonlinear_fitter_ipopt
-TEMPLATE        = lib
-CONFIG         *= plugin
-
 load(eigen)
 load(ipopt)
 
-packagesExist(eigen, ipopt) {
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, ipopt))
 
-	DESTDIR         = ../../build
+
+TARGET          = nonlinear_fitter_ipopt
+TEMPLATE        = lib
+CONFIG         *= plugin
+DESTDIR         = ../../build
  
-	INCLUDEPATH    += ../.. 
+INCLUDEPATH    += ../.. 
 
-	HEADERS         = fitter.h
-	SOURCES         = fitter.cpp
+HEADERS         = fitter.h
+SOURCES         = fitter.cpp
 
-	LIBS           += -L../../build \
-	                  -lcore
-}
-
+LIBS           += -L../../build \
+                  -lcore

@@ -52,6 +52,8 @@ void data_interpolant::load(const std::string& filename)
 	setDimY(_data->dimY());
 	setMin(_data->min());
 	setMax(_data->max());
+	setParametrization(_data->input_parametrization());
+	setParametrization(_data->output_parametrization());
 
 #ifdef USE_DELAUNAY
 	dD = dimX()+dimY();

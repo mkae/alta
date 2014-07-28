@@ -1,7 +1,11 @@
+load(eigen)
+
+requires(contains(CONFIG, eigen))
+
+
 TARGET          = rational_fitter_eigen
 TEMPLATE        = lib
-CONFIG         *= plugin  \
-                  eigen
+CONFIG         *= plugin
 
 DESTDIR         = ../../build
  

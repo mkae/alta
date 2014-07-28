@@ -1,20 +1,21 @@
-TARGET          = rational_fitter_matlab
-TEMPLATE        = lib
-CONFIG         *= plugin  
-
 load(eigen)
 load(matlab)
 
-packagesExist(eigen,matlab) {
-	DESTDIR         = ../../build
- 
-	INCLUDEPATH    += ../rational_function \
-		               ../rational_data     \
-			            ../.. 
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, matlab)) 
 
-	HEADERS         = rational_fitter.h
-	SOURCES         = rational_fitter.cpp
 
-	LIBS           += -L../../build        \
-		               -lcore
-}
+TARGET          = rational_fitter_matlab
+TEMPLATE        = lib
+CONFIG         *= plugin
+CONFIG         -= qt
+
+DESTDIR         = ../../build
+
+INCLUDEPATH    += ../.. 
+
+HEADERS         = rational_fitter.h
+SOURCES         = rational_fitter.cpp
+
+LIBS           += -L../../build        \
+	               -lcore

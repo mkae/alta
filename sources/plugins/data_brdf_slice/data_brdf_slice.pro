@@ -1,7 +1,11 @@
+load(openexr)
+load(eigen)
+
+requires(contains(CONFIG, openexr))
+requires(contains(CONFIG, eigen))
+
 TEMPLATE        = lib
-CONFIG         *=  plugin  \
-						 eigen   \
-						 openexr
+CONFIG         *=  plugin
 
 DESTDIR         = ../../build
 
@@ -11,4 +15,4 @@ SOURCES         = data.cpp
 
 
 LIBS           += -L../../build   \
-						-lcore          
+                  -lcore          

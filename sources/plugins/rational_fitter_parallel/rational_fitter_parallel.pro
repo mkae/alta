@@ -1,9 +1,14 @@
+load(eigen)
+load(quadprog)
+load(openmp)
+
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, quadprog))
+
+
 TARGET          = rational_fitter_parallel
 TEMPLATE        = lib
-CONFIG         *= plugin     \
-						eigen      \
-						quadprog   \
-						openmp
+CONFIG         *= plugin
 
 DESTDIR         = ../../build
  
@@ -16,8 +21,4 @@ HEADERS         = rational_fitter.h   \
 SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build       \
-						-lcore	
-
-#QMAKE_CXXFLAGS += -fPIC
-#QMAKE_CXXFLAGS += -g
-
+                  -lcore	

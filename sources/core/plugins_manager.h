@@ -41,7 +41,7 @@ class plugins_manager
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
 		static ptr<fitter> get_fitter(const std::string& n) ;
-
+		
 
 		//! \brief check if a data object and a function object are compatibles.
 		//! this has to be done before fitting to ensure that the

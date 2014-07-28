@@ -54,7 +54,7 @@ vec data_brdf_slice::get(int id) const
 
 	res[0] = 0.5*M_PI*(i+0.5) / double(width);
 	res[1] = 0.5*M_PI*(j+0.5) / double(height);
-	res[2] = 0.5*M_PI*(k+0.5) / double(slice);
+	res[2] = M_PI*(k+0.5) / double(slice);
 
 	res[3] = _data[3*id + 0];
 	res[4] = _data[3*id + 1];
@@ -76,7 +76,7 @@ void data_brdf_slice::set(vec x)
 
 	const int i  = floor(x[0] * width  / (0.5*M_PI));
 	const int j  = floor(x[1] * height / (0.5*M_PI));
-	const int k  = floor(x[2] * slice  / (0.5*M_PI));
+	const int k  = floor(x[2] * slice  / (M_PI));
 	const int id = i + j*width + k*width*height;
 
 	_data[3*id + 0] = x[3];
@@ -96,7 +96,7 @@ vec data_brdf_slice::value(vec x) const
 
 	const int i  = floor(x[0] * width  / (0.5*M_PI));
 	const int j  = floor(x[1] * height / (0.5*M_PI));
-	const int k  = floor(x[2] * slice  / (0.5*M_PI));
+	const int k  = floor(x[2] * slice  / (M_PI));
 	const int id = (i + j*width)*k;
 
 	if(i < 0 || i >= width)  { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
@@ -129,7 +129,7 @@ vec data_brdf_slice::max() const
 	vec res(2);
 	res[0] = M_PI / 2 ;
 	res[1] = M_PI / 2 ;
-	res[2] = M_PI / 2;
+	res[2] = M_PI;
 	return res ;
 }
 

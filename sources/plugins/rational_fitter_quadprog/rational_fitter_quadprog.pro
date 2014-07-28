@@ -1,8 +1,13 @@
+load(eigen)
+load(quadprog)
+
+requires(contains(CONFIG, eigen))
+requires(contains(CONFIG, quadprog))
+
+
 TARGET          = rational_fitter_quadprog
 TEMPLATE        = lib
-CONFIG         *= plugin     \
-						eigen      \
-						quadprog 
+CONFIG         *= plugin
 
 DESTDIR         = ../../build
  
@@ -14,7 +19,4 @@ HEADERS         = rational_fitter.h
 SOURCES         = rational_fitter.cpp
 
 LIBS           += -L../../build        \
-						-lcore	
-
-#QMAKE_CXXFLAGS += -fPIC
-
+                  -lcore	

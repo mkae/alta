@@ -3,16 +3,26 @@
 # Configuration file for CGAL library in the case where it is installed in
 # the default location for your configuration.
 
-CONFIG += cgal
+unix {
+	exists("/usr/include/CGAL/version.h") {
+		CONFIG *= cgal
+		LIBS   += -lCGAL -lCGAL_Core
+	}
+}
 
 macx {
-	INCLUDEPATH += /opt/local/include
-	LIBS        += -L/opt/local/lib
+	exists("/opt/local/include/CGAL/version.h") {
+		CONFIG      *= cgal
+		INCLUDEPATH *= /opt/local/include
+		LIBS        *= -L/opt/local/lib
+		LIBS        += -lCGAL -lCGAL_Core
+	}
 }
 
 win32 {
-	INCLUDEPATH += "C:\Program Files\CGAL-4.4\include"
-	LIBS        += -L"C:\Program Files\CGAL-4.4\lib"
+	exists("C:\Program Files\CGAL-4.4\include\CGAL\version.h") {
+		CONFIG      *= cgal
+		INCLUDEPATH *= "C:\Program Files\CGAL-4.4\include"
+		LIBS        *= -L"C:\Program Files\CGAL-4.4\lib"
+	}
 }
-	
-LIBS += -lCGAL -lCGAL_Core
