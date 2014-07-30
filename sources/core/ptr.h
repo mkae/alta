@@ -23,6 +23,11 @@
 #include <memory>
 template<class T> using ptr = std::shared_ptr<T>;
 
+template<class T, class U> 
+inline ptr<U> dynamic_pointer_cast(const ptr<T>& ptr_t) {
+	return std::dynamic_pointer_cast<U>(ptr_t);
+}
+
 #else
 
 /*  Define a counter class. This class should not be used by any other part of
