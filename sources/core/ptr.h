@@ -18,7 +18,8 @@
  *
  * See htpp://stackoverflow.com/questions/11886288/ 
  */
-#if __cplusplus >= 201103L
+#if TODO
+ //__cplusplus >= 201103L
 
 #include <memory>
 template<class T> using ptr = std::shared_ptr<T>;
