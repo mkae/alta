@@ -18,7 +18,7 @@
  *
  * See htpp://stackoverflow.com/questions/11886288/ 
  */
-#if TODO
+#if defined(TODO)
  //__cplusplus >= 201103L
 
 #include <memory>

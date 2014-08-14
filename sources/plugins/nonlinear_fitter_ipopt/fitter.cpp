@@ -110,7 +110,7 @@ class altaNLP : public Ipopt::TNLP
 
 				// Compute the difference vector and add its
 				// components to the obj_value
-				vec _y = _di - (*_f)(x);
+				vec _y = _di - _f->value(x);
 				for(int i=0; i<_f->dimY(); ++i)
 				{
 					obj_value += pow(_y[i], 2);
@@ -149,7 +149,7 @@ class altaNLP : public Ipopt::TNLP
 
 				// Compute the difference vector and add its
 				// components to the obj_value
-				vec _y = (*_f)(x) - _di;
+				vec _y = _f->value(x) - _di;
 
 				// Get the jacobian of the function at position x_i for the current
 				// set of parameters (set prior to function call)

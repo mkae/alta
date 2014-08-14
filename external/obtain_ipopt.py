@@ -12,25 +12,33 @@ obtain.obtain('IpOpt v3.11.8', 'Ipopt-3.11.8', 'http://www.coin-or.org/download/
 ## presence of cmake.
 compile_test = not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'Ipopt')
 
-if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'coin/IpIpoptNLP.hpp'):
-	if os.name == 'nt':
-		print '<<WARNING>> no automatic installation for this package'
-	else:
-		print '<<INSTALL>> configure and build Nlopt v2.4.1'
-		path  = os.getcwd()
-		third = path + os.sep + 'Ipopt-3.11.8' + os.sep + 'ThirdParty' + os.sep
-		os.chdir(third + 'Blas')
-		ret = os.system('./get.Blas')
-		os.chdir(third + 'Lapack')
-		ret = os.system('./get.Lapack')
-		os.chdir(third + 'ASL')
-		ret = os.system('./get.ASL')
-		os.chdir(third + 'Mumps')
-		ret = os.system('./get.Mumps')
 
-		os.chdir(path)
-		obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking')
-	#end
+if os.path.exists('.' + os.sep + 'Ipopt-3.11.8.tgz') :
+	print '<<ERROR>> The IpOpt package is already downloaded or installed'
+	print '<<ERROR>> If the plugins using IpOpt do not compile, check this installation'
+
 else:
-	print '<<INSTALL>> IpOpt already installed'
+
+	if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'coin/IpIpoptNLP.hpp'):
+		if os.name == 'nt':
+			print '<<WARNING>> no automatic installation for this package'
+		else:
+			print '<<INSTALL>> configure and build Nlopt v2.4.1'
+			path  = os.getcwd()
+			third = path + os.sep + 'Ipopt-3.11.8' + os.sep + 'ThirdParty' + os.sep
+			os.chdir(third + 'Blas')
+			ret = os.system('./get.Blas')
+			os.chdir(third + 'Lapack')
+			ret = os.system('./get.Lapack')
+			os.chdir(third + 'ASL')
+			ret = os.system('./get.ASL')
+			os.chdir(third + 'Mumps')
+			ret = os.system('./get.Mumps')
+
+			os.chdir(path)
+			obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking')
+		#end
+	else:
+		print '<<INSTALL>> IpOpt already installed'
+	#end
 #end
