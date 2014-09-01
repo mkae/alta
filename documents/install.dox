@@ -6,13 +6,10 @@
 ALTA is decomposed into three parts: the <b>core</b>, <b>plugins</b>, and
 command line <b>softwares</b>. The third party dependencies of each part
 follow those rules:
-<ul>
-	<li>The <b>core</b> depends only on Eigen library for its vector class</li>
-	<li><b>Plugins</b> depend on whatever library they need. The dependency of
-	a particular plugin and how to install it must be provided in its 
-	documentation.</li>
-	<li><b>Softwares</b> only depend on the core</li>
-</ul>
+
+ + The <b>core</b> depends only on Eigen library for its vector class.
+ + <b>Plugins</b> depend on whatever library they need. The dependency of a particular plugin and how to install it must be provided in its documentation.
+ + <b>Softwares</b> only depend on the core.
 
 To ease the installation of ALTA, we provide scripts to install some of the
 dependencies in the <em>$ALTA/external</em> directory. Each script is a python
@@ -46,6 +43,20 @@ will be called automatically.
 
 You can find more information on the dependencies in the \ref dependencies
 page.
+
+### Obtaining additional depedencies
+
+#### Ubuntu/Debian
+
+Most of the dependencies can be obtain using the 'apt-get' command from Ubuntu/Debian. Other dependancies are automatically obtained using the python scripts provided (see above).
+
+ 	$ sudo apt-get install libgomp1 libcgal-dev libflann-dev
+
+#### OSX
+
+We advise to install the port package manager.
+
+	$ sudo port install libgomp1 libcgal-dev libflann-dev
 
 <br />
 
