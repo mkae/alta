@@ -9,13 +9,47 @@
 #endif
 #include <stdio.h>
 
+//! Add dynamic library extension (.so or .dll) to a dynamic object as well as
+//! prepending 'lib' depending on the plateform.
+std::string library_name(const std::string name) 
+{
+	std::string filename;
+
+	const int n = name.length();
+#if defined( _WIN32)
+	if(name.substr(n-4, n) != std::string("dll")) {
+		filename.append(name);
+		filename.append(".dll");
+	}
+#elif defined(__APPLE__)
+	if(name.substr(n-5, n) != std::string("dylib")) {
+		filename.append("lib");
+		filename.append(name);
+		filename.append(".dylib");
+	}
+#else
+	if(name.substr(n-2, n) != std::string("so")) {
+		filename.append("lib");
+		filename.append(name);
+		filename.append(".so");
+	}
+#endif
+	else {
+		filename.append(name);
+	}
+
+	return filename;
+}
+
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
 //! provide function. The template argument is used to cast the library to a
 //! specific type.
 template<typename T> T open_library(const std::string& filename, const char* function)
 {
+	std::string libname = library_name(filename);
+
 #ifdef _WIN32
-    HINSTANCE handle = LoadLibraryA(filename.c_str());
+    HINSTANCE handle = LoadLibraryA(libname.c_str());
     if(handle != NULL)
     {
         T res = (T)GetProcAddress(handle, function);
@@ -32,12 +66,12 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     }
     else
     {
-        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
+        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
         std::cerr << "          cause: \"" << GetLastError() << "\"" << std::endl;
         return NULL;
     }
 #else
-    void* handle = dlopen(filename.c_str(), RTLD_GLOBAL | RTLD_LAZY);
+    void* handle = dlopen(libname.c_str(), RTLD_GLOBAL | RTLD_LAZY);
 
 	 if(handle != NULL)
 	 {
@@ -46,17 +80,17 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 
         if(dlerror() != NULL)
         {
-            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << libname << std::endl;
             return NULL;
         }
 #ifdef DEBUG_CORE
-        std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
+        std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << libname << "\"" << std::endl;
 #endif
         return (T)res;
     }
     else
     {
-        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << filename << "\"" << std::endl;
+        std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
 		  std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
         return NULL;
     }

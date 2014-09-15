@@ -1,29 +1,22 @@
 /*!
 \page tutorials Tutorials
 
-The following examples use a Linux syntax for the command lines and name of
-the shared objects. Command lines work when translated to Windows' or
-OSX's format.
+The following examples use a Linux syntax for the command lines and name of the shared objects. Command lines work when translated to Windows' or OSX's format.
 
-<br />
 
-<h2>Fitting using the command line</h2>
+### Fitting using the command line
 
-<h3>1D Rational interpolation</h3>
-The \a data2brdf allows to perform a fitting procedure by converting a \ref
-data object into a brdf object (also named \ref function).
+#### 1D Rational interpolation
+
+The \a data2brdf allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
 
 First, download the Kirby2 dataset in ALTA format: <a href="http://alta.gforge.inria.fr/data/Kirby2.dat">Kirby2.dat</a>. Save this file in <i>$ALTA/data/1d/NIST/Kirby2</i>.
 
-\verbatim
- $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
-\endverbatim
+    $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
 
 The result can be exported using the \a brdf2data commands.
 
-\verbatim
- $ ./build/brdf2data --input Kirby.brdf --output Kirby.dat --data-file ../data/1d/NIST/Kirby2/Kirby2.dat
-\endverbatim
+    $ ./build/brdf2data --input Kirby.brdf --output Kirby.dat --data-file ../data/1d/NIST/Kirby2/Kirby2.dat
 
 The \a brdf2data allows you to export a function into a data file. If no data plugin is specified, the ALTA format is used which is gnuplot compliant. The position of evaluation for the function are taken from a specified data file (here the original Kirby2 file).
 
@@ -31,41 +24,33 @@ You should obtain gnuplot data files like the following image:
 
 \image html Kirby2.png
 
-To convert this brdf file to be used in another software (here matlab),
-you will need the following command:
-\verbatim
- $ ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
-\endverbatim
+To convert this brdf file to be used in another software (here matlab), you will need the following command:
 
-\a brdf2brdf converts an ALTA brdf file into another format such as
-Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot
-convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann
+    $ ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
+
+\a brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann
 distribution).
 
-<br />
 
-<h3>2D Rational interpolation of BRDFs</h3>
+#### 2D Rational interpolation of BRDFs
 
-In this example, we will show how to perform data conversion and vertical segments interpolation of the <em>gold-metallic-paint</em> material from the MERL database using the command line programs on an OSX platform. First download the binary file <a href="http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary">gold-metallic-paint.binary</a> and copy it to the <em>$ALTA/data/3d/merl</em> directory.
+In this example, we will show how to perform data conversion and vertical segments interpolation of the `gold-metallic-paint` material from the MERL database using the command line programs on an OSX platform. First download the binary file [gold-metallic-paint.binary](http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary) and copy it to the `$ALTA/data/3d/merl` directory.
 
 The first command we will execute will convert the three dimensional data in a 2D slice in the halfway vector parametrization:
-\verbatim
- $ ./build/data2data --input ../data/3d/merl/gold-metallic-paint.binary --in-data ./build/libdata_merl.dylib --output ../data/2d/merl/gold-met.exr --out-data ./build/libdata_brdf_slice.dylib
-\endverbatim
 
-The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image files (.exr format), while the \a data_merl plugin opens MERL's binary format. This is the format used by Pacanowski <em>et al.</em> <a href="http://hal.inria.fr/hal-00678885/en">[2012]</a> to perform fitting. The output of this command should look like:
+    $ ./build/data2data --input ../data/3d/merl/gold-metallic-paint.binary --in-data ./build/libdata_merl.dylib --output ../data/2d/merl/gold-met.exr --out-data ./build/libdata_brdf_slice.dylib
+
+The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image files (.exr format), while the \a data_merl plugin opens MERL's binary format. This is the format used by Pacanowski et al. [[2012]](http://hal.inria.fr/hal-00678885/en) to perform fitting. The output of this command should look like:
 
 \image html gold-met-merl.png "gold-metallic-paint slice"
 
 Then, we search for a fit of this 2D BRDF slice using the \a rational_fitter_parallel and a Chebychev basis for 60 to 100 coefficients in total:
-\verbatim
- $ ./build/data2brdf --input ../data/2d/merl/gold-met.exr --data ./build/libdata_brdf_slice.dylib --output gold-met.brdf --fitter ./build/librational_fitter_parallel.dylib --func ./build/librational_function_chebychev.dylib --min-np 60 -- np 100
-\endverbatim
+
+    $ ./build/data2brdf --input ../data/2d/merl/gold-met.exr --data ./build/libdata_brdf_slice.dylib --output gold-met.brdf --fitter ./build/librational_fitter_parallel.dylib --func ./build/librational_function_chebychev.dylib --min-np 60 -- np 100
 
 This outputs a BRDF file which cannot be displayed directly. To see the result of our fitting, we can export this BRDF into the BRDF image slice format:
-\verbatim
- $ ./build/brdf2data --input gold-met.brdf --output gold-met-rat.exr --data ./build/libdata_brdf_slice.dylib
-\endverbatim
+
+    $ ./build/brdf2data --input gold-met.brdf --output gold-met-rat.exr --data ./build/libdata_brdf_slice.dylib
 
 It is now possible to perform side by side comparison of the original data, and the interpolated rational function:
 
@@ -82,25 +67,19 @@ It is now possible to perform side by side comparison of the original data, and 
   </table>
 </center>
 
-<br />
 
-<h3>Non-linear fitting</h3>
-In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/">CERES</a> nonlinear fitter to approximate the
-blue metallic paint from the <a href="http://www.merl.com/brdf/">MERL database</a> using a Lafortune lobe (Note that we do not provide the data in ALTA package, you will have to download it). The resulting BRDF is exported in a shader format compatible with BRDF Explorer.
+#### Non-linear fitting
 
-\verbatim
- $ ./build/data2brdf --data ./build/libdata_merl.so --input ../data/3d/merl/blue-metallic-paint.binary --output blue-met.brdf --fitter ./build/libnonlinear_fitter_ceres.so --func ./build/libnonlinear_function_lafortune.so  --export explorer
-\endverbatim
+In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/">CERES</a> nonlinear fitter to approximate the blue metallic paint from the <a href="http://www.merl.com/brdf/">MERL database</a> using a Lafortune lobe (Note that we do not provide the data in ALTA package, you will have to download it). The resulting BRDF is exported in a shader format compatible with BRDF Explorer.
+
+     $ ./build/data2brdf --data ./build/libdata_merl.so --input ../data/3d/merl/blue-metallic-paint.binary --output blue-met.brdf --fitter ./build/libnonlinear_fitter_ceres.so --func ./build/libnonlinear_function_lafortune.so  --export explorer
 
 This command line is rather long. To help you design complex command line in a more intuitive way, ALTA comes with a python script that creates command lines from XML files (see \ref format for an example).
 
-<br />
 
-<h3>XML scripts</h3>
+### XML scripts
 
-Here is the script to perform the same fitting as the previous example. It
-performs the fitting of the blue metallic paint from the MERL database using
-a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
+Here is the script to perform the same fitting as the previous example. It performs the fitting of the blue metallic paint from the MERL database using a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
 
 ~~~{.xml}
 <?xml version="1.0"?>
@@ -133,28 +112,21 @@ a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
 In this XML example, it is possible to perform fit using a compound function by concatenating multiple function plugins. This is equivalent to providing a list of plugins to the <code>\-\-func</code> argument: <code>\-\-func [libnonlinear_function_diffuse.so, libnonlinear_function_lafortune.so]</code>.
 
 You can perform this action using the following command, assuming that the
-xml script is in file <em>script.xml</em>:
-\verbatim
- $ ./scripts/xml_cmd.py script.xml
-\endverbatim
+xml script is in file `script.xml`:
 
-You can put multiple <code>\<action\></code> commands in the xml file. Those commands will be executed in order.
+    $ ./scripts/xml_cmd.py script.xml
 
-<br />
+You can put multiple `<action>` commands in the xml file. Those commands will be executed in order.
 
-<h2>Moment analysis using the command line</h2>
 
-The \a data2moment allows to perform a moment analysis on a \ref data object.
-It can be useful to determine whether a given data correspond to a separable
-function along its different axis.
+### Moment analysis using the command line
 
-\verbatim
- $ ./build/data2moments --input ../data/1d/NIST/Kirby2/Kirby2.dat --data ./build/libdata_interpolant.so
-\endverbatim
+The \a data2moment allows to perform a moment analysis on a \ref data object. It can be useful to determine whether a given data correspond to a separable function along its different axis.
 
-<br />
+    $ ./build/data2moments --input ../data/1d/NIST/Kirby2/Kirby2.dat --data ./build/libdata_interpolant.so
 
-<h2>Using the C++ interface</h2>
+
+### Using the C++ interface
 
 It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (`libcore.a` on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
 
