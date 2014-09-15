@@ -32,7 +32,7 @@ class function : public parametrized
 		/* INTERFACE */
 
 		// Overload the function operator
-		virtual vec operator()(const vec& x) const = 0 ;
+		virtual vec operator()(const vec& x) const { return this->value(x); } ;
 		virtual vec value(const vec& x) const = 0 ;
 
 		//! \brief Provide a first rough fit of the function. 
