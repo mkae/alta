@@ -8,4 +8,4 @@ env.Append(LIBS=['python2.7', 'boost_python-py27', 'core'])
 
 env['SHLIBPREFIX']=''
 
-env.SharedLibrary('alta', ['alta.cpp'])
+env.SharedLibrary('../build/alta', ['alta.cpp'])
