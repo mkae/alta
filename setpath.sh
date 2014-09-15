@@ -11,3 +11,4 @@ path=`pwd`/sources/build
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$path
 export PATH=$PATH:$path
+export PYTHONPATH=$PYTHONPATH:$path
