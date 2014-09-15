@@ -107,7 +107,10 @@ function* get_function(const std::string& filename) {
 // Exporting the ALTA module
 BOOST_PYTHON_MODULE(alta)
 {
-    bp::class_<my_vec>("vec")
+    bp::class_<arguments>("arguments")
+		 .def(bp::init<>());
+
+	 bp::class_<my_vec>("vec")
         .def(bp::init<bp::list>())
 /*        .def(" __setitem__", &my_vec::operator[])*/;
 
@@ -126,7 +129,8 @@ BOOST_PYTHON_MODULE(alta)
 	 bp::register_ptr_to_python< ptr<data> >();
 
 	 // Fitter interface
-    bp::class_<Fitter, ptr<Fitter>, boost::noncopyable>("fitter");
+    bp::class_<Fitter, ptr<Fitter>, boost::noncopyable>("fitter")
+		 .def("fit_data", bp::pure_virtual(&fitter::fit_data));
 	 bp::def("get_fitter", plugins_manager::get_fitter);
 	 bp::register_ptr_to_python< ptr<fitter> >();
 }
