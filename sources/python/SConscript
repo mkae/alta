@@ -3,8 +3,16 @@ env = Environment()
 env.Append(CPPPATH=['../../external/build/include'])
 
 env.Append(CPPPATH=['../', '/usr/include/python2.7'])
-env.Append(LIBPATH=['../build', '/usr/lib/x86_64-gnu-linux'])
+env.Append(CPPPATH=['/opt/local/include'])
+
+
+env.Append(LIBPATH=['../build'])
+env.Append(LIBPATH=['/usr/lib/x86_64-gnu-linux'])
+env.Append(LIBPATH=['/opt/local/lib'])
+
 env.Append(LIBS=['python2.7', 'boost_python-py27', 'core'])
+#env.Append(LIBS=['python2.7', 'boost_python-mt', 'core'])
+
 
 env['SHLIBPREFIX']=''
 
