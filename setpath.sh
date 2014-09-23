@@ -7,8 +7,10 @@
 # ALTA command line programs and plugins will be available
 # to the shell.
 #
-path=`pwd`/sources/build
+sources=`pwd`
+path=${sources}/sources/build
 
+export ALTA=$sources
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$path
 export PATH=$PATH:$path
 export PYTHONPATH=$PYTHONPATH:$path
