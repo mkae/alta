@@ -8,6 +8,12 @@
 # to the shell.
 #
 sources=`pwd`
+if [ "$BASH_VERSION" ]; then
+	sources=`dirname $BASH_SOURCE`
+	sources=`builtin cd ${sources}; builtin pwd`
+elif [ "$ZSH_VERSION" ]; then
+	sources=$(dirname "$0:A")
+fi
 path=${sources}/sources/build
 
 export ALTA=$sources
