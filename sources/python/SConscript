@@ -1,19 +1,28 @@
 env = Environment()
 
-env.Append(CPPPATH=['../../external/build/include'])
+conf = Configure(env)
 
+env.Append(CPPPATH=['../../external/build/include'])
 env.Append(CPPPATH=['../', '/usr/include/python2.7'])
 env.Append(CPPPATH=['/opt/local/include'])
-
 
 env.Append(LIBPATH=['../build'])
 env.Append(LIBPATH=['/usr/lib/x86_64-gnu-linux'])
 env.Append(LIBPATH=['/opt/local/lib'])
 
-env.Append(LIBS=['python2.7', 'boost_python-py27', 'core'])
-#env.Append(LIBS=['python2.7', 'boost_python-mt', 'core'])
+build_lib = False
+if conf.CheckLibWithHeader('boost_python-py27', 'boost/python.hpp', 'c++'):
+
+	env.Append(LIBS=['python2.7', 'boost_python-py27', 'core'])
+	#env.Append(LIBS=['python2.7', 'boost_python-mt', 'core'])
 
 
-env['SHLIBPREFIX']=''
+	env['SHLIBPREFIX']=''
 
-env.SharedLibrary('alta', ['alta.cpp'])
+#end
+
+env = conf.Finish()
+
+if build_lib:
+	env.SharedLibrary('alta', ['alta.cpp'])
+#end
