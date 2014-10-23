@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <algorithm>
 
 #define BRDF_SAMPLING_RES_THETA_H       90
 #define BRDF_SAMPLING_RES_THETA_D       90
@@ -39,6 +40,7 @@ data_merl::data_merl()
 {
 	const int n = BRDF_SAMPLING_RES_PHI_D/2 * BRDF_SAMPLING_RES_THETA_D * BRDF_SAMPLING_RES_THETA_H;
 	brdf = (double*) malloc (sizeof(double)*3*n);
+	std::fill(brdf, brdf + 3*n, 0.0);
 
     // Set the input and output parametrization
     _in_param  = params::RUSIN_TH_TD_PD;
