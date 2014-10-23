@@ -121,19 +121,20 @@ int main(int argc, char** argv)
 	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->input_parametrization())
 	          << " to " << params::get_name(d_out->input_parametrization()) << std::endl;
 
-	if(dynamic_pointer_cast<vertical_segment>(d_out))
+
+	if(dynamic_pointer_cast<vertical_segment>(d_out) || args.is_defined("splat"))
 	{
 		params::input param = params::parse_input(args["param"]);
-    if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
+    	if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
 		{
-	    std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
-	    param = d_in->input_parametrization();
+	    	std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
+	    	param = d_in->input_parametrization();
 		}
-    else if(param == params::UNKNOWN_INPUT)
-    {
-	    std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
-	    return -1;
-    }
+    	else if(param == params::UNKNOWN_INPUT)
+    	{
+	 	   std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
+		    return -1;
+    	}
 
 		d_out->setParametrization(param);
 		d_out->setDimX(params::dimension(param));
@@ -147,12 +148,7 @@ int main(int argc, char** argv)
 			// Copy the input vector
 			vec x = d_in->get(i);
 			params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
-			
-			for(int j=0; j<d_in->dimY(); ++j)
-			{
-				temp[d_out->dimX() + j] = x[d_in->dimX() + j];
-			}
-
+			params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
 			d_out->set(temp);
 
 		}	
@@ -181,7 +177,6 @@ int main(int argc, char** argv)
 
 			vec y = d_in->value(temp);
 			params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
-
 			d_out->set(x);
 		}	
 	}	
