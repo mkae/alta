@@ -124,21 +124,24 @@ int main(int argc, char** argv)
 
 	if(dynamic_pointer_cast<vertical_segment>(d_out) || args.is_defined("splat"))
 	{
-		params::input param = params::parse_input(args["param"]);
-    	if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
+		if(dynamic_pointer_cast<vertical_segment>(d_out))
 		{
-	    	std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
-	    	param = d_in->input_parametrization();
-		}
-    	else if(param == params::UNKNOWN_INPUT)
-    	{
-	 	   std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
-		    return -1;
-    	}
+			params::input param = params::parse_input(args["param"]);
+			if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
+			{
+				std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
+				param = d_in->input_parametrization();
+			}
+			else if(param == params::UNKNOWN_INPUT)
+			{
+				std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
+				return -1;
+			}
 
-		d_out->setParametrization(param);
-		d_out->setDimX(params::dimension(param));
-		d_out->setDimY(d_in->dimY());
+			d_out->setParametrization(param);
+			d_out->setDimX(params::dimension(param));
+			d_out->setDimY(d_in->dimY());
+		}
 
 		std::cout << "<<INFO>> output DIM = " << d_out->dimX() << ", " << d_out->dimY() << std::endl;
 
@@ -150,7 +153,6 @@ int main(int argc, char** argv)
 			params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
 			params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
 			d_out->set(temp);
-
 		}	
 	}
 	else

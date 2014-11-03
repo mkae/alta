@@ -122,7 +122,7 @@ BOOST_PYTHON_MODULE(alta)
 
 	 // Data interface
     bp::class_<Data, ptr<Data>, boost::noncopyable>("data")
-//		 .def("load", bp::pure_virtual(&data::load))
+//		 .def("load", bp::pure_virtual(&data::load));
 		 .def("size", bp::pure_virtual(&data::size));
 	 bp::def("get_data", plugins_manager::get_data);
 	 bp::def("load_data", load_data);

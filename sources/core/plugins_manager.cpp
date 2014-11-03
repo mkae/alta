@@ -8,6 +8,7 @@
     #include <dlfcn.h>
 #endif
 #include <stdio.h>
+#include <list>
 
 //! Add dynamic library extension (.so or .dll) to a dynamic object as well as
 //! prepending 'lib' depending on the plateform.
@@ -41,12 +42,48 @@ std::string library_name(const std::string name)
 	return filename;
 }
 
+void get_library_dirs(std::list<std::string>& dirs)
+{
+	dirs.push_back("");
+
+#ifndef _WIN32
+	std::string obj_str ;
+	const char *env_str = getenv("ALTA_LIB") ;
+
+	if(env_str == NULL) {
+		obj_str = "" ;
+	} else {
+		obj_str = std::string(env_str)+":" ;
+	}
+
+	while(true)	{
+		int lb = obj_str.find_first_not_of(":",0) ;
+		int le = obj_str.find_first_of(":",lb) ;
+
+		if(lb < le)	{
+			dirs.push_back(obj_str.substr(lb,le-lb)) ;
+			obj_str = obj_str.substr(le+1,obj_str.size()) ;
+		} else {
+			break ;
+		}
+	}
+#endif
+}
+
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
 //! provide function. The template argument is used to cast the library to a
 //! specific type.
 template<typename T> T open_library(const std::string& filename, const char* function)
 {
-	std::string libname = library_name(filename);
+	std::list<std::string> basename;
+	get_library_dirs(basename);
+
+	std::list<std::string>::iterator iter;
+	for(iter = basename.begin(); iter != basename.end(); ++iter)
+	{
+	std::string libname = *iter;
+	libname.append(library_name(filename));
+
 
 #ifdef _WIN32
     HINSTANCE handle = LoadLibraryA(libname.c_str());
@@ -57,7 +94,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
         if(res == NULL)
         {
             std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
-            return NULL;
+            continue;
         }
 #ifdef DEBUG_CORE
         std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
@@ -68,7 +105,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     {
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
         std::cerr << "          cause: \"" << GetLastError() << "\"" << std::endl;
-        return NULL;
+        continue;
     }
 #else
     void* handle = dlopen(libname.c_str(), RTLD_GLOBAL | RTLD_LAZY);
@@ -81,7 +118,7 @@ template<typename T> T open_library(const std::string& filename, const char* fun
         if(dlerror() != NULL)
         {
             std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << libname << std::endl;
-            return NULL;
+            continue;
         }
 #ifdef DEBUG_CORE
         std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << libname << "\"" << std::endl;
@@ -92,9 +129,11 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     {
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
 		  std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
-        return NULL;
+        continue;
     }
 #endif
+	}
+return NULL;
 }
 
 //! \brief load a function from the ALTA input file.

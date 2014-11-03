@@ -1,6 +1,5 @@
 env = Environment()
 
-conf = Configure(env)
 
 env.Append(CPPPATH=['../../external/build/include'])
 env.Append(CPPPATH=['../', '/usr/include/python2.7'])
@@ -10,19 +9,25 @@ env.Append(LIBPATH=['../build'])
 env.Append(LIBPATH=['/usr/lib/x86_64-gnu-linux'])
 env.Append(LIBPATH=['/opt/local/lib'])
 
-build_lib = False
-if conf.CheckLibWithHeader('boost_python-py27', 'boost/python.hpp', 'c++'):
+conf = Configure(env)
+boost_python_lib = ['boost_python-mt', 'python2.7']
 
-	env.Append(LIBS=['python2.7', 'boost_python-py27', 'core'])
+build_lib = False
+if conf.CheckLibWithHeader(boost_python_lib, 'boost/python.hpp', 'c++'):
+
+	env.Append(LIBS=['python2.7', boost_python_lib, 'core'])
 	#env.Append(LIBS=['python2.7', 'boost_python-mt', 'core'])
 
-
 	env['SHLIBPREFIX']=''
+	build_lib = True
+
+else:
+	print "<<ERROR>> Unable to build the Python interface, please install boost-python."
 
 #end
 
 env = conf.Finish()
 
 if build_lib:
-	env.SharedLibrary('alta', ['alta.cpp'])
+	env.SharedLibrary('alta.so', ['alta.cpp'])
 #end
