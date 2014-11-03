@@ -7,7 +7,6 @@ env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
 env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 
 build_lib = False
-
 conf = Configure(env)
 if conf.CheckLibWithHeader(env['OPENEXR_LIB'], 'ImfRgbaFile.h', 'c++'):
 

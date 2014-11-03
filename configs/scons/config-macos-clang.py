@@ -25,6 +25,18 @@ SOFT_LIB       = ['core', 'dl', 'stdc++']
 PLUGIN_LIB     = ['core', 'stdc++']
 
 
+## Python and boost-python library
+##
+PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
+PYTHON_DIR    = ['/opt/local/lib']
+PYTHON_LIB    = ['boost_python-mt', 'python2.7']
+
+
+## Eigen library
+##
+EIGEN_INC     = ['#external/build/include/Eigen']
+
+
 ## OpenMP flags
 ##
 OPENMP_FLAG   = []
