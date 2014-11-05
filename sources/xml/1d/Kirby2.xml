@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!-- This script file is part of the ALTA library. It is provided to
+	  perform unit testing of the library rational fitting methods
+     and functions.
+
+     This test script requires to be launched using the xml_cmd python
+     script provided in the $ALTA/sources/scripts directory. It also
+	  requires to have the data file Kirby2.dat to be present in the
+	  $ALTA/data/1d/NIST/Kirby2 directory	
+  -->
+<alta>
+	<!-- Fit the data to a Legendre RF, using a LS fitter -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input  name="../data/1d/NIST/Kirby2/Kirby2.dat" />
+		<output name="Kirby2.func" />
+
+		<!-- Define the function to use -->
+		<function name="rational_function_legendre" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_eigen" />
+	</action>
+
+	<action name="brdf2gnuplot">
+		<!-- Input and output arguments of the action -->
+		<input  name="Kirby2.func" />
+		<output name="Kirby2.dat" />
+
+		<!-- Parameters -->
+		<parameter name="data-file" value="../data/1d/NIST/Kirby2/Kirby2.dat" />
+	</action>
+	
+	<!-- Fit the data to a Legendre RF, using a VS fitter -->
+	<action name="data2brdf">
+
+		<!-- Input and output arguments of the action -->
+		<input  name="../data/1d/NIST/Kirby2/Kirby2.dat" />
+		<output name="Kirby2.func" />
+
+		<!-- Define the function to use -->
+		<function name="rational_function_legendre" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_parallel" />
+	</action>
+</alta>
+

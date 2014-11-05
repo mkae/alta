@@ -114,7 +114,8 @@ def parseFunction(xmlNode):
 	global lib_dir
 
 	cmd = ''
-	cmd += lib_dir + dd + libName(xmlNode.attrib['name'])
+	#cmd = lib_dir + dd + libName(xmlNode.attrib['name'])
+	cmd = xmlNode.attrib['name']
 
 	# Parse the parameters of the function
 	for param in xmlNode.findall('parameter'):
@@ -168,7 +169,8 @@ def parseAction(xmlNode):
 
 	for plugin in xmlNode.findall('plugin'):
 		cmd += ' --' + plugin.attrib['type']
-		cmd += ' ' + lib_dir + dd + libName(plugin.attrib['name'])
+		#cmd += ' ' + lib_dir + dd + libName(plugin.attrib['name'])
+                cmd += ' ' + plugin.attrib['name']
 	#end
 
 	for param in xmlNode.findall('parameter'):
@@ -196,7 +198,12 @@ else:
 for child in root.findall('action'):
 
 	# Create the cmd string with the command name
-	cmd = lib_dir + dd + child.attrib['name']
+        cmd = ''
+        if lib_dir != '':
+	    cmd = lib_dir + dd + child.attrib['name']
+        else:
+	    cmd = child.attrib['name']
+
 
 	# Parse the action
 	cmd += parseAction(child)

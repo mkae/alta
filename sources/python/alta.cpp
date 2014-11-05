@@ -93,6 +93,9 @@ struct Fitter : fitter, bp::wrapper<fitter> {
 	bool fit_data(const ptr<data>& d, ptr<function>& f, const arguments& args) {
 		return this->get_override("fit_data")(f, args);
 	}
+	bool fit_data(const ptr<Data>& d, ptr<Function>& f, const arguments& args) {
+		return this->get_override("fit_data")(f, args);
+	}
 
 	void set_parameters(const arguments& args) {
 		this->get_override("set_parameters")(args);
@@ -128,7 +131,6 @@ BOOST_PYTHON_MODULE(alta)
 	 // Data interface
     bp::class_<Data, ptr<Data>, boost::noncopyable>("data")
          .def("load", bp::pure_virtual(static_cast< void(data::*)(const std::string&)>(&data::load)))
-//		 .def("load", bp::pure_virtual(&data::load));
 		 .def("size", bp::pure_virtual(&data::size));
 	 bp::def("get_data", plugins_manager::get_data);
 	 bp::def("load_data", load_data);
@@ -136,7 +138,8 @@ BOOST_PYTHON_MODULE(alta)
 
 	 // Fitter interface
     bp::class_<Fitter, ptr<Fitter>, boost::noncopyable>("fitter")
-		 .def("fit_data", bp::pure_virtual(&fitter::fit_data));
+    	//.def("fit_data", &Fitter::fit_data);
+		.def("fit_data", bp::pure_virtual(&fitter::fit_data));
 	 bp::def("get_fitter", plugins_manager::get_fitter);
 	 bp::register_ptr_to_python< ptr<fitter> >();
 }
