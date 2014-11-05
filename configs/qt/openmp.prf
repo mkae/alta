@@ -15,10 +15,14 @@ unix:!macx {
 macx {
 	exists(/opt/local/bin/gcc-mp-4.9) {
 		CONFIG += openmp
-		QMAKE_CXX = /opt/local/bin/gcc-mp-4.9
+
+		QMAKE_CXX  = /opt/local/bin/gcc-mp-4.9
+		QMAKE_LINK = /opt/local/bin/gcc-mp-4.9
 		QMAKE_CXXFLAGS += -fopenmp
-		LIBS += -L/opt/local/lib/libgcc
-		QMAKE_LFLAGS += -fopenmp
+		QMAKE_CXXFLAGS -= -Xarch_x86_64
+		QMAKE_LFLAGS   += -fopenmp
+		QMAKE_LFLAGS   -= -Xarch_x86_64
+		LIBS += -L/opt/local/lib/libgcc -lstdc++
 	} else {
 		warning("No OpenMP compliant compiler found")
 	}

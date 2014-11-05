@@ -103,12 +103,16 @@ struct Fitter : fitter, bp::wrapper<fitter> {
 function* get_function(const std::string& filename) {
     return plugins_manager::get_function(filename);
 }
+function* get_function_from_args(const arguments& args) {
+    return plugins_manager::get_function(args);
+}
 
 // Exporting the ALTA module
 BOOST_PYTHON_MODULE(alta)
 {
     bp::class_<arguments>("arguments")
-		 .def(bp::init<>());
+		 .def(bp::init<>())
+		 .def("update", &arguments::update);
 
 	 bp::class_<my_vec>("vec")
         .def(bp::init<bp::list>())
@@ -119,9 +123,11 @@ BOOST_PYTHON_MODULE(alta)
 
 	 // Function interface
     bp::def("get_function", get_function, bp::return_value_policy<bp::manage_new_object>());
+    bp::def("get_function", get_function_from_args, bp::return_value_policy<bp::manage_new_object>());
 
 	 // Data interface
     bp::class_<Data, ptr<Data>, boost::noncopyable>("data")
+         .def("load", bp::pure_virtual(static_cast< void(data::*)(const std::string&)>(&data::load)))
 //		 .def("load", bp::pure_virtual(&data::load));
 		 .def("size", bp::pure_virtual(&data::size));
 	 bp::def("get_data", plugins_manager::get_data);
