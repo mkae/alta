@@ -14,7 +14,8 @@
 
 
 // here comes the magic
-template <typename T> T* get_pointer(ptr<T> const& p) {
+template <typename T> 
+T* get_pointer(ptr<T> const& p) {
   //notice the const_cast<> at this point
   //for some unknown reason, bp likes to have it like that
   return const_cast<T*>(p.get());
@@ -40,67 +41,11 @@ struct my_vec : public vec {
     }
 };
 
-// Creating a non purely virtual class for the function
-struct Function : function, bp::wrapper<function> { 
-    vec value(const vec& x) const {
-        return this->get_override("value")(x);
-    }
-
-    bool load(std::istream& in) {
-        return this->get_override("load")(in);
-    }
-};
-
-// Creating a non purely virtual class for the data
-struct Data : data, bp::wrapper<data> { 
-		// Load data from a file
-		void load(const std::string& filename) {
-        this->get_override("load")(filename);
-		}
-		void load(const std::string& filename, const arguments& args) {
-        this->get_override("load")(filename, args);
-		}
-
-		vec get(int i) const {
-        return this->get_override("get")(i);
-		}
-
-		vec operator[](int i) const {
-        return this->get_override("operator[]")(i);
-		}
-		
-		vec value(vec in) const {
-        return this->get_override("value")(in);
-		}
-
-		void set(vec x) {
-        this->get_override("set")(x);
-		}
-
-		int size() const {
-        return this->get_override("size")();
-		}
-};
-
 ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
 	ptr<data> d = plugins_manager::get_data(plugin_name);
 	d->load(filename);
 	return d;
 }
-
-// Creating a non purely virtual class for the function
-struct Fitter : fitter, bp::wrapper<fitter> { 
-	bool fit_data(const ptr<data>& d, ptr<function>& f, const arguments& args) {
-		return this->get_override("fit_data")(f, args);
-	}
-	bool fit_data(const ptr<Data>& d, ptr<Function>& f, const arguments& args) {
-		return this->get_override("fit_data")(f, args);
-	}
-
-	void set_parameters(const arguments& args) {
-		this->get_override("set_parameters")(args);
-	}
-};
 
 // Creating functions for the plugins_manager calls
 function* get_function(const std::string& filename) {
@@ -110,36 +55,43 @@ function* get_function_from_args(const arguments& args) {
     return plugins_manager::get_function(args);
 }
 
-// Exporting the ALTA module
+/* Exporting the ALTA module */
 BOOST_PYTHON_MODULE(alta)
 {
-    bp::class_<arguments>("arguments")
-		 .def(bp::init<>())
-		 .def("update", &arguments::update);
+	// Argument class
+	//
+	// TODO: {Laurent: we should be able to set arguments using python's maps}
+	bp::class_<arguments>("arguments")
+		.def(bp::init<>())
+		.def("update", &arguments::update);
 
-	 bp::class_<my_vec>("vec")
-        .def(bp::init<bp::list>())
-/*        .def(" __setitem__", &my_vec::operator[])*/;
+	bp::class_<my_vec>("vec")
+		.def(bp::init<bp::list>())
+		/*        .def(" __setitem__", &my_vec::operator[])*/;
 
-    bp::class_<Function, ptr<Function>, boost::noncopyable>("function")
-    	.def("value", bp::pure_virtual(&function::value));
+	// Function interface
+	//
+	bp::class_<function, ptr<function>, boost::noncopyable>("function", bp::no_init)
+		.def("value", &function::value);
+	bp::def("get_function", get_function, bp::return_value_policy<bp::manage_new_object>());
+	bp::def("get_function", get_function_from_args, bp::return_value_policy<bp::manage_new_object>());
 
-	 // Function interface
-    bp::def("get_function", get_function, bp::return_value_policy<bp::manage_new_object>());
-    bp::def("get_function", get_function_from_args, bp::return_value_policy<bp::manage_new_object>());
+	// Data interface
+	//
+	bp::class_<data, ptr<data>, boost::noncopyable>("data", bp::no_init)
+		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
+		.def("size", &data::size);
+	bp::def("get_data", plugins_manager::get_data);
+	bp::def("load_data", load_data);
 
-	 // Data interface
-    bp::class_<Data, ptr<Data>, boost::noncopyable>("data")
-         .def("load", bp::pure_virtual(static_cast< void(data::*)(const std::string&)>(&data::load)))
-		 .def("size", bp::pure_virtual(&data::size));
-	 bp::def("get_data", plugins_manager::get_data);
-	 bp::def("load_data", load_data);
-	 bp::register_ptr_to_python< ptr<data> >();
-
-	 // Fitter interface
-    bp::class_<Fitter, ptr<Fitter>, boost::noncopyable>("fitter")
-    	//.def("fit_data", &Fitter::fit_data);
-		.def("fit_data", bp::pure_virtual(&fitter::fit_data));
-	 bp::def("get_fitter", plugins_manager::get_fitter);
-	 bp::register_ptr_to_python< ptr<fitter> >();
+	// Fitter interface
+	//
+	// TODO: {Laurent: to make the call to fit_data possible, we need to
+	//        implement a Python converter to ptr<T>. This seems to be
+	//        tricky (see boost/python/shared_ptr_to_python.hpp). The
+	//        other solution is to use boost's shared_ptr instead of ptr
+	//        when compiling for the Python interface.}
+	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
+		.def("fit_data", &fitter::fit_data);
+	bp::def("get_fitter", plugins_manager::get_fitter);
 }

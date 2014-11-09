@@ -18,7 +18,13 @@
  *
  * See htpp://stackoverflow.com/questions/11886288/ 
  */
-#if defined(TODO)
+#if defined(USE_BOOST)
+
+#include <boost/shared_ptr.hpp>
+#define ptr boost::shared_ptr
+#define dynamic_pointer_cast boost::dynamic_pointer_cast
+
+#elif defined(TODO)
  //__cplusplus >= 201103L
 
 #include <memory>
@@ -108,12 +114,11 @@ template<class T> class ptr
 		//! is incremented.
 		ptr<T>& operator=(const ptr<T>& a)
 		{
-		  //RP:  Check and avoid assignment to itself 
-	    if ( (void*) this == (void *) &a)
-	    {
-	        return *this;
-	    }
-
+			//RP:  Check and avoid assignment to itself 
+		    if((void*) this == (void *) &a)
+		    {
+		        return *this;
+		    }
 
 			_counter->decrement();
 			if(_counter->value() < 1)
