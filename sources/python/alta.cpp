@@ -37,15 +37,24 @@ namespace boost {
  * TODO: Make sure that the value passed to this vector are floatting point
  *       convertible.
  */
-struct my_vec : public vec {
-    my_vec() : vec() {}
-
-    my_vec(const bp::list& l) : vec(bp::len(l)) {
+struct python_vec : public vec {
+    python_vec() : vec() {}
+	python_vec(const vec& x) : vec(x) {}
+    python_vec(const bp::list& l) : vec(bp::len(l)) {
         for(size_t i=0; i<bp::len(l); ++i) {
             (*this)[i] = bp::extract<double>(l[i]);
         }
     }
 };
+std::ostream &operator<<(std::ostream &out, const python_vec &x) {
+	out << "[";
+	for(int i=0; i<x.size(); ++i) {
+		if(i != 0) { out << ", "; }
+		out << x[i]; 
+	}
+	return out << "]";
+}
+
 
 
 /* This class is a wrapper to ALTA's arguments class to add Python specific
@@ -87,7 +96,7 @@ ptr<function> get_function(const std::string& filename) {
     }
 	return func;
 }
-ptr<function> get_function_from_args(const arguments& args) {
+ptr<function> get_function_from_args(const python_arguments& args) {
     ptr<function> func(plugins_manager::get_function(args));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
@@ -95,7 +104,9 @@ ptr<function> get_function_from_args(const arguments& args) {
     return func;
 }
 
-/* Exporting the ALTA module */
+
+/* Exporting the ALTA module 
+ */
 BOOST_PYTHON_MODULE(alta)
 {
 	// Argument class
@@ -105,9 +116,19 @@ BOOST_PYTHON_MODULE(alta)
 		.def(bp::init<bp::dict>())
 		.def("update", &arguments::update);
 
-	bp::class_<my_vec>("vec")
+
+	// Vector class
+	//
+	// TODO: There is a conversion issue right now that prevents us from using vectors
+	// within Python. This needs to be investiguated.
+	bp::class_<python_vec>("vec")
+		.def(bp::init<vec>())
 		.def(bp::init<bp::list>())
-		/*        .def(" __setitem__", &my_vec::operator[])*/;
+		.def(bp::self_ns::str(bp::self_ns::self))
+		/*.def(" __setitem__", &my_vec::operator[])*/;
+	bp::implicitly_convertible<vec, python_vec>();
+	bp::implicitly_convertible<python_vec, vec>();
+
 
 	// Function interface
 	//
@@ -118,14 +139,18 @@ BOOST_PYTHON_MODULE(alta)
 	bp::def("get_function", get_function);
 	bp::def("get_function", get_function_from_args);
 
+
 	// Data interface
 	//
 	bp::class_<data, ptr<data>, boost::noncopyable>("data", bp::no_init)
-		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
 		.def("size", &data::size)
+		.def("get",  &data::get)
+		.def("set",  &data::set)
+		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
 		.def("save", &data::save);
 	bp::def("get_data",  plugins_manager::get_data);
 	bp::def("load_data", load_data);
+
 
 	// Fitter interface
 	//
