@@ -218,4 +218,8 @@ We provide an example XML file that is self describing:
 	</action>
 </alta>
 \endverbatim
+
+The `<input>` command can take two different kind of attributes:
+ + `name="filename"` when the action is done for a single input file.
+ + `directory="dirname"` when all file withing 'dirname' must be processed using the current action.
 */

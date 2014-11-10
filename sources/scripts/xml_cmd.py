@@ -11,8 +11,10 @@ page.
 import sys
 from sys import argv
 from xml.etree.ElementTree import parse
+import subprocess
 import os
-
+from os import listdir
+from os.path import isfile, join
 
 """ Color capable outputing
 """
@@ -155,16 +157,6 @@ def parseAction(xmlNode):
 	global lib_dir, dat_dir, out_dir
 	cmd = ''
 
-	inputNode = xmlNode.find('input')
-	if not (inputNode is None):
-		cmd += ' --input ' + inputNode.attrib['name']
-	#end
-
-	outputNode = xmlNode.find('output')
-	if not (outputNode is None):
-		cmd += ' --output ' + outputNode.attrib['name']
-	#end
-
 	cmd += parseFunctions(xmlNode.findall('function'))
 
 	for plugin in xmlNode.findall('plugin'):
@@ -178,7 +170,25 @@ def parseAction(xmlNode):
 		cmd += ' ' + param.attrib['value']
 	#end
 
-	return cmd
+        # Search the input file to the command. It is possible for the xml
+        # command to loop over a list of file present in a directory using
+        # the directory attrib. In that case, cmd is duplicated into a cmd
+        # list.
+	inputNode = xmlNode.find('input')
+	outputNode = xmlNode.find('output')
+	if not (inputNode is None) and not (outputNode is None):
+            if 'directory' in inputNode.attrib:
+                dirname = inputNode.attrib['directory']
+                cmds = [cmd + ' --input ' + join(dirname, f) + ' --output ' + f + '.out' for f in listdir(dirname) if isfile(join(dirname, f))]
+                cmd = cmds;
+            else:
+	        cmd += ' --input '  + inputNode.attrib['name']
+		cmd += ' --output ' + outputNode.attrib['name']
+                cmd = [cmd]
+            #end
+	#end
+
+        return cmd
 
 #end
 
@@ -186,11 +196,8 @@ def parseAction(xmlNode):
 ## Parse the configuration part of the file
 ##
 conf = root.find("configuration")
-if conf is None:
-	print '<<PYTHON>> no configuration specified in the XML file'
-else:
-	parseConfiguration(conf)
-#end
+if not (conf is None):
+    parseConfiguration(conf)
 
 
 ## Command lines creation
@@ -206,14 +213,20 @@ for child in root.findall('action'):
 
 
 	# Parse the action
-	cmd += parseAction(child)
+        try:
+            for act in parseAction(child):
 
-	printout(cmd, GREEN)
-	print
+                printout(cmd + act, GREEN)
+                print
 
-	ret = os.system(cmd)
-	if ret != 0:
-		printout('<<PYTHON>> the action was not performed', RED)
-	#end
-	print '\n'
+	        ret = subprocess.check_call(cmd + act, shell=True)
+                if ret != 0:
+	            printout('<<PYTHON>> the action was not performed', RED)
+	        #end
+	        print '\n'
+            #end
+        except:
+            printout('<<PYTHON>> exception caught, stopping', RED)
+            print '\n'
+            exit(0)
 #end
