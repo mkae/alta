@@ -15,14 +15,7 @@
 
 int main(int argc, char** argv)
 {
-<<<<<<< local
-	QApplication app(argc, argv, false);
-	arguments args(argc, argv);
-
-	plugins_manager manager(args) ;
-=======
     arguments args(argc, argv) ;
->>>>>>> other
 
 	if(args.is_defined("help")) {
 		std::cout << "<<HELP>> data2diff --input data.file --output gnuplot.file --data loader.so --param RUSIN_TH_PH_TD_PD --partial 0" << std::endl ;

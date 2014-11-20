@@ -7,7 +7,6 @@ cd ../alta-alpha
 # Remove unecessary parts (data, retro plugins, ...)
 rm -rf data
 rm -rf papers
-rm -rf external/quadprog++-v2
 rm -rf sources/tests
 rm -rf sources/matlab
 rm -rf sources/xml
@@ -23,7 +22,7 @@ rm -rf sources/softs/data2diff
 rm -rf sources/scripts/generate-alpha.sh
 
 # Creating the C++ LICENSE header
-echo "/*\n$(cat LICENSE.txt | while read LINE; do echo " * $LINE"; done;)\n */\n\n" > LICENSE.C
+echo "/*$(cat LICENSE.txt | while read LINE; do echo " * $LINE"; done;) */" > LICENSE.C
 
 # Add headers to all .cpp .h files
 find ./sources/ -regex ".*\.\(h\|cpp\)$" | while read FILE; do
