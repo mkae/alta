@@ -11,9 +11,7 @@ rm -rf sources/tests
 rm -rf sources/matlab
 rm -rf sources/xml
 rm -rf sources/scripts/unitary*
-rm -rf sources/plugins/*retro*
 rm -rf sources/plugins/shifted_gamma_function
-rm -rf sources/plugins/rational_fitter_parsec_*
 rm -rf sources/softs/tests
 rm -rf sources/softs/rational_1d
 rm -rf sources/softs/generate_data
