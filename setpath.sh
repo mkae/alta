@@ -17,6 +17,7 @@ fi
 path=${sources}/sources/build
 
 export ALTA=$sources
+export ALTA_DIR=$sources/sources
 export ALTA_LIB=$path
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$path
 export PATH=$PATH:$path
