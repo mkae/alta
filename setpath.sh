@@ -18,6 +18,7 @@ path=${sources}/sources/build/
 scripts=${sources}/sources/scripts/
 
 export ALTA=$sources
+export ALTA_DIR=$sources/sources
 export ALTA_LIB=$path
 export ALTA_DIR=${sources}/sources/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$path
