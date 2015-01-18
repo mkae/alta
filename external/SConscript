@@ -44,7 +44,7 @@ else:
 		execfile('obtain_ceres.py')
 	#end
 	
-	print "<<INFO>> External libraries are compiled as shared librarie."
+	print "<<INFO>> External libraries are compiled as shared libraries."
 	print "<<INFO>> Please update your environment variable before running ALTA commands."
 
 	##
