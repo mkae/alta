@@ -10,10 +10,9 @@ build_lib = False
 
 conf = Configure(env)
 if conf.CheckLibWithHeader(env['FLANN_LIB'], 'flann/flann.hpp', 'CXX'):
-
 	build_lib = True
-
 #end
+
 env = conf.Finish()
 
 if build_lib:
