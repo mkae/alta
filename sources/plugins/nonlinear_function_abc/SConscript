@@ -1,7 +1,12 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+Import('env')
+env = env.Clone()
+
+#env.Append(CPPPATH = ['../../../external/build/include', '../../'])
+#env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+env.Append(LIBS = env['PLUGIN_LIB'])
 
 sources = ['function.cpp']
-libs = ['core']
-env.SharedLibrary('../../build/nonlinear_function_abc', sources, LIBS=libs)
+#libs = ['core']
+#env.SharedLibrary('../../build/nonlinear_function_abc', sources, LIBS=libs)
+
+env.SharedLibrary('../../build/nonlinear_function_abc', sources)

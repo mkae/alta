@@ -1,7 +1,15 @@
-env = Environment()
-env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
+Import('env')
+env = env.Clone()
+
+env.Append(LIBS = env['PLUGIN_LIB'])
+
+
+#env = Environment()
+#env.Append(CPPPATH = ['../../../external/build/include', '../../'])
+#env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['function.cpp']
-libs = ['core']
-env.SharedLibrary('../../build/nonlinear_function_retroyoo', sources, LIBS=libs)
+#libs = ['core']
+#env.SharedLibrary('../../build/nonlinear_function_retroyoo', sources, LIBS=libs)
+
+env.SharedLibrary('../../build/nonlinear_function_retroyoo', sources)
