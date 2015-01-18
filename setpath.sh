@@ -14,10 +14,13 @@ if [ "$BASH_VERSION" ]; then
 elif [ "$ZSH_VERSION" ]; then
 	sources=$(dirname "$0:A")
 fi
-path=${sources}/sources/build
+path=${sources}/sources/build/
+scripts=${sources}/sources/scripts/
 
 export ALTA=$sources
+export ALTA_DIR=$sources/sources
 export ALTA_LIB=$path
+export ALTA_DIR=${sources}/sources/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$path
-export PATH=$PATH:$path
+export PATH=$PATH:$path:$scripts
 export PYTHONPATH=$PYTHONPATH:$path

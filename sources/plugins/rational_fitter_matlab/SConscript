@@ -13,7 +13,8 @@ conf = Configure(env)
 if conf.CheckLib(env['MATLAB_LIB']):
 
 	build_lib = True
-
+else:
+	print "<<ERROR>> Unable to find Matlab for Rational Fitter. Check your MATLAB install"
 #end
 conf.Finish()
 
