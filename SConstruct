@@ -60,7 +60,13 @@ vars.Add('MATLAB_DIR',        'MATLAB directory')
 vars.Add('MATLAB_LIB',        'MATLAB libraries')
 
 
-env = Environment(variables = vars)
+
+env = Environment(variables = vars,
+
+                  # Honor the user's settings.
+                  ENV = {'PATH' : os.environ['PATH'],
+                         'CPATH' : os.environ['CPATH'],
+                         'LIBRARY_PATH' : os.environ['LIBRARY_PATH'] })
 
 
 ## PLATFORM dependant section
