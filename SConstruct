@@ -61,12 +61,13 @@ vars.Add('MATLAB_LIB',        'MATLAB libraries')
 
 
 
-env = Environment(variables = vars,
+# Select user environment variables that we want to honor.
+envVars = {}
+for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH' ]:
+        if var in os.environ:
+                envVars[var] = os.environ[var]
 
-                  # Honor the user's settings.
-                  ENV = {'PATH' : os.environ['PATH'],
-                         'CPATH' : os.environ['CPATH'],
-                         'LIBRARY_PATH' : os.environ['LIBRARY_PATH'] })
+env = Environment(variables = vars, ENV = envVars)
 
 
 ## PLATFORM dependant section
