@@ -6,6 +6,7 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 
 #include <core/common.h>
 
@@ -86,13 +87,15 @@ void smith::save_body(std::ostream& out, const arguments& args) const
 
     if(is_shader)
     {
-        out << std::endl;
-        out << "vec3 shadowing_smith(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 R)" << std::endl;
-        out << "{" << std::endl;
-        out << "\tvec3 H = normalize(L + V);" << std::endl;
-        out << "\treturn R + (vec3(1.0) - R) * pow(1.0f - clamp(dot(H,V), 0.0f, 1.0f), 5);" << std::endl;
-        out << "}" << std::endl;
-        out << std::endl;
+        // out << std::endl;
+        // out << "vec3 shadowing_smith(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 R)" << std::endl;
+        // out << "{" << std::endl;
+        // out << "\tvec3 H = normalize(L + V);" << std::endl;
+        // out << "\treturn R + (vec3(1.0) - R) * pow(1.0f - clamp(dot(H,V), 0.0f, 1.0f), 5);" << std::endl;
+        // out << "}" << std::endl;
+        // out << std::endl;
+        std::cerr << " IMPLEMENT ME AT " << __FILE__ << " " << __LINE__ << std::endl;
+        assert(0);
     }
 
 }
