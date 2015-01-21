@@ -24,11 +24,11 @@ void function::bootstrap(const ptr<data>, const arguments& args)
 
 void function::save(const std::string& filename, const arguments& args) const
 {
-	bool is_alta     = !args.is_defined("export") || args["export"] == "alta";
-	bool is_cpp      = args["export"] == "C++";
-	bool is_explorer = args["export"] == "explorer";
-	bool is_shader   = args["export"] == "shader" || is_explorer;
-	bool is_matlab   = args["export"] == "matlab";
+	bool const is_alta     = !args.is_defined("export") || args["export"] == "alta";
+	bool const is_cpp      = args["export"] == "C++";
+	bool const is_explorer = args["export"] == "explorer";
+	bool const is_shader   = args["export"] == "shader" || is_explorer;
+	bool const is_matlab   = args["export"] == "matlab";
 
 	// Open the file
 	std::ofstream file(filename.c_str());
