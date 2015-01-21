@@ -27,7 +27,7 @@ class plugins_manager
 		//! filename n. Return null if no one exist.
 		//!
 		//! \details
-		//! This function try to load the shared object file specified in the
+		//! This function attemps to load the shared object file specified in the
 		//! <code>--func filename</code>.
 		static function* get_function(const arguments& args) ;
 
