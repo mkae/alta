@@ -242,28 +242,28 @@ function* plugins_manager::get_function(const arguments& args)
 
         //! create a <em>compound</em> class to store multiple
         //! functions in it.
-		  compound_function* compound = new compound_function();
+        compound_function* compound = new compound_function();
 
-          //! For each args_vec element, create a function object and add
-          //! it to the compound one.
-          for(unsigned int i=0; i<args_vec.size(); ++i)
+        //! For each args_vec element, create a function object and add
+        //! it to the compound one.
+        for(unsigned int i=0; i<args_vec.size(); ++i)
+        {
+          std::string n("--func ");
+          n.append(args_vec[i]);
+  #ifdef DEBUG
+          std::cout << "<<DEBUG>> load function with args: " << n << std::endl;
+  #endif
+          arguments temp_args = arguments::create_arguments(n);
+          function* f = get_function(temp_args);
+          if(dynamic_cast<nonlinear_function*>(f) == NULL)
           {
-              std::string n("--func ");
-              n.append(args_vec[i]);
-#ifdef DEBUG
-              std::cout << "<<DEBUG>> load function with args: " << n << std::endl;
-#endif
-              arguments temp_args = arguments::create_arguments(n);
-              function* f = get_function(temp_args);
-              if(dynamic_cast<nonlinear_function*>(f) == NULL)
-              {
-                  std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
-              }
-              else
-              {
-                  compound->push_back(dynamic_cast<nonlinear_function*>(f), temp_args);
-              }
+              std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
           }
+          else
+          {
+              compound->push_back(dynamic_cast<nonlinear_function*>(f), temp_args);
+          }
+        }
 
 		  //! return the compound class
 		  func = compound;
@@ -289,50 +289,51 @@ function* plugins_manager::get_function(const arguments& args)
     // Treat the case of the Fresnel
     if(args.is_defined("fresnel"))
     {
-		 // Cast into a non linear function, only those are permitted to use
-		 // a Fresnel term.
-		 nonlinear_function* nl_func = dynamic_cast<nonlinear_function*>(func);
-		 if(nl_func == NULL)
-		 {
-			 std::cerr << "<<ERROR>> only non-linear function are permitted to use Fresnel" << std::endl;
-			 return func;
-		 }
+      // Cast into a non linear function, only those are permitted to use
+      // a Fresnel term.
+      nonlinear_function* nl_func = dynamic_cast<nonlinear_function*>(func);
+      if(nl_func == NULL)
+      {
+       std::cerr << "<<ERROR>> only non-linear function are permitted to use Fresnel" << std::endl;
+       return func;
+      }
 
-		 std::cout << "<<DEBUG>> multiplying by a Fresnel term" << std::endl;
+      std::cout << "<<DEBUG>> multiplying by a Fresnel term" << std::endl;
 
-		 std::string n("--func ");
-		 if(args.is_vec("fresnel"))
-		 {
-			 std::string temp = args["fresnel"];
-			 n.append(temp.substr(1, temp.size()-2));
-		 }
-		 else
-		 {
-			 std::string fname = args["fresnel"];
-			 if(fname.empty()) // Nothing to do except print error, no plugin defined
-			 {
-				 std::cerr << "<<ERROR>> Fresnel plugin not defined" << std::endl;
-				 std::cerr << "<<ERROR>> using --fresnel alone is not permitted" << std::endl;
-				 return func;
-			 }
-			 else // Case where the fresnel parameters is only the plugin filename
-			 {
-				 n.append(fname);
-			 }
-		 }
+      std::string n("--func ");
+      if(args.is_vec("fresnel"))
+      {
+       std::string temp = args["fresnel"];
+       n.append(temp.substr(1, temp.size()-2));
+      }
+      else
+      {
+       std::string fname = args["fresnel"];
+       if(fname.empty()) // Nothing to do except print error, no plugin defined
+       {
+      	 std::cerr << "<<ERROR>> Fresnel plugin not defined" << std::endl;
+      	 std::cerr << "<<ERROR>> using --fresnel alone is not permitted" << std::endl;
+      	 return func;
+       }
+       else // Case where the fresnel parameters is only the plugin filename
+       {
+      	 n.append(fname);
+       }
+      }
 
-		 nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
-		 if(func_fres != NULL)
-		 {
-			return new product_function(nl_func, func_fres);
-		 }
-		 else
-		 {
-			 std::cerr << "<<ERROR>> the right part of the product is not a nonlinear function. Will use only the left part." << std::endl;
-			 return func;
-		 }
-
+      nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
+      if(func_fres != NULL)
+      {
+      return new product_function(nl_func, func_fres);
+      }
+      else
+      {
+       std::cerr << "<<ERROR>> the right part of the product is not a nonlinear function. Will use only the left part." << std::endl;
+       return func;
+      }
 	 }
+
+   
 /*
 	 // Correction of the data by 1/cosine(theta_L)
 	 if(args.is_defined("data-correct-cosine"))
@@ -342,6 +343,8 @@ function* plugins_manager::get_function(const arguments& args)
 	 }
 	 // End of correction
 */
+
+
     return func;
 }
 ptr<data> plugins_manager::get_data(const std::string& n)
