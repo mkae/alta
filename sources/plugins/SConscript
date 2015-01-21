@@ -15,6 +15,8 @@ SConscript('nonlinear_function_beckmann/SConscript')
 SConscript('nonlinear_function_abc/SConscript')
 SConscript('nonlinear_function_blinn/SConscript')
 SConscript('nonlinear_function_isotropic_lafortune/SConscript')
+SConscript('nonlinear_function_sgd/SConscript')
+
 
 # Building nonlinear masking functions
 SConscript('nonlinear_shadowing_smith/SConscript')
