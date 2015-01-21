@@ -69,7 +69,6 @@ for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH' ]:
 
 env = Environment(variables = vars, ENV = envVars)
 
-
 ## PLATFORM dependant section
 ##
 if sys.platform == 'darwin':
@@ -87,7 +86,7 @@ if sys.platform == 'darwin':
 
 ## COMPILER dependant section
 ##
-if env['CC'] in ['gcc', 'clang'] or env['CXX'] in ['g++', 'clang']:
+if env['CC'] in ['gcc', 'clang'] or env['CXX'] in ['g++', 'clang', 'clang++']:
 	env.AppendUnique(CCFLAGS = '-fPIC')
 #end
 
