@@ -25,6 +25,12 @@ class blinn_function : public nonlinear_function
 
 	public: // methods
 
+		blinn_function()
+		{
+			setParametrization(params::COS_TH);
+			setDimX(1);			
+		}
+
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
 		virtual vec value(const vec& x) const ;
