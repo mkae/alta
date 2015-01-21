@@ -21,6 +21,7 @@ oprofile_data
 *.so
 *.la
 *.a
+*.dylib
 external/build
 external/Ipopt-*
 external/ceres-solver-*
