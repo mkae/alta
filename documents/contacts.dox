@@ -6,8 +6,12 @@ do not hesitate to share your experience of using this library, bug reports,
 or feature requests.<br />
 <ul>
 	<li><a href="mailto:laurent.belcour@gmail.com">Laurent Belcour</a>, Inria</li>
+	<li><a href="mailto:ludovic.courtes@inria.fr">Ludovic Courtès</a>, Inria</li>
 	<li><a href="mailto:romain.pacanowski@inria.fr">Romain Pacanowski</a>, CNRS</li>
 	<li><a href="mailto:xavier.granier@inria.fr">Xavier Granier</a>, LP2N</li>
 	<li><a href="mailto:pascal.barla@inria.fr">Pascal Barla</a>, Inria</li>
 </ul>
+
+More information on the project such as diffusion list and bug tracking are available on the gforge project webpage: https://gforge.inria.fr/projects/alta/
+
 */

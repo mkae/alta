@@ -51,10 +51,10 @@ Download and install
 
 ### Obtain sources
 
-To access the sources of ALTA, you can download the alpha sources:
+To access the sources of ALTA, you can clone the public git repository:
 
 <center>
-http://alta.gforge.inria.fr/downloads/alta-alpha.tar.gz
+git clone https://gforge.inria.fr/git/alta/alta.git
 </center>
 
 
