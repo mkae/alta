@@ -35,11 +35,7 @@ class WalterSmith : public nonlinear_function
 
   public: // methods
 
-    WalterSmith()
-    {
-      setParametrization(params::CARTESIAN);
-      setDimX(6);
-    }
+    WalterSmith();
 
     //! \brief Load function specific files
     virtual bool load(std::istream& in) ;
@@ -83,6 +79,8 @@ class WalterSmith : public nonlinear_function
 
   //TODO: CHECK that this is the correct parameter
   vec _alpha;
+
+  double const SQRT_PI;
 
 } ;
 

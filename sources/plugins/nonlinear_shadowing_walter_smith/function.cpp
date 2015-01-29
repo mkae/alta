@@ -17,6 +17,11 @@ ALTA_DLL_EXPORT function* provide_function()
   return new WalterSmith();
 }
 
+WalterSmith::WalterSmith() : SQRT_PI( 1.772453850905516 )
+{
+  setParametrization(params::CARTESIAN);
+  setDimX(6);
+}
 
 
 bool 
@@ -71,17 +76,8 @@ WalterSmith::value(const vec& x) const
     half_vector /= length;   
   }
   
-
-
-  //vec res(dimY());
-  // for(unsigned int i=0; i<dimY(); ++i)
-  // {
-  //   vec[i] = 0.0; 
-  // }
-
   vec res= vec::Zero( dimY() );
 
-  
 
   //Now Compute Shadowing Quantities
   double const v_dot_h = dot(view, half_vector); 
@@ -173,6 +169,7 @@ WalterSmith:: setDimY(int nY)
 
 double  WalterSmith::shadowTerm( double a ) const 
 {
+  #define WALTER_SMITH_EXACT
   #ifdef WALTER_SMITH_EXACT
   return 2.0 / ( 1 + erf(a) + std::exp(-a*a) / ( a * SQRT_PI));
   #else //THIS IS THE RATIONAL APPROXIMATION. FASTER BUT LESS ACCURATE
