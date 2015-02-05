@@ -32,17 +32,20 @@ sources/:   contains all the source files. A Makefile or VS project can be
 2. Building
 ===========
 
-You can build ALTA using either scons or Qt's qmake tools. Both tools should
-be called at the root level of ALTA (noted ${ALTA} in the following):
+ALTA uses SCons, a Python-based build system:
 
- $ scons --cfg=config-file.py
+  http://scons.org/
 
-for scons and:
+To build ALTA, run a command like the following from the top-level
+source directory (noted ${ALTA} in the remainder of this document):
 
- $ qmake && make -i
+  $ scons --cfg=config-file.py
 
- for qmake.
+Here, 'config-file.py' must be replaced with a suitable configuration
+file for your platform.  For instance, when building with GCC on
+GNU/Linux, you may run:
 
+  $ scons --cfg=configs/scons/config-linux-gcc.py
 
 
 3. Building Advises (for Qt enthousiasts)
