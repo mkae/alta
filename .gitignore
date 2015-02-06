@@ -1,7 +1,6 @@
 .sconf_temp
 .sconsign.dblite
 config.log
-syntax: glob
 documents/doxygen
 .*.swp
 *~
