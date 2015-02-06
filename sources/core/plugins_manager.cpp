@@ -1,3 +1,14 @@
+/* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
+
+   Copyright (C) 2014, 2015 CNRS
+   Copyright (C) 2013, 2014 Inria
+
+   This file is part of ALTA.
+
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0.  If a copy of the MPL was not distributed with this
+   file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+
 #include "plugins_manager.h"
 #include "rational_function.h"
 #include "vertical_segment.h"
