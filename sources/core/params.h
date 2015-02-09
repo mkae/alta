@@ -369,6 +369,12 @@ class params
 class parametrized
 {
 	public:
+		parametrized(params::input in_param, params::output out_param) {
+			_in_param  = in_param;
+			_out_param = out_param;
+			_nX = params::dimension(_in_param);
+			_nY = params::dimension(_out_param);
+		}
 		parametrized() : _in_param(params::UNKNOWN_INPUT), 
 		                 _out_param(params::UNKNOWN_OUTPUT) { }
 

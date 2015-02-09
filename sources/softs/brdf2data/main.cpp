@@ -95,6 +95,11 @@ int main(int argc, char** argv)
 
 	if(d && f != NULL)
 	{
+		// Is the output data file already allocated and has the same size
+		// than the training data ?
+		const bool out_filled = d->size() == d_out->size();
+		const bool output_dif = args.is_defined("export-diff");
+
 		vec temp(f->dimX());
 		for(int i=0; i<d->size(); ++i)
 		{
@@ -111,12 +116,17 @@ int main(int argc, char** argv)
 			}
 			vec y = f->value(temp);
 
-			for(int j=0; j<d->dimY(); ++j)
-			{
-				x[d->dimX() + j] = y[j];
+			for(int j=0; j<d->dimY(); ++j) {
+				x[d->dimX() + j] = (output_dif) ? x[d->dimX() + j] - y[j] : y[j];
 			}
 
-            d_out->set(x);
+			// If the output data is already allocated and has the same size
+			// than the training data, we do simple copy of the index elements.
+			if(out_filled) {
+				d_out->set(i, y);
+			} else {
+            	d_out->set(x);
+            }
 		}	
 
         d_out->save(args["output"]);

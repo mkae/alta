@@ -90,18 +90,16 @@ class vertical_segment : public data
 
 		// Acces to data
 		virtual vec get(int i) const ;		
-		virtual vec operator[](int i) const ;
-		virtual vec value(vec, vec) const 
-		{
-			NOT_IMPLEMENTED();
-		}
-        virtual vec value(vec) const
+		virtual vec operator[](int i) const;
+
+        virtual vec value(const vec&) const
         {
             NOT_IMPLEMENTED();
         }
 
 		//! \brief Put the sample inside the data
-		virtual void set(vec x);
+		virtual void set(const vec& x);
+		virtual void set(int i, const vec& x);
 		
 		//! \brief Specific accessor to a vertical segment, this gives the
 		//! complete vector, plus the ordinate segment

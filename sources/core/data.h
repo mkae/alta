@@ -58,25 +58,19 @@ class data : public parametrized
 		// Acces to data
 		virtual vec get(int i) const = 0 ;
 		virtual vec operator[](int i) const = 0 ;
-		
-		/*
-		//! \brief Provide an evaluation in a BRDF way of the data. 
-		//!
-		//! \details
-		//! The input vector in (can have texture coordinate) and the output
-        //! vector out are taken to grab a value and return it. The two vectors
-		//! should be compliant with the size and parametrization of the data.
-		virtual vec value(vec in, vec out) const = 0;
-		*/
 
-        //! \brief Provide an evaluation in a BRDF way of the data.
+        //! \brief Provide an evaluation of the data using interpolation. If
+        //! the data object does not provide an interpolation mechanism, it
+        //! should throw an exception.
         //!
         //! \details
-        //! The input vector must have the parametrization of the data.
-        virtual vec value(vec in) const = 0;
+        //! The input vector must have the parametrization of the data, and
+        //! match the total dimension: dimX + dimY.
+        virtual vec value(const vec& in) const = 0;
 
 		//! \brief Put the sample inside the data
-		virtual void set(vec x) = 0;
+		virtual void set(const vec& x) = 0;
+		virtual void set(int i, const vec& x) = 0;
 
 
 		// Get data size, e.g. the number of samples to fit
@@ -130,11 +124,7 @@ class data_params : public data
 			save(std::string("cluster.gnuplot"));
 		}
 
-		virtual vec value(vec, vec) const 
-		{
-			NOT_IMPLEMENTED();
-		}
-		virtual vec value(vec) const
+		virtual vec value(const vec&) const
 		{
 			NOT_IMPLEMENTED();
 		}
@@ -163,9 +153,14 @@ class data_params : public data
 		}
 
 		//! \todo This should crash at execution.
-		virtual void set(vec x)
+		virtual void set(const vec& x)
 		{
 			this->set(x);
+		}
+
+		virtual void set(int i, const vec& x)
+		{
+			this->set(i, x);
 		}
 
 		// Get data size, e.g. the number of samples to fit

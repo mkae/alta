@@ -281,7 +281,7 @@ throw
 
 // Mathematical definition not provided on the Window plateform
 #ifdef _WIN32
-#define M_PI 3.14159265
+#define M_PI 3.1415926535897932384626433832795
 
 template<typename T> bool isnan(T x)
 {

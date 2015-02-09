@@ -342,13 +342,13 @@ vec data_merl::get(int i) const
 	res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
 	return res ;
 }
-vec data_merl::operator[](int i) const 
+vec data_merl::operator[](int i) const
 {
 	return get(i) ;
 }
 
 //! \todo Test this function
-void data_merl::set(vec x)
+void data_merl::set(const vec& x)
 {
 	assert(x.size() == 6);
 	const int phid_ind = phi_diff_index(x[2]);
@@ -366,7 +366,15 @@ void data_merl::set(vec x)
 	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
 }
 
-vec data_merl::value(vec in) const
+void data_merl::set(int i, const vec& x)
+{
+	assert(x.size() == 3);
+	brdf[i] = x[0] / RED_SCALE;
+	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] = x[1] / GREEN_SCALE;
+	brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[2] / BLUE_SCALE;
+}
+
+vec data_merl::value(const vec& in) const
 {
     double r, g, b;
     lookup_brdf_val(brdf, in[0], in[1], in[2], r, g, b) ;

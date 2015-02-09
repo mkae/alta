@@ -78,7 +78,7 @@ vec data_brdf_slice::operator[](int i) const
 }
 
 //! \todo Test this function
-void data_brdf_slice::set(vec x)
+void data_brdf_slice::set(const vec& x)
 {
 	assert(x.size() == 6);
 	assert(x[0] <= 0.5*M_PI && x[0] >= 0.0);
@@ -93,13 +93,16 @@ void data_brdf_slice::set(vec x)
 	_data[3*id + 1] = x[4];
 	_data[3*id + 2] = x[5];
 }
-
-vec data_brdf_slice::value(vec, vec) const
+void data_brdf_slice::set(int id, const vec& x)
 {
-	vec res(3);
-	return res;
+	assert(x.size() == 3);
+
+	_data[3*id + 0] = x[0];
+	_data[3*id + 1] = x[1];
+	_data[3*id + 2] = x[2];
 }
-vec data_brdf_slice::value(vec x) const
+
+vec data_brdf_slice::value(const vec& x) const
 {
 	assert(x[0] <= 0.5*M_PI && x[0] >= 0.0);
 	assert(x[1] <= 0.5*M_PI && x[1] >= 0.0);

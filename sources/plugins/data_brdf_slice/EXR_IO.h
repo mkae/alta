@@ -10,6 +10,10 @@
 
 #ifndef EXR_IO_H_
 #define EXR_IO_H_
+/*
+ * Author: Cyril Soler
+ */
+
 
 #include <stdexcept>
 

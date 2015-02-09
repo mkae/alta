@@ -155,7 +155,7 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<data, ptr<data>, boost::noncopyable>("data", bp::no_init)
 		.def("size", &data::size)
 		.def("get",  &data::get)
-		.def("set",  &data::set)
+		//.def("set",  &data::set)
 		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
 		.def("save", &data::save);
 	bp::def("get_data",  plugins_manager::get_data);

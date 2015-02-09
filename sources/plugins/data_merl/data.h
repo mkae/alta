@@ -27,13 +27,14 @@ class data_merl : public data
 		virtual void save(const std::string& filename) const ;
 
 		// Acces to data
-		virtual vec get(int i) const ;
-		virtual vec operator[](int i) const ;
+		virtual vec get(int i) const;
+		virtual vec operator[](int i) const;
 
-      virtual vec value(vec in) const;
+      virtual vec value(const vec& in) const;
 		
 		// Set data
-		virtual void set(vec x);
+		virtual void set(int i, const vec& x);
+		virtual void set(const vec& x);
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const ;

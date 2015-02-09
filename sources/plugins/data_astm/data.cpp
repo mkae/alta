@@ -66,7 +66,7 @@ void data_astm::load(const std::string& filename, const arguments& args)
 }
 
 // Acces to data
-vec data_astm::get(int i) const 
+vec& data_astm::get(int i) 
 {
 	return _data[i];
 }

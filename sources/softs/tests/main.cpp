@@ -1,3 +1,4 @@
+
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2013 Inria
@@ -7,6 +8,29 @@
    This Source Code Form is subject to the terms of the Mozilla Public
    License, v. 2.0.  If a copy of the MPL was not distributed with this
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+
+#include <core/param.h>
+
+int main(int argc, char** argv) {
+
+	spherical sphericalParam;
+	isotropic_tl_tv isotropicParam;
+
+	vec in(4);
+	in[0] = 0.0;
+	in[1] = 0.0;
+	in[2] = 0.0;
+	in[3] = 0.0;
+
+	vec out(2);
+	sphericalParam.convert_to(in, isotropicParam, out);
+
+	return 0;
+}
+
+
+#ifdef OLD
+
 
 #include <core/args.h>
 #include <core/data.h>
@@ -208,3 +232,5 @@ int parametrization_tests()
 */
 	return nb_tests_failed;
 }
+
+#endif
