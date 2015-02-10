@@ -8,10 +8,10 @@ build_lib = False
 
 conf = Configure(env)
 
-if conf.CheckCXXHeader('unsupported/Eigen/LevenbergMarquardt'):
-
+if conf.CheckCXXHeader(‘unsupported/Eigen/LevenbergMarquardt'):
 	build_lib = True
-
+else:
+  print "<<WARNING>> Unsupported Eigen LevenbergMarquardt was not found"
 #end
 env = conf.Finish()
 
