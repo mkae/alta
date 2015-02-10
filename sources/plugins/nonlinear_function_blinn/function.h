@@ -89,7 +89,9 @@ class blinn_function : public nonlinear_function
 
 		void setDimY(int nY)
 		{
-			_nY = nY ;
+			//CODE CONSISTENCY WITH THE OTHER PLUGIN
+			//_nY = nY ;
+			function::setDimY(nY);
 
 			// Update the length of the vectors
 			_ks.resize(_nY) ;
@@ -99,9 +101,9 @@ class blinn_function : public nonlinear_function
 		void save_call(std::ostream& out, const arguments& args) const;
 		void save_body(std::ostream& out, const arguments& args) const;
 
-	private: // data
+	private: // lobe parameters
 
-		//! \brief The blinn lobe data
+		//! \brief The blinn lobe parameters
 		vec _ks, _N;
 } ;
 
