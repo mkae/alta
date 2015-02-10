@@ -24,11 +24,7 @@
 
 class UTIA : public data {
 private:
-/*
-	char*   path;
-	char*   matName;
-	int     step;
-*/
+
 	float   step_t,step_p;
 	int     nti, ntv, npi, npv, planes;
 	int     nPerPlane;
@@ -139,10 +135,10 @@ public:
 	// Acces to data
 	virtual vec get(int i) const {
 		vec res(7);
-		res[1] = 2.0*M_PI*double(i%npv)/double(npv); i /= npv;
-		res[0] = 0.5*M_PI*double(i%ntv)/double(ntv); i /= ntv;
-		res[3] = 2.0*M_PI*double(i%npi)/double(npi); i /= npi;
-		res[2] = 0.5*M_PI*double(i%nti)/double(nti);
+		res[3] = 2.0*M_PI*double(i%npv)/double(npv); i /= npv;
+		res[2] = 0.5*M_PI*double(i%ntv)/double(ntv); i /= ntv;
+		res[1] = 2.0*M_PI*double(i%npi)/double(npi); i /= npi;
+		res[0] = 0.5*M_PI*double(i%nti)/double(nti);
 		res[4] = Bd[i + 0*nPerPlane];
 		res[5] = Bd[i + 1*nPerPlane];
 		res[6] = Bd[i + 2*nPerPlane];
@@ -150,10 +146,10 @@ public:
 	}
 	virtual vec operator[](int i) const {
 		vec res(7);
-		res[1] = 2.0*M_PI*double(i%npv)/double(npv); i /= npv;
-		res[0] = 0.5*M_PI*double(i%ntv)/double(ntv); i /= ntv;
-		res[3] = 2.0*M_PI*double(i%npi)/double(npi); i /= npi;
-		res[2] = 0.5*M_PI*double(i%nti)/double(nti);
+		res[3] = 2.0*M_PI*double(i%npv)/double(npv); i /= npv;
+		res[2] = 0.5*M_PI*double(i%ntv)/double(ntv); i /= ntv;
+		res[1] = 2.0*M_PI*double(i%npi)/double(npi); i /= npi;
+		res[0] = 0.5*M_PI*double(i%nti)/double(nti);
 		res[4] = Bd[i + 0*nPerPlane];
 		res[5] = Bd[i + 1*nPerPlane];
 		res[6] = Bd[i + 2*nPerPlane];
@@ -164,9 +160,9 @@ public:
 		// Input and Ouput parameters
 		vec RGB(3);
 		double theta_i = in[0];
-		double phi_i   = in[2];
-		double theta_v = in[3];
-		double phi_v   = in[4];
+		double phi_i   = in[1];
+		double theta_v = in[2];
+		double phi_v   = in[3];
 
 		double PI2 = M_PI*0.5;
 		if(theta_i>PI2 || theta_v>PI2) {
