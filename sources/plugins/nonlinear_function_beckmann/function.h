@@ -87,6 +87,7 @@ class beckmann_function : public nonlinear_function
 
 	private: // data
 
-		vec _ks, _a; // Lobes data
+		vec _ks; //Specular coefficients. One per color/wavelength
+		vec _a; // Roughness parameters.  One per color/wavelength
 } ;
 
