@@ -5,7 +5,9 @@ import shutil
 import subprocess
 
 # Download GLOG
-obtain.obtain('GLOG v0.3.3', 'glog-0.3.3', 'http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz', 'glog-0.3.3.tar.gz')
+obtain.obtain('GLOG v0.3.3', 'glog-0.3.3',
+              'http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz', 'glog-0.3.3.tar.gz',
+              'fbf90c2285ba0561db7a40f8a4eefb9aa963e7d399bd450363e959929fe849d0')
 
 if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'glog'):
 	if os.name == 'nt':
@@ -32,7 +34,8 @@ name      = 'CERES v' + version
 directory = base + '-' + version
 url       = 'http://ceres-solver.org/ceres-solver-' + version + '.tar.gz'
 filename  = 'ceres-solver-' + version + '.tar.gz'
-obtain.obtain(name, directory, url, filename)
+sha256    = '30ac0729249f908afe80cb6fd06ae6d037f25a60d9fac54f61344389adab9c1a'
+obtain.obtain(name, directory, url, filename, sha256)
 
 ## Test for the presence of already compiled ceres version in
 ## the $ALTA/external/build directory. Then test for the

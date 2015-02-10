@@ -5,7 +5,9 @@ import shutil
 
 
 # Download NlOpt
-obtain.obtain('NlOpt', 'nlopt-2.4.1', 'http://ab-initio.mit.edu/nlopt/nlopt-2.4.1.tar.gz', 'nlopt-2.4.1.tar.gz')
+obtain.obtain('NlOpt', 'nlopt-2.4.1',
+              'http://ab-initio.mit.edu/nlopt/nlopt-2.4.1.tar.gz', 'nlopt-2.4.1.tar.gz',
+              'fe9ade54ed79c87f682540c34ad4e610ff32c9a43c52c6ea78cef6adcd5c1319')
 
 if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'nlopt.hpp'):
 	if os.name == 'nt':

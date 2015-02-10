@@ -3,15 +3,42 @@ import os
 import sys
 import shutil
 import tarfile
+import hashlib
+import SCons.Errors
 
 # Check if the build dir exists
 if not os.path.exists('build'):
 	os.mkdir('build')
 #end
 
-# Download a file
-def download(url, filename):
+# Make sure that FILENAME has the given SHA256, and raise an error
+# otherwise.
+def check_integrity(filename, sha256):
+        hasher = hashlib.sha256()
+        BLOCK_SIZE = 65536
+        with open(filename, 'rb') as input:
+                buf = input.read(BLOCK_SIZE);
+                while len(buf) > 0:
+                        hasher.update(buf)
+                        buf = input.read(BLOCK_SIZE)
+        obtained = hasher.hexdigest()
+        if obtained != sha256:
+                # Keep the faulty file around but move it out of the
+                # way so we don't end up using it by mistake.
+                os.rename(filename, filename + ".wrong-hash")
+
+                print >> sys.stderr, "error: downloaded file '" + \
+                        filename + "' is inauthentic"
+                print >> sys.stderr, \
+                        "error: got sha256 hash {0} but expected {1}".format(obtained, sha256)
+                raise SCons.Errors.BuildError("downloaded file is inauthentic",
+                                              1, 1, filename)
+
+# Download from URL to FILENAME, and make sure the result has the
+# given SHA256.
+def download(url, filename, sha256):
 	urllib.urlretrieve(url, filename)
+        check_integrity(filename, sha256)
 #end
 
 # Uncompress the archive
@@ -25,12 +52,12 @@ def patch(filename, patch):
 	ret = os.system('patch ' + filename + ' ' + patch)
 #end
 
-# Obtain a package and uncompress it
-def obtain(name, rep, url, filename):
+# Obtain a package, check its integrity, and uncompress it.
+def obtain(name, rep, url, filename, sha256):
 	if not os.path.exists(rep):
 		print '<<INSTALL>> Obtaining ' + name
 
-		download(url, filename)
+		download(url, filename, sha256)
 		uncompress(filename)
 	else:
 		print '<<INSTALL>> ' + name + ' already available'
