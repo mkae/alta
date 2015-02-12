@@ -19,22 +19,22 @@ if env.GetOption('clean'):
 	
 else:
 	##
-	#   IpOpt dependancies
+	#   IpOpt dependencies
 	##
 	execfile('obtain_ipopt.py')
 
 	##
-	#   NlOpt dependancies
+	#   NlOpt dependencies
 	##
 	execfile('obtain_nlopt.py')
 	
 	##
-	#   Eigen dependancies
+	#   Eigen dependencies
 	##
 	execfile('obtain_eigen.py')
 
 	##
-	#   CERES dependancies
+	#   CERES dependencies
 	##
 	if 'CERES_INC' in env:
 		if env['CERES_INC'] == ['#external/build/include'] and env['CERES_DIR'] == ['#external/build/lib']:
