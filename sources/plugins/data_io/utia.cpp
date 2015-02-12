@@ -49,10 +49,12 @@ public:
 	    setDimX(4);
 	    setDimY(3);
 
+	    _min.resize(4);
 	    _min[0] = 0.0;
 	    _min[1] = 0.0;
 	    _min[2] = 0.0;
 	    _min[3] = 0.0;
+	    _max.resize(4);
 	    _max[0] = 0.5*M_PI;
 	    _max[1] = 2.0*M_PI;
 	    _max[2] = 0.5*M_PI;
