@@ -51,6 +51,7 @@ class vec : public std::vector<double>
 
 		//! \brief copy operator. It resize the left operand to the size of the 
 		//! right operand.
+    //! RP: WHy isn't the return type vec& ? 
 		vec operator=(const vec& a)
 		{
 			this->resize(a.size());
@@ -58,6 +59,7 @@ class vec : public std::vector<double>
 			{
 				this->at(i) = a[i];
 			}
+
 			return *this ;
 		}
 
@@ -311,6 +313,12 @@ template<typename T> T erf(T x)
 
     return sign*y;
 }
+
+template<typename T> T erfc( T x )
+{
+  return 1 - erf(x);
+}
+
 #endif
 
 #ifdef _WIN32
