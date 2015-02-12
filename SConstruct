@@ -76,7 +76,7 @@ vars.Add('MATLAB_LIB',        'MATLAB libraries')
 
 # Select user environment variables that we want to honor.
 envVars = {}
-for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH' ]:
+for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH' ]:
         if var in os.environ:
                 envVars[var] = os.environ[var]
 
@@ -95,6 +95,23 @@ if sys.platform == 'darwin':
 	env.AppendUnique(CPPPATH = ['/opt/local/include/'])
 
 #end
+
+def CheckPKG(context, name):
+        """Return True if package NAME can be found with 'pkg-config'."""
+        context.Message('Checking for %s... ' % name)
+        ret = context.TryAction('pkg-config --exists \'%s\'' % name)[0]
+        context.Result(ret)
+        return ret
+
+# Configuration.
+
+conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+
+if conf.CheckPKG('eigen3 >= 3.2.0'):
+        env.ParseConfig('pkg-config --cflags --libs eigen3')
+
+env = conf.Finish()
+
 
 
 ## COMPILER dependant section

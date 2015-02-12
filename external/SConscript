@@ -18,6 +18,8 @@ if env.GetOption('clean'):
 	#shutil.rmtree('nlopt-2.4.1', True)
 	
 else:
+        conf = Configure(env)
+
 	##
 	#   IpOpt dependencies
 	##
@@ -31,7 +33,14 @@ else:
 	##
 	#   Eigen dependencies
 	##
-	execfile('obtain_eigen.py')
+
+        # At this point CCFLAGS and LINKFLAGS already contain the
+        # right flags if Eigen was found via 'pkg-config'.  Check
+        # whether it's usable, and download it if it's not.
+        if not conf.CheckCXXHeader('Eigen/Core'):
+                execfile('obtain_eigen.py')
+
+        conf.Finish()
 
 	##
 	#   CERES dependencies
