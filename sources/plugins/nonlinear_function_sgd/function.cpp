@@ -32,9 +32,15 @@ vec shifted_gamma_function::operator()(const vec& x) const
 vec shifted_gamma_function::value(const vec& x) const 
 {
 	// shading
-	vec lv(3); lv[0] = x[0]; lv[1] = x[1]; lv[2] = x[2];
-	vec n(3); n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
-	vec ev(3); ev[0] = x[3]; ev[1] = x[4]; ev[2] = x[5];
+	vec lv(3); 
+	lv[0] = x[0]; lv[1] = x[1]; lv[2] = x[2];
+
+	vec n(3); 
+	n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
+
+	vec ev(3); 
+	ev[0] = x[3]; ev[1] = x[4]; ev[2] = x[5];
+	
 	vec halfVector = normalize(lv + ev);
 	
 	double v_h = dot(ev, halfVector);
