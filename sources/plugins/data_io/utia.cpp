@@ -8,7 +8,6 @@
   This is an adaptation of the TBDRF.cpp file from Filip Jiri to the ALTA
   library. Conversion was made by Laurent Belcour on February 2015.
 
-  Authors: 
 *****************************************************************************/
 
 #include <core/common.h>
@@ -47,8 +46,17 @@ public:
 		// Set the input and output parametrization
 	    _in_param  = params::SPHERICAL_TL_PL_TV_PV;
 	    _out_param = params::RGB_COLOR;
-	    _nX = 4;
-	    _nY = 3;
+	    setDimX(4);
+	    setDimY(3);
+
+	    _min[0] = 0.0;
+	    _min[1] = 0.0;
+	    _min[2] = 0.0;
+	    _min[3] = 0.0;
+	    _max[0] = 0.5*M_PI;
+	    _max[1] = 2.0*M_PI;
+	    _max[2] = 0.5*M_PI;
+	    _max[3] = 2.0*M_PI;
 	}
 
 	virtual ~UTIA() {
@@ -158,6 +166,30 @@ public:
 		return res;
 	}
 
+	virtual void vecToIndex(const vec& in, int& iti, int& ipi, int& itv, int& ipv) const {
+		double theta_i = in[0];
+		double phi_i   = in[1];
+		double theta_v = in[2];
+		double phi_v   = in[3];
+
+		float d2r = 180.f/M_PI;
+		theta_i *= d2r;
+		theta_v *= d2r;
+		phi_i *= d2r;
+		phi_v *= d2r;
+		if(phi_i>=360.f) {
+			phi_i = 0.f;
+		}
+		if(phi_v>=360.f) {
+			phi_v = 0.f;
+		}
+
+		iti = (int)(floor(theta_i/step_t));
+		itv = (int)(floor(theta_v/step_t));
+		ipi = (int)(floor(phi_i/step_p));
+		ipv = (int)(floor(phi_v/step_p));
+	}
+
 	virtual vec value(const vec& in) const {
 		// Input and Ouput parameters
 		vec RGB(3);
@@ -249,6 +281,19 @@ public:
 	// Set data
 	virtual void set(const vec& x) {
 		assert(x.size() == dimX()+dimY());
+
+		const double PI2 = M_PI*0.5;
+		if(x[0]>PI2 || x[2]>PI2) {
+			return;
+		}
+
+		int iti, ipi, itv, ipv;
+		vecToIndex(x, iti, ipi, itv, ipv);
+
+		const int index = ((iti*npi + ipi)*ntv + itv)*npv + ipv;
+		Bd[index + 0*nPerPlane] = x[dimX() + 0];
+		Bd[index + 1*nPerPlane] = x[dimX() + 1];
+		Bd[index + 2*nPerPlane] = x[dimX() + 2];
 	}
 
 	virtual void set(int i, const vec& x) {
