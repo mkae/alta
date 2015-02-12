@@ -27,6 +27,10 @@ ALTA_DLL_EXPORT function* provide_function()
 		
 vec beckmann_function::G(const vec& x) const
 {
+	//TODO : RP: REMOVE THIS CODE BECAUSE IT IS NEVER CALLED ?
+	//TThe code below is equivalent to the Walter approximation 
+	// for Smith67 Shadowing
+	// See also plugin nonlinear_shadowing_walter_smith
 	vec res(dimY());
 
 	for(int i=0; i<dimY(); ++i)
@@ -37,7 +41,7 @@ vec beckmann_function::G(const vec& x) const
 		res[i] = 1.0;
 		if(cl < 1.6)
 		{
-			res[i] *= (3.535*cl + 2.181*cl*cl) / (1 + 2.276*cl + 2.577*cl*cl);
+			res[i] *= ((3.535 + 2.181*cl) * cl) / ( 1 + ( 2.276 + 2.577*cl)*cl);
 		}
 		if(cv < 1.6)
 		{
@@ -266,9 +270,10 @@ void beckmann_function::save_body(std::ostream& out, const arguments& args) cons
 
     if(is_shader)
     {
-        out << "vec3 g_beckmann(vec3 M, vec3 N, vec3 a)" << std::endl;
+    	//This is the Rational Approximation Code from Walter2007
+    	out << "vec3 g_beckmann(vec3 M, vec3 N, vec3 a)" << std::endl;
 		  out << "{" << std::endl;
-        out << "\tfloat d = dot(M,N);" << std::endl;
+      out << "\tfloat d = dot(M,N);" << std::endl;
 		  out << "\tvec3 c = d / (a * sqrt(1.0f-d));" << std::endl;
 		  out << "\tvec3 r;" << std::endl;
 		  out << "\tif(c.x < 1.6f) {" << std::endl;
@@ -287,16 +292,19 @@ void beckmann_function::save_body(std::ostream& out, const arguments& args) cons
 		  out << "\t\tr.z = 1.0f;" << std::endl;
 		  out << "\t}" << std::endl;
 		  out << "\treturn r;" << std::endl;
-        out << "}" << std::endl;
+      out << "}" << std::endl;
+
 		  out << std::endl;
-        out << "vec3 beckmann(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 ks, vec3 a)" << std::endl;
-        out << "{" << std::endl;
-        out << "\tvec3  H   = normalize(L + V);" << std::endl;
-        out << "\tfloat hn  = dot(H,N);" << std::endl;
+
+		  // This part is the call to beckmann function
+      out << "vec3 beckmann(vec3 L, vec3 V, vec3 N, vec3 X, vec3 Y, vec3 ks, vec3 a)" << std::endl;
+      out << "{" << std::endl;
+      out << "\tvec3  H   = normalize(L + V);" << std::endl;
+      out << "\tfloat hn  = dot(H,N);" << std::endl;
 		  out << "\tfloat ln  = dot(L,N);" << std::endl;
 		  out << "\tfloat vn  = dot(V,N);" << std::endl;
 		  out << "\t" << std::endl;
-        out << "\treturn ks / (4 * " << M_PI << " * a*a * ln*vn) * exp((hn*hn - 1.0) / (a*a*hn*hn)) * g_beckmann(L,N,a) * g_beckmann(V,N,a);" << std::endl;
-        out << "}" << std::endl;
+      out << "\treturn ks / (4 * " << M_PI << " * a*a * ln*vn) * exp((hn*hn - 1.0) / (a*a*hn*hn)) * g_beckmann(L,N,a) * g_beckmann(V,N,a);" << std::endl;
+      out << "}" << std::endl;
     }
 }
