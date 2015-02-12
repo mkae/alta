@@ -114,19 +114,16 @@ vec data_interpolant::operator[](int i) const
 	return get(i) ;
 }
 
-//! \todo Test this function
-void data_interpolant::set(vec x)
+void data_interpolant::set(const vec& x)
 {
-	assert(x.size() == dimX());
+	NOT_IMPLEMENTED();
+}
+void data_interpolant::set(int i, const vec& x)
+{
+	NOT_IMPLEMENTED();
 }
 
-vec data_interpolant::value(vec, vec) const
-{
-	vec res(dimY());
-	std::cerr << "<<ERROR>> Deprecated function: " << __func__ << std::endl;
-	return res;
-}
-vec data_interpolant::value(vec ax) const
+vec data_interpolant::value(const vec& ax) const
 {
 	vec res = vec::Zero(dimY());
 	
