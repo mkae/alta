@@ -145,10 +145,11 @@ WalterSmith::save_body(std::ostream& out, const arguments& args) const
     out << "\t vec3 H = normalize(L + V);" << std::endl;
     out << "\t float NdotL  = max( dot(N,L), 0.0 );" << std::endl;
     out << "\t float NdotV  = max( dot(N,V), 0.0 );" << std::endl;
-    out << "\t float dot_NH = max( dot(N,H), 0.0 );" << std::endl;
-    out << "\t float chi_v =  step( 0.0, dot_NH / NdotV ) ; " << std::endl;
+    out << "\t float VdotH = max( dot(V,H), 0.0 );" << std::endl;
+    out << "\t float LdotH = max( dot(L,H), 0.0 );" << std::endl;
+    out << "\t float chi_v =  step( 0.0, VdotH / NdotV ) ; " << std::endl;
     out << "\t if( chi_v <= 0.0 ) { return vec3(0.0, 0.0, 0.0); }" << std::endl;
-    out << "\t float chi_l =  step( 0.0, dot_NH / NdotL ) ; " << std::endl;
+    out << "\t float chi_l =  step( 0.0, LdotH / NdotL ) ; " << std::endl;
     out << "\t if( chi_l <= 0.0 ) { return vec3(0.0, 0.0, 0.0); }" << std::endl
         << std::endl;
 
