@@ -17,6 +17,7 @@ SConscript('nonlinear_function_abc/SConscript')
 SConscript('nonlinear_function_blinn/SConscript')
 SConscript('nonlinear_function_isotropic_lafortune/SConscript')
 SConscript('nonlinear_function_sgd/SConscript')
+SConscript('nonlinear_function_ward/SConscript')
 
 
 # Building nonlinear masking functions
