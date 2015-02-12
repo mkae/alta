@@ -71,9 +71,10 @@ public:
 				for(int i=0; i<H; ++i)
 					for(int j=0; j<W; ++j){
 						int index = i*W+j;
-		    			Bd[index + 0*nPerPlane] = temp[3*(i + j*W) + 0];
-		    			Bd[index + 1*nPerPlane] = temp[3*(i + j*W) + 1];
-		    			Bd[index + 2*nPerPlane] = temp[3*(i + j*W) + 2];
+						// TODO: The indexing is not the same here
+		    			Bd[index + 0*nPerPlane] = temp[3*index + 0];
+		    			Bd[index + 1*nPerPlane] = temp[3*index + 1];
+		    			Bd[index + 2*nPerPlane] = temp[3*index + 2];
 		  			}
 
 				delete[] temp;
@@ -114,9 +115,10 @@ public:
 			for(int i=0; i<H; ++i)
 				for(int j=0; j<W; ++j){
 					int index = i*W+j;
-	    			temp[3*(i + j*W) + 0] = Bd[index + 0*nPerPlane];
-	    			temp[3*(i + j*W) + 1] = Bd[index + 1*nPerPlane];
-	    			temp[3*(i + j*W) + 2] = Bd[index + 2*nPerPlane];
+					// TODO: The indexing is not the same here
+	    			temp[3*index + 0] = Bd[index + 0*nPerPlane];
+	    			temp[3*index + 1] = Bd[index + 1*nPerPlane];
+	    			temp[3*index + 2] = Bd[index + 2*nPerPlane];
 	  			}
 	  		t_EXR_IO<double>::SaveEXR(filename.c_str(), W, H, temp, 3);
 			delete[] temp;
