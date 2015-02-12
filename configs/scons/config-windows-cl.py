@@ -11,7 +11,6 @@ import os, sys
 ##
 CXX            = 'cl'
 CCFLAGS        = []
-LINKFLAGS      = []
 
 
 ## ALTA internal flags

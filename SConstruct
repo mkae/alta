@@ -34,8 +34,10 @@ if not os.path.exists(configFile):
 
 vars = Variables(configFile)
 vars.Add('CXX',               'Compiler')
-vars.Add('CCFLAGS',           'Compiler\'s flags')
-vars.Add('LINKFLAGS',         'Linker\'s flags')
+vars.Add('CCFLAGS',           'Compiler\'s flags',
+         default = ['-g', '-O2', '-Wall'])
+vars.Add('LINKFLAGS',         'Linker\'s flags',
+         default = [])
 vars.Add('CORE_LIB',          'Special links for ALTA core')
 vars.Add('SOFT_LIB',          'Special links for ALTA soft')
 vars.Add('PLUGIN_LIB',        'Special links for ALTA plugin')
