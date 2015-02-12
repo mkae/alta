@@ -33,6 +33,8 @@ typedef Delaunay_d::Point_const_iterator P_iter;
 
 Delaunay_d* D;
 int dD;
+#else
+#include <flann/flann.hpp>
 #endif
 
 data_interpolant::data_interpolant() : _data(new vertical_segment())
@@ -80,7 +82,8 @@ void data_interpolant::load(const std::string& filename)
 	std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
 #else
 	// Update the KDtreee by inserting all points
-	flann::Matrix<double> pts(new double[dimX()*_data->size()], _data->size(), dimX());
+	double* _d = new double[dimX()*_data->size()];
+	flann::Matrix<double> pts(_d, _data->size(), dimX());
 	for(int i=0; i<_data->size(); ++i)
 	{
 		vec x = _data->get(i);
@@ -111,24 +114,23 @@ vec data_interpolant::operator[](int i) const
 }
 
 //! \todo Test this function
-void data_interpolant::set(vec x)
+void data_interpolant::set(const vec& x)
 {
-	assert(x.size() == dimX());
+	NOT_IMPLEMENTED();
+}
+void data_interpolant::set(int i, const vec& x)
+{
+	NOT_IMPLEMENTED();	
 }
 
-vec data_interpolant::value(vec, vec) const
-{
-	vec res(dimY());
-	std::cerr << "<<ERROR>> Deprecated function: " << __func__ << std::endl;
-	return res;
-}
-vec data_interpolant::value(vec x) const
+vec data_interpolant::value(const vec& x) const
 {
 	vec res = vec::Zero(dimY());
 
 #ifndef USE_DELAUNAY
 	// Query point
-	flann::Matrix<double> pts(&x[0], 1, dimX());
+	vec xc(x);
+	flann::Matrix<double> pts(&xc[0], 1, dimX());
 	std::vector< std::vector<int> >    indices;
 	std::vector< std::vector<double> > dists;
 

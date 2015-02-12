@@ -43,11 +43,11 @@ class data_interpolant : public data
 		virtual vec get(int i) const ;
 		virtual vec operator[](int i) const ;
 
-		virtual vec value(vec in, vec out) const;
-		virtual vec value(vec x) const;
+		virtual vec value(const vec& x) const;
 
 		// Set data
-		virtual void set(vec x);
+		virtual void set(const vec& x);
+		virtual void set(int i, const vec& x);
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const ;
@@ -59,6 +59,5 @@ class data_interpolant : public data
 
 		// Interpolation 
 		flann::Index< flann::L2<double> >* _kdtree;
-		flann::Matrix<double>* _points;
 		int _knn;
 } ;
