@@ -18,6 +18,16 @@ if env.GetOption('clean'):
 	#shutil.rmtree('nlopt-2.4.1', True)
 	
 else:
+        ##
+        # Check for optional dependencies, downloading them if they
+        # are not already available in the user's environment.
+        #
+        # At this point CCFLAGS and LINKFLAGS already contain the
+        # right flags if those dependencies if they found via
+        # 'pkg-config'.  Check whether they are usable, and download
+        # them if not.
+        #
+        ##
         conf = Configure(env)
 
 	##
@@ -28,15 +38,12 @@ else:
 	##
 	#   NlOpt dependencies
 	##
-	execfile('obtain_nlopt.py')
+        if not conf.CheckLibWithHeader('nlopt', 'nlopt.hpp', 'c++'):
+                execfile('obtain_nlopt.py')
 	
 	##
 	#   Eigen dependencies
 	##
-
-        # At this point CCFLAGS and LINKFLAGS already contain the
-        # right flags if Eigen was found via 'pkg-config'.  Check
-        # whether it's usable, and download it if it's not.
         if not conf.CheckCXXHeader('Eigen/Core'):
                 execfile('obtain_eigen.py')
 
