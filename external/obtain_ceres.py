@@ -24,10 +24,7 @@ else:
 #end
 
 
-# Download Eigen3
-execfile('obtain_eigen.py')
- 
-# Download CERES
+# Download CERES.  Assume Eigen is already available.
 version   = '1.9.0'
 base      = 'ceres-solver'
 name      = 'CERES v' + version
