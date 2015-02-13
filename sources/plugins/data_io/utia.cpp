@@ -8,6 +8,13 @@
   This is an adaptation of the TBDRF.cpp file from Filip Jiri to the ALTA
   library. Conversion was made by Laurent Belcour on February 2015.
 
+  This file is available through a Creative-Commons BY-NC 3.0:
+
+       http://creativecommons.org/licenses/by-nc/3.0/
+
+  You are free to use, share and adapt this file as long as it is not used
+  for commercial purposes.
+
 *****************************************************************************/
 
 #include <core/common.h>
