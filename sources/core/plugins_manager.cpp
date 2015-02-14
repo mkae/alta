@@ -214,10 +214,10 @@ function* plugins_manager::get_function(const std::string& filename)
 	function* f = get_function(args);
 	f->setDimX(nX);
 	f->setDimY(nY);
-    if(f->input_parametrization() == params::UNKNOWN_INPUT)
-    {
-        f->setParametrization(param_in);
-    }
+  if(f->input_parametrization() == params::UNKNOWN_INPUT)
+  {
+    f->setParametrization(param_in);
+  }
 	f->setParametrization(param_out);
 
 	// Load the function part from the file object
@@ -227,7 +227,7 @@ function* plugins_manager::get_function(const std::string& filename)
 }
 
 //! Get an instance of the function selected based on the name <em>n</em>.
-//! Return NULL if no one exist.
+//! Return NULL if none exists.
 function* plugins_manager::get_function(const arguments& args)
 {
     if(!args.is_defined("func"))
@@ -268,7 +268,7 @@ function* plugins_manager::get_function(const arguments& args)
           function* f = get_function(temp_args);
           if(dynamic_cast<nonlinear_function*>(f) == NULL)
           {
-              std::cerr << "<<ERROR>> only non-linear function care compatible with a compound" << std::endl;
+              std::cerr << "<<ERROR>> only non-linear function are compatible with a compound" << std::endl;
           }
           else
           {
@@ -335,12 +335,12 @@ function* plugins_manager::get_function(const arguments& args)
       nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
       if(func_fres != NULL)
       {
-      return new product_function(nl_func, func_fres);
+        return new product_function(nl_func, func_fres);
       }
       else
       {
-       std::cerr << "<<ERROR>> the right part of the product is not a nonlinear function. Will use only the left part." << std::endl;
-       return func;
+        std::cerr << "<<ERROR>> the right part of the product is not a nonlinear function. Will use only the left part." << std::endl;
+        return func;
       }
 	 }
 

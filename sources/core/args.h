@@ -36,66 +36,63 @@ class arguments
 		{
 		}
 		arguments(int argc, char** const argv)
+    {
+      for(int i=0; i<argc; ++i)
+      {
+        std::string temp(argv[i]) ;
+        std::string key;
+        std::string data;
+
+        if(temp.compare(0, 2, "--") == 0)
         {
-            for(int i=0; i<argc; ++i)
+            key = temp.substr(2, temp.size()-2) ;
+  #ifdef DEBUG_ARGS
+            std::cout << "<<DEBUG>> (" << i << ")" << key << " -> [ ";
+  #endif
+            if(++i < argc)
             {
-                std::string temp(argv[i]) ;
-                std::string key;
-                std::string data;
-
-                if(temp.compare(0, 2, "--") == 0)
+                std::string next(argv[i]) ;
+                if(next[0] == '-')
                 {
-//#define DEBUG_ARGS
-                    key = temp.substr(2, temp.size()-2) ;
-#ifdef DEBUG_ARGS
-                    std::cout << "<<DEBUG>> (" << i << ")" << key << " -> [ ";
-#endif
-                    if(++i < argc)
-                    {
-
-                        std::string next(argv[i]) ;
-                        if(next[0] == '-')
-                        {
-                            --i;
-                        }
-                        else if(next[0] == '[' && next[next.size()-1] != ']')
-                        {
-                            data.append(next);
-
-                            ++i;
-                            while(i < argc && next[next.size()-1] != ']')
-                            {
-                                next = argv[i] ;
-                                data.append(" ");
-#ifdef DEBUG_ARGS
-                                std::cout << " ";
-#endif
-                                data.append(next);
-#ifdef DEBUG_ARGS
-                                std::cout << "(" << i << ")" << next;
-#endif
-
-                                ++i;
-                            }
-                            --i;
-                        }
-                        else
-                        {
-#ifdef DEBUG_ARGS
-                            std::cout << next;
-#endif
-                            data.append(next);
-                        }
-                    }
-#ifdef DEBUG_ARGS
-                    std::cout << "]" << std::endl;
-#endif
-                    _map.insert(std::pair<std::string, std::string>(key, data)) ;
+                    --i;
                 }
+                else if(next[0] == '[' && next[next.size()-1] != ']')
+                {
+                    data.append(next);
 
-            }
-        }
-		~arguments()
+                    ++i;
+                    while(i < argc && next[next.size()-1] != ']')
+                    {
+                        next = argv[i] ;
+                        data.append(" ");
+  #ifdef DEBUG_ARGS
+                        std::cout << " ";
+  #endif
+                        data.append(next);
+  #ifdef DEBUG_ARGS
+                        std::cout << "(" << i << ")" << next;
+  #endif
+                        ++i;
+                    }
+                    --i;
+                }
+                else
+                {
+  #ifdef DEBUG_ARGS
+                    std::cout << next;
+  #endif
+                    data.append(next);
+                }
+            }//end of if 
+  #ifdef DEBUG_ARGS
+            std::cout << "]" << std::endl;
+  #endif
+            _map.insert(std::pair<std::string, std::string>(key, data)) ;
+        }//end of if test with "--"
+      }//end of for-loop
+    }
+		
+    ~arguments()
 		{
 		}
 
@@ -110,43 +107,45 @@ class arguments
 			{
 				return false ;
 			}
-        }
+    }
 
-        //! \brief is the data at the given key in a vector format?
-        //! No matter the type of the data, this function will test is the
-        //! mapped string is of type "[ .... ]".
-        //! It returns false if there is no associated entry.
-        bool is_vec(const std::string& key) const
+    //! \brief is the data at the given key in a vector format?
+    //! No matter the type of the data, this function will test is the
+    //! mapped string is of type "[ .... ]".
+    //! It returns false if there is no associated entry.
+    bool is_vec(const std::string& key) const
+    {
+        if(_map.count(key) > 0)
         {
-            if(_map.count(key) > 0)
-            {
-                return _map.find(key)->second[0] == '[' ;
-            }
-            else
-            {
-                return false ;
-            }
+            return _map.find(key)->second[0] == '[' ;
         }
+        else
+        {
+            return false ;
+        }
+    }
 
 		//! \brief access the element stored value
 		std::string operator[](const std::string& key) const
 		{
-			if(_map.count(key) > 0)
-			{
-				return _map.find(key)->second ;
-			}
-			else
-			{
+  		if(_map.count(key) > 0)
+  		{
+  			return _map.find(key)->second ;
+  		}
+  		else
+  		{
                 //std::cerr << "Underfined request to key : \"" << key << "\"" << std::endl ;
-				return std::string() ;
-			}
-        }
-        //! \brief update the value \a val stored under key \a key
-        void update(const std::string& key, const std::string& val)
-        {
-            _map[key] = val;
-        }
-		//! \brief acces to the string value associated with the parameter
+  			return std::string() ;
+  		}
+    }
+    
+    //! \brief update the value \a val stored under key \a key
+    void update(const std::string& key, const std::string& val)
+    {
+        _map[key] = val;
+    }
+		
+    //! \brief acces to the string value associated with the parameter
 		//! \a key.
 		//!
 		//! The \a default_value argument will be returned if the \a key
@@ -158,6 +157,7 @@ class arguments
 			else
 				return default_value ;
 		}
+
 		//! \brief acces to the float value associated with the parameter
 		//! \a key.
 		//!
@@ -170,6 +170,7 @@ class arguments
 			else
 				return default_value ;
 		}
+
 		//! \brief acces to the integer value associated with the parameter
 		//! \a key.
 		//!
@@ -182,7 +183,8 @@ class arguments
 			else
 				return default_value ;
 		} 
-		//! \brief acces to a vector of float of size \a size associated with
+	
+  	//! \brief acces to a vector of float of size \a size associated with
 		//! the parameter \a key.
 		//!
 		//! The \a default_value argument will be returned if the \a key
@@ -262,39 +264,38 @@ class arguments
 			return res;
 		}
 
-        std::vector<std::string> get_vec(const std::string& key) const
-        {
-            std::vector<std::string> res;
-            if(_map.count(key) > 0)
-            {
-                std::string s = _map.find(key)->second;
+    std::vector<std::string> get_vec(const std::string& key) const
+    {
+      std::vector<std::string> res;
+      if(_map.count(key) > 0)
+      {
+          std::string s = _map.find(key)->second;
 
-                if(s[0] == '[') // Is an array of type [a, b, c]
-                {
-                    size_t pos = 1;
-                    while(pos != std::string::npos)
-                    {
-                        size_t ppos = s.find(',', pos);
+          if(s[0] == '[') // Is an array of type [a, b, c]
+          {
+              size_t pos = 1;
+              while(pos != std::string::npos)
+              {
+                  size_t ppos = s.find(',', pos);
 
-                        if(ppos != std::string::npos)
-                        {
-                            std::string temp = s.substr(pos, ppos-pos);
-                            res.push_back(temp);
-                            pos = ppos+1;
-                        }
-                        else
-                        {
-                            std::string temp = s.substr(pos, std::string::npos);
-                            temp = temp.substr(0, temp.size()-1);
-                            res.push_back(temp);
-                            pos = ppos;
-                        }
-                    }
-                }
-            }
-
-            return res;
+                  if(ppos != std::string::npos)
+                  {
+                      std::string temp = s.substr(pos, ppos-pos);
+                      res.push_back(temp);
+                      pos = ppos+1;
+                  }
+                  else
+                  {
+                      std::string temp = s.substr(pos, std::string::npos);
+                      temp = temp.substr(0, temp.size()-1);
+                      res.push_back(temp);
+                      pos = ppos;
+                  }
+              }
+          }
         }
+      return res;
+    }
 
 		  //! \brief get the reconstructed command line arguments (without
 		  //! the executable name
