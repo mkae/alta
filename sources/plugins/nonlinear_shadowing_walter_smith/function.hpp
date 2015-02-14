@@ -12,23 +12,31 @@
 #include <core/common.h>
 
 
-/*! 
+/*!
+ * \class WalterSmith 
  *  \ingroup functions
- *   \brief An implementation of the Walter Shadowing Term
+ *   \brief An implementation of the Walter Shadowing Term as published in 
+ *   in the paper  "Microfacet Models for Refraction" by Walter et al. (EGSR 2007)
  *   \brief This approximation is the correct one and users shoud NOT 
  *   use the one introduced by Schlick, which is available in alta in the nonlinear_shadowing_schlick plugin
- *  
  *
  *  \details
- *  Rational Approximation of the Smith Term that has been introduced
- *  in the paper  "Microfacet Models for Refraction" by Walter et al. EGSR 2007
+ *  This plugin implements Equations (26) and (27) of the paper
+ *  "Microfacet Models for Refraction" from Walter et al. (EGSR 2007)
+ *  Walter introduces the correct rational approximation of the Smith term 
  *  
- *  The Shadowing Term G1 is approximated by the following rational functions
- *  \f$ \f$
+ *  This plugingimplements the shadowing Term \f$ G(view,light,half)\f$ 
+ *  as follows:
+ *  
+ *  \f$G(view,light,half) = G_1(view,half) * G_1(light, half) \f$
+ *  where G_1 is approximated by the following rational functions:
+ *
+ *  \f$G_1( k, half) = \chi\Big( \frac{k \cdot half}{k \cdot normal} \Big) \f$
+ * 
  *  
  *  \author Romain Pacanowski romain.pacanowski@institutoptique.fr
  *  
- *  \todo Finish implementation
+ *  \todo Finish implementation and documentation
  */
 class WalterSmith : public nonlinear_function
 {
@@ -124,9 +132,7 @@ class WalterSmith : public nonlinear_function
     float partialDerivative( float alpha, float tangent_value) const;
 
   private: // parameters
-
-  //TODO: CHECK that this is the correct parameter
-  vec _alpha;
+  vec _alpha; /*!< The roughness parameter. One parameter per output dimension */
 
   double const LOCAL_EPSILON;
   std::string const  FUNCTION_NAME_TOKEN; 
