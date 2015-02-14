@@ -183,22 +183,43 @@ bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, ptr<function>& fit, co
 
 void nonlinear_fitter_ceres::set_parameters(const arguments& args)
 {
-    if(args.is_defined("ceres-max-num-iterations"))
+    std::string const MAX_NUM_ITER_OPTION = "ceres-max-num-iterations";
+    if(args.is_defined(MAX_NUM_ITER_OPTION))
     {
-        options.max_num_iterations = args.get_int("ceres-max-num-iterations", 50); // Default value = 50
+      options.max_num_iterations = args.get_int(MAX_NUM_ITER_OPTION, 50); // Default value = 50
     }
 
     if(args["ceres-factorization"] == "normal-cholesky")
     {
-        options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+      options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
     }
     else
     {
-        options.linear_solver_type = ceres::DENSE_QR;
+      options.linear_solver_type = ceres::DENSE_QR;
     }
 
     if(args.is_defined("ceres-debug"))
     {
-        options.minimizer_progress_to_stdout = true; // Default value = false;
+      options.minimizer_progress_to_stdout = true; // Default value = false;
     }
+
+    std::string const FUNCTION_TOLERANCE_OPTION = "ceres-function-tolerance";
+    if( args.is_defined(FUNCTION_TOLERANCE_OPTION) )
+    {
+      options.function_tolerance = args.get_double(FUNCTION_TOLERANCE_OPTION, 1e-6); //Default value = 1e-6
+    }
+
+    std::string const GRADIENT_TOLERANCE_OPTION = "ceres-gradient-tolerance";
+    if( args.is_defined(GRADIENT_TOLERANCE_OPTION))
+    {
+      options.function_tolerance = args.get_double(GRADIENT_TOLERANCE_OPTION, 1e-10); //Default value = 1e-10
+    }
+
+    std::string const PARAMETER_TOLERANCE_OPTION = "ceres-parameter-tolerance";
+    if( args.is_defined(PARAMETER_TOLERANCE_OPTION))
+    {
+      options.function_tolerance = args.get_double(PARAMETER_TOLERANCE_OPTION, 1e-8); //Default value = 1e-8
+    }
+
+
 }
