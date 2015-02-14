@@ -239,7 +239,32 @@ bool nonlinear_fitter_nlopt::fit_data(const ptr<data>& d, ptr<function>& fit, co
 		res = nlopt_set_maxeval(opt, args.get_int("nlop-max-num-iterations", 10));
 		if(res < 0) { print_nlopt_error(res, "nlopt_set_maxeval"); }
 	}
+
+	//Cf. here : http://ab-initio.mit.edu/wiki/index.php/NLopt_Introduction#Termination_conditions
+
+	//Set by default 1e-4 as relative function tolerance
 	nlopt_set_xtol_rel(opt, 1e-4);
+
+	//Parse  other options related to stopping criterion
+	std::string const FUNC_TOLERANCE = "nlop-relative-function-tolerance";
+	if( args.is_defined(FUNC_TOLERANCE) )
+	{
+			double const new_func_tol = args.get_double(FUNC_TOLERANCE,1e-4);			
+			res = nlopt_set_xtol_rel(opt, new_func_tol );		
+			
+			if( res < 0 ) { print_nlopt_error(res, "nlopt_set_xtol_rel"); }
+	}
+
+	//Absolute Tolerance Function on a value
+	std::string const ABS_FUNC_TOLERANCE = "nlop-abs-function-tolerance";
+	if( args.is_defined(ABS_FUNC_TOLERANCE))
+	{
+		double const new_func_tol = args.get_double(ABS_FUNC_TOLERANCE, 1e-6);
+		res= nlopt_set_ftol_abs(opt, new_func_tol);
+		
+		if( res < 0) { print_nlopt_error(res, "nlopt_set_ftol_abs"); }
+	}
+
 
 	// Create the problem
 	void* dat[2];
