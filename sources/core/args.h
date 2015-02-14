@@ -171,6 +171,34 @@ class arguments
 				return default_value ;
 		}
 
+    //! \brief access to the double value associated with the parameter \a key
+    //!
+    //! The \a default_value argument will be returned if the \a key
+    //! has no associated value.
+    double get_double(const std::string& key, double default_value = 0.0) const
+    {
+      //IF C++ 2011 is supported and activated
+      #if __cplusplus > 199711L
+        
+      auto search = _map.find(key);
+      if ( search != _map.end() )
+      {
+        return std::stod( search->second );
+      }
+      return default_value;
+
+      #else
+      
+      std::map<std::string,std::string>::const_iterator res = _map.find(key);
+      if ( res != _map.end() )
+      {
+        return std::atof( res->second.c_str() );
+      }
+      
+      return default_value;
+      #endif
+    }
+
 		//! \brief acces to the integer value associated with the parameter
 		//! \a key.
 		//!
