@@ -35,7 +35,8 @@ SConscript('rational_fitter_leastsquare/SConscript')
 SConscript('rational_fitter_quadprog/SConscript')
 SConscript('rational_fitter_parallel/SConscript')
 SConscript('rational_fitter_matlab/SConscript')
-SConscript('rational_fitters/SConscript')
+# This SConscript does not exist on the master branch
+#SConscript('rational_fitters/SConscript')
 
 
 # # Building rational functions
