@@ -238,8 +238,12 @@ class arguments
 		template<typename T>
 		std::vector<T> get_vec(const std::string& key) const
 		{
-			std::vector<T> res;
+		  std::vector<T> res;
 
+      //TODO: RP: it is not very efficient to call count + find 
+      // because find is called twice !!! 
+      // My advice: find should be called once, check if the key exist
+      // and if yes use the iterator returned by find
 			if(_map.count(key) > 0)
 			{
 				std::string str = _map.find(key)->second;
@@ -264,6 +268,7 @@ class arguments
 			return res;
 		}
 
+    //RP: why is this method coded and specialized ?
     std::vector<std::string> get_vec(const std::string& key) const
     {
       std::vector<std::string> res;
@@ -354,15 +359,16 @@ class arguments
 			  return current_args;
 		  }
 
-          friend std::ostream& operator<<(std::ostream& out, const arguments& args)
+      //! \brief Friend function to display the content of an argument object
+      friend std::ostream& operator<<(std::ostream& out, const arguments& args)
+      {
+          std::map<std::string, std::string>::const_iterator it;
+          for(it=args._map.begin(); it!=args._map.end(); ++it)
           {
-              std::map<std::string, std::string>::const_iterator it;
-              for(it=args._map.begin(); it!=args._map.end(); ++it)
-              {
-                  out<< "[" << it->first << "] -> " << it->second << std::endl;
-              }
-              return out;
+              out<< "[" << it->first << "] -> " << it->second << std::endl;
           }
+          return out;
+      }
 
 
 	private: // data
