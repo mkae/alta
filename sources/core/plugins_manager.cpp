@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <list>
 
+//#define DEBUG
+
+
 //! Add dynamic library extension (.so or .dll) to a dynamic object as well as
 //! prepending 'lib' depending on the plateform.
 std::string library_name(const std::string name) 
@@ -230,56 +233,72 @@ function* plugins_manager::get_function(const std::string& filename)
 //! Return NULL if none exists.
 function* plugins_manager::get_function(const arguments& args)
 {
-    if(!args.is_defined("func"))
-    {
-#ifdef DEBUG
-        std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
-#endif
-        return new rational_function();
-    }
-
-    // The function to be returned.
-    function* func = NULL;
-
-    if(args.is_vec("func"))
-    {
-        std::vector<std::string> args_vec = args.get_vec("func");
-
-        // Treating the case []
-        if(args_vec.size() == 0)
-        {
-            return NULL;
-        }
-
-        //! create a <em>compound</em> class to store multiple
-        //! functions in it.
-        compound_function* compound = new compound_function();
-
-        //! For each args_vec element, create a function object and add
-        //! it to the compound one.
-        for(unsigned int i=0; i<args_vec.size(); ++i)
-        {
-          std::string n("--func ");
-          n.append(args_vec[i]);
   #ifdef DEBUG
-          std::cout << "<<DEBUG>> load function with args: " << n << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
+  std::cout << " INitial args = " << args << std::endl;
   #endif
-          arguments temp_args = arguments::create_arguments(n);
-          function* f = get_function(temp_args);
-          if(dynamic_cast<nonlinear_function*>(f) == NULL)
-          {
-              std::cerr << "<<ERROR>> only non-linear function are compatible with a compound" << std::endl;
-          }
-          else
-          {
-              compound->push_back(dynamic_cast<nonlinear_function*>(f), temp_args);
-          }
-        }
 
-		  //! return the compound class
-		  func = compound;
+  if(!args.is_defined("func"))
+  {
+#ifdef DEBUG
+      std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
+#endif
+      return new rational_function();
+  }
+
+  // The function to be returned.
+  function* func = NULL;
+
+  if(args.is_vec("func")) //Checking if  the argument prodived with --func is of the form --func [ arg1, arg2, arg3]
+  {
+    #ifdef DEBUG
+    std::cout << __FILE__ << " " << __LINE__ << " ARGUMENTS of --func are forming a VECTOR " << std::endl;
+    #endif 
+
+    std::vector<std::string> args_vec = args.get_vec("func");
+
+    // Treating the case []
+    if(args_vec.size() == 0)
+    {
+        return NULL;
     }
-    else
+
+    //! create a <em>compound</em> class to store multiple
+    //! functions in it.
+    compound_function* compound = new compound_function();
+
+    //! For each args_vec element, create a function object and add
+    //! it to the compound one.
+    for(unsigned int i=0; i<args_vec.size(); ++i)
+    {
+      std::string n("--func ");
+      n.append(args_vec[i]);
+#ifdef DEBUG
+      std::cout << __FILE__ << " " << __LINE__ << std::endl
+                << " at i=" << i << " n=" << n << std::endl;
+      std::cout << "<<DEBUG>> load function with args: " << n << std::endl;
+#endif
+      arguments temp_args = arguments::create_arguments(n);
+
+      //Recursive call
+      function* f = get_function(temp_args);
+      if(dynamic_cast<nonlinear_function*>(f) == NULL)
+      {
+          std::cerr << "<<ERROR>> only non-linear functions are compatible with a compound" << std::endl;
+      }
+      else
+      {
+          compound->push_back(dynamic_cast<nonlinear_function*>(f), temp_args);
+      }
+    }
+
+		  //! return the compound class 
+		  func = compound;
+      #ifdef DEBUG
+      std::cout << __FILE__ << " " << __LINE__ << " WE HAVE A COMPOUND " << std::endl;
+      #endif
+    }
+    else //Here we check if the argument provided with --func is file describing a function
     {
         const std::string filename = args["func"];
         FunctionPrototype myFunction = open_library<FunctionPrototype>(filename, "provide_function");
@@ -300,6 +319,11 @@ function* plugins_manager::get_function(const arguments& args)
     // Treat the case of the Fresnel
     if(args.is_defined("fresnel"))
     {
+      #ifdef DEBUG
+      std::cout << __FILE__ << " " << __LINE__ << std::endl;
+      std::cout << " INSIDE fresnel args = " << args << std::endl;
+      #endif
+
       // Cast into a non linear function, only those are permitted to use
       // a Fresnel term.
       nonlinear_function* nl_func = dynamic_cast<nonlinear_function*>(func);
@@ -332,6 +356,11 @@ function* plugins_manager::get_function(const arguments& args)
        }
       }
 
+      #ifdef DEBUG
+      std::cout << __FILE__ << " " << __LINE__ << std::endl;
+      std::cout << " n = " << n << std::endl;
+      #endif
+       
       nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
       if(func_fres != NULL)
       {
