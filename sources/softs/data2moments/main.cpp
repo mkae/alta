@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 	if(d)
 	{
 		// Data parametrization
-		params::input data_param = d->parametrization();
+		/*params::input data_param = d->parametrization();*/
 		const int nX = d->dimX();
 		const int nY = d->dimY();
 
