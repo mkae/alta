@@ -218,10 +218,10 @@ public:
 		// If the domain of def of one phi is [-pi .. pi] you need to convert it
 		// to the domain [0 .. 2pi]
 		if(phi_i < 0.0) {
-			phi_i = M_PI - phi_i;
+			phi_i = M_2PI + phi_i;
 		}
 		if(phi_v < 0.0) {
-			phi_v = M_PI - phi_v;
+			phi_v = M_2PI + phi_v;
 		}
 
 		// Sanity check
