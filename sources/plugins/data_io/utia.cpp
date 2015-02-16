@@ -100,7 +100,7 @@ public:
 		/* If the file is a binary */
 		} else {
 
-			std::ifstream stream(filename, std::ios_base::in | std::ios_base::binary);
+			std::ifstream stream(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 			/*
 			if (!stream.is_open()) {
 			  std::cerr << "<<ERROR>> Unable to open file '" << filename << "' !" << std::endl;
@@ -140,7 +140,7 @@ public:
 	  		t_EXR_IO<double>::SaveEXR(filename.c_str(), W, H, temp, 3);
 			delete[] temp;
 		} else {
-			std::ofstream stream(filename, std::ios_base::out | std::ios_base::binary);
+			std::ofstream stream(filename.c_str(), std::ios_base::out | std::ios_base::binary);
 			int count = 0;
 			for(int isp=0;isp<planes;isp++)	{
 			  for(int ni=0;ni<nti*npi;ni++)
