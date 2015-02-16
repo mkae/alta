@@ -87,11 +87,11 @@ public:
 				/* Data copy */
 				for(int i=0; i<H; ++i)
 					for(int j=0; j<W; ++j){
-						int index = i*W+j;
-						// TODO: The indexing is not the same here
-		    			Bd[index + 0*nPerPlane] = temp[3*index + 0];
-		    			Bd[index + 1*nPerPlane] = temp[3*index + 1];
-		    			Bd[index + 2*nPerPlane] = temp[3*index + 2];
+						int indexUTIA = i*W+j;
+						int indexEXR  = (H-i-1)*W+j;
+		    			Bd[indexUTIA + 0*nPerPlane] = temp[3*indexEXR + 0];
+		    			Bd[indexUTIA + 1*nPerPlane] = temp[3*indexEXR + 1];
+		    			Bd[indexUTIA + 2*nPerPlane] = temp[3*indexEXR + 2];
 		  			}
 
 				delete[] temp;
@@ -131,11 +131,11 @@ public:
 			/* Data copy */
 			for(int i=0; i<H; ++i)
 				for(int j=0; j<W; ++j){
-					int index = i*W+j;
-					// TODO: The indexing is not the same here
-	    			temp[3*index + 0] = Bd[index + 0*nPerPlane];
-	    			temp[3*index + 1] = Bd[index + 1*nPerPlane];
-	    			temp[3*index + 2] = Bd[index + 2*nPerPlane];
+					int indexUTIA = i*W+j;
+					int indexEXR  = (H-i-1)*W+j;
+	    			temp[3*indexEXR + 0] = Bd[indexUTIA + 0*nPerPlane];
+	    			temp[3*indexEXR + 1] = Bd[indexUTIA + 1*nPerPlane];
+	    			temp[3*indexEXR + 2] = Bd[indexUTIA + 2*nPerPlane];
 	  			}
 	  		t_EXR_IO<double>::SaveEXR(filename.c_str(), W, H, temp, 3);
 			delete[] temp;
@@ -154,25 +154,20 @@ public:
 	// Acces to data
 	virtual vec get(int i) const {
 		vec res(7);
-		res[3] = 2.0*M_PI*double(i%npv)/double(npv); i /= npv;
-		res[2] = 0.5*M_PI*double(i%ntv)/double(ntv); i /= ntv;
-		res[1] = 2.0*M_PI*double(i%npi)/double(npi); i /= npi;
-		res[0] = 0.5*M_PI*double(i%nti)/double(nti);
 		res[4] = Bd[i + 0*nPerPlane];
 		res[5] = Bd[i + 1*nPerPlane];
 		res[6] = Bd[i + 2*nPerPlane];
+
+		const double r2d = M_PI / 180.0;
+		res[3] = r2d*step_p*(i % npv); i /= npv;
+		res[2] = r2d*step_t*(i % ntv); i /= ntv;
+		res[1] = r2d*step_p*(i % npi); i /= npi;
+		res[0] = r2d*step_t*(i % nti);
+
 		return res;
 	}
 	virtual vec operator[](int i) const {
-		vec res(7);
-		res[3] = 2.0*M_PI*double(i%npv)/double(npv); i /= npv;
-		res[2] = 0.5*M_PI*double(i%ntv)/double(ntv); i /= ntv;
-		res[1] = 2.0*M_PI*double(i%npi)/double(npi); i /= npi;
-		res[0] = 0.5*M_PI*double(i%nti)/double(nti);
-		res[4] = Bd[i + 0*nPerPlane];
-		res[5] = Bd[i + 1*nPerPlane];
-		res[6] = Bd[i + 2*nPerPlane];
-		return res;
+		return get(i);
 	}
 
 	virtual void vecToIndex(const vec& in, int& iti, int& ipi, int& itv, int& ipv) const {
@@ -186,10 +181,10 @@ public:
 		theta_v *= d2r;
 		phi_i *= d2r;
 		phi_v *= d2r;
-		if(phi_i>=360.f) {
+		if(phi_i >= 360.f) {
 			phi_i = 0.f;
 		}
-		if(phi_v>=360.f) {
+		if(phi_v >= 360.f) {
 			phi_v = 0.f;
 		}
 
@@ -200,6 +195,10 @@ public:
 	}
 
 	virtual vec value(const vec& in) const {
+
+		const double PI2 = M_PI*0.5;
+		const double M_2PI = M_PI*2.0;
+
 		// Input and Ouput parameters
 		vec RGB(3);
 		double theta_i = in[0];
@@ -207,13 +206,27 @@ public:
 		double theta_v = in[2];
 		double phi_v   = in[3];
 
-		double PI2 = M_PI*0.5;
-		if(theta_i>PI2 || theta_v>PI2) {
-			RGB[0] = 0.f;
-			RGB[1] = 0.f;
-			RGB[2] = 0.f;
+
+		// Check is the angular configuration is above the hemisphere
+		if(theta_i > PI2 || theta_v > PI2) {
+			RGB[0] = 0.0;
+			RGB[1] = 0.0;
+			RGB[2] = 0.0;
 			return RGB;
 		}
+
+		// If the domain of def of one phi is [-pi .. pi] you need to convert it
+		// to the domain [0 .. 2pi]
+		if(phi_i < 0.0) {
+			phi_i = M_PI - phi_i;
+		}
+		if(phi_v < 0.0) {
+			phi_v = M_PI - phi_v;
+		}
+
+		// Sanity check
+		assert(phi_i >= 0.0 && phi_i <= M_2PI);
+		assert(phi_v >= 0.0 && phi_v <= M_2PI);
 
 		float d2r = 180.f/M_PI;
 		theta_i *= d2r;
