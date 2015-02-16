@@ -334,10 +334,12 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 		}
 	}
 
+#ifdef CORE_DEBUG
 	for(int k=0; k<deg.size(); ++k) {
 		std::cout << deg[k] << ", ";
 	}
 	std::cout << std::endl;
+#endif
 	return deg ;
 
 }
