@@ -202,24 +202,43 @@ vec rational_function_1d::q(const vec& x) const
 	return res ;
 }
 
-// Estimate the number of configuration for an indice
-// vector of dimension d with maximum element value
-// being k.
+// Estimate the number of configuration for an indice vector of dimension
+// d with maximum element value being k. This function is heavy to call and
+// should be use lightely. I did the maximum I could to unroll the dimension
+// loop.
 int rational_function_1d::estimate_dk(int k, int d)
 {
-	if(d == 1)
-	{
+	// For dim = 1, only one configuration is possible and only one 
+	// configuration with zeroth powers remains
+	if (d == 1 || k == 0) {
 		return 1;
-	}
-	else if(d ==2)
-	{
+
+	// If only one power is available, there is dim configurations
+	} else if (k == 1) {
+		return d;
+
+/*  // This one is not working. I need to redo the maths here.
+
+	// If max power is two, then there is d^2 configuration minus the
+	// number of symmetric configurations: d(d+1)/2.
+	} else if (k == 2) {
+		return (d*(d-1))/2;
+*/
+
+	// For dim = 2, configuration are [k-i, i], i \in [0,k]
+	} else if (d == 2) {
 		return k+1;
-	}
-	else
-	{
+
+	// For dim = 3, we need to list all the possible cases for the first
+	// dimension equals to i \in [0,k] and the remaining dimensions
+	// sharing the k-i remaining elements.
+	} else if (d == 3) {
+		const int k2 = k+1;
+		return k2*k2 - (k2*k)/2;
+
+	} else {
 		int res = 0;
-		for(int i=0; i<=k; ++i)
-		{
+		for(int i=0; i<=k; ++i)	{
 			res += estimate_dk(k-i, d-1);
 		}
 		return res;
@@ -315,6 +334,12 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 		}
 	}
 
+#ifdef CORE_DEBUG
+	for(int k=0; k<deg.size(); ++k) {
+		std::cout << deg[k] << ", ";
+	}
+	std::cout << std::endl;
+#endif
 	return deg ;
 
 }
