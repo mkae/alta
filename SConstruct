@@ -129,6 +129,7 @@ if env['CC'] in ['gcc', 'clang'] or env['CXX'] in ['g++', 'clang', 'clang++']:
 ##
 env.AppendUnique(LIBPATH = ['#external/build/lib'])
 env.AppendUnique(LIBPATH = ['#sources/build'])
+#env.AppendUnique(LIBPATH = ['#build/'])
 env.AppendUnique(CPPPATH = ['#external/build/include'])
 #env.AppendUnique(CPPPATH = ['#external/build/include/Eigen'])
 env.AppendUnique(CPPPATH = ['#sources'])
