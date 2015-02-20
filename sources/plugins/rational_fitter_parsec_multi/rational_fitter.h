@@ -1,14 +1,3 @@
-/* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
-
-   Copyright (C) 2014 Bordeaux-INP
-   Copyright (C) 2014 Inria
-
-   This file is part of ALTA.
-
-   This Source Code Form is subject to the terms of the Mozilla Public
-   License, v. 2.0.  If a copy of the MPL was not distributed with this
-   file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
-
 #pragma once
 
 // Include STL
@@ -22,74 +11,62 @@
 #include <core/vertical_segment.h>
 #include <core/fitter.h>
 #include <core/args.h>
+#include "gesvdm2.h"
 
-/*! \brief A vertical segment fitter for rational functions that search for a solution
- *  for a fixed number of coefficient. This plugin can run in parallel with OpenMP and
- *  is using QuadProg++ quadratic solver.
+/*! \brief A vertical segment fitter for rational function using the library QuadProg++
+ *  You can find the library here: http://quadprog.sourceforge.net/
  *  \ingroup plugins
- *
- *  \details
- *  You can find QuadProg++ <a href="http://quadprog.sourceforge.net/">here</a>.
- *  <br />
- *
- *  <h3>Plugin parameters</h3>
- *
- *  We provide the following command line arguments to manipulate this plugin:
- *  <ul>
- *		<li><b>--np</b> <em>[int]</em> controls the maximum number of total coefficients
- *		an interpolation should have. By default, this number is 10.</li>
- *		<li><b>--min-np</b> <em>[int]<em></li> controls the starting value for the 
- *		number of coefficients for the rational function. by default, this number
- *		is 10.</li>
- *		<li><b>--np-step</b> <em>[int]</em> stepping for the number of coefficients
- *		of the rational function. By default, this number is 1.</li>
- *		<li><b>--nb-cores</b> <em>[int]</em> number of core allocated to perform
- *		the seach. By default, this is equal to the number of processors.</li>
- *		<li><b>--use_delta</b> use the strategy of Pacanowski et al. [2012] to
- *		modify the constraint vector by the condition number of the constraint
- *		matrix. We did not experience any benefit from using it.</li>
- *  </ul>
  */
-class rational_fitter_parallel : public fitter
+class rational_fitter_parsec_multi : public fitter
 {
-	public: // methods
+  public: // methods
 
-		rational_fitter_parallel() ;
-		virtual ~rational_fitter_parallel() ;
+    rational_fitter_parsec_multi();
+    virtual ~rational_fitter_parsec_multi();
 
-		// Fitting a data object
-		//
-		virtual bool fit_data(const ptr<data>& d, ptr<function>& fit, const arguments& args) ;
+    // Fitting a data object
+    //
+    virtual bool fit_data(const ptr<data>& d, ptr<function>& fit, const arguments& args);
 
-		// Provide user parameters to the fitter
-		//
-		virtual void set_parameters(const arguments& args) ;
+    // Provide user parameters to the fitter
+    //
+    virtual void set_parameters(const arguments& args);
 
-	protected: // methods
+  private: // methods
 
-		// Fitting a data object using np elements in the numerator and nq 
-		// elements in the denominator
-		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, 
-		                      const ptr<rational_function>& fit, const arguments &args, 
-                              double& delta, double& linf_dist,double& l2_dist) ;
-		virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq, 
-		                      int ny, rational_function_1d* fit, const arguments& args, 
-									 vec& p, vec& q, double& delta) ;
+    static void fill_p(const gesvdm2_args_t *args, int ny, int i0, int M,
+		       double *P, int ldp);
 
-		//! \brief Create a constraint vector given its index i in the data
-		//! object and the rational function object to fit. This function
-		//! returns two rows of the constraints matrix A, cu and cl, 
-		//! corresponding to the lower constraint and the upper constraint
-		//! of the vertical segment.
-		virtual void get_constraint(int i, int np, int nq, int ny, 
-		                            const ptr<vertical_segment>& data, 
-											 const rational_function_1d* func, 
-											 vec& cu, vec& cl);
+    static void fill_q(const gesvdm2_args_t *args, int ny, int i0, int M,
+		       double *P, int ldp);
 
-	protected: // data
+    static void solve_init( const gesvdm2_args_t *pb, subproblem_t *spb );
+    static int  solve_wrapper( const gesvdm2_args_t *args, subproblem_t *pb, int M, int ny,
+			       double *CIptr, double *ciptr );
+    static int solve_finalize( const gesvdm2_args_t *pb, subproblem_t *spb );
 
-		//! Number of points used when starting the adaptive interpolation
-		//! procedure. By default, this value is 100.
-		int nb_starting_points;
-} ;
+    static int  test_all_constraint( const vertical_segment     *data,
+				     const rational_function_1d *r,
+				     int ny );
 
+    void initPbRf( subproblem_t *pb );
+
+  protected: // data
+
+    // Fitting a data object using np elements in the numerator and nq
+    // elements in the denominator
+    virtual bool fit_data(vertical_segment *d, int N, rational_function *rf, int &np);
+
+    // min and Max usable np and nq values for the fitting
+    int _max_np, _max_nq;
+    int _min_np, _min_nq;
+
+    // Add constraints to the boundary of the domain. You can shrink it of
+    // the parameter --boundary-constraint *double*
+    double _boundary;
+
+    dague_context_t *_dague;
+    int              _nbcores;
+    const arguments *_args;
+
+};

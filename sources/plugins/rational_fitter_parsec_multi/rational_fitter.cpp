@@ -1,21 +1,7 @@
-/* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
-
-   Copyright (C) 2014 Bordeaux-INP
-   Copyright (C) 2014 Inria
-
-   This file is part of ALTA.
-
-   This Source Code Form is subject to the terms of the Mozilla Public
-   License, v. 2.0.  If a copy of the MPL was not distributed with this
-   file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
-
-#include "rational_fitter.h"
-
-#include <core/plugins_manager.h>
-
 #include <Eigen/SVD>
 #include <Array.hh>
 #include <QuadProg++.hh>
+#include <core/plugins_manager.h>
 
 #include <string>
 #include <iostream>
@@ -23,314 +9,450 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
-#include <string>
-#include <list>
-#ifdef _OPENMP
-#include <omp.h>
+
+#include <dplasma.h>
+#include <data_dist/matrix/two_dim_rectangle_cyclic.h>
+#include <gesvdm.h>
+
+#include "rational_fitter.h"
+
+#ifdef WIN32
+#define isnan(X) ((X != X))
 #endif
 
-#include "quadratic_program.h"
+#include <core/common.h>
 
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
-	return new rational_fitter_parallel();
+    return new rational_fitter_parsec_multi();
 }
 
-rational_fitter_parallel::rational_fitter_parallel() : nb_starting_points(100)
-{
-}
-rational_fitter_parallel::~rational_fitter_parallel() 
+rational_fitter_parsec_multi::rational_fitter_parsec_multi() : _boundary(1.0), _args(NULL)
 {
 }
 
-bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
+rational_fitter_parsec_multi::~rational_fitter_parsec_multi()
 {
-	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
-	if(!r)
+    dague_fini(&_dague);
+}
+
+void rational_fitter_parsec_multi::set_parameters(const arguments& args)
+{
+    _max_np = args.get_float("np", 10);
+    _max_nq = args.get_float("nq", _max_np);
+    _min_np = args.get_float("min-np", _max_np);
+    _min_nq = args.get_float("min-nq", _min_np);
+ 
+    _max_np = std::max<int>(_max_np, _min_np);
+    _max_nq = std::max<int>(_max_nq, _min_nq);
+    
+    _boundary = args.get_float("boundary-constraint", 1.0f);
+    _nbcores = args.get_int( "nbcores", 2 );
+    _args = &args;
+
+    {
+	int argc = 1;
+	char **argv = (char**)malloc((argc+1)*sizeof(char*));
+
+	argv[0] = strdup( "./manao" );
+	argv[1] = NULL;
+
+	_dague = dague_init(_nbcores, &argc, &argv);
+
+	free(argv[0]);
+	free(argv);
+    }
+}
+
+
+bool rational_fitter_parsec_multi::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
+{
+    std::cerr << "Entering first level of fit_data" << std::endl;
+
+    ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit);
+    const ptr<vertical_segment>& d = dynamic_pointer_cast<vertical_segment>(dat);
+    if(!r || !d)
 	{
-		std::cerr << "<<ERROR>> not passing the correct function class to the fitter: must be a rational_function" << std::endl ;
-		return false ;
+	    std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl;
+	    return false;
 	}
 
-	ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(!d)
+    // I need to set the dimension of the resulting function to be equal
+    // to the dimension of my fitting problem
+
+    // This doesn't work for dimension greater than 1 for now.
+    //assert( d->dimY() == 1 );
+
+    r->setDimX(d->dimX());
+    r->setDimY(d->dimY());
+    r->setMin(d->min());
+    r->setMax(d->max());
+
+    std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np
+	      << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl;
+
+    const int step = args.get_int("np-step", 1);
+    int i;
+
+    for(i=std::max<int>(2,_min_np); i<=_max_np; i+=step )
 	{
-		std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
-		std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
+	    // double min_delta  = std::numeric_limits<double>::max();
+	    // double min_l2_dist= std::numeric_limits<double>::max();
+	    // double mean_delta = 0.0;
+	    // int nb_sol_found  = 0;
+	    // int nb_sol_tested = 0;
+	    timer time;
+	    int np;
 
-		ptr<vertical_segment> vs(new vertical_segment());
-		for(int i=0; i<dat->size(); ++i) 
+	    std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
+	    std::cout.flush() ;
+
+	    time.start();
+
+	    // i=np+nq => i-1 independant pb
+	    std::cout << r.getcounter() << std::endl;
+	    if(fit_data(d.get(), i-1, r.get(), np))
 		{
-			const vec x = dat->get(i);
-			vec y(dat->dimX() + 3*dat->dimY());
+		    time.stop();
 
-			for(int k=0; k<x.size()   ; ++k) { y[k]                          = x[k]; }
-			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size()]               = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX() +   dat->dimY()]; }
-			for(int k=0; k<dat->dimY(); ++k) { y[k + x.size() + dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX() + 2*dat->dimY()]; }
+		    std::cout << r.getcounter() << std::endl;
+		    std::cout << "<<INFO>> got a fit using np = " << np << " & nq =  " << i-np << "      " << std::endl;
+		    std::cout << "<<INFO>> " << *(r.get()) << std::endl;
+		    std::cout << "<<INFO>> it took " << time << std::endl;
 
-			vs->set(y);
-		}
-
-		d = vs;
-	}
-
-	// I need to set the dimension of the resulting function to be equal
-	// to the dimension of my fitting problem
-	r->setDimX(d->dimX()) ;
-	r->setDimY(d->dimY()) ;
-	r->setMin(d->min()) ;
-	r->setMax(d->max()) ;
-
-	const int _min_np = args.get_int("min-np", 10);
-	const int _max_np = args.get_int("np", _min_np);
-	std::cout << "<<INFO>> N in  [" << _min_np << ", " << _max_np << "]"  << std::endl ;
-
-	const int nb_starting_points = args.get_int("nb-starting-points", 100);
-	std::cout << "<<INFO>> number of data point used in start: " << nb_starting_points << std::endl;
-
-	const int  step      = args.get_int("np-step", 1);
-	const bool use_delta = args.is_defined("use_delta");
-
-    for(int i=_min_np; i<=_max_np; i+=step)
-	{
-		std::cout << "<<INFO>> fit using np+nq = " << i << std::endl ;
-		std::cout.flush() ;
-		timer time ;
-		time.start() ;
-
-#ifdef _OPENMP
-      const int nb_cores = args.get_int("nb-cores", omp_get_num_procs());
-#ifdef DEBUG
-		std::cout << "<<DEBUG>> will use " << nb_cores << " threads to compute the quadratic programs" << std::endl ;
-#endif
-
-		omp_set_num_threads(nb_cores) ;
-#endif
-
-		double min_delta   = std::numeric_limits<double>::max();
-		double min_l2_dist = std::numeric_limits<double>::max();
-		double mean_delta = 0.0;
-		int nb_sol_found  = 0;
-		int nb_sol_tested = 0;
-
-        #pragma omp parallel for shared(args, nb_sol_found, nb_sol_tested, min_delta, mean_delta), schedule(dynamic,1)
-        for(int j=1; j<i; ++j)
-        {
-            // Compute the number of coefficients in the numerator and in the denominator
-            // from the current number of coefficients i and the current index in the
-            // loop j.
-            int temp_np = i - j;
-            int temp_nq = j;
-
-            vec p(temp_np*r->dimY()), q(temp_nq*r->dimY());
-
-            // Allocate a rational function and set it to the correct size, dimensions
-            // and parametrizations.
-				ptr<rational_function> rk(NULL);
-            #pragma omp critical (args)
-            {
-					rk = dynamic_pointer_cast<rational_function>(ptr<function>(plugins_manager::get_function(args)));
-				}
-				if(!rk)
-            {
-                std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
-                throw;
-            }
-            rk->setParametrization(r->input_parametrization());
-            rk->setParametrization(r->output_parametrization());
-            rk->setDimX(r->dimX()) ;
-            rk->setDimY(r->dimY()) ;
-            rk->setMin(r->min()) ;
-            rk->setMax(r->max()) ;
-
-            // Set the rational function size
-            rk->setSize(temp_np, temp_nq);
-
-            double delta = 1.0;
-            double linf_dist, l2_dist;
-            bool is_fitted = fit_data(d, temp_np, temp_nq, rk, args, delta, linf_dist, l2_dist);
-            if(is_fitted)
-            {
-                #pragma omp critical (nb_sol_found)
-                {
-                    ++nb_sol_found ;
-                    mean_delta += delta ;
-
-                    std::cout << "<<INFO>> found a solution with np=" << temp_np << ", nq = " << temp_nq << std::endl;
-                    std::cout << "<<INFO>> Linf error = " << linf_dist << std::endl;
-                    std::cout << "<<INFO>> L2   error = " << l2_dist << std::endl;
-                    std::cout << "<<INFO>>      delta = " << delta << std::endl;
-                    std::cout << std::endl;
-
-                    // Get the solution with the minimum delta or the minimum L2 distance, 
-						  // and update the main rational function r.
-                    if((use_delta && delta < min_delta) || (!use_delta && l2_dist < min_l2_dist))
-                    {
-                        min_delta   = delta ;
-                        min_l2_dist = l2_dist ;
-                        r->setSize(temp_np, temp_nq);
-                        for(int y=0; y<r->dimY(); ++y)
-                        {
-                            r->update(y, rk->get(y));
-                        }
-                    }
-                }
-            }
-
-            #pragma omp critical (nb_sol_tested)
-            {
-                // Update the solution
-                nb_sol_tested++;
-
-                std::cout << "<<DEBUG>> nb solutions tested: " << nb_sol_tested << " / " << i << "\r";
-                std::cout.flush();
-            }
-        }
-
-        if(min_delta < std::numeric_limits<double>::max())
-		{
-			std::cout << "<<INFO>> mean delta = " << mean_delta/nb_sol_found << std::endl;
-			std::cout << "<<INFO>>  min delta = " << min_delta << std::endl;
-			std::cout << *(r.get())<< std::endl;
-
-			time.stop();
-			std::cout << "<<INFO>> got a fit using N = " << i << std::endl ;
-			std::cout << "<<INFO>> it took " << time << std::endl ;
-			std::cout << "<<INFO>> I got " << nb_sol_found << " solutions to the QP" << std::endl ;
-			return true ;
+		    return true;
 		}
 	}
 
-	return false ;
+    std::cerr << "Exiting first level of fit_data" << std::endl;
+    return false;
 }
 
-void rational_fitter_parallel::set_parameters(const arguments&)
+bool rational_fitter_parsec_multi::fit_data(vertical_segment *d, int N, rational_function *r, int &np)
 {
-}
+    std::cerr << "Entering Second level of fit_data for (np+nq)=" << N+1 << std::endl;
 
+    // Size of the problem
+    const int M = d->size();
+    const int twoM = 2 * M;
+    bool rc = false;
 
-bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq, 
-                                        const ptr<rational_function>& r, const arguments &args,
-                                        double& delta, double& linf_dist, double& l2_dist)
-{
-	// Fit the different output dimension independantly
-	for(int j=0; j<d->dimY(); ++j)
+    /*
+     * Create tree for QR reduction
+     */
+    {
+	gesvdm2_args_t args;
+	tiled_matrix_desc_t *panel;
+	dplasma_qrtree_t qrtree;
+	two_dim_block_cyclic_t *matrixCI = (two_dim_block_cyclic_t*)malloc(sizeof(two_dim_block_cyclic_t));
+	two_dim_block_cyclic_t *vectorCI = (two_dim_block_cyclic_t*)malloc(sizeof(two_dim_block_cyclic_t));
+	int nb = N + 1;
+	int mb = nb; //twoM; //nb;
+	//int mb = std::max<int>(nb, 400);
+
+	//	assert( (mb == nb) && (mb%2 == 0) );
+	if (mb%2 == 1)
+	    mb++;
+
+	memset(matrixCI, 0, sizeof(two_dim_block_cyclic_t));
+	memset(vectorCI, 0, sizeof(two_dim_block_cyclic_t));
+
+	two_dim_block_cyclic_init( matrixCI, matrix_RealDouble, matrix_Lapack,
+				   1, 0, mb, nb, twoM, nb * N, 0, 0,
+				   twoM, nb * N, 1, 1, 1);
+
+	/* Overwrite llm top make sure we use the correct one and not a multiple of N */
+	matrixCI->super.llm = twoM;
+	//matrixCI->mat = (double*)malloc( nb*N * twoM * sizeof(double));
+	matrixCI->mat = NULL;
+
+	panel = tiled_matrix_submatrix( (tiled_matrix_desc_t *)matrixCI,
+					0, 0, twoM, (twoM > nb ? nb : twoM) );
+
+	std::cerr << "<<DEBUG>> M: " << M << " N: "<< N << std::endl;
+
+	dplasma_hqr_init( &qrtree, PlasmaNoTrans, panel,
+			  DPLASMA_FLAT_TREE, DPLASMA_FIBONACCI_TREE,
+			  4, 1, 0, 0 );
+
+	r->setSize( nb, nb );
+	for(int j=0; j<d->dimY(); j++)
+	    r->get(j)->resize( nb, nb );
+
+	args.qrtree = &qrtree;
+	args.ib = ((32 < nb) ? 32 : nb);
+	args.M = twoM;
+	args.n = N;
+	args.ndim = d->dimY();
+	args.A  = (tiled_matrix_desc_t *)matrixCI;
+	args.dataptr = d;
+	args.rfpm    = this;
+	args.rfptr   = r;
+
+	args.fillp = &fill_p;
+	args.fillq = &fill_q;
+	args.solve_init     = &solve_init;
+	args.solve          = &solve_wrapper;
+	args.solve_finalize = &solve_finalize;
+
+	args.pbs   = (subproblem_t *)calloc(N, sizeof(subproblem_t));
+
+	std::cerr << "<<DEBUG>> Start gesvd" << std::endl;
+	dplasma_dgesvdm2( _dague, &args );
+
+	std::cerr << "<<DEBUG>> End of gesvd" << std::endl;
+	free(panel);
+	dplasma_hqr_finalize( &qrtree );
+
+	dague_ddesc_destroy((dague_ddesc_t*)matrixCI);
+	dague_ddesc_destroy((dague_ddesc_t*)vectorCI);
+	std::cerr << "<<DEBUG>> Data freed" << std::endl;
+
+	free(matrixCI);
+	free(vectorCI);
+
 	{
-		vec p(np), q(nq);
-		rational_function_1d* rf = r->get(j);
-		rf->resize(np, nq);
+	    subproblem_t *spb = args.pbs;
+	    int nb_sol_found  = 0;
+	    int min_sol = -1;
+	    double min_delta   = std::numeric_limits<double>::max();
+	    double min_l2_dist = std::numeric_limits<double>::max();
+	    double mean_delta = 0.0;
 
-		if(!fit_data(d, np, nq, j, rf, args, p, q, delta))
-		{
-			return false ;
-		}
-
-		rf->update(p, q);
-	}
-
-	linf_dist = r->Linf_distance(dynamic_pointer_cast<data>(d));
-	l2_dist   = r->L2_distance(dynamic_pointer_cast<data>(d));
-
-	return true ;
-}
-
-// dat is the data object, it contains all the points to fit
-// np and nq are the degree of the RP to fit to the data
-// y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
-// the function returns a rational BRDF function and a boolean
-bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny,
-                                        rational_function_1d* r, const arguments& args,
-                                        vec& p, vec& q, double& delta)
-{
-	const int m = d->size(); // 2*m = number of constraints
-	const int n = np+nq;     // n = np+nq
-
-    quadratic_program qp(np, nq, args.is_defined("use_delta"));
-
-    // Starting with only a nb_starting_points vertical segments
-    std::list<unsigned int> training_set;
-    const int di = std::max((m-1) / (nb_starting_points-1), 1);
-    for(int i=0; i<m; ++i)
-	{
-        if(i % di == 0)
-        {
-            // Create two vector of constraints
-            vec c1(n), c2(n);
-            get_constraint(i, np, nq, ny, d, r, c1, c2);
-
-            qp.add_constraints(c1);
-            qp.add_constraints(c2);
-
-        }
-        else
-        {
-            training_set.push_back(i);
-        }
-	}
-    qp.set_training_set(training_set);
-
-    do
-	{
-#ifdef _OPENMP
-#ifdef DEBUG
-        std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
-#endif
-#endif
-		QuadProgPP::Vector<double> x(n);
-		bool solves_qp = qp.solve_program(x, delta, p, q);
-		r->update(p, q);
-
-		if(solves_qp)
-		{
-			if(qp.test_constraints(ny, r, d))
+	    for (int i=0; i<N; i++, spb++) {
+		
+		if ( spb->isfitted == 1 ) {
+		    rc = true;
+		    nb_sol_found ++;
+		    mean_delta += spb->delta[0];
+		    
+		    std::cout << "<<INFO>> found a solution with np=" << (i+1)
+			      << ", nq= " << (N-i)
+			      << ", delta= " << spb->delta[0]
+			      << ", l2_dist= " << spb->l2_dist
+			      << std::endl;
+		    
+		    if(spb->delta[0] < min_delta)
 			{
-#ifdef DEBUG
-				std::cout << "<<INFO>> got solution " << *r << std::endl ;
-#endif
-				return true;
-            }
-        }
-        else
-		{
-#ifdef DEBUG
-			std::cout << "<<DEBUG>> not enough coefficients" << std::endl;
-#endif
-			return false;
+			    min_delta   = spb->delta[0] ;
+			    min_l2_dist = spb->l2_dist ;
+			    min_sol = i;
+			}
 		}
-    } while(qp.nb_constraints() < 2*m);
+	    }
+	    std::cout << std::endl;
+	
+	    if (rc) {
+		np = min_sol+1;
+		r->setSize( min_sol+1, N-min_sol );
+		r->update( (rational_function*)(args.pbs[min_sol].rfptr) );
+		
+		std::cout << "<<INFO>> mean delta = " << mean_delta/nb_sol_found << std::endl;
+		std::cout << "<<INFO>>  min delta = " << min_delta << std::endl;
+		std::cout << "<<INFO>>  min l2 dist = " << min_l2_dist << std::endl;
+	    }
+	}
+    }
 
-	return false;
+    std::cerr << "Exiting Second level of fit_data for (np+nq)=" << N+1 << std::endl;
+    return rc;
 }
 
-void rational_fitter_parallel::get_constraint(int i, int np, int nq, int ny, 
-		                                        const ptr<vertical_segment>& data, 
-															 const rational_function_1d* func,
-															 vec& cu, vec& cl)
+void rational_fitter_parsec_multi::fill_p(const gesvdm2_args_t *args, int ny, int i0, int M,
+					  double *P, int ldp)
 {
-	const vec xi = data->get(i) ;
-	cu.resize(np+nq);
-	cl.resize(np+nq);
+    const vertical_segment *d    = (vertical_segment *)(args->dataptr);
+    rational_function_1d   *rf1d = ((rational_function *)(args->rfptr))->get(ny);
+    double *lP = P;
+    vec xi;
+    const int N = args->n + 1;
+    int i, j;
 
-	// Create two vectors of constraints
-	for(int j=0; j<np+nq; ++j)
-	{
-		// Filling the p part
-		if(j<np)
-		{
-			const double pi = func->p(xi, j) ;
-			cu[j] =  pi ;
-			cl[j] = -pi ;
+    /* Check row major format with exact number of columns */
+    assert(ldp == N);
 
-		}
-		// Filling the q part
-		else
-		{
-			vec yl, yu ;
-			data->get(i, yl, yu) ;
-			const double qi = func->q(xi, j-np) ;
+    for( i=0; i<M; i++, i0++) {
+	xi = d->get(i0);
 
-			cu[j] = -yu[ny] * qi ;
-			cl[j] =  yl[ny] * qi ;
-		}
+	// A row of the P matrix has this
+	// form: [p_{0}(x_i), .., p_{np}(x_i)]
+	// The lower and upper constraint are later computed
+	for(j=0; j<N; j++, lP++) {
+	    *lP = rf1d->p(xi, j);
 	}
+    }
+}
+
+void rational_fitter_parsec_multi::fill_q(const gesvdm2_args_t *args, int ny, int i0, int M,
+					  double *Q, int ldq)
+{
+    const vertical_segment *d    = (vertical_segment *)(args->dataptr);
+    rational_function_1d   *rf1d = ((rational_function *)(args->rfptr))->get(ny);
+    double *lQ = Q;
+    vec xi, yl, yu;
+    const int N = args->n + 1;
+    int i, j;
+
+    /* Check row major format with exact number of columns */
+    assert( ldq == (N + 2) );
+
+    for( i=0; i<M; i++, i0++) {
+	d->get(i0, xi, yl, yu);
+
+	*lQ = yu[ny]; lQ++;
+	*lQ = yl[ny]; lQ++;
+
+	// A row of the Q matrix has this
+	// form: [q_{0}(x_i), .., q_{nq}(x_i)]
+	// The lower and upper constraint are later computed
+	for(j=0; j<N; j++, lQ++) {
+	    *lQ = rf1d->q(xi, j);
+	}
+    }
+}
+
+int rational_fitter_parsec_multi::test_all_constraint( const vertical_segment     *data,
+						       const rational_function_1d *r,
+						       int ny )
+{
+    int n;
+    for(n=0; n<data->size(); ++n)
+    {
+	vec x, yl, yu;
+	data->get(n, x, yl, yu);
+
+	vec y = r->value(x);
+	if( (y[0] < yl[ny]) ||
+	    (y[0] > yu[ny]) )
+	{
+	    return 0;
+	}
+    }
+    return 1;
+}
+
+/**
+ * Take as input the full constraint matrix CI for a dimension ny, and
+ * the associated ci vector with the 2-norm of each row scaled by delta.
+ * Apply the quadratic program and test against all the constraints.
+ * Return true if all constraints match, false otherwise.
+ */
+void rational_fitter_parsec_multi::solve_init( const gesvdm2_args_t *args, subproblem_t *spb )
+{
+    rational_fitter_parsec_multi *rfpm = (rational_fitter_parsec_multi*)(args->rfpm) ;
+    rational_function            *rf   = (rational_function*)(args->rfptr);
+    rational_function            *rf2  = NULL;
+    int np = spb->np;
+    int nq = spb->nq;
+
+    rf2 = dynamic_cast<rational_function*>(plugins_manager::get_function(*(rfpm->_args)));
+
+    std::cout << rf2 << ": Start initPbRf" << std::endl;
+    if(!rf)
+	{
+	    std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
+	    throw;
+	}
+    rf2->setParametrization(rf->input_parametrization());
+    rf2->setParametrization(rf->output_parametrization());
+    rf2->setDimX(rf->dimX()) ;
+    rf2->setDimY(rf->dimY()) ;
+    rf2->setMin(rf->min()) ;
+    rf2->setMax(rf->max()) ;
+	
+    // Set the rational function size
+    rf2->setSize(np, nq);
+
+    spb->rfptr = rf2;
+}
+
+
+/**
+ * Take as input the full constraint matrix CI for a dimension ny, and
+ * the associated ci vector with the 2-norm of each row scaled by delta.
+ * Apply the quadratic program and test against all the constraints.
+ * Return true if all constraints match, false otherwise.
+ */
+int rational_fitter_parsec_multi::solve_wrapper( const gesvdm2_args_t *args, subproblem_t *pb, int M, int ny,
+						 double *CIptr, double *ciptr )
+{
+    const vertical_segment *d    = (const vertical_segment*)(args->dataptr);
+    rational_function      *rf   = (rational_function*)(pb->rfptr);
+    rational_function_1d   *rf1d = rf->get(ny);
+    const int np = pb->np;
+    const int nq = pb->nq;
+    const int N  = np + nq;
+
+    // Compute the solution
+    QuadProgPP::Matrix<double> CE(0.0, N, 0);
+    QuadProgPP::Vector<double> ce(0.0, 0);
+    QuadProgPP::Matrix<double> G (0.0, N, N);
+    QuadProgPP::Vector<double> g (0.0, N);
+    QuadProgPP::Vector<double> x (0.0, N);
+
+    QuadProgPP::Matrix<double> CI(CIptr, N, M);
+    QuadProgPP::Vector<double> ci(ciptr, M);
+
+    // Select the size of the result vector to
+    // be equal to the dimension of p + q
+    for(int i=0; i<N; ++i) {
+	G[i][i] = 1.0;
+    }
+
+    double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
+    bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
+
+    if(solves_qp) {
+	std::cout << "<<INFO>> got solution for pb with np=" << pb->np << ", nq=" << pb->nq << std::endl;
+
+	// Recopy the vector d
+	vec p(np), q(nq);
+	double norm = 0.0;
+
+	for(int i=0; (i<N) & solves_qp; ++i) {
+	    const double v = x[i];
+
+	    solves_qp = solves_qp && !isnan(v)
+		&& (v != std::numeric_limits<double>::infinity());
+
+	    norm += v*v;
+	    if(i < np) {
+		p[i] = v;
+	    }
+	    else {
+		q[i - np] = v;
+	    }
+	}
+
+	if (solves_qp) {
+	    std::cout << "<<INFO>> got solution to second step for pb with np=" << pb->np << ", nq=" << pb->nq << std::endl;
+
+	    // Rq: doesn't need protection in // since it should be working on independant vectors
+	    rf1d->update(p, q);
+	    solves_qp = (test_all_constraint( d, rf1d, ny ) == 1);
+	}
+    }
+    else {
+	std::cerr << "<<DEBUG>> Didn't get solution to the pb with np=" << pb->np << ", nq=" << pb->nq << std::endl;
+    }
+
+    return solves_qp;
+}
+
+int rational_fitter_parsec_multi::solve_finalize( const gesvdm2_args_t *args, subproblem_t *pb )
+{
+    const vertical_segment *d  = (const vertical_segment*)(args->dataptr);
+    rational_function      *rf = (rational_function*)(pb->rfptr);
+
+    static ptr<data> dat((data *)d);
+    
+    std::cout << "d=" << d << std::endl;
+    std::cout << "<<INFO>> got solution to final step for pb with np=" << pb->np << ", nq=" << pb->nq << std::endl;
+    pb->linf_dist = rf->Linf_distance(dat);
+    pb->l2_dist   = rf->L2_distance(dat);
+    std::cout << "<<INFO>> got solution with np=" << pb->np << ", nq=" << pb->nq
+	      << " Linf: " << pb->linf_dist << " L2: " << pb->l2_dist << std::endl;
+    std::cout << "d=" << d << std::endl;
+
+    return pb->isfitted;
 }

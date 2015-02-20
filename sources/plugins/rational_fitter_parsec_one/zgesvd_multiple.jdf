@@ -16,15 +16,40 @@ extern "C" %{
 #include "data_dist/matrix/matrix.h"
 #include "gesvdm.h"
 
-#define UPDATE( __nb, __value )                                         \
-    if (__value != 0. ){                                                \
-        if ( scale < __value ) {                                        \
-            sumsq = __nb + (sumsq) * ( scale / __value ) * ( scale / __value ); \
-            scale = __value;                                            \
-        } else {                                                        \
-            sumsq = sumsq + __nb * ( __value / scale ) *  ( __value / scale ); \
-        }                                                               \
+static inline void ssq_update( double *scale, double *sumsq, double val ) {
+    double aval = fabs(val);
+    if (aval != 0. ){
+	if ( *scale < aval ) {
+	    *sumsq = 1. + (*sumsq) * ( (*scale) / aval ) * ( (*scale) / aval );
+	    *scale = aval;
+	} else {
+	    *sumsq = (*sumsq) + ( aval / (*scale) ) *  ( aval / (*scale) );
+	}
     }
+}
+
+#define PRECISION_z
+
+static inline void dplasma_zprint_tile( int m, int n, dague_complex64_t *A, int lda )
+{
+    int i, j;
+
+    fflush(stdout);
+    for(i=0; i<m; i++) {
+	for(j=0; j<n; j++) {
+#if defined(PRECISION_z) || defined(PRECISION_c)
+	    fprintf(stdout, " (% e, % e)",
+		    creal( A[j*lda + i] ),
+		    cimag( A[j*lda + i] ));
+#else
+	    fprintf(stdout, " % e", A[j*lda + i]);
+#endif
+	}
+	fprintf(stdout, "\n");
+    }
+    fflush(stdout);
+    usleep(1000);
+}
 
 %}
 
@@ -40,44 +65,6 @@ minMN  [type = "int" hidden = on default = "dague_imin(descA.mb, descA.n)" ]
 
 p_work [type = "dague_memory_pool_t *" size = "(sizeof(PLASMA_Complex64_t)*ib*(descA.nb))"]
 p_tau  [type = "dague_memory_pool_t *" size = "(sizeof(PLASMA_Complex64_t)   *(descA.nb))"]
-
-/* fill_cip(m) */
-/*   /\* Execution space *\/ */
-/*   m  = 0 .. descA.mt-1 */
-
-/*   /\* Locality *\/ */
-/*   : dataCI(m, 0) */
-
-/*   WRITE CIp-> CIp rownorm( m, 0 .. descCI.nt-1 ) */
-
-/* BODY */
-/* { */
-/*     int tempmm = m == descCI.mt-1 ? descCI.m - m*descCI.mb : descCI.mb; */
-
-/*     args->fill_p( m * descCI.mb, tempmm, args->np, CIp, descCI.mb, */
-/*                   args->data, args->rptr ); */
-
-/* } */
-/* END */
-
-/* fill_ciq(m) */
-/*   /\* Execution space *\/ */
-/*   m  = 0 .. descA.mt-1 */
-
-/*   /\* Locality *\/ */
-/*   : dataCI(m, 0) */
-
-/*   WRITE CIq-> CIq rownorm( m, 0 .. descCI.nt-1 ) */
-
-/* BODY */
-/* { */
-/*     int tempmm = m == descCI.mt-1 ? descCI.m - m*descCI.mb : descCI.mb; */
-
-/*     args->fill_q( m * descCI.mb, tempmm, args->np, CIp, descCI.mb, */
-/*                   args->data, args->rptr, args->ny ); */
-/* } */
-/* END */
-
 
 /*
  * Computes norm 2 of each rows, and create the backup of A, to restore it after factorization
@@ -111,7 +98,7 @@ BODY
 {
     double *lA = (double*)A;
     double *lCI = (double*)CI;
-    double scale, sumsq, tmp;
+    double scale, sumsq;
 
     int tempmm = (m==(descA.mt-1)) ? (descA.m - m * descA.mb) : descA.mb;
     int tempnn = (n==(descA.nt-1)) ? (descA.n - n * descA.nb) : descA.nb;
@@ -136,18 +123,21 @@ BODY
         for(j=0; j<tempnn; j++) {
             lA = ((dague_complex64_t*)B) + i + j * descA.mb;
 
-            tmp = fabs(*lA);
-            UPDATE( 1., tmp );
+            ssq_update( &scale, &sumsq, *lA );
 
 #if defined(PRECISION_z) || defined(PRECISION_c)
             lA++;
-            tmp = fabs(*lA);
-            UPDATE( 1., tmp );
+            ssq_update( &scale, &sumsq, *lA );
 #endif
         }
 
         *lCI = scale * dplasma_dsqrt( sumsq );
     }
+
+    /* fprintf(stdout, "************  Matrix CI  *************  \n"); */
+    /* dplasma_zprint_tile( tempmm, tempnn, A, ldam ); */
+    /* fprintf(stdout, "************  Vector ci  *************  \n"); */
+    /* dplasma_zprint_tile( 1, tempmm, CI, 1 ); */
 }
 END
 
@@ -202,6 +192,7 @@ BODY
                     p_elem_T, ib,
                     p_elem_A, p_elem_B );
     }
+
     dague_private_memory_push( p_tau,  p_elem_A );
     dague_private_memory_push( p_work, p_elem_B );
     dague_private_memory_push( p_work, p_elem_T );
@@ -258,7 +249,7 @@ BODY
     void *p_elem_B = dague_private_memory_pop( p_work );
     void *p_elem_T = dague_private_memory_pop( p_work );
 
-    memset( p_elem_T, 0, descA.mb * ib * sizeof(dague_complex64_t) );
+    memset( p_elem_T, 0, descA.nb * ib * sizeof(dague_complex64_t) );
 
     if ( type == DPLASMA_QR_KILLED_BY_TS ) {
         CORE_ztsqrt(
@@ -314,17 +305,23 @@ BODY
         assert(tempmm == descA.mb);
 
         /* Zero out below R */
-        CORE_zlaset( PlasmaLower, descA.mb-1, descA.nb-1,
+        CORE_zlaset( PlasmaLower, descA.mb-1, descA.nb,
                      0., 0., ((dague_complex64_t*)A)+1, descA.mb );
     }
 
+    /* fprintf(stdout, "************  Matrix QR  *************  \n"); */
+    /* dplasma_zprint_tile( tempmm, descA.nb, A, descA.mb ); */
+
     /* Bidiagonalize R/L */
     LAPACKE_zgebrd( LAPACK_COL_MAJOR, tempmm, descA.nb,
-                    A, descA.mb, S, p_elem_work, p_elem_tauq, p_elem_taup );
+		    A, descA.mb, S, p_elem_work, p_elem_tauq, p_elem_taup );
+
+    /* fprintf(stdout, "************  Matrix Bidiag  *************  \n"); */
+    /* dplasma_zprint_tile( tempmm, descA.nb, A, descA.mb ); */
 
     /* Perform bidiagonal QR iteration */
-    LAPACKE_zbdsqr( LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), tempmm,
-                    0, 0, 0, S, p_elem_work, NULL, 1, NULL, 1, NULL, 1 );
+    LAPACKE_zbdsqr( LAPACK_COL_MAJOR, lapack_const(PlasmaUpper), minMN,
+		    0, 0, 0, S, p_elem_work, NULL, 1, NULL, 1, NULL, 1 );
 
     dague_private_memory_push( p_tau,  p_elem_taup );
     dague_private_memory_push( p_tau,  p_elem_tauq );
@@ -346,6 +343,9 @@ BODY
 
     fprintf(stdout, "<<DEBUG>> delta factor (%d): %e / %e = %e\n",
             n, ((double*)S)[minMN-1], ((double*)S)[0], ((double*)S)[minMN-1] / ((double*)S)[0] );
+
+    /* fprintf(stdout, "************  Vector S  *************  \n"); */
+    /* dplasma_zprint_tile( 1, minMN, S, 1 ); */
 }
 END
 
@@ -382,6 +382,9 @@ BODY
     /* if (m == 0) { */
     /*     memcpy( CI, S, tempmm * sizeof(double)); */
     /* } */
+
+    /* fprintf(stdout, "************  Vector - delts * Ci  *************  \n"); */
+    /* dplasma_zprint_tile( 1, tempmm, CI, 1 ); */
 }
 END
 
