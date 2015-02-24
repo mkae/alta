@@ -1,8 +1,0 @@
-Import('env')
-env = env.Clone()
-
-# Special linking flags, defined in the OS dependant configuration file
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
-
-sources = ['data.cpp']
-env.SharedLibrary('../../build/data_merl', sources)
