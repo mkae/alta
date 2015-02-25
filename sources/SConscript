@@ -1,6 +1,7 @@
 core    = SConscript('core/SConscript')
 plugins = SConscript('plugins/SConscript')
 softs   = SConscript('softs/SConscript')
+tests   = SConscript('tests/SConscript')
 
 python  = SConscript('python/SConscript')
 #Requires(plugins, core)
