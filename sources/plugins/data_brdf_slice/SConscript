@@ -1,18 +1,20 @@
-Import('env')
+Import('env', 'CheckPKG')
 env = env.Clone()
 
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-env.AppendUnique(LIBS    = env['OPENEXR_LIB'])
 env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
 env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 
 build_lib = False
-conf = Configure(env)
-if conf.CheckLibWithHeader(env['OPENEXR_LIB'], 'ImfRgbaFile.h', 'c++'):
+conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-	build_lib = True
+# Check we have the necessary dependency.
+if conf.CheckPKG('IlmBase'):
+        env.ParseConfig('pkg-config --cflags --libs IlmBase')
+        if conf.CheckLibWithHeader('Half', 'ImfRgbaFile.h', 'c++'):
+                env.AppendUnique(LIBS = ['Half'])
+                build_lib = True
 
-#end
 env = conf.Finish()
 
 if build_lib:
