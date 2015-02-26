@@ -97,7 +97,7 @@ if sys.platform == 'darwin':
 
 def CheckPKG(context, name):
         """Return True if package NAME can be found with 'pkg-config'."""
-        context.Message('Checking for %s... ' % name)
+        context.Message('Checking for %s using pkg-config... ' % name)
         ret = context.TryAction('pkg-config --exists \'%s\'' % name)[0]
         context.Result(ret)
         return ret
