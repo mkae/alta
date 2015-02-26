@@ -25,7 +25,7 @@ else:
 		if os.name == 'nt':
 			print '<<WARNING>> no automatic installation for this package'
 		else:
-			print '<<INSTALL>> configure and build Nlopt v2.4.1'
+			print '<<INSTALL>> configure and build Ipopt v3.11.8 and its dependencies'
 			path  = os.getcwd()
 			third = path + os.sep + 'Ipopt-3.11.8' + os.sep + 'ThirdParty' + os.sep
 			os.chdir(third + 'Blas')
