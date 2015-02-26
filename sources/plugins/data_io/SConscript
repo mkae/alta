@@ -14,7 +14,6 @@ conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 if conf.CheckPKG('OpenEXR'):
         env.ParseConfig('pkg-config --cflags --libs OpenEXR')
         if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
-                env.AppendUnique(LIBS = ['IlmImf'])
                 build_EXR = True
 
 env = conf.Finish()
