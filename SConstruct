@@ -105,13 +105,6 @@ def CheckPKG(context, name):
 # Export 'CheckPKG' for use in SConscripts.
 Export('CheckPKG')
 
-## COMPILER dependant section
-##
-if env['CC'] in ['gcc', 'clang'] or env['CXX'] in ['g++', 'clang', 'clang++']:
-	env.AppendUnique(CCFLAGS = ['-fPIC'])
-#end
-
-
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different
 ## paths.
