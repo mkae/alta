@@ -47,7 +47,6 @@ vars.Add('PYTHON_DIR',        'Python and boost-python libraries directory')
 vars.Add('PYTHON_LIB',        'Python and boost-python libraries')
 vars.Add('OPENEXR_INC',       'OpenEXR include directory')
 vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory')
-vars.Add('OPENEXR_LIB',       'OpenEXR libraries')
 vars.Add('FLANN_INC',         'FLANN include directory')
 vars.Add('FLANN_DIR',         'FLANN libraries directory')
 vars.Add('FLANN_LIB',         'FLANN libraries')
@@ -103,25 +102,8 @@ def CheckPKG(context, name):
         context.Result(ret)
         return ret
 
-# Configuration.
-
-conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-
-if conf.CheckPKG('eigen3 >= 3.2.0'):
-        env.ParseConfig('pkg-config --cflags --libs eigen3')
-if conf.CheckPKG('nlopt >= 2.4.1'):
-        env.ParseConfig('pkg-config --cflags --libs nlopt')
-
-env = conf.Finish()
-
-
-
-## COMPILER dependant section
-##
-if env['CC'] in ['gcc', 'clang'] or env['CXX'] in ['g++', 'clang', 'clang++']:
-	env.AppendUnique(CCFLAGS = ['-fPIC'])
-#end
-
+# Export 'CheckPKG' for use in SConscripts.
+Export('CheckPKG')
 
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different

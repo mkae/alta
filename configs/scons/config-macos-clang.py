@@ -49,7 +49,6 @@ OPENMP_LIB    = []
 ##
 OPENEXR_INC    = ['/opt/local/include/OpenEXR']
 OPENEXR_DIR    = ['/opt/local/lib']
-OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
 
 
 ## FLANN library

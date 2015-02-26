@@ -24,4 +24,10 @@ if sys.platform == 'darwin':
 	env.AppendUnique(CCFLAGS = '-fvisibility=hidden')
 #end
 
+
+# We're not building a real static library, but rather what Libtool
+# calls a "convenience library": an archive that contains PIC code.
+# Thus, force '-fPIC'.
+env.AppendUnique(CCFLAGS = ['-fPIC'])
+
 env.StaticLibrary('../build/core', sources)
