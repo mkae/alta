@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 					cart[3] = cos(phi_o)*sin(theta_o);
 					cart[4] = sin(phi_o)*sin(theta_o);
 					cart[5] = cos(theta_o);
-					vec x(3);
+					vec x(4);
 
 					params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_PH_TD_PD, &x[0]);
 
