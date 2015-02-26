@@ -103,18 +103,8 @@ def CheckPKG(context, name):
         context.Result(ret)
         return ret
 
-# Configuration.
-
-conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-
-if conf.CheckPKG('eigen3 >= 3.2.0'):
-        env.ParseConfig('pkg-config --cflags --libs eigen3')
-if conf.CheckPKG('nlopt >= 2.4.1'):
-        env.ParseConfig('pkg-config --cflags --libs nlopt')
-
-env = conf.Finish()
-
-
+# Export 'CheckPKG' for use in SConscripts.
+Export('CheckPKG')
 
 ## COMPILER dependant section
 ##
