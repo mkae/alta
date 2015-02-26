@@ -75,10 +75,11 @@ else:
 	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
 	env.Append(CPPPATH = ['build' + os.sep + 'include'])
 
-        # We're not building a real static library, but rather what
-        # Libtool calls a "convenience library": an archive that
-        # contains PIC code.  Thus, force '-fPIC'.
-        env.AppendUnique(CCFLAGS = ['-fPIC'])
+        if env['CC'] != 'cl':
+                # We're not building a real static library, but rather what
+                # Libtool calls a "convenience library": an archive that
+                # contains PIC code.  Thus, force '-fPIC'.
+                env.AppendUnique(CCFLAGS = ['-fPIC'])
 
 	env.StaticLibrary(target = qp_target, source = qp_sources)
 
