@@ -81,6 +81,7 @@ for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH' ]:
                 envVars[var] = os.environ[var]
 
 env = Environment(variables = vars, ENV = envVars)
+#env['PLATFORM'] = sys.platform
 
 ## PLATFORM dependant section
 ##
@@ -128,7 +129,7 @@ core     = env.SConscript('sources/core/SConscript')
 plugins  = env.SConscript('sources/plugins/SConscript')
 softs    = env.SConscript('sources/softs/SConscript')
 python   = env.SConscript('sources/python/SConscript')
-#tests    = env.SConscript('sources/tests/SConscript')
+tests    = env.SConscript('sources/tests/SConscript')
 #env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
 
 env.Depends(plugins, core)
