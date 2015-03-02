@@ -63,7 +63,7 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		// Convert the sample point into the function space
 		vec x(f->dimX());
 		params::convert(&xi[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
-
+ 
 		// Get the jacobian of the function at position x_i for the current
 		// set of parameters (set prior to function call)
 		vec _jac = f->parametersJacobian(x);
@@ -276,8 +276,7 @@ bool nonlinear_fitter_nlopt::fit_data(const ptr<data>& d, ptr<function>& fit, co
 		print_nlopt_error(res, "nlopt_set_min_objective");
 		return false;
 	}
-
-
+	
 	// Launch minimization
 	double f_end;
 	res = nlopt_optimize(opt, &p[0], &f_end);
