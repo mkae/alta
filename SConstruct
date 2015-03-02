@@ -81,11 +81,11 @@ for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH' ]:
                 envVars[var] = os.environ[var]
 
 env = Environment(variables = vars, ENV = envVars)
-#env['PLATFORM'] = sys.platform
+print '<<INFO>> The current platform is: ' + env['PLATFORM']
 
 ## PLATFORM dependant section
 ##
-if sys.platform == 'darwin':
+if env['PLATFORM'] == 'darwin':
 
 	# Adding the /usr/local/lib directory used to store libraries of
 	# MacPorts or Brew.
@@ -105,7 +105,7 @@ def CheckPKG(context, name):
         return ret
 
 # Export 'CheckPKG' for use in SConscripts.
-# Export('CheckPKG')
+Export('CheckPKG')
 
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different
