@@ -6,7 +6,7 @@
 #include <iostream>
 
 bool closeTo(double a, double b) {
-	return abs(a-b) < 1.0E-10;
+	return std::abs(a-b) < 1.0E-10;
 }
 
 /* Test different configurations for the Half / Cartesian parametrization

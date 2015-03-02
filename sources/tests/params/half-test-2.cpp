@@ -6,7 +6,7 @@
 #include <iostream>
 
 bool closeTo(double a, double b) {
-	return abs(a-b) < 1.0E-10;
+	return std::abs(a-b) < 1.0E-10;
 }
 
 bool inRange(double x, double a, double b) {
