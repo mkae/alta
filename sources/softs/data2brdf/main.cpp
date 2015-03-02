@@ -113,7 +113,7 @@ int main(int argc, char** argv)
         fit->set_parameters(args) ;
 
         ptr<function> f = plugins_manager::get_function(args);
-        ptr<data> d     = plugins_manager::get_data(args["data"]);
+        ptr<data>     d = plugins_manager::get_data(args["data"]);
         d->load(args["input"], args);
 
         if(!f || !d)
@@ -122,11 +122,11 @@ int main(int argc, char** argv)
             return 1;
         }
 
-		  if(d->size() == 0)
-		  {
-			  std::cerr << "<<ERROR>> no data loaded, please check you input file" << std::endl;
-			  return 1;
-		  }
+        if(d->size() == 0)
+        {
+            std::cerr << "<<ERROR>> no data loaded, please check you input file" << std::endl;
+            return 1;
+        }
 
         // Check the compatibility between the data and the function
         plugins_manager::check_compatibility(d, f, args);
