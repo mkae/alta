@@ -152,7 +152,11 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 struct CompoundFunctor: Eigen::DenseFunctor<double>
 {
 	CompoundFunctor(compound_function* f, int index, const ptr<data> d, bool use_cosine) :
-		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _index(index), _cosine(use_cosine)
+		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), 
+		_f(f), 
+		_d(d), 
+		_cosine(use_cosine),
+		_index(index)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
