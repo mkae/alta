@@ -1,7 +1,8 @@
 import os
 import shutil
 
-Import('env', 'CheckPKG')
+#Import('env', 'CheckPKG')
+Import('env')
 env = env.Clone()
 
 if env.GetOption('clean'):
@@ -28,7 +29,7 @@ else:
         # them if not.
         #
         ##
-        conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+        # conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
 	##
 	#   IpOpt dependencies
@@ -38,20 +39,20 @@ else:
 	##
 	#   NlOpt dependencies
 	##
-        if conf.CheckPKG('nlopt >= 2.4.1'):
-                env.ParseConfig('pkg-config --cflags --libs nlopt')
-        if not conf.CheckLibWithHeader('nlopt', 'nlopt.hpp', 'c++'):
-                execfile('obtain_nlopt.py')
+        # if conf.CheckPKG('nlopt >= 2.4.1'):
+        #         env.ParseConfig('pkg-config --cflags --libs nlopt')
+        # if not conf.CheckLibWithHeader('nlopt', 'nlopt.hpp', 'c++'):
+        #         execfile('obtain_nlopt.py')
 	
 	##
 	#   Eigen dependencies
 	##
-        if conf.CheckPKG('eigen3 >= 3.2.0'):
-                env.ParseConfig('pkg-config --cflags --libs eigen3')
-        if not conf.CheckCXXHeader('Eigen/Core'):
-                execfile('obtain_eigen.py')
+        # if conf.CheckPKG('eigen3 >= 3.2.0'):
+        #         env.ParseConfig('pkg-config --cflags --libs eigen3')
+        # if not conf.CheckCXXHeader('Eigen/Core'):
+        #         execfile('obtain_eigen.py')
 
-        env = conf.Finish()
+        # env = conf.Finish()
 
 	##
 	#   CERES dependencies

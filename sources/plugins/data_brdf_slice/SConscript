@@ -1,22 +1,29 @@
-Import('env', 'CheckPKG')
+#Import('env', 'CheckPKG')
+Import('env')
 env = env.Clone()
 
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS    = env['OPENEXR_LIB'])
 env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
 env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 
-build_lib = False
-conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+build_EXR = False
+# conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-# Check we have the necessary dependency.
-if conf.CheckPKG('OpenEXR'):
-        env.ParseConfig('pkg-config --cflags --libs OpenEXR')
-        if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
-                build_lib = True
+# # Check we have the necessary dependency.
+# if conf.CheckPKG('OpenEXR'):
+#         env.ParseConfig('pkg-config --cflags --libs OpenEXR')
+#         if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
+#                 build_lib = True
 
+# env = conf.Finish()
+
+conf = Configure(env)
+if conf.CheckLibWithHeader(env['OPENEXR_LIB'], 'ImfRgbaFile.h', 'c++'):
+        build_EXR = True
 env = conf.Finish()
 
-if build_lib:
+if build_EXR:
 	sources = ['data.cpp']
 	env.SharedLibrary('../../build/data_brdf_slice', sources)
 #end

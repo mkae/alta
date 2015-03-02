@@ -47,6 +47,7 @@ vars.Add('PYTHON_DIR',        'Python and boost-python libraries directory')
 vars.Add('PYTHON_LIB',        'Python and boost-python libraries')
 vars.Add('OPENEXR_INC',       'OpenEXR include directory')
 vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory')
+vars.Add('OPENEXR_LIB',       'OpenEXR libraries')
 vars.Add('FLANN_INC',         'FLANN include directory')
 vars.Add('FLANN_DIR',         'FLANN libraries directory')
 vars.Add('FLANN_LIB',         'FLANN libraries')
@@ -103,7 +104,7 @@ def CheckPKG(context, name):
         return ret
 
 # Export 'CheckPKG' for use in SConscripts.
-Export('CheckPKG')
+# Export('CheckPKG')
 
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different
@@ -127,7 +128,7 @@ core     = env.SConscript('sources/core/SConscript')
 plugins  = env.SConscript('sources/plugins/SConscript')
 softs    = env.SConscript('sources/softs/SConscript')
 python   = env.SConscript('sources/python/SConscript')
-tests    = env.SConscript('sources/tests/SConscript')
+#tests    = env.SConscript('sources/tests/SConscript')
 #env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
 
 env.Depends(plugins, core)
