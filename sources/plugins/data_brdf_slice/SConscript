@@ -8,11 +8,12 @@ env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 build_lib = False
 conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-# Check we have the necessary dependency.
+# Check we have the necessary dependency, but gracefully handle
+# situations where 'pkg-config' is missing.
 if conf.CheckPKG('OpenEXR'):
         env.ParseConfig('pkg-config --cflags --libs OpenEXR')
-        if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
-                build_lib = True
+if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
+        build_lib = True
 
 env = conf.Finish()
 
