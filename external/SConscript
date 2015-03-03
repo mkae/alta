@@ -1,6 +1,7 @@
 import os
 import shutil
 
+#Import('env', 'CheckPKG')
 Import('env')
 env = env.Clone()
 
@@ -18,45 +19,44 @@ if env.GetOption('clean'):
 	#shutil.rmtree('nlopt-2.4.1', True)
 	
 else:
-	##
-	# Check for optional dependencies, downloading them if they
-	# are not already available in the user's environment.
-	#
-	# At this point CCFLAGS and LINKFLAGS already contain the
-	# right flags if those dependencies if they found via
-	# 'pkg-config'.  Check whether they are usable, and download
-	# them if not.
-	#
-	##
+        ##
+        # Check for optional dependencies, downloading them if they
+        # are not already available in the user's environment.
+        #
+        # At this point CCFLAGS and LINKFLAGS already contain the
+        # right flags if those dependencies if they found via
+        # 'pkg-config'.  Check whether they are usable, and download
+        # them if not.
+        #
+        ##
+        # The line below should only be used on Unices
+        # conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+        # 
+	# FOR NOW I AM COMMENTING IT but this is the spirit ...
+	#if( env['PLATFORM'].startswith('win' ):
+	#else:
+	#	conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+
+	conf = Configure(env)
 
 	##
 	#   IpOpt dependencies
 	##
 	execfile('obtain_ipopt.py')
 
-	# RP: Construct a configure environment according to plaform
-	if env['PLATFORM'].startswith('win' ):
-		conf = Configure(env)	
-	else:
-		# 
-		#  If we are not on a windows platform we assume that is safe to use pkg-config
-		# 
-		Import('env', 'CheckPKG')
-		conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-		
-		# NlOpt Dependencies
-		if conf.CheckPKG('nlopt >= 2.4.1'):
-			env.ParseConfig('pkg-config --cflags --libs nlopt')
-		
-		# Eigen Dependencies
-		if conf.CheckPKG('eigen3 >= 3.2.0'):
-			env.ParseConfig('pkg-config --cflags --libs eigen3')
-	#end
-
-	# Regardless of the plaform , use scons to check Headers and libs
-	# If they are not found. Download them
+	##
+	#   NlOpt dependencies
+	##
+  # if conf.CheckPKG('nlopt >= 2.4.1'):
+	#         env.ParseConfig('pkg-config --cflags --libs nlopt')
 	if not conf.CheckLibWithHeader('nlopt', 'nlopt.hpp', 'c++'):
 		execfile('obtain_nlopt.py')
+	
+	##
+	#   Eigen dependencies
+	##
+        # if conf.CheckPKG('eigen3 >= 3.2.0'):
+        #         env.ParseConfig('pkg-config --cflags --libs eigen3')
 
 	if not conf.CheckCXXHeader('Eigen/Core'):
 		execfile('obtain_eigen.py')
