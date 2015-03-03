@@ -285,10 +285,12 @@ throw
 #ifdef _WIN32
 #define M_PI 3.1415926535897932384626433832795
 
+#if (_MSC_VER < 1800)
 template<typename T> bool isnan(T x)
 {
 	return x==std::numeric_limits<T>::signaling_NaN();
 }
+#endif
 
 template<typename T> T erf(T x)
 {
