@@ -42,7 +42,6 @@ OPENMP_LIB    = []
 ##
 OPENEXR_INC    = ['']
 OPENEXR_DIR    = ['']
-OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
 
 
 ## FLANN library
