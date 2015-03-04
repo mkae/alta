@@ -76,11 +76,11 @@ vars.Add('MATLAB_LIB',        'MATLAB libraries')
 
 # Select user environment variables that we want to honor.
 envVars = {}
-for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH' ]:
+for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH', 'TMP' ]:
         if var in os.environ:
                 envVars[var] = os.environ[var]
 
-env = Environment(variables = vars, ENV = envVars)
+env = Environment(variables = vars, ENV = envVars )
 print '<<INFO>> The current platform is: ' + env['PLATFORM']
 
 ## PLATFORM dependant section
@@ -94,11 +94,10 @@ if env['PLATFORM'] == 'darwin':
 
 	env.AppendUnique(LIBPATH = ['/opt/local/lib/'])
 	env.AppendUnique(CPPPATH = ['/opt/local/include/'])
-
-elif env['PLATFORM'] == 'win32':
+#elif env['PLATFORM'] == 'win32':
 
 	# Required flag for VS linker
-	env['ENV']['TMP'] = os.environ['TMP']
+#	env['ENV']['TMP'] = os.environ['TMP']
 #end
 
 def CheckPKG(context, name):
