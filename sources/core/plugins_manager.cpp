@@ -95,8 +95,8 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 	std::list<std::string>::iterator iter;
 	for(iter = basename.begin(); iter != basename.end(); ++iter)
 	{
-	std::string libname = *iter;
-	libname.append(library_name(filename));
+	 std::string libname = *iter;
+	 libname.append(library_name(filename));
 
 
 #ifdef _WIN32
@@ -364,7 +364,19 @@ function* plugins_manager::get_function(const arguments& args)
       nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
       if(func_fres != NULL)
       {
-        return new product_function(nl_func, func_fres);
+        bool const fresnel_is_fixed = (args.is_defined("fixed-fresnel")) ? (true) : (false);
+        bool const lobe_is_fixed    = (args.is_defined("fixed-lobe")) ? (true) : (false);
+       
+        if( fresnel_is_fixed )
+        {
+          std::cout << "<<DEBUG>> The Fresnel term is fixed" << std::endl;
+        }
+        if( lobe_is_fixed )
+        {
+          std::cout << "<<DEBUG>> The lobe is fixed" << std::endl;
+        }
+
+        return new product_function(nl_func, func_fres, lobe_is_fixed, fresnel_is_fixed);
       }
       else
       {
@@ -471,7 +483,7 @@ void plugins_manager::check_compatibility(ptr<data>& d, const ptr<function>& f,
 
 	if(f->dimY() != d->dimY())
 	{
-        f->setDimY(d->dimY());
+    f->setDimY(d->dimY());
 	}
 
 	/*

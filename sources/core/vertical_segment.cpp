@@ -79,7 +79,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 #ifdef DEBUG
 				std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
 #endif
-
+				
 				for(int k=0; k<dimX(); ++k)
 				{
 					_min[k] =  std::numeric_limits<double>::max() ;

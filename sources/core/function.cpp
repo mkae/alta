@@ -798,11 +798,12 @@ void compound_function::save_call(std::ostream& out, const arguments& args) cons
 
 /*--- Product functions implementation ----*/
 
-product_function::product_function(nonlinear_function* g1, nonlinear_function* g2) 
+product_function::product_function( nonlinear_function* g1, nonlinear_function* g2,
+																	  bool is_g1_fixed, bool is_g2_fixed) 
+: f1( g1 ),
+	f2( g2 ),
+	_is_fixed( std::pair<bool,bool>( is_g1_fixed, is_g2_fixed) )
 {
-	this->f1 = g1;
-	this->f2 = g2;
-
 	// If the two parametrization are different, use the CARTESIAN parametrization
 	// as the input parametrization, then do the convertion for all the functions.
 	if(g1->input_parametrization() != g2->input_parametrization())
@@ -1011,27 +1012,46 @@ void product_function::setMax(const vec& max)
 
 int product_function::nbParameters() const
 {
-	return f1->nbParameters() + f2->nbParameters();
+	int num_parameters = 0;
+	
+	num_parameters +=	(! _is_fixed.first) ? (f1->nbParameters()) : (0) ;
+
+	num_parameters +=	(! _is_fixed.second) ? (f2->nbParameters()) : (0) ;
+
+	return num_parameters;
 }
 
 vec product_function::parameters() const
 {
-	int nb_f1_params = f1->nbParameters();
-	int nb_f2_params = f2->nbParameters();
-	int nb_params = nb_f1_params + nb_f2_params;
+	// int nb_f1_params = f1->nbParameters();
+	// int nb_f2_params = f2->nbParameters();
+	// int nb_params = nb_f1_params + nb_f2_params;
+	int const nb_params = product_function::nbParameters();	
 
+	int nb_f1_params = 0;
+	
 	vec params(nb_params);
-
-	vec f1_params = f1->parameters();
-	for(int i=0; i<nb_f1_params; ++i)
+	if( !_is_fixed.first )
 	{
-		params[i] = f1_params[i];
+		//F1 is active save the number of paramters of f1 
+		nb_f1_params = f1->nbParameters();
+
+		vec f1_params = f1->parameters();
+		for(int i=0; i<nb_f1_params; ++i)
+		{
+			params[i] = f1_params[i];
+		}
+
 	}
 
-	vec f2_params = f2->parameters();
-	for(int i=0; i<nb_f2_params; ++i)
+	if( ! _is_fixed.second )
 	{
-		params[i+nb_f1_params] = f2_params[i];
+		int const nb_f2_params = f2->nbParameters();
+		vec f2_params = f2->parameters();
+		for(int i=0; i<nb_f2_params; ++i)
+		{
+			params[i+nb_f1_params] = f2_params[i];
+		}		
 	}
 
 	return params;
@@ -1039,43 +1059,65 @@ vec product_function::parameters() const
 
 void product_function::setParameters(const vec& p)
 {
-	int nb_f1_params = f1->nbParameters();
-	int nb_f2_params = f2->nbParameters();
 
-	vec f1_params(nb_f1_params);
-	for(int i=0; i<nb_f1_params; ++i)
-	{
-		f1_params[i] = p[i];
-	}
-	f1->setParameters(f1_params);
+	int nb_f1_params = 0;
 
-	vec f2_params(nb_f2_params);
-	for(int i=0; i<nb_f2_params; ++i)
+	if( ! _is_fixed.first )
 	{
-		f2_params[i] = p[i+nb_f1_params];
+		nb_f1_params = f1->nbParameters();
+	
+		vec f1_params(nb_f1_params);
+		for(int i=0; i<nb_f1_params; ++i)
+		{
+			f1_params[i] = p[i];
+		}
+
+		f1->setParameters(f1_params);	
 	}
-	f2->setParameters(f2_params);
+
+	if( ! _is_fixed.second )
+	{
+		int const nb_f2_params = f2->nbParameters();
+		vec f2_params(nb_f2_params);
+		for(int i=0; i<nb_f2_params; ++i)
+		{
+			f2_params[i] = p[i+nb_f1_params];
+		}
+		
+		f2->setParameters(f2_params);			
+	}
+
+
 }
 
-//! Get the vector of min parameters for the function
+//! Get the vector of max parameters for the function
 vec product_function::getParametersMax() const
 {
-	int nb_f1_params = f1->nbParameters();
-	int nb_f2_params = f2->nbParameters();
-	int nb_params = nb_f1_params + nb_f2_params;
+	int const nb_params = product_function::nbParameters();	
+
+	int nb_f1_params = 0;
 
 	vec params(nb_params);
 
-	vec f1_params = f1->getParametersMax();
-	for(int i=0; i<nb_f1_params; ++i)
+	if( !_is_fixed.first )
 	{
-		params[i] = f1_params[i];
+		nb_f1_params = f1->nbParameters();
+		vec f1_params = f1->getParametersMax();
+		for(int i=0; i<nb_f1_params; ++i)
+		{
+			params[i] = f1_params[i];
+		}
 	}
 
-	vec f2_params = f2->getParametersMax();
-	for(int i=0; i<nb_f2_params; ++i)
+	if( ! _is_fixed.second )
 	{
-		params[i+nb_f1_params] = f2_params[i];
+		int const nb_f2_params = f2->nbParameters();
+		vec f2_params = f2->getParametersMax();
+		for(int i=0; i<nb_f2_params; ++i)
+		{
+			params[i+nb_f1_params] = f2_params[i];
+		}
+
 	}
 
 	return params;
@@ -1084,32 +1126,49 @@ vec product_function::getParametersMax() const
 //! Get the vector of min parameters for the f1tion
 vec product_function::getParametersMin() const
 {
-	int nb_f1_params = f1->nbParameters();
-	int nb_f2_params = f2->nbParameters();
-	int nb_params = nb_f1_params + nb_f2_params;
+	int nb_f1_params = 0;
+
+	int const nb_params = product_function::nbParameters();	
 
 	vec params(nb_params);
 
-	vec f1_params = f1->getParametersMin();
-	for(int i=0; i<nb_f1_params; ++i)
+	if( ! _is_fixed.first )
 	{
-		params[i] = f1_params[i];
+		nb_f1_params = f1->nbParameters();
+
+		vec f1_params = f1->getParametersMin();
+		for(int i=0; i<nb_f1_params; ++i)
+		{
+			params[i] = f1_params[i];
+		}
 	}
 
-	vec f2_params = f2->getParametersMin();
-	for(int i=0; i<nb_f2_params; ++i)
+	if( ! _is_fixed.second )
 	{
-		params[i+nb_f1_params] = f2_params[i];
+		int const nb_f2_params = f2->nbParameters();
+		vec f2_params = f2->getParametersMin();
+		for(int i=0; i<nb_f2_params; ++i)
+		{
+			params[i+nb_f1_params] = f2_params[i];
+		}	
 	}
+
+
+	
 
 	return params;
 }
 
 vec product_function::parametersJacobian(const vec& x) const
 {
-	int nb_f1_params = f1->nbParameters();
-	int nb_f2_params = f2->nbParameters();
-	int nb_params = nb_f1_params + nb_f2_params;
+//ß	std::cout << "ENTERING parametersJacobian " __FILE__ << " " << __LINE__ << std::endl;
+
+
+	int const nb_f1_params = f1->nbParameters();
+	int const nb_f2_params = f2->nbParameters();
+	//int nb_params = nb_f1_params + nb_f2_params;
+	int const nb_params = product_function::nbParameters();
+
 
 	// Convert the input value x to the input space of the f1tion
 	vec xf2(f2->dimX());
@@ -1117,25 +1176,46 @@ vec product_function::parametersJacobian(const vec& x) const
 	vec xf1(f1->dimX());
 	params::convert(&x[0], input_parametrization(), f1->input_parametrization(), &xf1[0]);
 
-	vec f1_jacobian = f1->parametersJacobian(xf1);
-	vec f2_jacobian = f2->parametersJacobian(xf2);
-
+	//Value of each function for the given x
 	vec f1_value = f1->value(xf1);
 	vec f2_value = f2->value(xf2);
 
+	//Jacobien of each function for the given x
+	vec f1_jacobian = f1->parametersJacobian(xf1);
+	vec f2_jacobian = f2->parametersJacobian(xf2);
+
 	// F = f2nel; f = f1tion
 	// d(F * f)(x) /dp = F(x) df(x) /dp + f(x) dF(x) / dp
-	vec jac(nb_params*_nY);
-	for(int y=0; y<_nY; ++y)
-	{
-		for(int i=0; i<nb_f1_params; ++i)
-		{
-			jac[y*nb_params + i] = f1_jacobian[y*nb_f1_params + i] * f2_value[y];
-		}
+	//vec jac(nb_params*_nY);
+	
+	//Forcing Zero by default
+	vec jac= vec::Zero( nb_params * dimY() );
 
-		for(int i=0; i<nb_f2_params; ++i)
+
+	for(int y=0; y<dimY(); ++y)
+	{
+		if( ! _is_fixed.first)
 		{
-			jac[y*nb_params + (i+nb_f1_params)] = f2_jacobian[y*nb_f2_params + i] * f1_value[y];
+			for(int i=0; i<nb_f1_params; ++i)
+			{
+				jac[y*nb_params + i] = f1_jacobian[y*nb_f1_params + i] * f2_value[y];
+			}	
+		}
+		
+		if( ! _is_fixed.second )
+		{
+			for(int i=0; i<nb_f2_params; ++i)
+			{
+				if( _is_fixed.first )
+				{
+					jac[y*nb_params + i ] = f2_jacobian[y*nb_f2_params + i] * f1_value[y];
+				}
+				else
+				{
+					jac[y*nb_params + (i+nb_f1_params)] = f2_jacobian[y*nb_f2_params + i] * f1_value[y];	
+				}
+				
+			}				
 		}
 	}
 
