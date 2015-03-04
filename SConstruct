@@ -95,6 +95,10 @@ if env['PLATFORM'] == 'darwin':
 	env.AppendUnique(LIBPATH = ['/opt/local/lib/'])
 	env.AppendUnique(CPPPATH = ['/opt/local/include/'])
 
+elif env['PLATFORM'] == 'win32':
+
+	# Required flag for VS linker
+	env['ENV']['TMP'] = os.environ['TMP']
 #end
 
 def CheckPKG(context, name):
