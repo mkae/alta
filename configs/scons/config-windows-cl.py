@@ -10,7 +10,7 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'cl'
-CCFLAGS        = []
+CCFLAGS        = ['/Zi','/nologo', '/O2', '/Ox', '/arch:AVX', '/EHsc' ]
 
 
 ## ALTA internal flags
@@ -22,8 +22,8 @@ PLUGIN_LIB     = ['core']
 
 ## Python and boost-python library
 ##
-PYTHON_INC    = ['/usr/include/python2.7']
-PYTHON_DIR    = []
+PYTHON_INC    = ['C:/Python27/include/']
+PYTHON_DIR    = ['C:/Python27/libs/']
 PYTHON_LIB    = ['boost_python', 'python2.7']
 
 
@@ -40,15 +40,15 @@ OPENMP_LIB    = []
 
 ## OpenEXR library
 ##
-OPENEXR_INC    = ['/usr/include/OpenEXR']
-OPENEXR_DIR    = ['/usr/lib']
+OPENEXR_INC    = ['']
+OPENEXR_DIR    = ['']
 OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
 
 
 ## FLANN library
 ##
-FLANN_INC    = ['/usr/include/flann']
-FLANN_DIR    = ['/usr/lib/x86_64_linux-gnu']
+FLANN_INC    = ['']
+FLANN_DIR    = ['']
 FLANN_LIB    = ['flann']
 
 
@@ -94,6 +94,6 @@ IPOPT_OPT_LIB  = []
 
 ## MATLAB library and Engine
 ##
-MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
-MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
+MATLAB_INC  = ['']
+MATLAB_DIR  = ['']
 MATLAB_LIB  = ['eng', 'mex','mat']
