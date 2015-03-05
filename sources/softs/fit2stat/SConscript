@@ -1,0 +1,10 @@
+Import('env')
+env = env.Clone()
+
+# Special linking flags, defined in the OS dependant configuration file
+env.AppendUnique(LIBS = env['SOFT_LIB'])
+
+# Soft Sources
+sources = ['fit2stat.cpp']
+
+env.Program('../../build/fit2stat', sources)
