@@ -6,4 +6,6 @@ SConscript('brdf2brdf/SConscript')
 SConscript('brdf2data/SConscript')
 SConscript('brdf2gnuplot/SConscript')
 
+SConscript('fit2stat/SConscript')
+
 #SConscript('tests/SConscript')
