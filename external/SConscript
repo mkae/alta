@@ -33,7 +33,10 @@ else:
 	##
 	#   IpOpt dependencies
 	##
-	execfile('obtain_ipopt.py')
+        if conf.CheckPKG('ipopt'):
+                env.ParseConfig('pkg-config --cflags --libs ipopt')
+        if not conf.CheckLibWithHeader('ipopt', 'coin/IpTNLP.hpp', 'c++'):
+                execfile('obtain_ipopt.py')
 
 	##
 	#   NlOpt dependencies
