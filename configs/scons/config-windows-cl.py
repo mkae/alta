@@ -10,7 +10,11 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'cl'
-CCFLAGS        = ['/Zi','/nologo', '/O2', '/Ox', '/arch:AVX', '/EHsc' ]
+
+# We used to have '/arch:AVX' here, but that generates invalid code if
+# the underlying CPU does not support AVX (which is typically the case
+# in VMs.)
+CCFLAGS        = ['/Zi','/nologo', '/O2', '/Ox', '/EHsc']
 
 
 ## ALTA internal flags
