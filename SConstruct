@@ -75,7 +75,8 @@ vars.Add('MATLAB_LIB',        'MATLAB libraries')
 
 # Select user environment variables that we want to honor.
 envVars = {}
-for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH', 'TMP' ]:
+for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH',
+             'TMP', 'TMPDIR' ]:
         if var in os.environ:
                 envVars[var] = os.environ[var]
 
