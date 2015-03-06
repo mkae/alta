@@ -16,7 +16,6 @@
 #include <fstream>
 #include <limits>
 #include <algorithm>
-#include <cmath>
 
 #include <core/common.h>
 
@@ -63,7 +62,7 @@ vec isotropic_lafortune_function::value(const vec& x) const
 		}
 
 #ifndef DEBUG
-		if(isnan(res[i]) || res[i] == std::numeric_limits<double>::infinity())
+		if((res[i] == std::numeric_limits<double>::signaling_NaN() ) || res[i] == std::numeric_limits<double>::infinity())
 		{
 			std::cout << "<<ERROR>> invalid value for input: " << x << std::endl;
             std::cout << "          invalid value for parameter: " << parameters() << std::endl;

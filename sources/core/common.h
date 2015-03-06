@@ -14,7 +14,18 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+
+// Math Constants exist in Windows but they need to be included
+// by defining the constant _USE_MATH_DEFINES
+// Cf https://msdn.microsoft.com/en-us/library/4hwaceh6%28v=vs.110%29.aspx
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
 #include <cmath>
+#include <math.h>
+#else
+#include <cmath>
+#endif
+
 #include <cstring>
 #include <algorithm>
 
@@ -269,7 +280,7 @@ template<typename T> T clamp(T x, T a, T b)
 	return std::max<T>(std::min<T>(x, b), a);
 }
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #define NOT_IMPLEMENTED() \
 std::cerr << "<<ERROR>> not implemented " << __FUNCDNAME__ << " in file " << __FILE__ \
           << ":" << __LINE__ << std::endl; \
@@ -282,8 +293,7 @@ throw
 #endif
 
 // Mathematical definition not provided on the Window plateform
-#ifdef _WIN32
-#define M_PI 3.1415926535897932384626433832795
+#ifdef _MSC_VER
 
 #if (_MSC_VER < 1800)
 template<typename T> bool isnan(T x)
