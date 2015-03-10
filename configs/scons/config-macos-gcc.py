@@ -41,8 +41,8 @@ OPENMP_LIB    = ['gomp']
 
 ## OpenEXR library
 ##
-OPENEXR_INC    = ['/usr/include/OpenEXR']
-OPENEXR_DIR    = ['/usr/lib']
+#OPENEXR_INC    = ['/usr/include/OpenEXR']
+#OPENEXR_DIR    = ['/usr/lib']
 
 
 ## FLANN library

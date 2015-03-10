@@ -2,16 +2,19 @@ Import('env', 'CheckPKG')
 env = env.Clone()
 
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
-env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
 
 build_lib = False
 conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-# Check we have the necessary dependency, but gracefully handle
-# situations where 'pkg-config' is missing.
-if conf.CheckPKG('OpenEXR'):
+# First take flags from the user's config, if any, then from pkg-config.
+if ('OPENEXR_DIR' in env) and ('OPENEXR_INC' in env):
+        env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
+        env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
+elif conf.CheckPKG('OpenEXR'):
         env.ParseConfig('pkg-config --cflags --libs OpenEXR')
+
+# Regardless of whether pkg-config succeeded, check whether the
+# library is usable.
 if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
         build_lib = True
 

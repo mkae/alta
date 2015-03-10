@@ -47,8 +47,8 @@ OPENMP_LIB    = []
 
 ## OpenEXR library
 ##
-OPENEXR_INC    = ['/opt/local/include/OpenEXR']
-OPENEXR_DIR    = ['/opt/local/lib']
+#OPENEXR_INC    = ['/opt/local/include/OpenEXR']
+#OPENEXR_DIR    = ['/opt/local/lib']
 
 
 ## FLANN library
