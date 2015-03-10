@@ -34,12 +34,9 @@ def check_integrity(filename, sha256):
                 raise SCons.Errors.BuildError("downloaded file is inauthentic",
                                               1, 1, filename)
 
-# Download from URL to FILENAME, and make sure the result has the
-# given SHA256.
-def download(url, filename, sha256):
+# Download from URL to FILENAME.
+def download(url, filename):
 	urllib.urlretrieve(url, filename)
-        check_integrity(filename, sha256)
-#end
 
 # Uncompress the archive
 def uncompress(filename):
@@ -57,7 +54,9 @@ def obtain(name, rep, url, filename, sha256):
 	if not os.path.exists(rep):
 		print '<<INSTALL>> Obtaining ' + name
 
-		download(url, filename, sha256)
+                if not os.path.exists(filename):
+                        download(url, filename)
+                check_integrity(filename, sha256)
 		uncompress(filename)
 	else:
 		print '<<INSTALL>> ' + name + ' already available'
