@@ -1,7 +1,7 @@
 import os
 import sys
 
-Import('env')
+Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
 # Library sources
@@ -12,8 +12,7 @@ sources = ['common.cpp',
            'rational_function.cpp', 
            'vertical_segment.cpp']
 
-# Special linking flags, defined in the OS dependant configuration file
-env.AppendUnique(LIBS    = env['CORE_LIB'])
+env.AppendUnique(LIBS    = ALTA_LIBS)
 env.AppendUnique(CPPPATH = env['EIGEN_INC'])
 
 ## Known compilation issue. If the core is not compiled with -fvisibility-hidden

@@ -38,8 +38,6 @@ vars.Add('CCFLAGS',           'Compiler\'s flags',
          default = ['-g', '-O2', '-Wall'])
 vars.Add('LINKFLAGS',         'Linker\'s flags',
          default = [])
-vars.Add('CORE_LIB',          'Special links for ALTA core')
-vars.Add('SOFT_LIB',          'Special links for ALTA soft')
 vars.Add('PLUGIN_LIB',        'Special links for ALTA plugin')
 vars.Add('EIGEN_INC',         'Eigen include directory (mandatory)')
 vars.Add('PYTHON_INC',        'Python and boost-python include directory')
@@ -145,6 +143,25 @@ def openexr_available(env):
 
 # Export these for use in SConscripts.
 Export('CheckPKG', 'openexr_available')
+
+conf = Configure(env)
+
+# Determine the extra libraries that libcore (and thus everything
+# else) depends on.  Plugins need to specify it in addition to -lcore
+# because libcore is not a shared library.
+ALTA_LIBS = []
+
+# Libcore's uses 'dlopen', which is in libdl in GNU libc.
+if conf.CheckLibWithHeader('dl', 'dlfcn.h', 'c++'):
+        ALTA_LIBS = ['dl']
+
+# Libcore uses 'clock_gettime', which is in librt in GNU libc.
+if conf.CheckLibWithHeader('rt', 'sched.h', 'c++'):
+        ALTA_LIBS = ALTA_LIBS + ['rt']
+
+Export('ALTA_LIBS')
+
+conf.Finish()
 
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different

@@ -14,8 +14,6 @@ CXX            = 'g++'
 
 ## ALTA internal flags
 ##
-CORE_LIB       = ['rt', 'dl']
-SOFT_LIB       = ['core', 'rt', 'dl']
 PLUGIN_LIB     = ['core']
 
 

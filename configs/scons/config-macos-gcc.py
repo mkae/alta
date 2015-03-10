@@ -14,8 +14,6 @@ CXX            = 'gcc'
 
 ## ALTA internal flags
 ##
-CORE_LIB       = ['dl']
-SOFT_LIB       = ['core', 'dl']
 PLUGIN_LIB     = ['core']
 
 

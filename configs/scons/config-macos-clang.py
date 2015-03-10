@@ -20,8 +20,6 @@ LINKFLAGS      = ['-headerpad_max_install_names', '-Xarch_x86_64', '-mmacosx-ver
 
 ## ALTA internal flags
 ##
-CORE_LIB       = ['dl', 'stdc++']
-SOFT_LIB       = ['core', 'dl', 'stdc++']
 PLUGIN_LIB     = ['core', 'stdc++']
 
 

@@ -19,8 +19,6 @@ CCFLAGS        = ['/Zi','/nologo', '/O2', '/Ox', '/EHsc']
 
 ## ALTA internal flags
 ##
-CORE_LIB       = []
-SOFT_LIB       = ['core']
 PLUGIN_LIB     = ['core']
 
 
