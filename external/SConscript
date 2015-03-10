@@ -2,7 +2,6 @@ import os
 import shutil
 
 Import('env', 'CheckPKG')
-env = env.Clone()
 
 if env.GetOption('clean'):
 	print "Removing all the third party packages"
@@ -76,16 +75,14 @@ else:
 	qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
 	qp_base    = 'quadprog++' + os.sep
 	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
-	env.Append(CPPPATH = ['build' + os.sep + 'include'])
+        qp_env     = env.Clone()
+	qp_env.Append(CPPPATH = ['build' + os.sep + 'include'])
 
-        if env['CC'] != 'cl':
+        if qp_env['CC'] != 'cl':
                 # We're not building a real static library, but rather what
                 # Libtool calls a "convenience library": an archive that
                 # contains PIC code.  Thus, force '-fPIC'.
-                env.AppendUnique(CCFLAGS = ['-fPIC'])
+                qp_env.AppendUnique(CCFLAGS = ['-fPIC'])
 
-	env.StaticLibrary(target = qp_target, source = qp_sources)
-
-#end
-
+	qp_env.StaticLibrary(target = qp_target, source = qp_sources)
 
