@@ -107,8 +107,40 @@ def CheckPKG(context, name):
         context.Result(ret)
         return ret
 
-# Export 'CheckPKG' for use in SConscripts.
-Export('CheckPKG')
+def library_available(env, pkgspec='', lib='', header='',
+                      language='c++', inc_var='', lib_var=''):
+        """Return True if the given library is available.  First look for the
+        LIB_VAR and INC_VAR construction variables, honoring them if
+        they are defined.  Then look for PKGSPEC using pkg-config.
+        Last, try to build LIB with HEADER.  Configure ENV
+        accordingly.
+
+        """
+        conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+
+        if (lib_var in env) and (inc_var in env):
+                env.AppendUnique(LIBPATH = env[lib_var])
+                env.AppendUnique(CPPPATH = env[inc_var])
+        elif conf.CheckPKG(pkgspec):
+                env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
+
+        # Regardless of whether pkg-config succeeded, check whether
+        # the library is usable.
+        result = conf.CheckLibWithHeader(lib, header, language)
+
+        conf.Finish()
+        return result
+
+def openexr_available(env):
+        """Return True if OpenEXR is available."""
+        return library_available(env, pkgspec='OpenEXR',
+                                 inc_var='OPENEXR_INC',
+                                 lib_var='OPENEXR_LIB',
+                                 lib='IlmImf',
+                                 header='ImfRgbaFile.h')
+
+# Export these for use in SConscripts.
+Export('CheckPKG', 'openexr_available')
 
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different

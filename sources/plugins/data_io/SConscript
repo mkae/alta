@@ -1,27 +1,10 @@
-Import('env', 'CheckPKG')
+Import('env', 'openexr_available')
 env = env.Clone()
 
 # Special linking flags, defined in the OS dependant configuration file
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
-build_EXR = False
-conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-
-# First take flags from the user's config, if any, then from pkg-config.
-if ('OPENEXR_DIR' in env) and ('OPENEXR_INC' in env):
-        env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
-        env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
-elif conf.CheckPKG('OpenEXR'):
-        env.ParseConfig('pkg-config --cflags --libs OpenEXR')
-
-# Regardless of whether pkg-config succeeded, check whether the
-# library is usable.
-if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
-        build_EXR = True
-
-env = conf.Finish()
-
-if build_EXR:
+if openexr_available(env):
 	env.SharedLibrary('../../build/data_utia', ['utia.cpp'])
         env.SharedLibrary('../../build/data_merl', ['merl.cpp'])
 #env.SharedLibrary('../../build/data_astm', ['astm.cpp'])

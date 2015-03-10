@@ -1,26 +1,9 @@
-Import('env', 'CheckPKG')
+Import('env', 'openexr_available')
 env = env.Clone()
 
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 
-build_lib = False
-conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-
-# First take flags from the user's config, if any, then from pkg-config.
-if ('OPENEXR_DIR' in env) and ('OPENEXR_INC' in env):
-        env.AppendUnique(LIBPATH = env['OPENEXR_DIR'])
-        env.AppendUnique(CPPPATH = env['OPENEXR_INC'])
-elif conf.CheckPKG('OpenEXR'):
-        env.ParseConfig('pkg-config --cflags --libs OpenEXR')
-
-# Regardless of whether pkg-config succeeded, check whether the
-# library is usable.
-if conf.CheckLibWithHeader('IlmImf', 'ImfRgbaFile.h', 'c++'):
-        build_lib = True
-
-env = conf.Finish()
-
-if build_lib:
+if openexr_available(env):
 	sources = ['data.cpp']
 	env.SharedLibrary('../../build/data_brdf_slice', sources)
 #end
