@@ -135,7 +135,7 @@ def openexr_available(env):
         """Return True if OpenEXR is available."""
         return library_available(env, pkgspec='OpenEXR',
                                  inc_var='OPENEXR_INC',
-                                 lib_var='OPENEXR_LIB',
+                                 lib_var='OPENEXR_DIR',
                                  lib='IlmImf',
                                  header='ImfRgbaFile.h')
 
