@@ -165,33 +165,38 @@ class params
         //! \brief static function for input type convertion. The outvec
         //! resulting vector should be allocated with the correct
         //! output size.
+        //! TODO:  RP this function is weird the outtype and intype ARE NEVER USED
         static void convert(const double* invec, params::output intype, int indim,
                             params::output outtype, int outdim, double* outvec)
         {
         	// The convertion is done using the cartesian parametrization as
-			// an intermediate one. If the two parametrizations are equals
-			// there is no need to perform the conversion.
-			if(outdim == indim)
-			{
-				for(int i=0; i<outdim; ++i) { outvec[i] = invec[i]; }
-			}
-			// If the dimension of the output data is bigger than the 
-			// dimensions of the input domain, and the input domain is of
-			// dimension one, spread the data over all dimensions.
-			else if(indim == 1)
-			{
-				for(int i=0; i<outdim; ++i) { outvec[i] = invec[0]; }
-			}
-			// If the output dimension is one, compute the average of the
-			// input vector values.
-			else if(outdim == 1)
-			{
-				for(int i=0; i<indim; ++i) { outvec[0] = invec[i]; }	
-			}
-			else
-			{
-				NOT_IMPLEMENTED();
-			}
+    			// an intermediate one. If the two parametrizations are equals
+    			// there is no need to perform the conversion.
+    			if(outdim == indim)
+    			{
+    				for(int i=0; i<outdim; ++i) { outvec[i] = invec[i]; }
+    			}
+    			// If the dimension of the output data is bigger than the 
+    			// dimensions of the input domain, and the input domain is of
+    			// dimension one, spread the data over all dimensions.
+    			else if(indim == 1)
+    			{
+    				for(int i=0; i<outdim; ++i) { outvec[i] = invec[0]; }
+    			}
+    			// If the output dimension is one, compute the average of the
+    			// input vector values.
+    			else if(outdim == 1)
+    			{
+    				for(int i=0; i<indim; ++i) 
+            { 
+                outvec[0] += invec[i]; 
+            }	
+            outvec[0] /= static_cast<double>(indim);
+    			}
+    			else
+    			{
+    				NOT_IMPLEMENTED();
+    			}
         }
 
         //! \brief static function for input type convertion. The outvec
