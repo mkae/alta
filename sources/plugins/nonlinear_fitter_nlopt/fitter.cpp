@@ -148,14 +148,15 @@ bool nonlinear_fitter_nlopt::fit_data(const ptr<data>& d, ptr<function>& fit, co
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(fit);
 	if(!nf)
 	{
-		std::cerr << "<<ERROR>> the function is not a non-linear function" << std::endl;
+		std::cerr << "<<ERROR>> Nl-Opt Fitter. the function is not a non-linear function" << std::endl;
 		return false;
 	}
 	nf->bootstrap(d, args);
 
-#ifndef DEBUG
-	std::cout << "<<DEBUG>> number of parameters: " << nf->nbParameters() << std::endl;
-#endif
+	#ifdef DEBUG
+	std::cout << "<<DEBUG>> Nl-Opt Fitter. number of parameters: " << nf->nbParameters() << std::endl;
+	#endif
+	
 	if(nf->nbParameters() == 0)
 	{
 		return true;
