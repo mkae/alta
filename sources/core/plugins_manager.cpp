@@ -176,6 +176,9 @@ function* plugins_manager::get_function(const std::string& filename)
 	if(line != "#ALTA FUNC HEADER")
 	{
 		std::cerr << "<<ERROR>> this is not a function file" << std::endl;
+
+    //RP: Returning NULL immediately now
+    return NULL;
 	}
 
 	// Parse the header for the function command line and the dimension
@@ -224,7 +227,7 @@ function* plugins_manager::get_function(const std::string& filename)
 	f->setParametrization(param_out);
 
 	// Load the function part from the file object
-    f->load(file);
+  f->load(file);
 
 	return f;
 }
@@ -404,7 +407,7 @@ ptr<data> plugins_manager::get_data(const std::string& n)
     if(n.empty())
     {
 #ifdef DEBUG
-        std::cout << "<<DEBUG>> no data plugin specified, returning a vertial_segment loader" << std::endl;
+        std::cout << "<<DEBUG>> no data plugin specified, returning a vertical_segment loader" << std::endl;
 #endif
         return new vertical_segment();
     }
@@ -448,8 +451,9 @@ ptr<fitter> plugins_manager::get_fitter(const std::string& n)
     }
 }
 
-void plugins_manager::check_compatibility(ptr<data>& d, const ptr<function>& f,
-                                          const arguments& args)
+void plugins_manager::check_compatibility( ptr<data>& d, 
+                                           const ptr<function>& f,
+                                           const arguments& args)
 {
 	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
 		f->input_parametrization() == params::UNKNOWN_INPUT)
@@ -471,7 +475,7 @@ void plugins_manager::check_compatibility(ptr<data>& d, const ptr<function>& f,
 		else if(d->input_parametrization() != f->input_parametrization() && args.is_defined("change-param"))
 		{
 			std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->input_parametrization()) << std::endl;
-            std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
+      std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
 			ptr<data_params> dd = new data_params(d, f->input_parametrization());
 			d = dynamic_pointer_cast<data>(dd) ;
 		}
@@ -497,7 +501,8 @@ void plugins_manager::check_compatibility(ptr<data>& d, const ptr<function>& f,
 }
 
 // \todo implement the Darwin (MACOS) version.
-#ifdef WIN32
+// \todo : Why not move these functions to common.h ?
+#ifdef _WIN32
 #include <windows.h>
 size_t plugins_manager::get_system_memory()
 {
@@ -506,10 +511,22 @@ size_t plugins_manager::get_system_memory()
 	GlobalMemoryStatusEx(&status);
 	return status.ullTotalPhys;
 }
-#elif __APPLE__
+#elif defined(__APPLE__)
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/param.h>
+#include <sys/sysctl.h>
 size_t plugins_manager::get_system_memory()
 {
-	return 0;
+  int mib[2];
+  mib[0] = CTL_HW;
+  mib[1] = HW_MEMSIZE;    
+  int64_t size = 0;   
+	size_t len = sizeof( size );
+  if ( sysctl( mib, 2, &size, &len, NULL, 0 ) == 0 )
+    return (size_t)size;
+  
+  return 0L;
 }
 #else
 #include <unistd.h>
