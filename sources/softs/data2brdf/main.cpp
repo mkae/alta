@@ -110,62 +110,63 @@ int main(int argc, char** argv)
         return 1 ;
     }
 
-        fit->set_parameters(args) ;
+    fit->set_parameters(args) ;
 
-        ptr<function> f = plugins_manager::get_function(args);
-        ptr<data>     d = plugins_manager::get_data(args["data"]);
-        d->load(args["input"], args);
+    ptr<function> f = plugins_manager::get_function(args);
+    ptr<data>     d = plugins_manager::get_data(args["data"]);
+    d->load(args["input"], args);
 
-        if(!f || !d)
-        {
-            std::cerr << "<<ERROR>> no function or data object correctly defined" << std::endl;
-            return 1;
-        }
+    if(!f || !d)
+    {
+        std::cerr << "<<ERROR>> no function or data object correctly defined" << std::endl;
+        return 1;
+    }
 
-        if(d->size() == 0)
-        {
-            std::cerr << "<<ERROR>> no data loaded, please check you input file" << std::endl;
-            return 1;
-        }
+    if(d->size() == 0)
+    {
+        std::cerr << "<<ERROR>> no data loaded, please check you input file" << std::endl;
+        return 1;
+    }
 
-        // Check the compatibility between the data and the function
-        plugins_manager::check_compatibility(d, f, args);
+    // Check the compatibility between the data and the function
+    plugins_manager::check_compatibility(d, f, args);
 
 
-        // Start a timer
-        timer time ;
-        time.start() ;
+    // Start a timer
+    timer time ;
+    time.start() ;
 
-        // Fit the data
-        bool is_fitted = fit->fit_data(d, f, args) ;
+    // Fit the data
+    bool is_fitted = fit->fit_data(d, f, args) ;
 
-        // Get the fitting duration
-        time.stop();
+    // Get the fitting duration
+    time.stop();
 
-        // Display the result
-        if(is_fitted)
-        {
-            std::cout << "<<INFO>> total time: " << time << std::endl ;
+    // Display the result
+    if(is_fitted)
+    {
+        std::cout << "<<INFO>> total time: " << time << std::endl ;
 
-            double L2   = f->L2_distance(d);
-            double Linf = f->Linf_distance(d);
-            std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
-            std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
+        double L2   = f->L2_distance(d);
+        double Linf = f->Linf_distance(d);
+        std::cout << "<<INFO>> L2   distance to data = " << L2   << std::endl;
+        std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
 
-            // Export the L2 and Linf values to the command line
-            std::stringstream L2string, Linfstring;
-            L2string << L2; Linfstring << Linf;
-            args.update("L2",   L2string.str());
-            args.update("Linf", Linfstring.str());
+        // Export the L2 and Linf values to the command line
+        std::stringstream L2string, Linfstring;
+        L2string << L2; Linfstring << Linf;
+        args.update("L2",   L2string.str());
+        args.update("Linf", Linfstring.str());
 
-            f->save(args["output"], args) ;
-            return 0;
-        }
-        else
-        {
-            std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
-            return 1;
-        }
+        f->save(args["output"], args) ;
+
+        return 0;
+    }
+    else
+    {
+        std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
+        return 1;
+    }
 
 
     return 0 ;
