@@ -155,7 +155,8 @@ double function::L2_distance(const ptr<data>& d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-		vec x(dimX()), y(dimY());
+    vec x(dimX());
+    vec y(dimY());
 
 		if(input_parametrization() == params::UNKNOWN_INPUT)
 		{
@@ -167,7 +168,7 @@ double function::L2_distance(const ptr<data>& d) const
 		}
 		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
 
-		l2_dist += std::pow(norm(y-value(x)), 2);
+    l2_dist += std::pow(norm(y-value(x)), 2);
 	}
 	l2_dist = std::sqrt(l2_dist / d->size());
 	return l2_dist;
@@ -189,30 +190,30 @@ double function::Linf_distance(const ptr<data>& d) const
 		vec dat = d->get(i);
 		vec x(dimX()), y(dimY());
 
-        // Convert the position of the data sample to the parametrization
-        // of the function.
-        if(input_parametrization() == params::UNKNOWN_INPUT)
-        {
-            memcpy(&x[0], &dat[0], dimX()*sizeof(double));
-        }
-        else
-        {
-            params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
-        }
+    // Convert the position of the data sample to the parametrization
+    // of the function.
+    if(input_parametrization() == params::UNKNOWN_INPUT)
+    {
+        memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+    }
+    else
+    {
+        params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+    }
 
 		// Copy the value part of the data vector in a vector to perform vector
 		// operations on it (used in the computation of the mean).
-        memcpy(&y[0], &dat[d->dimX()], d->dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->dimX()], d->dimY()*sizeof(double));
 
 		// Take the componentwise-max of the two vectors.
 		const vec v = value(x);
-        for(int j=0; j<d->dimY(); ++j)
+    for(int j=0; j<d->dimY(); ++j)
 		{
 			linf_dist = std::max<double>(linf_dist, std::abs(y[j]-v[j]));
 		}
 
 		// Compute the mean
-		mean += (y-v) / double(d->size());
+		mean += (y-v) / static_cast<double>(d->size());
 	}
 	
 	// Compute the standard deviation with respect to the mean error
