@@ -59,14 +59,14 @@ class data : public parametrized
 		virtual vec get(int i) const = 0 ;
 		virtual vec operator[](int i) const = 0 ;
 
-        //! \brief Provide an evaluation of the data using interpolation. If
-        //! the data object does not provide an interpolation mechanism, it
-        //! should throw an exception.
-        //!
-        //! \details
-        //! The input vector must have the parametrization of the data, and
-        //! match the total dimension: dimX + dimY.
-        virtual vec value(const vec& in) const = 0;
+    //! \brief Provide an evaluation of the data using interpolation. If
+    //! the data object does not provide an interpolation mechanism, it
+    //! should throw an exception.
+    //!
+    //! \details
+    //! The input vector must have the parametrization of the data, and
+    //! match the total dimension: dimX + dimY.
+    virtual vec value(const vec& in) const = 0;
 
 		//! \brief Put the sample inside the data
 		virtual void set(const vec& x) = 0;
