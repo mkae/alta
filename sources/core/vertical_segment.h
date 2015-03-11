@@ -92,10 +92,10 @@ class vertical_segment : public data
 		virtual vec get(int i) const ;		
 		virtual vec operator[](int i) const;
 
-        virtual vec value(const vec&) const
-        {
-            NOT_IMPLEMENTED();
-        }
+    virtual vec value(const vec&) const
+    {
+      NOT_IMPLEMENTED();
+    }
 
 		//! \brief Put the sample inside the data
 		virtual void set(const vec& x);
