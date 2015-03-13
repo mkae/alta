@@ -77,7 +77,16 @@ struct ptr_counter
 
 template<class T> class ptr;
 
-template<class T, class U> 
+/* Work around a bug in GCC 4.4.6 (and presumably older versions) whereby the
+   template parameters need to be given in reverse order.  Failing to do that,
+   GCC fails with "no matching function for call to
+	 'dynamic_pointer_cast(ptr<function>&)'", and similar errors.  */
+# if defined __GNUC__ &&																				\
+     ((__GNUC__ == 4 && __GNUC_MINOR__ <= 4) || (__GNUC__ < 4))
+template<class U, class T>
+# else
+template<class T, class U>
+# endif
 ptr<U> dynamic_pointer_cast(const ptr<T>& ptr_t);
 
 template<class T> class ptr
