@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2014 Inria
+   Copyright (C) 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -47,6 +47,8 @@ inline ptr<U> dynamic_pointer_cast(const ptr<T>& ptr_t) {
 }
 
 #else
+
+# include <stdlib.h>															/* for 'NULL' */
 
 /*  Define a counter class. This class should not be used by any other part of
  *  ALTA code.
