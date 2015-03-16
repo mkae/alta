@@ -24,6 +24,15 @@ ALTA_DLL_EXPORT function* provide_function()
     return new diffuse_function();
 }
 
+diffuse_function::diffuse_function() 
+    : _kd( vec::Zero( dimY() ) )
+{
+    setParametrization(params::CARTESIAN);
+    setDimX(6);
+}
+
+
+
 // Overload the function operator
 vec diffuse_function::operator()(const vec& x) const 
 {
