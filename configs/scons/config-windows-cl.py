@@ -26,7 +26,6 @@ PLUGIN_LIB     = ['core']
 ##
 PYTHON_INC    = ['C:/Python27/include/']
 PYTHON_DIR    = ['C:/Python27/libs/']
-PYTHON_LIB    = ['boost_python', 'python2.7']
 
 
 ## Eigen library

@@ -42,7 +42,6 @@ vars.Add('PLUGIN_LIB',        'Special links for ALTA plugin')
 vars.Add('EIGEN_INC',         'Eigen include directory (mandatory)')
 vars.Add('PYTHON_INC',        'Python and boost-python include directory')
 vars.Add('PYTHON_DIR',        'Python and boost-python libraries directory')
-vars.Add('PYTHON_LIB',        'Python and boost-python libraries')
 vars.Add('OPENEXR_INC',       'OpenEXR include directory')
 vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory')
 vars.Add('FLANN_INC',         'FLANN include directory')
@@ -142,7 +141,7 @@ def openexr_available(env):
                                  header='ImfRgbaFile.h')
 
 # Export these for use in SConscripts.
-Export('CheckPKG', 'openexr_available')
+Export('CheckPKG', 'library_available', 'openexr_available')
 
 conf = Configure(env)
 
@@ -184,7 +183,7 @@ external = env.SConscript('external/SConscript')
 core     = env.SConscript('sources/core/SConscript')
 plugins  = env.SConscript('sources/plugins/SConscript')
 softs    = env.SConscript('sources/softs/SConscript')
-#python   = env.SConscript('sources/python/SConscript')
+python   = env.SConscript('sources/python/SConscript')
 #tests    = env.SConscript('sources/tests/SConscript')
 #env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
 

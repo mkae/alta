@@ -27,9 +27,8 @@ PLUGIN_LIB     = ['core', 'stdc++']
 ## Be sure to install boost-python and python
 ## You can do this by using Macports (http://www.macports.org/) 
 ## or Homebrew (http://brew.sh/)
-PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
-PYTHON_DIR    = ['/opt/local/lib']
-PYTHON_LIB    = ['boost_python-mt', 'python2.7']
+#PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
+#PYTHON_DIR    = ['/opt/local/lib']
 
 
 ## Eigen library

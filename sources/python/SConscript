@@ -1,30 +1,20 @@
-Import('env')
+Import('env', 'library_available')
 env = env.Clone()
 
-env.AppendUnique(CPPPATH = env['PYTHON_INC'])
-env.AppendUnique(LIBPATH = env['PYTHON_DIR'])
-env.AppendUnique(LIBS    = env['PYTHON_LIB'])
-env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-
-conf = Configure(env)
-boost_python_lib = ['boost_python-mt', 'python2.7']
-
 build_lib = False
-if conf.CheckLib(env['PYTHON_LIB']):
 
-	#env.Append(LIBS=['python2.7', boost_python_lib, 'core'])
-	#env.Append(LIBS=['python2.7', 'boost_python-mt', 'core'])
-	build_lib = True
-
-else:
-	print "<<ERROR>> Unable to build the Python interface, please install boost-python"
-	print "          or check your configuration."
-
-#end
-
-env = conf.Finish()
+# Check whether Python 2.7 and Boost.Python are available.
+if library_available(env, pkgspec='python-2.7',
+										 inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
+										 lib='python2.7', header='Python.h'):
+	conf = Configure(env)
+	build_lib = conf.CheckLibWithHeader('boost_python',
+																			'boost/python.hpp', 'c++')
+	conf.Finish()
 
 if build_lib:
 	env['SHLIBPREFIX']=''
 	env.SharedLibrary('../build/alta.so', ['alta.cpp'])
-#end
+else:
+	print "<<ERROR>> Unable to build the Python interface, please install boost-python"
+	print "          or check your configuration."
