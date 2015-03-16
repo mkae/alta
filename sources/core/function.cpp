@@ -354,6 +354,13 @@ vec nonlinear_function::getParametersMin() const
 
 
 /*--- Compound functions implementation ----*/
+compound_function::~compound_function()
+{
+	for( unsigned int i=0; i < fs.size(); i++)
+	{
+		delete fs[i];
+	}
+}
 
 vec compound_function::operator()(const vec& x) const
 {

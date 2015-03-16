@@ -172,6 +172,9 @@ class compound_function: public nonlinear_function
 {
 	public: // methods
 
+		//Destructor
+		virtual ~compound_function();
+
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const;
 		virtual vec value(const vec& x) const;
