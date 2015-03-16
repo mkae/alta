@@ -81,6 +81,10 @@ for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH',
                 envVars[var] = os.environ[var]
 
 env = Environment(variables = vars, ENV = envVars )
+
+# Generate help text for the build variables.
+Help(vars.GenerateHelpText(env))
+
 print '<<INFO>> The current platform is: ' + env['PLATFORM']
 
 ## PLATFORM dependant section
