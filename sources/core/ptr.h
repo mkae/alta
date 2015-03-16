@@ -48,7 +48,7 @@ inline ptr<U> dynamic_pointer_cast(const ptr<T>& ptr_t) {
 
 #else
 
-# include <stdlib.h>															/* for 'NULL' */
+#include <cstdlib>															/* for 'NULL' */
 
 /*  Define a counter class. This class should not be used by any other part of
  *  ALTA code.
@@ -117,8 +117,11 @@ template<class T> class ptr
 			_counter->decrement();
 			if(_counter->value() < 1 || _ptr == NULL)
 			{
-				if(_ptr != NULL) { delete _ptr; }
+				delete _ptr; 
+				_ptr = NULL;
+				
 				delete _counter;
+				_counter = NULL;
 			}
 		}
 
@@ -145,8 +148,11 @@ template<class T> class ptr
 			_counter->decrement();
 			if(_counter->value() < 1)
 			{
-				if(_ptr != NULL) { delete _ptr; }
+				delete _ptr; 
+				_ptr = NULL;
+
 				delete _counter;
+				_counter = NULL;
 			}
 
 			_counter = a._counter;
