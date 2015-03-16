@@ -243,10 +243,10 @@ function* plugins_manager::get_function(const arguments& args)
 
   if(!args.is_defined("func"))
   {
-#ifdef DEBUG
-      std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
-#endif
-      return new rational_function();
+    #ifdef DEBUG
+    std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
+    #endif
+    return new rational_function();
   }
 
   // The function to be returned.
@@ -276,11 +276,13 @@ function* plugins_manager::get_function(const arguments& args)
     {
       std::string n("--func ");
       n.append(args_vec[i]);
-#ifdef DEBUG
+
+      #ifdef DEBUG
       std::cout << __FILE__ << " " << __LINE__ << std::endl
                 << " at i=" << i << " n=" << n << std::endl;
       std::cout << "<<DEBUG>> load function with args: " << n << std::endl;
-#endif
+      #endif
+      
       arguments temp_args = arguments::create_arguments(n);
 
       //Recursive call
@@ -300,28 +302,29 @@ function* plugins_manager::get_function(const arguments& args)
       #ifdef DEBUG
       std::cout << __FILE__ << " " << __LINE__ << " WE HAVE A COMPOUND " << std::endl;
       #endif
-    }
-    else //Here we check if the argument provided with --func is file describing a function
+  }
+  else //Here we check if the argument provided with --func is file describing a function
+  {
+    const std::string filename = args["func"];
+    FunctionPrototype myFunction = open_library<FunctionPrototype>(filename, "provide_function");
+    if(myFunction != NULL)
     {
-        const std::string filename = args["func"];
-        FunctionPrototype myFunction = open_library<FunctionPrototype>(filename, "provide_function");
-        if(myFunction != NULL)
-        {
-#ifdef DEBUG
-            std::cout << "<<DEBUG>> using function provider in file \"" << filename << "\"" << std::endl;
-#endif
-            func =  myFunction();
-        }
-        else
-        {
-            std::cerr << "<<ERROR>> no function provider found in file \"" << filename << "\"" << std::endl;
-            return new rational_function() ;
-        }
+      #ifdef DEBUG
+      std::cout << "<<DEBUG>> using function provider in file \"" << filename << "\"" << std::endl;
+      #endif
+      
+      func =  myFunction();
     }
+    else
+    {
+      std::cerr << "<<ERROR>> no function provider found in file \"" << filename << "\"" << std::endl;
+      return new rational_function() ;
+    }
+  }
 
-    // Treat the case of the Fresnel
-    if(args.is_defined("fresnel"))
-    {
+  // Treat the case of the Fresnel
+  if(args.is_defined("fresnel"))
+  {
       #ifdef DEBUG
       std::cout << __FILE__ << " " << __LINE__ << std::endl;
       std::cout << " INSIDE fresnel args = " << args << std::endl;
