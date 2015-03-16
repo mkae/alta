@@ -172,3 +172,6 @@ env.Depends(softs, core)
 #env.Depends(python, core)
 #env.Depends(tests, core)
 #env.NoClean(external)
+
+# Consider files changed as soon as their modification time changes.
+Decider('timestamp-newer')
