@@ -173,7 +173,8 @@ env.AppendUnique(CPPPATH = ['#external/build/include'])
 #env.AppendUnique(CPPPATH = ['#external/build/include/Eigen'])
 env.AppendUnique(CPPPATH = ['#sources'])
 
-
+# Consider files changed as soon as their modification time changes.
+env.Decider('timestamp-newer')
 
 ## Launch the compilations
 ##l
@@ -192,6 +193,3 @@ env.Depends(softs, core)
 #env.Depends(python, core)
 #env.Depends(tests, core)
 #env.NoClean(external)
-
-# Consider files changed as soon as their modification time changes.
-Decider('timestamp-newer')
