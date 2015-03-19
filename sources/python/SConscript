@@ -8,8 +8,16 @@ if library_available(env, pkgspec='python-2.7',
 										 inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
 										 lib='python2.7', header='Python.h'):
 	conf = Configure(env)
-	build_lib = conf.CheckLibWithHeader('boost_python',
+
+	# On GNU/Linux the '-mt' suffix is no longer used, but it is still
+	# used on some other platforms (see
+	# <http://stackoverflow.com/questions/2293962/boost-libraries-in-multithreading-aware-mode>.)
+	build_lib = conf.CheckLibWithHeader('boost_python-mt',
 																			'boost/python.hpp', 'c++')
+	if not build_lib:
+		build_lib = conf.CheckLibWithHeader('boost_python',
+														            'boost/python.hpp', 'c++')
+
 	conf.Finish()
 
 if build_lib:
