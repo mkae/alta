@@ -21,6 +21,7 @@ if library_available(env, pkgspec='python-2.7',
 	conf.Finish()
 
 if build_lib:
+	env.Prepend(LIBS = ['core'])
 	env['SHLIBPREFIX']=''
 	env.SharedLibrary('../build/alta.so', ['alta.cpp'])
 else:
