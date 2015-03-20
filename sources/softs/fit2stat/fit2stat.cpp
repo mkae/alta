@@ -33,7 +33,9 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
-
+//TODO: Move to ALTA CORE
+//TODO: Documentation
+//TODO:  Add the relative error computation
 class Error
 {
 public:
@@ -62,8 +64,7 @@ public:
 
 };
 
-
-// TODO: Finish the implementation
+ 
 // TODO : Write the documentation
 // TODO: Move this class to ALTA Core
 // The methods provided by this class assume that the parametrization of 
@@ -74,7 +75,7 @@ class Norm
   static vec L2( ptr<data> const & data, ptr<function> const & f )
   {
     vec l2 = vec::Zero( f->dimY() );
-    
+
     for(unsigned int i=0; i < data->size(); i++)
     {
       vec const dat = data->get(i);          
@@ -144,20 +145,45 @@ class Norm
     //if p is not superior or equal to 1.0 this formula does not define a norm
     assert( p >= 1.0 );
 
-    vec Lp = vec::Zero( f->dimY() );
+    // This is another strategy to compute the norm
+    // First we put all the data into Eigen::Array
+    // Then we perform the computation on the big array directly
+    Eigen::ArrayXd  a_Lp = Eigen::ArrayXd::Zero( f->dimY() );    
+    Eigen::ArrayXXd  all_data_y( data->size(), f->dimY() );
+    all_data_y.setZero(data->size(), f->dimY());
 
+    Eigen::ArrayXXd  all_y_fx( data->size(), f->dimY() );
+    all_y_fx.setZero(data->size(), f->dimY());
+
+    timer chrono;
+    chrono.start();
     for(unsigned int i=0; i < data->size(); i++)
     {
-      vec const dat = data->get(i);          
-      vec const data_x = dat.head( data->dimX() );
-      vec const data_y = dat.tail( data->dimY() );
+      Eigen::ArrayXd const dat = data->get(i);          
+      Eigen::ArrayXd const data_x = dat.head( data->dimX() );
+      Eigen::ArrayXd const data_y = dat.tail( data->dimY() );
+      Eigen::ArrayXd const y_fx = f->value(data_x);
+      
+      all_data_y.row(i) = data_y;
+      all_y_fx.row(i)   = y_fx;
 
-      Lp += (f->value(data_x) - data_y).cwiseAbs().array().pow(p).matrix();
-
+      //a_Lp += pow( abs(y_fx - data_y), p );
     }
+    chrono.stop();
+    std::cout << "<<INFO>> Time to demultiplex data " << chrono << std::endl;
+    chrono.reset();
+
+    Eigen::ArrayXd pre_cal = pow(abs(all_data_y - all_y_fx), p).colwise().sum();
+
+
     double const one_over_p = 1.0 / p;
 
-    return Lp.array().pow( one_over_p );
+    return pre_cal.pow( one_over_p );
+
+    //return Lp.array().pow( one_over_p );
+    
+    //Implici conversion from Eigen::Array to Matrix
+    return a_Lp.pow( one_over_p );
 
   }
 
@@ -354,8 +380,14 @@ main(int argc, char* argv[])
   vertical_segment*   conv_vs = NULL;
   bool conversion_necessary = true;
   std::cout << "<<INFO>> Converting data to function parametrization if needed" << std::endl;
+
+  timer  t;
+  t.start();
   convertDataToFunctionParam( generic_data, brdf, conversion_necessary, conv_vs );
-  
+  t.stop();
+  std::cout << "<<INFO>> Data converted in " << t << std::endl;
+  t.reset();
+
   ptr<data> converted_data = NULL;
   if( conversion_necessary )
   {
@@ -367,7 +399,6 @@ main(int argc, char* argv[])
     converted_data = generic_data;
   }
 
-  timer  t;
   
   //Norm L1
   t.start(); 
