@@ -206,7 +206,7 @@ class compound_function: public nonlinear_function
 		//! Will load the file <em>first_guess.brdf</em> as the initial value
 		//! <br />
 		//! \verbatim
-		//! --func [libfunc1.so --boostrap [val1, val2], libfunc2.so --bootstrap first_guess1.brdf]
+		//! --func [libfunc1.so --bootstrap [val1, val2], libfunc2.so --bootstrap first_guess1.brdf]
 		//! \endverbatim
 		//! Will load the vector of parameters <em>[val1, val2]</em> for the
 		//! first function and the file <em>first_guess1.brdf</em> for the
