@@ -21,6 +21,38 @@
 
 //#define RELATIVE_ERROR
 
+vertical_segment::vertical_segment(unsigned int dim_X, 
+                                   unsigned int dim_Y, 
+                                   unsigned int size)
+	: data(dim_X, dim_Y)
+{
+	initializeToZero( size );
+}
+
+vertical_segment::vertical_segment( params::input in_param, 
+                                   	params::output out_param,
+                                   	unsigned int size )
+	: data( in_param, out_param)
+{
+	initializeToZero( size );
+}
+
+void 
+vertical_segment::initializeToZero( unsigned int number_of_data_elements )
+{
+	_data.clear();
+
+	unsigned int const  size_of_one_element = dimX() + dimY();
+	
+	for( unsigned int i=0; i < number_of_data_elements; i++)
+	{
+		vec initial_element = vec::Zero( size_of_one_element );
+		_data.push_back( initial_element );
+	}
+}
+
+
+
 void vertical_segment::load(const std::string& filename) 
 {
 	arguments args ;
@@ -279,8 +311,11 @@ vec vertical_segment::get(int i) const
 {
     const int n = dimX() + dimY();
     vec res(n);
-    for(int k=0; k<n; ++k) { res[k] = _data[i][k]; }
-
+    
+    for(int k=0; k<n; ++k) 
+    { 
+			res[k] = _data[i][k]; 
+    }    
     return res ;
 }
 

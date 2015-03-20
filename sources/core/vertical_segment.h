@@ -73,6 +73,21 @@ class vertical_segment : public data
 {
 	public: // methods
 
+
+    //! \brief Default constructor that does nothing at all.
+    vertical_segment()
+    {
+    }
+
+    vertical_segment(unsigned int dim_X, unsigned int dim_Y, unsigned int size);
+
+    //! \brief Construct vertical segment data for a given size and where the size of each element
+    //! is also given. All data are initialized to zero
+    vertical_segment( params::input in_param, 
+                      params::output out_param,
+                      unsigned int size );
+
+
 		// Load data from a file
 		virtual void load(const std::string& filename) ;
 
@@ -112,6 +127,9 @@ class vertical_segment : public data
 
 		// Get data size
 		virtual int size() const ;
+
+  private: // method
+    void initializeToZero( unsigned int number_of_data_elements );
 
 	private: // data
 
