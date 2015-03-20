@@ -74,7 +74,7 @@ class Norm
   static vec L2( ptr<data> const & data, ptr<function> const & f )
   {
     vec l2 = vec::Zero( f->dimY() );
-
+    
     for(unsigned int i=0; i < data->size(); i++)
     {
       vec const dat = data->get(i);          
@@ -367,14 +367,48 @@ main(int argc, char* argv[])
     converted_data = generic_data;
   }
 
-  std::cout << "<<INFO>> From Norm L1:"    << Norm::L1(converted_data, brdf)      << std::endl;
-  std::cout << "<<INFO>> From Norm L2:"    << Norm::L2(converted_data, brdf)      << std::endl;
-  std::cout << "<<INFO>> From Norm L3:"    << Norm::Lp(converted_data, brdf, 3.0) << std::endl;
-  std::cout << "<<INFO>> From Norm LINF: " << Norm::LInf(converted_data, brdf)    << std::endl;
+  timer  t;
+  
+  //Norm L1
+  t.start(); 
+  vec const  norm_l1 = Norm::L1(converted_data, brdf);
+  t.stop();
+  std::cout << "<<INFO>> From Norm L1:" << norm_l1 << " (computed in " << t << ")" << std::endl;  
+  t.reset();
 
-  std::cout << "<<INFO>> Mean Square Error = " << Error::meanSquareError(converted_data, brdf) << std::endl;
-  std::cout << "<<INFO>> Root Mean Square Error = " << Error::rootMeanSquareError(converted_data, brdf) << std::endl;
+  //Norm L2
+  t.start();
+  vec const norm_l2 = Norm::L2(converted_data, brdf);
+  t.stop();
+  std::cout << "<<INFO>> From Norm L2:" << norm_l2 << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
+  //Norm L3
+  t.start();
+  vec const norm_l3 = Norm::Lp(converted_data, brdf, 3.0);
+  t.stop();
+  std::cout << "<<INFO>> From Norm L3:"    << norm_l3 << " (computed in " << t << ")" << std::endl;
+  t.reset();
+
+  //Norm LInf
+  t.start();
+  vec const norm_linf = Norm::LInf(converted_data, brdf);
+  t.stop();
+  std::cout << "<<INFO>> From Norm LINF: " <<  norm_linf << " (computed in " << t << ")" << std::endl;
+  t.reset();
+
+  //MSE and RMSE
+  t.start();
+  vec const mse = Error::meanSquareError(converted_data, brdf);
+  t.stop();
+  std::cout << "<<INFO>> Mean Square Error = " << mse << " (computed in " << t << ")" << std::endl;
+  t.reset();
+
+  t.start();
+  vec const rmse = Error::rootMeanSquareError(converted_data, brdf);
+  t.stop();
+  std::cout << "<<INFO>> Root Mean Square Error = " << rmse << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
   // Compute Weighted Norms by cosine factors
   vec cosine_theta_view;
@@ -382,20 +416,35 @@ main(int argc, char* argv[])
   computeCosineFactorsFromData( converted_data, cosine_theta_light, cosine_theta_view );
   vec cosine_light_view = cosine_theta_light.cwiseProduct( cosine_theta_light );
   
+  t.start();
+  vec const norm_l2_cos_light = Norm::weightedL2(converted_data, brdf, cosine_theta_light);
+  t.stop();
   std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light) " 
-            << Norm::weightedL2(converted_data, brdf, cosine_theta_light) << std::endl;
+            << norm_l2_cos_light << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
+  t.start();
+  vec const norm_l2_cos_light_view = Norm::weightedL2(converted_data, brdf, cosine_light_view);
+  t.stop();
   std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light)*cos(theta_view) " 
-            << Norm::weightedL2(converted_data, brdf, cosine_light_view) << std::endl;;
+            << norm_l2_cos_light_view << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
 
   //Comparisons with the norm methods provided in function.cpp
+  t.start();
   double const L2   = brdf->L2_distance( generic_data ) ;
-  std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2   << std::endl;
+  t.stop();
+  std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
+            << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
+  t.start();
   double const Linf = brdf->Linf_distance( generic_data );  
-  std::cout << "<<INFO>> Linf distance to data = " << Linf << std::endl;
-
+  t.stop();
+  std::cout << "<<INFO>> Linf distance to data = " << Linf 
+            << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
 
   return EXIT_SUCCESS;
