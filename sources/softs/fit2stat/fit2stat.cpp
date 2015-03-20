@@ -135,6 +135,33 @@ class Norm
     return L1;
   }
 
+  /*! 
+   * \brief Compute the Lp norm from a given p (with \f$ p >= 1 \f$) 
+   * \f$ \big(\sum_{i=1}^{i=n} |x_i|^p\big)^{1/p} \f$
+   */
+  static vec Lp(ptr<data> const & data, ptr<function> const & f, double p)
+  {
+    //if p is not superior or equal to 1.0 this formula does not define a norm
+    assert( p >= 1.0 );
+
+    vec Lp = vec::Zero( f->dimY() );
+
+    for(unsigned int i=0; i < data->size(); i++)
+    {
+      vec const dat = data->get(i);          
+      vec const data_x = dat.head( data->dimX() );
+      vec const data_y = dat.tail( data->dimY() );
+
+      Lp += (f->value(data_x) - data_y).cwiseAbs().array().pow(p).matrix();
+
+    }
+    double const one_over_p = 1.0 / p;
+
+    return Lp.array().pow( one_over_p );
+
+  }
+
+
 
 
   // static vec L2( ptr<data> const & data, ptr<function> const & f)
@@ -404,9 +431,10 @@ main(int argc, char* argv[])
     converted_data = generic_data;
   }
 
-  std::cout << "<<INFO>> From Norm L1 = " << Norm::L1(converted_data, brdf) << std::endl;
-  std::cout << "<<INFO>> From Norm  L2_same_param = "  << Norm::L2(converted_data, brdf)   << std::endl;
-  std::cout << "<<INFO>> From Norm LINF_same_param = " << Norm::LInf(converted_data, brdf) << std::endl;
+  std::cout << "<<INFO>> From Norm L1:"    << Norm::L1(converted_data, brdf)      << std::endl;
+  std::cout << "<<INFO>> From Norm L2:"    << Norm::L2(converted_data, brdf)      << std::endl;
+  std::cout << "<<INFO>> From Norm L3:"    << Norm::Lp(converted_data, brdf, 3.0) << std::endl;
+  std::cout << "<<INFO>> From Norm LINF: " << Norm::LInf(converted_data, brdf)    << std::endl;
 
   std::cout << "<<INFO>> Mean Square Error = " << Error::meanSquareError(converted_data, brdf) << std::endl;
   std::cout << "<<INFO>> Root Mean Square Error = " << Error::rootMeanSquareError(converted_data, brdf) << std::endl;
