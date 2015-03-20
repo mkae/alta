@@ -29,6 +29,20 @@ class data : public parametrized
 {
 	public: // methods
 
+		data() : parametrized()
+		{}
+
+		data( unsigned int dim_X, unsigned int dim_Y)
+			: parametrized( dim_X, dim_Y )
+		{
+		}
+
+		data(params::input in_param, params::output out_param)
+		: parametrized( in_param, out_param)
+		{
+
+		}
+
 		// Virtual destructor
 		virtual ~data() {} 
 
