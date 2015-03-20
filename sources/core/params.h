@@ -92,7 +92,7 @@ class params
   										  \theta_v \sin(\Delta\phi).\f$]*/
        ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
-       BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined in Stark et al. [2004].
+       BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined input Stark et al. [2004].
                                  Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
   										 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
 
@@ -374,14 +374,32 @@ class params
 class parametrized
 {
 	public:
-		parametrized(params::input in_param, params::output out_param) {
-			_in_param  = in_param;
-			_out_param = out_param;
-			_nX = params::dimension(_in_param);
-			_nY = params::dimension(_out_param);
+    parametrized() 
+      : _in_param(params::UNKNOWN_INPUT), 
+        _out_param(params::UNKNOWN_OUTPUT),
+        _nX( 0 ),
+        _nY( 0 )
+    { 
+    }
+
+    parametrized( unsigned int dim_X, unsigned int dim_Y)
+    : _in_param(params::UNKNOWN_INPUT), 
+      _out_param(params::UNKNOWN_OUTPUT),
+      _nX( dim_X ),
+      _nY( dim_Y ),
+      _min( vec::Zero( _nX+_nY) ),
+      _max( vec::Zero( _nX+_nY) )
+    {}
+
+		parametrized(params::input in_param, params::output out_param) 
+    : _in_param( in_param ),
+      _out_param( out_param ),
+      _nX( params::dimension(_in_param) ),
+      _nY( params::dimension(_out_param) ) ,
+      _min( vec::Zero( _nX+_nY) ),
+      _max( vec::Zero( _nX+_nY) )
+    {
 		}
-		parametrized() : _in_param(params::UNKNOWN_INPUT), 
-		                 _out_param(params::UNKNOWN_OUTPUT) { }
 
 		//! \brief provide the input parametrization of the object.
 		virtual params::input parametrization() const
@@ -439,9 +457,15 @@ class parametrized
 			else
 			{
 				std::cout << "<<ERROR>> an output parametrization is already defined: " << std::endl;
-			}
+			}      
 		}
 
+    //! \brief Set the input and output parametrizations directly
+    virtual void setParametrizations(params::input new_in_param, params::output new_out_param)
+    {
+      setParametrization( new_in_param);
+      setParametrization( new_out_param );
+    }
 
 		/* DIMENSION OF THE INPUT AND OUTPUT DOMAIN */
 
