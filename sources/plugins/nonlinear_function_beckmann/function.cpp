@@ -177,11 +177,24 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 		
 void beckmann_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-	for(int i=0; i<dimY(); ++i)
-	{
-		_ks[i] = 1.0;
-		_a[i]  = 1.0;
-	}
+  if( args.is_defined("bootstrap") )
+  {
+		#ifdef BOOTSTRAP_DEBUG
+	  std::cout << __FILE__ << " " << __LINE__ << " args = " << args << std::endl;
+	  #endif
+  	nonlinear_function::bootstrap(d, args);
+  }
+  else //DEFAULT BOOTSTRAPING
+  {
+		for(int i=0; i<dimY(); ++i)
+		{
+			_ks[i] = 1.0;
+			_a[i]  = 1.0;
+		}
+  }
+
+	std::cout << "<<INFO>> Beckman Function. Fit will start with ks = " << _ks 
+						<< " and a = " << _a << " " << std::endl;
 }
 
 //! Load function specific files
