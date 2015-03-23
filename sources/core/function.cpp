@@ -19,18 +19,28 @@
 
 void function::bootstrap(const ptr<data>, const arguments& args)
 {
-    // If the bootstrap option contains a filename, load it
-    if(args.is_defined("bootstrap") && !args["bootstrap"].empty())
+  #ifdef BOOTSTRAP_DEBUG
+  std::cout << __FILE__ << " " << __LINE__ << " args = " << args << std::endl;
+  #endif
+
+  // If the bootstrap option contains a filename, load it
+  if(args.is_defined("bootstrap") && !args["bootstrap"].empty())
+  {
+    std::ifstream in(args["bootstrap"].c_str());
+    if(in.is_open())
     {
-        std::ifstream in(args["bootstrap"].c_str());
-        if(in.is_open())
-        {
-            if(!load(in))
-				{
-					std::cerr << "<<ERROR>> cannot bootstrap from file \"" << args["bootstrap"] << "\"" << std::endl;
-				}
-        }
+      if(!load(in))
+			{
+				std::cerr << "<<ERROR>> cannot bootstrap from file \"" << args["bootstrap"] << "\"" << std::endl;
+			}
     }
+    else // No file for the boostrap arguments
+    {
+      std::cerr << " Bootstrapping from command line is not implemented" << std::endl;
+			NOT_IMPLEMENTED();
+    }
+  }//end of if bootstrap is defined and not empty
+    
 }
 
 void function::save(const std::string& filename, const arguments& args) const
@@ -320,15 +330,30 @@ void nonlinear_function::save_call(std::ostream& out, const arguments& args) con
 
 void nonlinear_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-    if(args.is_vec("bootstrap"))
-    {
-        vec p = args.get_vec("bootstrap", nbParameters());
-        setParameters(p);
-    }
-    else
-    {
-        function::bootstrap(d, args);
-    }
+  #ifdef BOOTSTRAP_DEBUG
+  std::cout << __FILE__ << " " << __LINE__ << " args = " << args << std::endl;
+  #endif
+
+  if(args.is_vec("bootstrap"))
+  {
+    vec p = args.get_vec("bootstrap", nbParameters());
+
+    #ifdef BOOTSTRAP_DEBUG
+    std::cout << __FILE__ << " " << __LINE__ << " args = " << args << std::endl;
+    std::cout << "BOOTSTRAPPING VALUE = " << p << std::endl
+              << " with nbParameters = " << nbParameters() << std::endl;
+    #endif
+
+    setParameters(p);
+  }
+  else
+  {
+    #ifdef BOOTSTRAP_DEBUG
+    std::cout << __FILE__ << " " << __LINE__ << " args = " << args << std::endl;
+    #endif
+
+    function::bootstrap(d, args);
+  }
 }
 		
 vec nonlinear_function::getParametersMax() const
@@ -509,7 +534,11 @@ void compound_function::setParametrization(params::output new_param)
 
 void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 {
-	const bool global_bootstrap = args.is_defined("bootstrap");
+	bool const global_bootstrap = args.is_defined("bootstrap");
+
+	#ifdef BOOTSTRAP_DEBUG
+	std::cout << __FILE__ << " " << __LINE__ << " args = " << args << std::endl;
+	#endif
 
 	// Check if the bootstrap is global
 	if(global_bootstrap)
@@ -517,7 +546,6 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 		if(args.is_vec("bootstrap"))
 		{
 			vec p = args.get_vec("bootstrap", nbParameters());
-			std::cout << "<<INFO>> Will use " << p << " as a bootstrap for the non-linear function" << std::endl;
 			setParameters(p);
 		
 			for(unsigned int i=0; i<fs.size(); ++i)
@@ -527,6 +555,8 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 					fs[i]->bootstrap(d, fs_args[i]);
 				}
 			}
+      std::cout << "<<DEBUG>> Number of parameters for compound function: " << nbParameters() << std::endl;
+      std::cout << "<<INFO>> Will use " << p << " as a bootstrap vector for the compound non-linear function" << std::endl;
 		}
 		else
 		{
@@ -590,9 +620,9 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 							fs[i]->bootstrap(d, fs_args[i]);
 							std::cout << "<<DEBUG>> Unable to load one function of compound, regular bootstraping" << std::endl;
 						}
-					}
-				}
-			}
+					}//end of else
+				}//end of for-loop
+			}//end of if
 			else
 			{
 				std::cerr << "<<ERROR>> you must provide a vector of parameters or a file to load with the bootstrap" << std::endl;
@@ -601,6 +631,7 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 	}
 	else
 	{
+		std::cout << "<<DEBUG>> No gobal bootstrap option. Bootstraping per function" << std::endl;
 		for(unsigned int i=0; i<fs.size(); ++i)
 		{
 			fs[i]->bootstrap(d, fs_args[i]);
@@ -816,12 +847,12 @@ product_function::product_function( nonlinear_function* g1, nonlinear_function* 
 	// as the input parametrization, then do the convertion for all the functions.
 	if(g1->input_parametrization() != g2->input_parametrization())
 	{
-		function::setParametrization(params::CARTESIAN);
+   	function::setParametrization(params::CARTESIAN);
 		function::setDimX(6);
 	}
 	else
 	{
-		function::setParametrization(g1->input_parametrization());
+    function::setParametrization(g1->input_parametrization());
 		function::setDimX(g1->dimX());
 	}
 }
@@ -1059,7 +1090,7 @@ vec product_function::parameters() const
 		for(int i=0; i<nb_f2_params; ++i)
 		{
 			params[i+nb_f1_params] = f2_params[i];
-		}		
+		}
 	}
 
 	return params;
@@ -1080,7 +1111,7 @@ void product_function::setParameters(const vec& p)
 			f1_params[i] = p[i];
 		}
 
-		f1->setParameters(f1_params);	
+		f1->setParameters(f1_params);	    
 	}
 
 	if( ! _is_fixed.second )
