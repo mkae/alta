@@ -51,7 +51,7 @@ class function : public parametrized
 		//!
 		//! \details
 		//! Can be used to set the diffuse component of the function for
-		//! example. The default behaviour is to load a function file.
+		//! example. The default behavior is to load a function file.
 		virtual void bootstrap(const ptr<data>, const arguments& args);
 
 		/* IMPORT/EXPORT FUNCTIONS */
