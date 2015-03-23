@@ -198,5 +198,10 @@ vec schlick::parametersJacobian(const vec& x) const
 
 void schlick::bootstrap(const ptr<data> d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i) { R[i] = 0.5; }
+    for(int i=0; i<dimY(); ++i) 
+    { 
+        R[i] = 0.5; 
+    }
+    
+    std::cout << "<<INFO>> Normalized Fresnel with Schlick Approx. Fit will start from " << R << std::endl;
 }
