@@ -309,6 +309,8 @@ vec vertical_segment::operator[](int i) const
 }
 vec vertical_segment::get(int i) const 
 {
+	//SLOW !!!!! and useless 
+	// call _data[i]
     const int n = dimX() + dimY();
     vec res(n);
     
