@@ -43,6 +43,7 @@ vars.Add('EIGEN_INC',         'Eigen include directory (mandatory)')
 vars.Add('PYTHON_INC',        'Python and boost-python include directory')
 vars.Add('PYTHON_DIR',        'Python and boost-python libraries directory')
 vars.Add('OPENEXR_INC',       'OpenEXR include directory')
+vars.Add('OPENEXR_LIB',       'OpenEXR libraries', default = [])
 vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory')
 vars.Add('FLANN_INC',         'FLANN include directory')
 vars.Add('FLANN_DIR',         'FLANN libraries directory')
@@ -119,15 +120,16 @@ def library_available(env, pkgspec='', lib='', header='',
         """
         conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-        if (lib_var in env) and (inc_var in env):
+        if (lib in env) and (len(env[lib]) > 0):
                 env.AppendUnique(LIBPATH = env[lib_var])
                 env.AppendUnique(CPPPATH = env[inc_var])
+                env.AppendUnique(LIBS = env[lib])
         elif conf.CheckPKG(pkgspec):
                 env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
 
         # Regardless of whether pkg-config succeeded, check whether
         # the library is usable.
-        result = conf.CheckLibWithHeader(lib, header, language)
+        result = conf.CheckLibWithHeader(env[lib], header, language)
 
         conf.Finish()
         return result
@@ -137,7 +139,7 @@ def openexr_available(env):
         return library_available(env, pkgspec='OpenEXR',
                                  inc_var='OPENEXR_INC',
                                  lib_var='OPENEXR_DIR',
-                                 lib='IlmImf',
+                                 lib='OPENEXR_LIB',
                                  header='ImfRgbaFile.h')
 
 # Export these for use in SConscripts.
@@ -184,7 +186,7 @@ external = env.SConscript('external/SConscript')
 core     = env.SConscript('sources/core/SConscript')
 plugins  = env.SConscript('sources/plugins/SConscript')
 softs    = env.SConscript('sources/softs/SConscript')
-python   = env.SConscript('sources/python/SConscript')
+#python   = env.SConscript('sources/python/SConscript')
 #tests    = env.SConscript('sources/tests/SConscript')
 #env.SConscript(dirs=['sources/core', 'sources/softs', 'sources/plugins'])
 
