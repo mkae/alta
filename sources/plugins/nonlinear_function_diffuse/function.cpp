@@ -180,42 +180,58 @@ vec diffuse_function::parametersJacobian(const vec& x) const
 
 void diffuse_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-	// Set the diffuse component
-	if(params::is_cosine_weighted(d->output_parametrization()) || args.is_defined("cos-fit"))
-	{
-		vec cart(6);
+    
+    // Check if the bootstrat option is there
+    // If yes ask nonlinear class to parse it
+    if( args.is_defined("bootstrap") )
+    {
+        NOT_IMPLEMENTED();
+        //TODO Make this work
+        //if we want to boostrap from command line with the diffuse term
+        nonlinear_function::bootstrap( d, args);
+        std::cout << "<<INFO>> Bootstrapping from command line with " << _kd << std::endl;
+    }
+    else //Else we are doing a classical bootstrapping for the diffuse term
+        // By taking the minimum value of the BRDF
+    {
+        // Set the diffuse component
+        if(params::is_cosine_weighted(d->output_parametrization()) || args.is_defined("cos-fit"))
+        {
+            vec cart(6);
 
-		for(int i=0; i<d->dimY(); ++i)
-			_kd[i] = std::numeric_limits<double>::max();
+            for(int i=0; i<d->dimY(); ++i)
+                _kd[i] = std::numeric_limits<double>::max();
 
-		for(int i=1; i<d->size(); ++i)
-		{
-			vec x = d->get(i);
-			params::convert(&x[0], d->input_parametrization(), params::CARTESIAN, &cart[0]);
-			double cosine = (cart[2] > 0.0 ? cart[2] : 0.0) * (cart[5] > 0.0 ? cart[5] : 0.0);
+            for(int i=1; i<d->size(); ++i)
+            {
+                vec x = d->get(i);
+                params::convert(&x[0], d->input_parametrization(), params::CARTESIAN, &cart[0]);
+                double cosine = (cart[2] > 0.0 ? cart[2] : 0.0) * (cart[5] > 0.0 ? cart[5] : 0.0);
 
-			if(cosine > 0.0)
-			{
-				for(int j=0; j<d->dimY(); ++j)
-				{
-					_kd[j] = std::min(x[d->dimX() + j] / cosine, _kd[j]);
-				}
-			}
-		}
-	}
-	else
-	{
-		for(int i=0; i<d->dimY(); ++i)
-			_kd[i] = std::numeric_limits<double>::max();
+                if(cosine > 0.0)
+                {
+                    for(int j=0; j<d->dimY(); ++j)
+                    {
+                        _kd[j] = std::min(x[d->dimX() + j] / cosine, _kd[j]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for(int i=0; i<d->dimY(); ++i)
+                _kd[i] = std::numeric_limits<double>::max();
 
-		for(int i=0; i<d->size(); ++i)
-		{
-			vec xi = d->get(i);
-			for(int j=0; j<d->dimY(); ++j)
-				_kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
-		}
-	}
-	std::cout << "<<INFO>> found diffuse: " << _kd << std::endl;
+            for(int i=0; i<d->size(); ++i)
+            {
+                vec xi = d->get(i);
+                for(int j=0; j<d->dimY(); ++j)
+                    _kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+            }
+        }
+    }//end of else case
+
+    std::cout << "<<INFO>> found diffuse: " << _kd << std::endl;
 
 }
 
