@@ -287,7 +287,7 @@ bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, 
 			if(qp.test_constraints(ny, r, d))
 			{
 #ifdef DEBUG
-				std::cout << "<<INFO>> got solution " << *(r.get()) << std::endl ;
+				std::cout << "<<INFO>> got solution " << *r << std::endl ;
 #endif
 				return true;
             }
