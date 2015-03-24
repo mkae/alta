@@ -212,7 +212,7 @@ bool beckmann_function::load(std::istream& in)
 			return false;
 	}
 
-    // Checking for the comment line #FUNC nonlinear_function_lafortune
+    // Checking for the comment line #FUNC nonlinear_function_beckmann
 	std::string token;
 	in >> token;
 	if(token.compare("#FUNC") != 0) 
