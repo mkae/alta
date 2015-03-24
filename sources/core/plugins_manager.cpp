@@ -227,9 +227,13 @@ function* plugins_manager::get_function(const std::string& filename)
 	f->setParametrization(param_out);
 
 	// Load the function part from the file object
-  f->load(file);
+  if( f->load(file) )
+  {
+    return f;
+  }
 
-	return f;
+  std::cout << "<<ERROR>> COULD NOT LOAD THE BRDF from File " << filename << std::endl;
+	 return NULL;
 }
 
 //! Get an instance of the function selected based on the name <em>n</em>.
