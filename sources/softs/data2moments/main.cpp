@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -85,7 +85,11 @@ int main(int argc, char** argv)
 		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;
 		return 1;
 	}
-	d->load(args["input"]);
+	try
+	{
+		d->load(args["input"]);
+	}
+	CATCH_FILE_IO_ERROR(args["input"]);
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);

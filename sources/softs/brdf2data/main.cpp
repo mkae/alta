@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -71,7 +71,11 @@ int main(int argc, char** argv)
 	ptr<data> d = plugins_manager::get_data(args["data"]) ;
 	if(args.is_defined("data-file"))
 	{
-		d->load(args["data-file"]);
+			try
+			{
+				d->load(args["data-file"]);
+			}
+			CATCH_FILE_IO_ERROR(args["data-file"]);
 	}
 
     // Get the output object. In the case where it is not a VS file, we use

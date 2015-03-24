@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -111,7 +111,12 @@ int main(int argc, char** argv)
 	
 	// Import data
 	ptr<data> d_in = plugins_manager::get_data(args["in-data"]) ;
-	d_in->load(args["input"], args);
+	try
+	{
+		d_in->load(args["input"], args);
+	}
+	CATCH_FILE_IO_ERROR(args["input"]);
+
 	if(!d_in) 
 	{
 		std::cout << "<<INFO>> input data will be treated as ALTA format" << std::endl;

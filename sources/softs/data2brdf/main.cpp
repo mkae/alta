@@ -114,7 +114,12 @@ int main(int argc, char** argv)
 
     ptr<function> f = plugins_manager::get_function(args);
     ptr<data>     d = plugins_manager::get_data(args["data"]);
-    d->load(args["input"], args);
+
+		try
+		{
+			d->load(args["input"], args);
+		}
+		CATCH_FILE_IO_ERROR(args["input"]);
 
     if(!f || !d)
     {

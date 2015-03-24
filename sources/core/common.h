@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -385,3 +385,34 @@ class timer
         unsigned int _start, _stop;
         unsigned int _elapsed;
 };
+
+
+// I/O error handling in user interfaces.
+
+#include <iostream>
+#include <cstdlib>
+
+#ifndef _WIN32
+
+# define CATCH_FILE_IO_ERROR(file)								\
+		catch (std::ios_base::failure& e) {						\
+				std::cerr << "<<ERROR>> failed to load '"	\
+									<< (file) << "'"								\
+									<< ": " << strerror(errno)			\
+									<< std::endl;										\
+				exit(EXIT_FAILURE);												\
+		}
+
+#else
+
+// We cannot rely on 'errno' on Windows.
+
+# define CATCH_FILE_IO_ERROR(file)								\
+		catch (std::ios_base::failure& e) {						\
+				std::cerr << "<<ERROR>> failed to load '"	\
+									<< (file) << "'"								\
+									<< std::endl;										\
+				exit(EXIT_FAILURE);												\
+		}
+
+#endif	/* _WIN32 */

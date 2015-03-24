@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013 Inria
+   Copyright (C) 2013, 2015 Inria
 
    This file is part of ALTA.
 
@@ -43,22 +43,26 @@ int main(int argc, char** argv)
 
 	// Load the data
 	rational_1d_data data ;
-	if(args.is_defined("min") && args.is_defined("max"))
+	try
 	{
-		data.load(args["input"], args.get_float("min", 0.0f), args.get_float("max", 1.0f));
+		if(args.is_defined("min") && args.is_defined("max"))
+		{
+			data.load(args["input"], args.get_float("min", 0.0f), args.get_float("max", 1.0f));
+		}
+		else if(args.is_defined("min") && !args.is_defined("max"))
+		{
+			data.load(args["input"], args.get_float("min", 0.0f), std::numeric_limits<double>::max());
+		}
+		else if(args.is_defined("min") && !args.is_defined("max"))
+		{
+			data.load(args["input"], -std::numeric_limits<double>::max(), args.get_float("min", 0.0f));
+		}
+		else
+		{
+			data.load(args["input"]);
+		}
 	}
-	else if(args.is_defined("min") && !args.is_defined("max"))
-	{
-		data.load(args["input"], args.get_float("min", 0.0f), std::numeric_limits<double>::max());
-	}
-	else if(args.is_defined("min") && !args.is_defined("max"))
-	{
-		data.load(args["input"], -std::numeric_limits<double>::max(), args.get_float("min", 0.0f));
-	}
-	else
-	{
-		data.load(args["input"]);
-	}
+	CATCH_FILE_IO_ERROR(args["input"]);
 
 	// Fitting call
 	rational_1d_fitter* fitter ;

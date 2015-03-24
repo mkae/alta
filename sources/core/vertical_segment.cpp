@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -61,12 +61,12 @@ void vertical_segment::load(const std::string& filename)
 		
 void vertical_segment::load(const std::string& filename, const arguments& args) 
 {
-	std::ifstream file(filename.c_str()) ;
-	if(!file.is_open())
-	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		throw std::exception();
-	}
+	std::ifstream file;
+
+	// Raise an exception when 'open' fails.
+	file.exceptions (std::ios::failbit);
+	file.open(filename.c_str());
+	file.exceptions (std::ios::goodbit);
 
 	vec min, max ;
 	vec ymin, ymax;
