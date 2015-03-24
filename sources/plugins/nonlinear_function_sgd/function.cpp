@@ -41,14 +41,19 @@ vec shifted_gamma_function::value(const vec& x) const
 	vec ev(3); 
 	ev[0] = x[3]; ev[1] = x[4]; ev[2] = x[5];
 	
-	vec halfVector = normalize(lv + ev);
+	vec const halfVector = normalize(lv + ev);
 	
-	double v_h = dot(ev, halfVector);
-	double n_h = dot(n, halfVector);
-	double n_l = dot(n, lv); 
+	double const v_h = dot(ev, halfVector);
+	double const n_h = dot(n, halfVector);
+	double const n_l = dot(n, lv); 
+	
 	double inLight = 1.0;
-	if (n_l < 0.0) inLight = 0.0;
-	double n_v = dot(n, ev);
+	if (n_l < 0.0)
+	{
+		inLight = 0.0;
+	}
+
+	double const n_v = dot(n, ev);
 
 	return one_pi * inLight * (n_l * rho_d + rho_s.cwiseProduct(D(alpha, p, n_h, K_ap)).cwiseProduct(G1(n_l)).cwiseProduct(G1 (n_v)).cwiseProduct(Fresnel(F_0, F_1, v_h)));
 }
@@ -156,3 +161,123 @@ vec shifted_gamma_function::G1(double theta) const
 	}
 	return G1;
 }
+
+
+bool shifted_gamma_function::load(std::istream& in)
+{
+	// Parse line until the next comment
+	while(in.peek() != '#')
+	{
+		char line[256];
+		in.getline(line, 256);
+
+		if(!in.good())
+		{
+			return false;
+		}
+	}
+
+	// Checking for the comment line #FUNC nonlinear_function_sgd
+	std::string token;
+	in >> token;
+	if(token.compare("#FUNC") != 0) 
+	{ 
+		std::cerr << "<<ERROR>> parsing the stream. The #FUNC is not the next line defined." << std::endl; 
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+      return false;
+	}
+
+	in >> token;
+   if(token.compare("nonlinear_function_sgd") != 0) 
+	{
+		std::cerr << "<<ERROR>> parsing the stream. function name is not the next token." << std::endl; 
+		std::cerr << "<<ERROR>> got \"" << token << "\" instead." << std::endl; 
+    return false;
+	}
+
+	std::cout << " HERE " << __FILE__<< " " << __LINE__ << *this << std::endl;
+
+
+	//Diffuse part first
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> rho_d[i];
+	}
+
+	//Specular part 
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> rho_s[i];
+	}
+
+	//Alpha
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> alpha[i];
+	}
+
+	//Power
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> p[i];
+	}
+
+	//F0
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> F_0[i];
+	}
+
+	//F1
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> F_1[i];
+	}
+
+	//K_alpha_p
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> K_ap[i];
+	}
+
+	//Lambda
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> sh_lambda[i];
+	}
+
+	// c
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> sh_c[i];
+	}
+
+	//k
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> sh_k[i];
+	}
+
+	//theta_o
+	for( unsigned int i=0; i < dimY(); i++)
+	{
+		in >> token >> sh_theta0[i];
+	}
+
+	
+
+	std::cout << " HERE " << __FILE__<< " " << __LINE__ << *this << std::endl;
+
+	return true;
+}
+
+void 
+shifted_gamma_function::save(const std::string& filename, const arguments& args) const
+{
+	NOT_IMPLEMENTED();
+}
+
+
+
+
+
