@@ -857,6 +857,13 @@ product_function::product_function( nonlinear_function* g1, nonlinear_function* 
 	}
 }
 
+product_function::~product_function()
+{
+  delete f1;
+  delete f2;
+}
+
+
 vec product_function::operator()(const vec& x) const
 {
 	return value(x);

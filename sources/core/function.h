@@ -293,6 +293,7 @@ class product_function : public nonlinear_function
 										 bool is_g1_fixed = false,
 										 bool is_g2_fixed = false);
 
+		~product_function();
 
 		/* ACCESS TO INDIVIDUAL ELEMENTS */
 

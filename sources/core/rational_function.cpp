@@ -437,6 +437,10 @@ rational_function::rational_function(int np, int nq) : np(np), nq(nq)
 //! \todo clean memory here
 rational_function::~rational_function()
 {
+	for(unsigned int i=0; i < rs.size(); i++)
+	{
+		delete rs[i];
+	}
 }
 
 
