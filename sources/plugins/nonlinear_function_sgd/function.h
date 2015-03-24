@@ -37,10 +37,13 @@ class shifted_gamma_function : public nonlinear_function
 		virtual vec value(const vec& x) const ;
 
 		//! \brief Export function
-		virtual void save_call(std::ostream& out, const arguments& args) const {
+		virtual void save_call(std::ostream& out, const arguments& args) const 
+    {
 			NOT_IMPLEMENTED();
 		}
-		virtual void save_body(std::ostream& out, const arguments& args) const {
+		
+    virtual void save_body(std::ostream& out, const arguments& args) const 
+    {
 			NOT_IMPLEMENTED();
 		}
 		
@@ -72,8 +75,18 @@ class shifted_gamma_function : public nonlinear_function
     		K_ap      = vec::Zero(nY);
     		rho_d     = vec::Zero(nY);
     		rho_s     = vec::Zero(nY);
-    		alpha     = vec::Zero(nY); alpha.fill(1.0);
+    		alpha     = vec::Zero(nY); 
+
+        alpha.fill(1.0);
 		}
+
+    //! Load BRDF parameters from .brdf file
+    virtual bool load(std::istream& in);
+
+    //! Save the Function 
+    virtual void save(const std::string& filename, const arguments& args) const;
+
+    friend std::ostream& operator<<(std::ostream& out, const shifted_gamma_function & sgd);
 
 	private:
 		//! Fresnel term of the microfacet distribution
@@ -97,4 +110,18 @@ class shifted_gamma_function : public nonlinear_function
 		//! Color parameters
 		vec rho_d, rho_s, alpha;
 } ;
+
+
+std::ostream& operator<<(std::ostream& out, const shifted_gamma_function & sgd)
+{
+  out << " Shifted Gamma Function: Parameters = { rho _d = " << sgd.rho_d
+      << " rho_s = " << sgd.rho_s << " alpha = " << sgd.alpha << std::endl
+      << " K_alpha_p = " << sgd.K_ap << " F_0 = " << sgd.F_0 << " F_1 = " << sgd.F_1 << std::endl
+      << " sh_c = " << sgd.sh_c << " sh_thetao = " << sgd.sh_theta0 << std::endl
+      << " sh_k = " << sgd.sh_k << " sh_lambda = " << sgd.sh_lambda << " power = " << sgd.p 
+      << " } " << std::endl; 
+  
+  return out;
+}
+
 
