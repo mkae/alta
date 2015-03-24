@@ -42,16 +42,22 @@ public:
   static vec meanSquareError(ptr<data> const & data, ptr<function> const & f )
   {
     vec mse = vec::Zero( f->dimY() );
+
+    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    
+    //Note that: data_x = dat.head( data->dimX() );
+    //           data_y = dat.tail( data->dimY() );
+    vec f_y = vec::Zero( f->dimY() );
     
     for(unsigned int i=0; i < data->size(); i++)
     {
-      vec const dat = data->get(i);          
-      vec const data_x = dat.head( data->dimX() );
-      vec const data_y = dat.tail( data->dimY() );
+      dat = data->get(i); 
 
-      mse += (f->value(data_x) - data_y).array().square().matrix();
+      f_y = f->value(dat.head( data->dimX() ) );
+
+      mse += (f_y - dat.tail( data->dimY() ) ).array().square().matrix();
     }
-
+    
     return mse * (1.0 / data->size() );
 
   }
@@ -76,13 +82,19 @@ class Norm
   {
     vec l2 = vec::Zero( f->dimY() );
 
+    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    
+    //Note that: data_x = dat.head( data->dimX() );
+    //           data_y = dat.tail( data->dimY() );
+    vec f_y = vec::Zero( f->dimY() );
+    
     for(unsigned int i=0; i < data->size(); i++)
     {
-      vec const dat = data->get(i);          
-      vec const data_x = dat.head( data->dimX() );
-      vec const data_y = dat.tail( data->dimY() );
+      dat = data->get(i);
 
-      l2 += (f->value(data_x) - data_y).array().square().matrix();
+      f_y = f->value(dat.head( data->dimX() ) );
+      
+      l2 += ( f_y - dat.tail( data->dimY() )).array().square().matrix();
 
     }
     return l2.cwiseSqrt();
@@ -92,13 +104,12 @@ class Norm
   {
     vec l2 = vec::Zero( f->dimY() );
 
+    vec dat = vec::Zero( data->dimX() + data->dimY() );
+
     for(unsigned int i=0; i < data->size(); i++)
     {
-      vec const dat = data->get(i);          
-      vec const data_x = dat.head( data->dimX() );
-      vec const data_y = dat.tail( data->dimY() );
-
-      l2 += ((f->value(data_x) - data_y) * weights[i]).array().square().matrix();
+      dat = data->get(i);
+      l2 += ((f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )) * weights[i]).array().square().matrix();
 
     }
     return l2.cwiseSqrt();
@@ -108,13 +119,15 @@ class Norm
   {
     vec max = vec::Zero( f->dimY() );
 
+    vec dat = vec::Zero( data->dimX() + data->dimY() );
+  
     for(unsigned int i=0; i < data->size(); i++)
     {
-      vec const dat = data->get(i);          
-      vec const data_x = dat.head( data->dimX() );
-      vec const data_y = dat.tail( data->dimY() );
+      dat = data->get(i);          
+      //vec const data_x = dat.head( data->dimX() );
+      //vec const data_y = dat.tail( data->dimY() );
 
-      max =  max.cwiseMax( (f->value(data_x) - data_y).cwiseAbs() );
+      max =  max.cwiseMax( (f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )).cwiseAbs() );
 
     }
     return max;
@@ -124,13 +137,15 @@ class Norm
   {
     vec L1 = vec::Zero( f->dimY() );
 
+    vec dat = vec::Zero( data->dimX() + data->dimY() );
+
     for(unsigned int i=0; i < data->size(); i++)
     {
-      vec const dat = data->get(i);          
-      vec const data_x = dat.head( data->dimX() );
-      vec const data_y = dat.tail( data->dimY() );
+      dat = data->get(i);          
+      //vec const data_x = dat.head( data->dimX() );
+      //vec const data_y = dat.tail( data->dimY() );
 
-      L1 += (f->value(data_x) - data_y).cwiseAbs();
+      L1 += (f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )).cwiseAbs();
 
     }
     return L1;
@@ -155,8 +170,8 @@ class Norm
     Eigen::ArrayXXd  all_y_fx( data->size(), f->dimY() );
     all_y_fx.setZero(data->size(), f->dimY());
 
-    timer chrono;
-    chrono.start();
+    //timer chrono;
+    //chrono.start();
     for(unsigned int i=0; i < data->size(); i++)
     {
       Eigen::ArrayXd const dat = data->get(i);          
@@ -169,9 +184,9 @@ class Norm
 
       //a_Lp += pow( abs(y_fx - data_y), p );
     }
-    chrono.stop();
-    std::cout << "<<INFO>> Time to demultiplex data " << chrono << std::endl;
-    chrono.reset();
+    // chrono.stop();
+    // std::cout << "<<INFO>> Time to demultiplex data " << chrono << std::endl;
+    // chrono.reset();
 
     Eigen::ArrayXd pre_cal = pow(abs(all_data_y - all_y_fx), p).colwise().sum();
 
@@ -203,30 +218,35 @@ bool convertDataToFunctionParam(ptr<data> const & data,
       conversion_necessary = false;
       return true;
     }
-    else //Ouput parametrizations are different. 
-      // Output parametrization of  the Function prevails
+    else // Ouput parametrizations are different. 
+         // Output parametrization of  the Function prevails
     {
       converted_data = new vertical_segment( data->input_parametrization(), 
                                              f->output_parametrization(),
                                              data->size() );
+      converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+
+      //Note that: data_x = dat.head( data->dimX() );
+      //           data_y = dat.tail( data->dimY() );
+      vec dat        = vec::Zero( data->dimX() + data->dimY() );
+      vec data_x     = vec::Zero( data->dimX() );
+      vec data_y     = vec::Zero( data->dimY() );
+      vec new_data_y = vec::Zero( f->dimY() );
+      vec new_data   = vec::Zero(data->dimX() + f->dimY() );
 
       for( unsigned int i=0; i < converted_data->size(); i++)
       {
-        vec const dat = data->get(i);          
-        vec const data_x = dat.head( data->dimX() );
-        vec const data_y = dat.tail( data->dimY() );
-
-        vec new_data_y = vec::Zero( f->dimY() );
+        dat = data->get(i);          
+        data_x = dat.head( data->dimX() );
+        data_y = dat.tail( data->dimY() );
 
         params::convert( &data_y[0], data->output_parametrization(), data->dimY(),
                         f->output_parametrization(), f->dimY(),  &new_data_y[0]);
 
-        vec new_data = vec::Zero(data->dimX() + f->dimY() );
         new_data.head( data->dimX() ) = data_x;
         new_data.tail( f->dimY() )    = new_data_y;
 
         converted_data->set(i, new_data );
-
       }
       
     }
@@ -238,26 +258,31 @@ bool convertDataToFunctionParam(ptr<data> const & data,
     if( data->output_parametrization() == f->output_parametrization() ) 
     {
 
-      unsigned int const new_size = f->dimX() + f->dimY();
       converted_data = new vertical_segment( f->dimX(), f->dimY(), data->size() );
       converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
       
+      //Note that: data_x = dat.head( data->dimX() );
+      //           data_y = dat.tail( data->dimY() );
+      vec dat        = vec::Zero( data->dimX() + data->dimY() );
+      vec data_x     = vec::Zero( data->dimX() );
+      vec data_y     = vec::Zero( data->dimY() );
+      
+      vec new_data = vec::Zero( f->dimX() + f->dimY() );
+      vec new_data_y = vec::Zero( f->dimY() );
+      vec new_data_x = vec::Zero( f->dimX() );
+
       for( unsigned int i=0; i < converted_data->size(); i++)
       {
 
-        vec const dat = data->get(i);
-        vec const data_x = dat.head( data->dimX() );
-        vec const data_y = dat.tail( data->dimY() );
+        dat = data->get(i);
+        data_x = dat.head( data->dimX() );
+        data_y = dat.tail( data->dimY() );
         
-        vec new_data_x = vec::Zero( f->dimX() );
-
         params::convert( &data_x[0], data->input_parametrization() , 
                         f->input_parametrization(), &new_data_x[0] );
 
-        vec new_data = vec::Zero( new_size );
         new_data.head( f->dimX() ) = new_data_x;
         new_data.tail( f->dimY() ) = data_y;
-
 
         converted_data->set(i, new_data );
       }//end of for-loop
@@ -275,10 +300,8 @@ bool convertDataToFunctionParam(ptr<data> const & data,
       //   vec const data_x = dat.head( data->dimX() );
       //   vec const data_y = dat.tail( data->dimY() );
       // }
-
-
+      NOT_IMPLEMENTED();
     }
-
   }
 
   return true;
@@ -296,10 +319,11 @@ void computeCosineFactorsFromData( ptr<data> const & data,
   
   if( data->input_parametrization() == params::CARTESIAN)
   {
+    vec data_x = vec::Zero( data->dimX() );
+
     for( unsigned int i=0; i < data->size(); i++)
     {
-      vec const data_x = (data->get(i)).head( data->dimX() );
-      
+      data_x = (data->get(i)).head( data->dimX() );
       cosine_theta_light[i] = data_x[2];
       cosine_theta_view[i]  = data_x[5];
     }
@@ -460,6 +484,39 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light)*cos(theta_view) " 
             << norm_l2_cos_light_view << " (computed in " << t << ")" << std::endl;
   t.reset();
+
+
+  //If output is not void we output the different metrics to a file
+  if( args.is_defined("output") )
+  {
+    std::string output_filename = args["output"];
+    if( output_filename != "")
+    {
+      std::ofstream  fwriter(output_filename.c_str() );
+
+      if( fwriter.good() )
+      {
+        fwriter << "#FIT2STATS EXPORT. DIMENSIONS ARE THE ONE FROM THE BRDF FUNCTION" << std::endl;
+        fwriter << "#CMD " << args.get_cmd() << std::endl;
+        fwriter << "#DIM " << brdf->dimX() << " " << brdf->dimY() << std::endl;
+        fwriter << std::endl;
+
+        fwriter << "L1 " << norm_l1 << std::endl;
+        fwriter << "L2 " << norm_l2 << std::endl;
+        fwriter << "L3 " << norm_l3 << std::endl;
+        fwriter << "LINF " << norm_linf << std::endl;
+        fwriter << "MSE " << mse << std::endl;
+        fwriter << "RMSE " << rmse << std::endl;
+        
+        fwriter << std::endl;
+      }
+      else
+      {
+        std::cerr << "<<ERROR>> Could not save metrics to " << output_filename << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
+  }
 
 
   //Comparisons with the norm methods provided in function.cpp
