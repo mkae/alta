@@ -4,5 +4,5 @@ env = env.Clone()
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
 
-env.Program('./build/half-test-1', './params/half-test-1.cpp')
-env.Program('./build/half-test-2', './params/half-test-2.cpp')
+env.Alias('tests', env.Program('./build/half-test-1', './params/half-test-1.cpp'))
+env.Alias('tests', env.Program('./build/half-test-2', './params/half-test-2.cpp'))

@@ -23,7 +23,7 @@ if library_available(env, pkgspec='python-2.7',
 if build_lib:
 	env.Prepend(LIBS = ['core'])
 	env['SHLIBPREFIX']=''
-	env.SharedLibrary('../build/alta.so', ['alta.cpp'])
+	env.Alias('python', env.SharedLibrary('../build/alta.so', ['alta.cpp']))
 else:
 	print "<<ERROR>> Unable to build the Python interface, please install boost-python"
 	print "          or check your configuration."
