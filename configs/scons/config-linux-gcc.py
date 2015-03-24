@@ -38,7 +38,7 @@ OPENMP_LIB   = ['gomp']
 ##
 #OPENEXR_INC    = ['/usr/include/OpenEXR']
 #OPENEXR_DIR    = ['/usr/lib/x86_64_linux-gnu']
-OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
+#OPENEXR_LIB    = ['Half', 'IlmImf', 'IlmThread']
 
 
 ## FLANN library
