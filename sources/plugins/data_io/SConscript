@@ -4,7 +4,9 @@ env = env.Clone()
 # Special linking flags, defined in the OS dependant configuration file
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
+env.SharedLibrary('../../build/data_merl', ['merl.cpp'])
+
 if openexr_available(env):
 	env.SharedLibrary('../../build/data_utia', ['utia.cpp'])
-        env.SharedLibrary('../../build/data_merl', ['merl.cpp'])
+
 #env.SharedLibrary('../../build/data_astm', ['astm.cpp'])
