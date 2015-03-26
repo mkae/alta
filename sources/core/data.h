@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -109,7 +109,7 @@ class data_params : public data
 		//! that can be applied on the raw data to be clusterized.
 		//! \note by default we use <em>none</em>, but if the input space
 		//! dimension is reduced, the program will halt.
-		enum clustrering
+		enum clustering
 		{
 			MEAN,
 			MEDIAN,
@@ -121,7 +121,7 @@ class data_params : public data
 		//! \brief contructor requires the definition of a base class that
 		//! has a parametrization, and a new parametrization.
 		data_params(const ptr<data> d, params::input new_param,
-		            data_params::clustrering method = data_params::NONE) :
+		            data_params::clustering method = data_params::NONE) :
 			_clustering_method(method)
 		{
 			setParametrization(new_param);
@@ -185,7 +185,7 @@ class data_params : public data
 
 	protected: // data
 
-		data_params::clustrering _clustering_method;
+		data_params::clustering _clustering_method;
 
 		std::vector<vec> _data;
 };
