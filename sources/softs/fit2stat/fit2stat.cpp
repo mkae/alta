@@ -335,6 +335,22 @@ void computeCosineFactorsFromData( ptr<data> const & data,
 }
 
 
+void  demultiplexData( ptr<data> const & data, 
+                       Eigen::ArrayXXd & data_x, 
+                       Eigen::ArrayXXd & data_y )
+{
+
+}
+
+void evaluateFunctionAtData( Eigen::ArrayXXd const & data_x, 
+                             ptr<function> const & f,
+                             Eigen::ArrayXXd & f_y )
+{
+
+}
+
+
+
 
 
 int 
@@ -380,8 +396,17 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> Loading data ..." << std::endl;
   ptr<vertical_segment> vs_data = new vertical_segment();
   //ptr<data> vs_data = plugins_manager::get_data("vertical_segment");
-  vs_data->load(args["input"], args);
   
+  try
+  {
+    vs_data->load(args["input"], args);  
+  }
+  catch(...)
+  {
+    return EXIT_FAILURE;
+  }
+  
+
   std::cout << "<<INFO>> DATA LOADED ." << std::endl;
   std::cout << "<<INFO>> DATA Y dimension :" << vs_data->dimY() << std::endl;
 
@@ -533,7 +558,6 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> Linf distance to data = " << Linf 
             << " (computed in " << t << ")" << std::endl;
   t.reset();
-
 
   return EXIT_SUCCESS;
 }
