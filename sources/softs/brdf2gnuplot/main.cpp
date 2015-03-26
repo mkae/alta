@@ -69,15 +69,10 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	// Create output file
-	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
-	file.precision(10);
-
 	// Should I export a BRDF or BRDF*cos ?
 	// Cannot export a cosine term if no parametrization is defined for the
 	// input function
 	const bool cos_plot = args.is_defined("cos-plot") && f->input_parametrization() != params::UNKNOWN_INPUT;
-
 
 	// Load a data file
 	if(args.is_defined("data") || args.is_defined("data-file"))
@@ -87,13 +82,25 @@ int main(int argc, char** argv)
 		// Load data file if the plugin manager created a plugin object.
 		if(d)
 		{
-			d->load(args["data-file"]);
+			try
+			{	
+				d->load(args["data-file"]);	
+			}
+			catch(...)
+			{
+				return EXIT_FAILURE;
+			}
 		}
 		else
 		{
 			std::cerr << "<<ERROR>> unable to load the data plugin" << std::endl;
-			return 1;
+			return EXIT_FAILURE;
 		}
+
+		// Create output file now that we are sure that needed data are loaded
+		std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+		file.precision(10);
+
 
 		// Print the distance to the data to check if it correspond to the value
 		// computed prior.
@@ -171,9 +178,15 @@ int main(int argc, char** argv)
 
 			file << std::endl ;
 		}
+
+		file.close();
 	}
 	else if(args.is_defined("polar-plot"))
 	{
+		// Create output file
+		std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+		file.precision(10);
+
 		vec spherical(4);
 		spherical[0] = args.get_float("inc-angle", 0.0);
 		spherical[1] = M_PI;
@@ -209,9 +222,8 @@ int main(int argc, char** argv)
 			for(int k=0; k<f->dimY(); ++k) { file << y[k] << "\t"; }
 			file << std::endl;
 		}
-
+			file.close();
 	}
 
-	file.close();
 	return 0 ;
 }
