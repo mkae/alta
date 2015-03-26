@@ -377,10 +377,6 @@ void fastNormComputation( Eigen::ArrayXXd const & o_data_y,
                           Eigen::VectorXd & mse,
                           Eigen::VectorXd & rmse )
 {
-
-  //Eigen::ArrayXd tmp  =  (o_data_y - f_y).square().colwise().sum();
-
-
   Eigen::MatrixXd  const distance_matrix = (o_data_y - f_y).matrix();
 
   for( unsigned int i=0; i < f_y.cols(); i++)
@@ -391,11 +387,33 @@ void fastNormComputation( Eigen::ArrayXXd const & o_data_y,
     LInf(i) = distance_matrix.col(i).lpNorm<Eigen::Infinity>();
   }
 
-
-  mse = distance_matrix.colwise().sum() / o_data_y.rows();
+  mse = distance_matrix.array().square().colwise().sum() / o_data_y.rows();
   rmse = mse.cwiseSqrt();
 
 }
+
+void fastWeightedErrors( Eigen::ArrayXXd const & o_data_y, 
+                         Eigen::ArrayXXd const & f_y,
+                         Eigen::VectorXd const & weights,
+                         Eigen::VectorXd & mse,
+                         Eigen::VectorXd & rmse )
+{
+
+  Eigen::MatrixXd  const distance_matrix = (o_data_y - f_y).matrix();
+  Eigen::MatrixXd tmp = Eigen::MatrixXd( distance_matrix.rows(), distance_matrix.cols() );
+
+  for( unsigned int i=0; i < f_y.cols() ; i++)
+  {
+    tmp.col(i) = distance_matrix.col(i).cwiseProduct( weights );
+  }
+
+  mse = tmp.array().square().colwise().sum();
+  
+  mse /= o_data_y.rows();
+  rmse = mse.cwiseSqrt();
+
+}
+
 
 
 
@@ -444,17 +462,21 @@ main(int argc, char* argv[])
   ptr<vertical_segment> vs_data = new vertical_segment();
   //ptr<data> vs_data = plugins_manager::get_data("vertical_segment");
   
+  timer  t;
   try
   {
+    t.start();
     vs_data->load(args["input"], args);  
+      t.stop();
   }
   catch(...)
   {
     return EXIT_FAILURE;
   }
-  
 
-  std::cout << "<<INFO>> DATA LOADED ." << std::endl;
+
+  std::cout << "<<INFO>> DATA LOADED in " << t << std::endl;
+  t.reset();
   std::cout << "<<INFO>> DATA Y dimension :" << vs_data->dimY() << std::endl;
 
 
@@ -466,7 +488,6 @@ main(int argc, char* argv[])
     std::cout << "<<ERROR>> Could not load the BRDF. Check your file. ABORTING !!!! "  << std::endl;
     return EXIT_FAILURE;  
   }
-  
   std::cout << "<<INFO>> BRDF File Loaded. Starting to compute statistics ... " << std::endl;
 
 
@@ -477,7 +498,7 @@ main(int argc, char* argv[])
   bool conversion_necessary = true;
   std::cout << "<<INFO>> Converting data to function parametrization if needed" << std::endl;
 
-  timer  t;
+  
   t.start();
   convertDataToFunctionParam( generic_data, brdf, conversion_necessary, conv_vs );
   t.stop();
@@ -495,7 +516,7 @@ main(int argc, char* argv[])
     converted_data = generic_data;
   }
 
-  //Here we go new way
+  //Here we go new way and faster because we evaluate the function just once
   Eigen::ArrayXXd data_x =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimX() );
   Eigen::ArrayXXd data_y =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimY() ) ;
 
@@ -525,14 +546,16 @@ main(int argc, char* argv[])
   fastNormComputation( data_y, f_y, L1_norm, L2_norm, L3_norm, LInf_norm, mse, rmse);
   t.stop();
   std::cout << "<<INFO>> Fast Norm Computations in  " << t << std::endl;
-  std::cout << " L1_norm " << L1_norm << std::endl
-            << " L2_norm " << L2_norm << std::endl
-            << " L3_norm " << L3_norm << std::endl
-            << " Linf_norm " << LInf_norm << std::endl
-            << " Mse  " << mse << std::endl
-            << " Rmse " << rmse << std::endl;
+  std::cout << "<<INFO>> L1_norm " << L1_norm << std::endl
+            << "<<INFO>> L2_norm " << L2_norm << std::endl
+            << "<<INFO>> L3_norm " << L3_norm << std::endl
+            << "<<INFO>> Linf_norm " << LInf_norm << std::endl
+            << "<<INFO>> Mse  " << mse << std::endl
+            << "<<INFO>> Rmse " << rmse << std::endl;
   t.reset();
-  
+
+
+
 
   
   //Norm L1
@@ -582,19 +605,39 @@ main(int argc, char* argv[])
   computeCosineFactorsFromData( converted_data, cosine_theta_light, cosine_theta_view );
   vec cosine_light_view = cosine_theta_light.cwiseProduct( cosine_theta_view );
   
-  t.start();
-  vec const norm_l2_cos_light = Norm::weightedL2(converted_data, brdf, cosine_theta_light);
-  t.stop();
-  std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light) " 
-            << norm_l2_cos_light << " (computed in " << t << ")" << std::endl;
-  t.reset();
 
-  t.start();
-  vec const norm_l2_cos_light_view = Norm::weightedL2(converted_data, brdf, cosine_light_view);
-  t.stop();
-  std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light)*cos(theta_view) " 
-            << norm_l2_cos_light_view << " (computed in " << t << ")" << std::endl;
-  t.reset();
+
+  Eigen::VectorXd w_cosine_light_mse;
+  Eigen::VectorXd w_cosine_light_rmse;
+
+  fastWeightedErrors( data_y, f_y, cosine_theta_light, w_cosine_light_mse, w_cosine_light_rmse);
+
+  std::cout << "<<INFO>> Weighted MSE by cosine of the light direction: " << w_cosine_light_mse << std::endl;
+  std::cout << "<<INFO>> Weighted Root-MSE by cosine of the light direction: " << w_cosine_light_rmse << std::endl;
+
+
+  Eigen::VectorXd w_cosine_light_view_mse;
+  Eigen::VectorXd w_cosine_light_view_rmse;
+  fastWeightedErrors( data_y, f_y, cosine_light_view, w_cosine_light_view_mse, w_cosine_light_view_rmse);
+
+  std::cout << "<<INFO>> Weighted MSE by cos(theta_light) cos(theta_view): " << w_cosine_light_view_mse << std::endl;
+  std::cout << "<<INFO>> Weighted Root-MSE by cos(theta_light) cos(theta_view): " << w_cosine_light_view_rmse << std::endl;
+
+
+
+  // t.start();
+  // vec const norm_l2_cos_light = Norm::weightedL2(converted_data, brdf, cosine_theta_light);
+  // t.stop();
+  // std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light) " 
+  //           << norm_l2_cos_light << " (computed in " << t << ")" << std::endl;
+  // t.reset();
+
+  // t.start();
+  // vec const norm_l2_cos_light_view = Norm::weightedL2(converted_data, brdf, cosine_light_view);
+  // t.stop();
+  // std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light)*cos(theta_view) " 
+  //           << norm_l2_cos_light_view << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
 
   //If output is not void we output the different metrics to a file
@@ -612,13 +655,16 @@ main(int argc, char* argv[])
         fwriter << "#DIM " << brdf->dimX() << " " << brdf->dimY() << std::endl;
         fwriter << std::endl;
 
-        fwriter << "L1 " << L1_norm << std::endl;
-        fwriter << "L2 " << L2_norm << std::endl;
-        fwriter << "L3 " << L3_norm << std::endl;
-        fwriter << "LINF " << LInf_norm << std::endl;
-        fwriter << "MSE " << mse << std::endl;
-        fwriter << "RMSE " << rmse << std::endl;
-        
+        fwriter << "L1 :" << L1_norm << std::endl;
+        fwriter << "L2 :" << L2_norm << std::endl;
+        fwriter << "L3 :" << L3_norm << std::endl;
+        fwriter << "LINF :" << LInf_norm << std::endl;
+        fwriter << "MSE :" << mse << std::endl;
+        fwriter << "RMSE :" << rmse << std::endl;
+        fwriter << "MSE * cos(theta_light) :" << w_cosine_light_mse << std::endl;
+        fwriter << "RMSE * cos(theta_light) :" << w_cosine_light_rmse << std::endl;
+        fwriter << "MSE * cos(theta_light) * cos(theta_view) :" << w_cosine_light_mse << std::endl;
+        fwriter << "RMSE * cos(theta_light) cos(theta_view)  :" << w_cosine_light_rmse << std::endl;
         fwriter << std::endl;
       }
       else
