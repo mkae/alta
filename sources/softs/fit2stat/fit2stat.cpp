@@ -336,9 +336,23 @@ void computeCosineFactorsFromData( ptr<data> const & data,
 
 
 void  demultiplexData( ptr<data> const & data, 
-                       Eigen::ArrayXXd & data_x, 
-                       Eigen::ArrayXXd & data_y )
+                       Eigen::ArrayXXd & o_data_x, 
+                       Eigen::ArrayXXd & o_data_y )
 {
+
+  vec dat        = vec::Zero( data->dimX() + data->dimY() );
+  vec data_x     = vec::Zero( data->dimX() );
+  vec data_y     = vec::Zero( data->dimY() );
+      
+  for( unsigned int i=0; i < data->size(); i++)
+  {
+    dat    = data->get(i);
+    data_x = dat.head( data->dimX() );
+    data_y = dat.tail( data->dimY() );
+
+    o_data_x.row(i) = data_x;
+    o_data_y.row(i) = data_y;
+  }
 
 }
 
@@ -346,9 +360,42 @@ void evaluateFunctionAtData( Eigen::ArrayXXd const & data_x,
                              ptr<function> const & f,
                              Eigen::ArrayXXd & f_y )
 {
-
+//  Eigen::VectorXd vdata_x
+  for( unsigned int i=0; i < data_x.rows(); i++)
+  {
+      f_y.row(i) = f->value( data_x.row(i) ) ;
+  }
 }
 
+
+void fastNormComputation( Eigen::ArrayXXd const & o_data_y, 
+                          Eigen::ArrayXXd const & f_y,
+                          Eigen::VectorXd & L1,
+                          Eigen::VectorXd & L2, 
+                          Eigen::VectorXd & L3, 
+                          Eigen::VectorXd & LInf,
+                          Eigen::VectorXd & mse,
+                          Eigen::VectorXd & rmse )
+{
+
+  //Eigen::ArrayXd tmp  =  (o_data_y - f_y).square().colwise().sum();
+
+
+  Eigen::MatrixXd  const distance_matrix = (o_data_y - f_y).matrix();
+
+  for( unsigned int i=0; i < f_y.cols(); i++)
+  {
+    L1(i)   = distance_matrix.col(i).lpNorm<1>();
+    L2(i)   = distance_matrix.col(i).lpNorm<2>();
+    L3(i)   = distance_matrix.col(i).lpNorm<3>();
+    LInf(i) = distance_matrix.col(i).lpNorm<Eigen::Infinity>();
+  }
+
+
+  mse = distance_matrix.colwise().sum() / o_data_y.rows();
+  rmse = mse.cwiseSqrt();
+
+}
 
 
 
@@ -448,53 +495,92 @@ main(int argc, char* argv[])
     converted_data = generic_data;
   }
 
+  //Here we go new way
+  Eigen::ArrayXXd data_x =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimX() );
+  Eigen::ArrayXXd data_y =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimY() ) ;
+
+  t.start();
+  demultiplexData( converted_data, data_x, data_y );
+  t.stop();
+  std::cout << "<<INFO>> Demultiplex data in " << t << std::endl;
+  t.reset();
+
+  Eigen::ArrayXXd f_y    = Eigen::ArrayXXd::Zero( converted_data->size(), brdf->dimY() ) ;
+
+  t.start();
+  evaluateFunctionAtData( data_x, brdf, f_y );
+  t.stop();
+  std::cout << "<<INFO>> Evaluate function for all data in  " << t << std::endl;
+  t.reset();
+   
+  Eigen::VectorXd L1_norm   = Eigen::VectorXd::Zero( brdf->dimY() );
+  Eigen::VectorXd L2_norm   = Eigen::VectorXd::Zero( brdf->dimY() );
+  Eigen::VectorXd L3_norm   = Eigen::VectorXd::Zero( brdf->dimY() );
+  Eigen::VectorXd LInf_norm = Eigen::VectorXd::Zero( brdf->dimY() );
+
+  Eigen::VectorXd mse       = Eigen::VectorXd::Zero( brdf->dimY() );
+  Eigen::VectorXd rmse      = Eigen::VectorXd::Zero( brdf->dimY() );
+
+  t.start();
+  fastNormComputation( data_y, f_y, L1_norm, L2_norm, L3_norm, LInf_norm, mse, rmse);
+  t.stop();
+  std::cout << "<<INFO>> Fast Norm Computations in  " << t << std::endl;
+  std::cout << " L1_norm " << L1_norm << std::endl
+            << " L2_norm " << L2_norm << std::endl
+            << " L3_norm " << L3_norm << std::endl
+            << " Linf_norm " << LInf_norm << std::endl
+            << " Mse  " << mse << std::endl
+            << " Rmse " << rmse << std::endl;
+  t.reset();
+  
+
   
   //Norm L1
-  t.start(); 
-  vec const  norm_l1 = Norm::L1(converted_data, brdf);
-  t.stop();
-  std::cout << "<<INFO>> From Norm L1:" << norm_l1 << " (computed in " << t << ")" << std::endl;  
-  t.reset();
+  // t.start(); 
+  // vec const  norm_l1 = Norm::L1(converted_data, brdf);
+  // t.stop();
+  // std::cout << "<<INFO>> From Norm L1:" << norm_l1 << " (computed in " << t << ")" << std::endl;  
+  // t.reset();
 
   //Norm L2
-  t.start();
-  vec const norm_l2 = Norm::L2(converted_data, brdf);
-  t.stop();
-  std::cout << "<<INFO>> From Norm L2:" << norm_l2 << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // vec const norm_l2 = Norm::L2(converted_data, brdf);
+  // t.stop();
+  // std::cout << "<<INFO>> From Norm L2:" << norm_l2 << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
   //Norm L3
-  t.start();
-  vec const norm_l3 = Norm::Lp(converted_data, brdf, 3.0);
-  t.stop();
-  std::cout << "<<INFO>> From Norm L3:"    << norm_l3 << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // vec const norm_l3 = Norm::Lp(converted_data, brdf, 3.0);
+  // t.stop();
+  // std::cout << "<<INFO>> From Norm L3:"    << norm_l3 << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
   //Norm LInf
-  t.start();
-  vec const norm_linf = Norm::LInf(converted_data, brdf);
-  t.stop();
-  std::cout << "<<INFO>> From Norm LINF: " <<  norm_linf << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // vec const norm_linf = Norm::LInf(converted_data, brdf);
+  // t.stop();
+  // std::cout << "<<INFO>> From Norm LINF: " <<  norm_linf << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
   //MSE and RMSE
-  t.start();
-  vec const mse = Error::meanSquareError(converted_data, brdf);
-  t.stop();
-  std::cout << "<<INFO>> Mean Square Error = " << mse << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // vec const mse = Error::meanSquareError(converted_data, brdf);
+  // t.stop();
+  // std::cout << "<<INFO>> Mean Square Error = " << mse << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
-  t.start();
-  vec const rmse = Error::rootMeanSquareError(converted_data, brdf);
-  t.stop();
-  std::cout << "<<INFO>> Root Mean Square Error = " << rmse << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // vec const rmse = Error::rootMeanSquareError(converted_data, brdf);
+  // t.stop();
+  // std::cout << "<<INFO>> Root Mean Square Error = " << rmse << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
   // Compute Weighted Norms by cosine factors
   vec cosine_theta_view;
   vec cosine_theta_light;
   computeCosineFactorsFromData( converted_data, cosine_theta_light, cosine_theta_view );
-  vec cosine_light_view = cosine_theta_light.cwiseProduct( cosine_theta_light );
+  vec cosine_light_view = cosine_theta_light.cwiseProduct( cosine_theta_view );
   
   t.start();
   vec const norm_l2_cos_light = Norm::weightedL2(converted_data, brdf, cosine_theta_light);
@@ -526,10 +612,10 @@ main(int argc, char* argv[])
         fwriter << "#DIM " << brdf->dimX() << " " << brdf->dimY() << std::endl;
         fwriter << std::endl;
 
-        fwriter << "L1 " << norm_l1 << std::endl;
-        fwriter << "L2 " << norm_l2 << std::endl;
-        fwriter << "L3 " << norm_l3 << std::endl;
-        fwriter << "LINF " << norm_linf << std::endl;
+        fwriter << "L1 " << L1_norm << std::endl;
+        fwriter << "L2 " << L2_norm << std::endl;
+        fwriter << "L3 " << L3_norm << std::endl;
+        fwriter << "LINF " << LInf_norm << std::endl;
         fwriter << "MSE " << mse << std::endl;
         fwriter << "RMSE " << rmse << std::endl;
         
@@ -545,19 +631,19 @@ main(int argc, char* argv[])
 
 
   //Comparisons with the norm methods provided in function.cpp
-  t.start();
-  double const L2   = brdf->L2_distance( generic_data ) ;
-  t.stop();
-  std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
-            << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // double const L2   = brdf->L2_distance( generic_data ) ;
+  // t.stop();
+  // std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
+  //           << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
-  t.start();
-  double const Linf = brdf->Linf_distance( generic_data );  
-  t.stop();
-  std::cout << "<<INFO>> Linf distance to data = " << Linf 
-            << " (computed in " << t << ")" << std::endl;
-  t.reset();
+  // t.start();
+  // double const Linf = brdf->Linf_distance( generic_data );  
+  // t.stop();
+  // std::cout << "<<INFO>> Linf distance to data = " << Linf 
+  //           << " (computed in " << t << ")" << std::endl;
+  // t.reset();
 
   return EXIT_SUCCESS;
 }
