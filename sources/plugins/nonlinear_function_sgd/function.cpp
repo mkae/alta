@@ -195,9 +195,6 @@ bool shifted_gamma_function::load(std::istream& in)
     return false;
 	}
 
-	std::cout << " HERE " << __FILE__<< " " << __LINE__ << *this << std::endl;
-
-
 	//Diffuse part first
 	for( unsigned int i=0; i < dimY(); i++)
 	{
@@ -263,10 +260,6 @@ bool shifted_gamma_function::load(std::istream& in)
 	{
 		in >> token >> sh_theta0[i];
 	}
-
-	
-
-	std::cout << " HERE " << __FILE__<< " " << __LINE__ << *this << std::endl;
 
 	return true;
 }
