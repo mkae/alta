@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -13,6 +13,7 @@
 // Include STL
 #include <vector>
 #include <string>
+#include <iostream>
 
 // Interface
 #include "common.h"
@@ -131,6 +132,9 @@ class vertical_segment : public data
   private: // method
     void initializeToZero( unsigned int number_of_data_elements );
 
+		static void load_data_from_text(std::istream& input, vertical_segment& result,
+																		const arguments& args);
+
 	private: // data
 
 		// Store for each point of data, the upper
@@ -138,3 +142,4 @@ class vertical_segment : public data
 		std::vector<vec> _data ;
 } ;
 
+/* -*- c++ -*- */

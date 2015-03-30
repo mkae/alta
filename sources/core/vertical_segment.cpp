@@ -58,7 +58,7 @@ void vertical_segment::load(const std::string& filename)
 	arguments args ;
 	load(filename, args) ;
 }
-		
+
 void vertical_segment::load(const std::string& filename, const arguments& args) 
 {
 	std::ifstream file;
@@ -68,15 +68,24 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	file.open(filename.c_str());
 	file.exceptions (std::ios::goodbit);
 
+	load_data_from_text(file, *this, args);
+
+	file.close();
+}
+
+void vertical_segment::load_data_from_text(std::istream& input,
+																					 vertical_segment& result,
+																					 const arguments& args)
+{
 	vec min, max ;
 	vec ymin, ymax;
 
-	_nX = 0 ; _nY = 0 ;
+	result._nX = 0 ; result._nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
-	while(file.good())
+	while(input.good())
 	{
 		std::string line ;
-		std::getline(file, line) ;
+		std::getline(input, line) ;
 		std::stringstream linestream(line) ;
 
 		// Discard incorrect lines
@@ -89,33 +98,33 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 			if(comment == std::string("DIM"))
 			{
-				linestream >> _nX >> _nY ;
+				linestream >> result._nX >> result._nY ;
 
-				vs.reserve(dimY()) ;
-				for(int k=0; k<dimY(); ++k)
+				vs.reserve(result.dimY()) ;
+				for(int k=0; k<result.dimY(); ++k)
 				{
 					vs[k] = 0 ;
 				}
 
-				_min.resize(dimX()) ;
-				_max.resize(dimX()) ;
+				result._min.resize(result.dimX()) ;
+				result._max.resize(result.dimX()) ;
 
-				min = args.get_vec("min", _nX, -std::numeric_limits<float>::max()) ;
-				max = args.get_vec("max", _nX,  std::numeric_limits<float>::max()) ;
+				min = args.get_vec("min", result._nX, -std::numeric_limits<float>::max()) ;
+				max = args.get_vec("max", result._nX,  std::numeric_limits<float>::max()) ;
 #ifdef DEBUG
 				std::cout << "<<DEBUG>> data will remove outside of " << min << " -> " << max << " x-interval" << std::endl;
 #endif
 
-				ymin = args.get_vec("ymin", _nY, -std::numeric_limits<float>::max()) ;
-				ymax = args.get_vec("ymax", _nY,  std::numeric_limits<float>::max()) ;
+				ymin = args.get_vec("ymin", result._nY, -std::numeric_limits<float>::max()) ;
+				ymax = args.get_vec("ymax", result._nY,  std::numeric_limits<float>::max()) ;
 #ifdef DEBUG
 				std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
 #endif
 				
-				for(int k=0; k<dimX(); ++k)
+				for(int k=0; k<result.dimX(); ++k)
 				{
-					_min[k] =  std::numeric_limits<double>::max() ;
-					_max[k] = -std::numeric_limits<double>::max() ;
+					result._min[k] =  std::numeric_limits<double>::max() ;
+					result._max[k] = -std::numeric_limits<double>::max() ;
 				}
 			}
 			else if(comment == std::string("VS"))
@@ -128,13 +137,13 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			{
 				std::string param;
 				linestream >> param;
-				_in_param = params::parse_input(param);
+				result._in_param = params::parse_input(param);
 			}
 			else if(comment == std::string("PARAM_OUT"))
 			{
 				std::string param;
 				linestream >> param;
-				_out_param = params::parse_output(param);
+				result._out_param = params::parse_output(param);
 			}
 			continue ;
 		} 
@@ -145,24 +154,24 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 		else
 		{
 			// Read the data point x and y coordinates
-			vec v = vec::Zero(dimX() + 3*dimY()) ;
-			for(int i=0; i<dimX()+dimY(); ++i) 
+			vec v = vec::Zero(result.dimX() + 3*result.dimY()) ;
+			for(int i=0; i<result.dimX()+result.dimY(); ++i) 
 			{
 				linestream >> v[i] ;
 			}
 
 			// If data is not in the interval of fit
 			bool is_in = true ;
-			for(int i=0; i<dimX(); ++i)
+			for(int i=0; i<result.dimX(); ++i)
 			{
 				if(v[i] < min[i] || v[i] > max[i])
 				{
 					is_in = false ;
 				}
 			}
-			for(int i=0; i<dimY(); ++i)
+			for(int i=0; i<result.dimY(); ++i)
 			{
-				if(v[dimX()+i] < ymin[i] || v[dimX()+i] > ymax[i])
+				if(v[result.dimX()+i] < ymin[i] || v[result.dimX()+i] > ymax[i])
 				{
 					is_in = false ;
 				}
@@ -178,13 +187,13 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 			if(args.is_defined("data-correct-cosine"))
 			{
 				double cart[6];
-				params::convert(&v[0], input_parametrization(), params::CARTESIAN, cart);
+				params::convert(&v[0], result.input_parametrization(), params::CARTESIAN, cart);
 				if(cart[5] > 0.0 && cart[2] > 0.0)
 				{
 					factor = 1.0/cart[5]*cart[2];
-					for(int i=0; i<dimY(); ++i) 
+					for(int i=0; i<result.dimY(); ++i) 
 					{
-						v[i + dimX()] /= factor;
+						v[i + result.dimX()] /= factor;
 					}
 				}
 				else
@@ -197,7 +206,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 			// Check if the data containt a vertical segment around the mean
 			// value.
-			for(int i=0; i<dimY(); ++i)
+			for(int i=0; i<result.dimY(); ++i)
 			{
 				double min_dt = 0.0;
 				double max_dt = 0.0;
@@ -207,8 +216,8 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				{
 					linestream >> min_dt ;
 					linestream >> max_dt ;
-					min_dt = min_dt-v[dimX()+i];
-					max_dt = max_dt-v[dimX()+i];
+					min_dt = min_dt-v[result.dimX()+i];
+					max_dt = max_dt-v[result.dimX()+i];
 				}
 				else if(vs[i] == 1)
 				{
@@ -226,18 +235,18 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 				if(args.is_defined("dt-relative"))
 				{
-               v[dimX() +   dimY()+i] = v[dimX() + i] * (1.0 + min_dt) ;
-					v[dimX() + 2*dimY()+i] = v[dimX() + i] * (1.0 + max_dt) ;
+               v[result.dimX() +   result.dimY()+i] = v[result.dimX() + i] * (1.0 + min_dt) ;
+					v[result.dimX() + 2*result.dimY()+i] = v[result.dimX() + i] * (1.0 + max_dt) ;
 				}
 				else if(args.is_defined("dt-max"))
 				{
-               v[dimX() +   dimY()+i] = v[dimX() + i] + std::max(v[dimX() + i] * min_dt, min_dt);
-					v[dimX() + 2*dimY()+i] = v[dimX() + i] + std::max(v[dimX() + i] * max_dt, max_dt);
+               v[result.dimX() +   result.dimY()+i] = v[result.dimX() + i] + std::max(v[result.dimX() + i] * min_dt, min_dt);
+					v[result.dimX() + 2*result.dimY()+i] = v[result.dimX() + i] + std::max(v[result.dimX() + i] * max_dt, max_dt);
 				}
 				else
 				{
-					v[dimX() +   dimY()+i] = v[dimX() + i] + min_dt ;
-					v[dimX() + 2*dimY()+i] = v[dimX() + i] + max_dt ;
+					v[result.dimX() +   result.dimY()+i] = v[result.dimX() + i] + min_dt ;
+					v[result.dimX() + 2*result.dimY()+i] = v[result.dimX() + i] + max_dt ;
 				}
 
 				// You can enforce the vertical segment to stay in the positive
@@ -245,34 +254,34 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 				// that the data point is also clamped to zero if negative.
 				if(args.is_defined("dt-positive"))
 				{
-					v[dimX() +          i] = std::max(v[dimX() +          i], 0.0);
-					v[dimX() +   dimY()+i] = std::max(v[dimX() +   dimY()+i], 0.0);
-					v[dimX() + 2*dimY()+i] = std::max(v[dimX() + 2*dimY()+i], 0.0);
+					v[result.dimX() +          i] = std::max(v[result.dimX() +          i], 0.0);
+					v[result.dimX() +   result.dimY()+i] = std::max(v[result.dimX() +   result.dimY()+i], 0.0);
+					v[result.dimX() + 2*result.dimY()+i] = std::max(v[result.dimX() + 2*result.dimY()+i], 0.0);
 				}
 
 #ifdef DEBUG
-                std::cout << "<<DEBUG>> vs = [" << v[dimX() +   dimY()+i] << ", " << v[dimX() + 2*dimY()+i] << "]" << std::endl;
+                std::cout << "<<DEBUG>> vs = [" << v[result.dimX() +   result.dimY()+i] << ", " << v[result.dimX() + 2*result.dimY()+i] << "]" << std::endl;
 #endif
 			}
 
-			_data.push_back(v) ;
+			result._data.push_back(v) ;
 
 			// Update min and max
-			for(int k=0; k<dimX(); ++k)
+			for(int k=0; k<result.dimX(); ++k)
 			{
-				_min[k] = std::min(_min[k], v[k]) ;
-				_max[k] = std::max(_max[k], v[k]) ;
+				result._min[k] = std::min(result._min[k], v[k]) ;
+				result._max[k] = std::max(result._max[k], v[k]) ;
 			}
 		}
 	}
 			
 	if(args.is_defined("data-correct-cosine"))
-		save("/tmp/data-corrected.dat");
+		result.save("/tmp/data-corrected.dat");
 
-	std::cout << "<<INFO>> loaded file \"" << filename << "\"" << std::endl ;
-	std::cout << "<<INFO>> data inside " << _min << " ... " << _max << std::endl ;
-	std::cout << "<<INFO>> loading data file of R^" << dimX() << " -> R^" << dimY() << std::endl ;
-	std::cout << "<<INFO>> " << _data.size() << " elements to fit" << std::endl ;
+	std::cout << "<<INFO>> loaded input stream" << std::endl ;
+	std::cout << "<<INFO>> data inside " << result._min << " ... " << result._max << std::endl ;
+	std::cout << "<<INFO>> loading data input of R^" << result.dimX() << " -> R^" << result.dimY() << std::endl ;
+	std::cout << "<<INFO>> " << result._data.size() << " elements to fit" << std::endl ;
 }
 
 void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
