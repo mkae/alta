@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014, 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -423,7 +423,7 @@ ptr<data> plugins_manager::get_data(const std::string& n)
     if(myData != NULL)
     {
 #ifdef DEBUG
-        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
+        std::cout << "<<DEBUG>> using data provider in file \"" << n << "\"" << std::endl;
 #endif
         return myData();
     }
@@ -447,7 +447,7 @@ ptr<fitter> plugins_manager::get_fitter(const std::string& n)
     if(myFitter != NULL)
     {
 #ifdef DEBUG
-        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
+        std::cout << "<<DEBUG>> using fitter provider in file \"" << n << "\"" << std::endl;
 #endif
         return myFitter();
     }
