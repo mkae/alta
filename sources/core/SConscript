@@ -4,7 +4,8 @@ import sys
 Import('env', 'ALTA_LIBS')
 
 # Library sources
-sources = ['common.cpp', 
+sources = ['common.cpp',
+           'data.cpp',
            'function.cpp', 
            'params.cpp', 
            'plugins_manager.cpp', 
