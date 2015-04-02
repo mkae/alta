@@ -6,7 +6,7 @@ build_lib = False
 # Check whether Python 2.7 and Boost.Python are available.
 if library_available(env, pkgspec='python-2.7',
 										 inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
-										 lib='python2.7', header='Python.h'):
+										 lib='PYTHON_LIB', header='Python.h'):
 	conf = Configure(env)
 
 	# On GNU/Linux the '-mt' suffix is no longer used, but it is still
