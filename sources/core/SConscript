@@ -6,6 +6,7 @@ Import('env', 'ALTA_LIBS')
 # Library sources
 sources = ['common.cpp',
            'data.cpp',
+           'data_storage.cpp',
            'function.cpp', 
            'params.cpp', 
            'plugins_manager.cpp', 
