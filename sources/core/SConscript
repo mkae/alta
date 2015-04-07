@@ -11,14 +11,16 @@ sources = ['common.cpp',
            'rational_function.cpp', 
            'vertical_segment.cpp']
 
+CCFLAGS = env['CCFLAGS']
+
 ## Known compilation issue. If the core is not compiled with -fvisibility-hidden
 ## on OSX, the shared libraries and the softwares cannot share vtables. This
 ## impact the use of dynamic_cast in shared libraries.
 ##
 if sys.platform == 'darwin':
-	CCFLAGS = ['-fvisibility=hidden']
+	CCFLAGS = CCFLAGS + ['-fvisibility=hidden']
 else:
-  CCFLAGS = []
+  CCFLAGS = CCFLAGS + []
 
 if env['CC'] != 'cl':
 	# We're not building a real static library, but rather what
