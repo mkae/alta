@@ -51,7 +51,15 @@ class vec : public std::vector<double>
 		{
 			assign(dim, 0.0) ;
 		}
-        
+
+		//! \brief Return a pointer to the underlying memory region.
+		const double *data() const
+		{
+			// std::vector<T>::at returns a reference, and since the std::vector
+			// storage is guaranteed to be contiguous, we can do this.
+			return &at(0);
+		}
+
 		//! \brief get a subpart of the vector
         vec subvector(int start, int n) const
         {
