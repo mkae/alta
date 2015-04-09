@@ -19,48 +19,6 @@
 # include <endian.h>
 #endif
 
-// Key/value association list.
-typedef std::map<std::string, std::string> alist;
-
-// Read the ALTA header on INPUT and fill in RESULT as a list of key/value
-// pairs.
-static void read_header(std::istream &input, alist &result)
-{
-	while(input.good())
-	{
-		if (input.peek() == '#')
-		{
-			input.get();																// consume the hash sign
-
-			std::string line;
-			std::getline(input, line);
-			std::stringstream linestream(line);
-
-			// Lines starting with '# ' are real comments and we ignore them.
-			// Others are key/value associations that we want to use.
-			if (linestream.peek() != ' ')
-			{
-				 std::string key, rest;
-				 linestream >> key;
-				 if (!key.empty())
-				 {
-					 getline(linestream, rest);
-					 if (key == "ALTA" && rest == "END HEADER")
-					 {
-						 break;
-					 }
-					 else
-					 {
-						 result[key] = rest;
-					 }
-				 }
-			}
-		}
-		// The first non-comment line terminates the header.
-		else break;
-	}
-}
-
 void vertical_segment::load_data_from_text(std::istream& input,
 																					 vertical_segment& result,
 																					 const arguments& args)
@@ -71,8 +29,7 @@ void vertical_segment::load_data_from_text(std::istream& input,
 	result._nX = 0 ; result._nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
 
-	alist header;
-	read_header(input, header);
+	header header(input);
 
 	{
 		std::stringstream dim(header["DIM"]);

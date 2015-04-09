@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -21,6 +21,9 @@
 #include <limits.h>
 #include <unistd.h>
 #endif
+
+#include <iostream>
+
 
 double norm(const vec& a)
 {
@@ -178,4 +181,50 @@ unsigned int timer::current_time() const
 	clock_gettime(CLOCK_MONOTONIC, &_time);
 	return (unsigned int)_time.tv_sec;
 #endif
+}
+
+
+header::header(std::istream& input)
+{
+	while(input.good())
+	{
+		if (input.peek() == '#')
+		{
+			input.get();																// consume the hash sign
+
+			std::string line;
+			std::getline(input, line);
+			std::stringstream linestream(line);
+
+			// Lines starting with '# ' are real comments and we ignore them.
+			// Others are key/value associations that we want to use.
+			if (linestream.peek() != ' ')
+			{
+				 std::string key, rest;
+				 linestream >> key;
+				 if (!key.empty())
+				 {
+					 if (key == "ALTA")
+					 {
+						 std::string first, second;
+						 linestream >> first >> second;
+						 if (second == "HEADER")
+						 {
+							 if (first == "END")
+								 break;
+							 else
+								 _kind = first;
+						 }
+					 }
+					 else
+					 {
+						 getline(linestream, rest);
+						 _alist[key] = rest;
+					 }
+				 }
+			}
+		}
+		// The first non-comment line terminates the header.
+		else break;
+	}
 }

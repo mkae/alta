@@ -29,6 +29,9 @@
 #include <cstring>
 #include <algorithm>
 
+#include <string>
+#include <map>
+
 #ifdef OLD
 /*! \brief A core implementation of a vector of double.
  *  \ingroup core
@@ -385,6 +388,37 @@ class timer
         unsigned int _start, _stop;
         unsigned int _elapsed;
 };
+
+
+// Reading the ALTA header of data and function files.
+
+
+// Key/value association list.
+class header
+{
+	public:
+		//! \brief Read the ALTA header on INPUT.
+		header(std::istream &input);
+
+		//! \brief Return the type of this header--i.e., the "FOO" in
+		// "#ALTA FOO HEADER".
+		const std::string& kind() const
+		{
+			return _kind;
+		}
+
+		//! \brief Return the value associated with KEY in this header.
+		const std::string& operator[](const std::string& key)
+		{
+			return _alist[key];
+		}
+
+	protected:
+		std::string _kind;
+		std::map<std::string, std::string> _alist;
+};
+
+
 
 
 // I/O error handling in user interfaces.
