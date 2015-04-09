@@ -192,38 +192,15 @@ function* plugins_manager::get_function(const std::string& filename)
 
 	// Parse the header for the function command line and the dimension
 	// of the function
-	while(line != "#ALTA HEADER END")
+	header header(file);
+
 	{
-		std::getline(file, line) ;
-		std::stringstream linestream(line) ;
-
-		linestream.ignore(1) ;
-
-		std::string comment ;
-		linestream >> comment ;
-
-		if(comment == std::string("DIM"))
-		{
-			linestream >> nX >> nY ;
-		}
-		else if(comment == std::string("PARAM_IN"))
-		{
-			std::string name;
-			linestream >> name;
-			std::cout << "<<DEBUG>> parsed input parametrization: " << name << std::endl;
-			param_in = params::parse_input(name);
-		}
-		else if(comment == std::string("PARAM_OUT"))
-		{
-			std::string name;
-			linestream >> name;
-			param_out = params::parse_output(name);
-		}
-		else if(comment == std::string("CMD"))
-      {
-			args = arguments::create_arguments(line.substr(4, std::string::npos));
-		}
+		std::stringstream linestream(header["DIM"]);
+		linestream >> nX >> nY;
 	}
+	param_in = params::parse_input(header["PARAM_IN"]);
+	param_out = params::parse_output(header["PARAM_OUT"]);
+	args = arguments::create_arguments(header["CMD"]);
 
 	// Create the function from the command line
 	function* f = get_function(args);
