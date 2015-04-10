@@ -1,8 +1,8 @@
-Import('env')
+Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
-# Special linking flags, defined in the OS dependant configuration file
-env.AppendUnique(LIBS = env['SOFT_LIB'])
+env.Prepend(LIBS = ['core'])
+env.AppendUnique(LIBS = ALTA_LIBS)
 
 env.Program('./build/half-test-1', './params/half-test-1.cpp')
 env.Program('./build/half-test-2', './params/half-test-2.cpp')
