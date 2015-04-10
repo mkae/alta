@@ -123,6 +123,7 @@ int main(int argc, char** argv)
 		}
 		CATCH_FILE_IO_ERROR(input_file);
 
-		return files_are_equal(temp_file1, temp_file2)
+		return (sample1.equals(sample2)
+						&& files_are_equal(temp_file1, temp_file2))
 				? EXIT_SUCCESS : EXIT_FAILURE;
 }
