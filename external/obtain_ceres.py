@@ -3,6 +3,8 @@ import os
 import sys
 import shutil
 import subprocess
+import SCons.Warnings as W
+import SCons.SConf as C
 
 # Download GLOG
 obtain.obtain('GLOG v0.3.3', 'glog-0.3.3',
@@ -11,17 +13,14 @@ obtain.obtain('GLOG v0.3.3', 'glog-0.3.3',
 
 if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'glog'):
 	if os.name == 'nt':
-		print '<<WARNING>> no automatic installation for this package'
+		W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of GLOG')
 	else:
-            if sys.platform == 'darwin':
-                obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
-            #end
-	    print '<<INSTALL>> configure and build GLOG v0.3.3'
-            obtain.configure_build('glog-0.3.3', '--enable-static=no --enable-shared=true --with-pic=true')
-	#end
+		if sys.platform == 'darwin':
+			obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
+		C.progress_display('configuring and building GLOG')
+		obtain.configure_build('glog-0.3.3', '--enable-static=no --enable-shared=true --with-pic=true')
 else:
-	print '<<INSTALL>> GLOG already installed'
-#end
+	C.progress_display('GLOG is already installed')
 
 
 # Download CERES.  Assume Eigen is already available.
@@ -43,13 +42,12 @@ with open(os.devnull, 'w') as fnull:
 	res = subprocess.call(['cmake', '--version'], stdout = fnull, stderr = fnull, shell=True)
 	if res != 0:
 		compile_test = False
-		print '<<ERROR>> cmake is not installed'
-	#end
-#end
+		W.warn(obtain.AltaDependencyWarning,
+					 'CMake is not installed but is needed to build CERES')
 
 
-if  compile_test:
-	print '<<INSTALL>> configure and build CERES'
+if compile_test:
+	C.progress_display('configuring and building CERES')
 	os.chdir('.' + os.sep + 'ceres-solver-' + version)
 	build_dir = os.pardir + os.sep + 'build' + os.sep
 
@@ -77,5 +75,5 @@ if  compile_test:
 	
 	os.chdir(os.pardir)
 else:
-	print '<<INSTALL>> CERES already installed or cannot be installed automatically'
-#end
+	W.warn(obtain.AltaDependencyWarning,
+				 'CERES already installed or cannot be installed automatically')

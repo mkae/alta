@@ -1,3 +1,5 @@
+import SCons.Warnings as W
+
 Import('env')
 env = env.Clone()
 	
@@ -16,13 +18,12 @@ if conf.CheckLibWithHeader(env['CERES_LIB'], 'ceres/ceres.h', 'c++'):
 		if conf.CheckLib(lib):
 			env.AppendUnique(LIBS = lib)
 		else:
-			print "<<WARNING>> COULD NOT FIND Library: " + lib
-	#end
+			W.warn(W.WarningOnByDefault, "could not find library " + lib)
 
 	build_lib = True
 else:
-	print "<<ERROR>> Unable to find Ceres Headers or libraries. Check your CERES Install"
-#end
+	W.warn(W.WarningOnByDefault, "unable to find CERES headers or libraries")
+
 env = conf.Finish()
 
 if build_lib:

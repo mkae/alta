@@ -3,8 +3,10 @@ import os
 import sys
 import shutil
 import subprocess
+import SCons.Warnings as W
+import SCons.SConf as C
 
-# Download CERES
+# Download IpOpt.
 obtain.obtain('IpOpt v3.11.8', 'Ipopt-3.11.8',
               'http://www.coin-or.org/download/source/Ipopt/Ipopt-3.11.8.tgz', 'Ipopt-3.11.8.tgz',
               '9f9b76075fbd9315286ea4d7c159c94cab4a4fb16122fb172b24910af5b5b75b')
@@ -16,16 +18,18 @@ compile_test = not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + 
 
 
 if os.path.exists('.' + os.sep + 'Ipopt-3.11.8.tgz') :
-	print '<<ERROR>> The IpOpt package is already downloaded or installed'
-	print '<<ERROR>> If the plugins using IpOpt do not compile, check this installation'
+	C.progress_display('the IpOpt package is already downloaded or installed')
+	C.progress_display('if the plugins using IpOpt fail to build, \
+check this installation')
 
 else:
 
 	if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'coin/IpIpoptNLP.hpp'):
 		if os.name == 'nt':
-			print '<<WARNING>> no automatic installation for this package'
+			W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of IpOpt')
 		else:
-			print '<<INSTALL>> configure and build Ipopt v3.11.8 and its dependencies'
+			C.progress_display('configuring and building Ipopt and its dependencies')
+
 			path  = os.getcwd()
 			third = path + os.sep + 'Ipopt-3.11.8' + os.sep + 'ThirdParty' + os.sep
 			os.chdir(third + 'Blas')
@@ -41,6 +45,6 @@ else:
 			obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking')
 		#end
 	else:
-		print '<<INSTALL>> IpOpt already installed'
+		C.progress_display('IpOpt is already installed')
 	#end
 #end

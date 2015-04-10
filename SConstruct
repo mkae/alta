@@ -11,6 +11,7 @@
 
 import os
 import sys
+import SCons.SConf as C
 
 ## Add ALTA custom cmd configurations
 ##
@@ -84,7 +85,7 @@ env = Environment(variables = vars, ENV = envVars )
 # Generate help text for the build variables.
 Help(vars.GenerateHelpText(env))
 
-print '<<INFO>> The current platform is: ' + env['PLATFORM']
+C.progress_display('the current platform is: ' + env['PLATFORM'])
 
 ## PLATFORM dependant section
 ##

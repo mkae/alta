@@ -5,6 +5,13 @@ import shutil
 import tarfile
 import hashlib
 import SCons.Errors
+import SCons.Warnings as W
+import SCons.SConf as C
+
+# Warning class to report stuff about our dependencies.
+class AltaDependencyWarning(W.WarningOnByDefault):
+	pass
+
 
 # Check if the build dir exists
 if not os.path.exists('build'):
@@ -52,16 +59,13 @@ def patch(filename, patch):
 # Obtain a package, check its integrity, and uncompress it.
 def obtain(name, rep, url, filename, sha256):
 	if not os.path.exists(rep):
-		print '<<INSTALL>> Obtaining ' + name
-
-                if not os.path.exists(filename):
-                        download(url, filename)
-                check_integrity(filename, sha256)
+		C.progress_display('obtaining ' + name)
+		if not os.path.exists(filename):
+			download(url, filename)
+		check_integrity(filename, sha256)
 		uncompress(filename)
 	else:
-		print '<<INSTALL>> ' + name + ' already available'
-	#end
-#end
+		C.progress_display(name + ' source code is already available')
 
 def configure_build(rep, options = ''):
 	os.chdir(rep)
