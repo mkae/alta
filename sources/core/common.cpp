@@ -200,6 +200,8 @@ header::header(std::istream& input)
 			// Others are key/value associations that we want to use.
 			if (linestream.peek() != ' ')
 			{
+				 linestream.flags(std::ios_base::skipws);
+
 				 std::string key, rest;
 				 linestream >> key;
 				 if (!key.empty())
@@ -218,6 +220,12 @@ header::header(std::istream& input)
 					 }
 					 else
 					 {
+						 while(!linestream.eof()
+									 && std::isspace(linestream.peek()))
+						 {
+								 linestream.get();
+						 }
+
 						 getline(linestream, rest);
 						 _alist[key] = rest;
 					 }
@@ -227,4 +235,12 @@ header::header(std::istream& input)
 		// The first non-comment line terminates the header.
 		else break;
 	}
+}
+
+header::value::operator int() const
+{
+		int result;
+		std::stringstream input(_value);
+		input >> result;
+		return result;
 }

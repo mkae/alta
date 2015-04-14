@@ -194,10 +194,10 @@ function* plugins_manager::get_function(const std::string& filename)
 	// of the function
 	header header(file);
 
-	{
-		std::stringstream linestream(header["DIM"]);
-		linestream >> nX >> nY;
-	}
+	std::pair<int, int> dim = header["DIM"];
+	nX = dim.first;
+	nY = dim.second;
+
 	param_in = params::parse_input(header["PARAM_IN"]);
 	param_out = params::parse_output(header["PARAM_OUT"]);
 	args = arguments::create_arguments(header["CMD"]);

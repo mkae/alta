@@ -31,10 +31,9 @@ void vertical_segment::load_data_from_text(std::istream& input,
 
 	header header(input);
 
-	{
-		std::stringstream dim(header["DIM"]);
-		dim >> result._nX >> result._nY;
-	}
+	std::pair<int, int> dim = header["DIM"];
+	result._nX = dim.first;
+	result._nY = dim.second;
 
 	vs.reserve(result.dimY()) ;
 	for(int k=0; k<result.dimY(); ++k)
@@ -66,12 +65,8 @@ void vertical_segment::load_data_from_text(std::istream& input,
 	result._in_param = params::parse_input(header["PARAM_IN"]);
 	result._out_param = params::parse_output(header["PARAM_OUT"]);
 
-	{
-		int number;
-		std::stringstream line(header["VS"]);
-		line >> number;
-		vs[current_vs] = number; ++current_vs ;
-	}
+	vs[current_vs] = header["VS"];
+	++current_vs;
 
 	// Now read the body.
 	while(input.good())

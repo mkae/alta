@@ -14,6 +14,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <cstring>
 
 // Math Constants exist in Windows but they need to be included
 // by defining the constant _USE_MATH_DEFINES
@@ -397,6 +398,28 @@ class timer
 class header
 {
 	public:
+		class value
+		{
+		protected:
+				std::string &_value;
+		public:
+				value(std::string& value): _value(value) { };
+				const std::string& string() const { return _value; }
+				operator const std::string&() const { return _value; }
+				operator int() const;
+
+				template<class T, class U>
+				operator std::pair<T, U>() const
+				{
+						std::stringstream input(_value);
+						T first; U second;
+
+						input >> first >> second;
+						std::pair<T, U> result(first, second);
+						return result;
+				}
+		};
+
 		//! \brief Read the ALTA header on INPUT.
 		header(std::istream &input);
 
@@ -408,9 +431,10 @@ class header
 		}
 
 		//! \brief Return the value associated with KEY in this header.
-		const std::string& operator[](const std::string& key)
+		value operator[](const std::string& key)
 		{
-			return _alist[key];
+			value v = _alist[key];
+			return v;
 		}
 
 	protected:
