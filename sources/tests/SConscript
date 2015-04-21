@@ -1,3 +1,5 @@
+import os
+
 Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
@@ -6,3 +8,23 @@ env.AppendUnique(LIBS = ALTA_LIBS)
 
 env.Alias('tests', env.Program('./build/half-test-1', './params/half-test-1.cpp'))
 env.Alias('tests', env.Program('./build/half-test-2', './params/half-test-2.cpp'))
+env.Alias('tests', env.Program('./build/data-io-test', 'data-io.cpp'))
+
+# Data files used by the tests.
+test_file = File('Kirby2.dat').srcnode().abspath
+test_data_directory = os.path.dirname(test_file)
+
+# Inspired by <http://www.scons.org/wiki/UnitTests>.
+def run_unit_test(env, target, source):
+	program = str(source[0].abspath)
+	envvars = os.environ
+	envvars['TEST_DATA_DIRECTORY'] = test_data_directory
+
+	if os.spawnle(os.P_WAIT, program, program, envvars) == 0:
+		open(str(target[0]),'w').write("PASS\n")
+	else:
+		open(str(target[0]),'w').write("FAIL\n")
+		return 1
+
+env.Alias('tests', env.Command("test.passed", 'build/data-io-test',
+															 run_unit_test))
