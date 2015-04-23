@@ -81,7 +81,9 @@ vars.Add('MATLAB_LIB',        'MATLAB libraries')
 envVars = {}
 for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH', 'TMP', 'TMPDIR' ]:
     if var in os.environ:
-            envVars[var] = os.environ[var]
+        envVars[var] = os.environ[var]
+    else:
+        envVars[var] = '';
 
 if len(envVars['PKG_CONFIG_PATH']) > 0:
     envVars['PKG_CONFIG_PATH'] += ':'
