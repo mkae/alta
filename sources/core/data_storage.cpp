@@ -19,6 +19,48 @@
 # include <endian.h>
 #endif
 
+// Key/value association list.
+typedef std::map<std::string, std::string> alist;
+
+// Read the ALTA header on INPUT and fill in RESULT as a list of key/value
+// pairs.
+static void read_header(std::istream &input, alist &result)
+{
+	while(input.good())
+	{
+		if (input.peek() == '#')
+		{
+			input.get();																// consume the hash sign
+
+			std::string line;
+			std::getline(input, line);
+			std::stringstream linestream(line);
+
+			// Lines starting with '# ' are real comments and we ignore them.
+			// Others are key/value associations that we want to use.
+			if (linestream.peek() != ' ')
+			{
+				 std::string key, rest;
+				 linestream >> key;
+				 if (!key.empty())
+				 {
+					 getline(linestream, rest);
+					 if (key == "ALTA" && rest == "END HEADER")
+					 {
+						 break;
+					 }
+					 else
+					 {
+						 result[key] = rest;
+					 }
+				 }
+			}
+		}
+		// The first non-comment line terminates the header.
+		else break;
+	}
+}
+
 void vertical_segment::load_data_from_text(std::istream& input,
 																					 vertical_segment& result,
 																					 const arguments& args)
@@ -28,72 +70,61 @@ void vertical_segment::load_data_from_text(std::istream& input,
 
 	result._nX = 0 ; result._nY = 0 ;
 	std::vector<int> vs ; int current_vs = 0 ;
+
+	alist header;
+	read_header(input, header);
+
+	{
+		std::stringstream dim(header["DIM"]);
+		dim >> result._nX >> result._nY;
+	}
+
+	vs.reserve(result.dimY()) ;
+	for(int k=0; k<result.dimY(); ++k)
+	{
+			vs[k] = 0 ;
+	}
+
+	result._min.resize(result.dimX()) ;
+	result._max.resize(result.dimX()) ;
+
+	min = args.get_vec("min", result._nX, -std::numeric_limits<float>::max()) ;
+	max = args.get_vec("max", result._nX,  std::numeric_limits<float>::max()) ;
+#ifdef DEBUG
+	std::cout << "<<DEBUG>> data will remove outside of " << min << " -> " << max << " x-interval" << std::endl;
+#endif
+
+	ymin = args.get_vec("ymin", result._nY, -std::numeric_limits<float>::max()) ;
+	ymax = args.get_vec("ymax", result._nY,  std::numeric_limits<float>::max()) ;
+#ifdef DEBUG
+	std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
+#endif
+
+	for(int k=0; k<result.dimX(); ++k)
+	{
+			result._min[k] =  std::numeric_limits<double>::max() ;
+			result._max[k] = -std::numeric_limits<double>::max() ;
+	}
+
+	result._in_param = params::parse_input(header["PARAM_IN"]);
+	result._out_param = params::parse_output(header["PARAM_OUT"]);
+
+	{
+		int number;
+		std::stringstream line(header["VS"]);
+		line >> number;
+		vs[current_vs] = number; ++current_vs ;
+	}
+
+	// Now read the body.
 	while(input.good())
 	{
 		std::string line ;
 		std::getline(input, line) ;
 		std::stringstream linestream(line) ;
 
-		// Discard incorrect lines
-		if(linestream.peek() == '#')
-		{
-			linestream.ignore(1) ;
-
-			std::string comment ;
-			linestream >> comment ;
-
-			if(comment == std::string("DIM"))
-			{
-				linestream >> result._nX >> result._nY ;
-
-				vs.reserve(result.dimY()) ;
-				for(int k=0; k<result.dimY(); ++k)
-				{
-					vs[k] = 0 ;
-				}
-
-				result._min.resize(result.dimX()) ;
-				result._max.resize(result.dimX()) ;
-
-				min = args.get_vec("min", result._nX, -std::numeric_limits<float>::max()) ;
-				max = args.get_vec("max", result._nX,  std::numeric_limits<float>::max()) ;
-#ifdef DEBUG
-				std::cout << "<<DEBUG>> data will remove outside of " << min << " -> " << max << " x-interval" << std::endl;
-#endif
-
-				ymin = args.get_vec("ymin", result._nY, -std::numeric_limits<float>::max()) ;
-				ymax = args.get_vec("ymax", result._nY,  std::numeric_limits<float>::max()) ;
-#ifdef DEBUG
-				std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
-#endif
-
-				for(int k=0; k<result.dimX(); ++k)
-				{
-					result._min[k] =  std::numeric_limits<double>::max() ;
-					result._max[k] = -std::numeric_limits<double>::max() ;
-				}
-			}
-			else if(comment == std::string("VS"))
-			{
-				int t ;
-				linestream >> t ;
-				vs[current_vs] = t ; ++current_vs ;
-			}
-			else if(comment == std::string("PARAM_IN"))
-			{
-				std::string param;
-				linestream >> param;
-				result._in_param = params::parse_input(param);
-			}
-			else if(comment == std::string("PARAM_OUT"))
-			{
-				std::string param;
-				linestream >> param;
-				result._out_param = params::parse_output(param);
-			}
-			continue ;
-		}
-		else if(line.empty())
+		// Discard comments and empty lines.
+		if(line.empty() || linestream.peek() == '#')
 		{
 			continue ;
 		}
