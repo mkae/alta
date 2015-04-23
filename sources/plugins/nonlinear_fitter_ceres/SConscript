@@ -1,32 +1,18 @@
 import SCons.Warnings as W
 
-Import('env')
+Import('env', 'library_available')
 env = env.Clone()
-	
-env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-env.AppendUnique(LIBS    = env['CERES_LIB'])
-env.AppendUnique(LIBPATH = env['CERES_DIR'])
-env.AppendUnique(CPPPATH = env['CERES_INC'])
 
-build_lib = False
+env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
-conf = Configure(env)
-
-if conf.CheckLibWithHeader(env['CERES_LIB'], 'ceres/ceres.h', 'c++'):
-
+if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h'):
+	conf = Configure(env)
 	for lib in env['CERES_OPT_LIB']:		
 		if conf.CheckLib(lib):
 			env.AppendUnique(LIBS = lib)
 		else:
 			W.warn(W.WarningOnByDefault, "could not find library " + lib)
+	env = conf.Finish()
 
-	build_lib = True
-else:
-	W.warn(W.WarningOnByDefault, "unable to find CERES headers or libraries")
-
-env = conf.Finish()
-
-if build_lib:
-	sources = ['fitter.cpp']
-	env.SharedLibrary('../../build/nonlinear_fitter_ceres', sources)
+	env.SharedLibrary('../../build/nonlinear_fitter_ceres', 'fitter.cpp')
 #end

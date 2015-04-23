@@ -46,7 +46,7 @@ vars.Add('PYTHON_DIR',        'Python and boost-python libraries directory')
 vars.Add('PYTHON_LIB',        'Python and boost-python libraries', default = [])
 vars.Add('OPENEXR_INC',       'OpenEXR include directory', default=[])
 vars.Add('OPENEXR_LIB',       'OpenEXR libraries', default = [])
-vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory',default=[])
+vars.Add('OPENEXR_DIR',       'OpenEXR libraries directory', default=[])
 vars.Add('FLANN_INC',         'FLANN include directory')
 vars.Add('FLANN_DIR',         'FLANN libraries directory')
 vars.Add('FLANN_LIB',         'FLANN libraries')
@@ -61,26 +61,33 @@ vars.Add('CERES_LIB',         'CERES libraries')
 vars.Add('CERES_OPT_LIB',     'CERES optional libraries')
 vars.Add('NLOPT_INC',         'NLOPT include directory')
 vars.Add('NLOPT_DIR',         'NLOPT libraries directory')
-vars.Add('NLOPT_LIB',         'NLOPT libraries')
+vars.Add('NLOPT_LIB',         'NLOPT libraries', default = [])
 vars.Add('NLOPT_OPT_LIB',     'NLOPT optional libraries')
 vars.Add('IPOPT_INC',         'IPOPT include directory')
 vars.Add('IPOPT_DIR',         'IPOPT libraries directory')
-vars.Add('IPOPT_LIB',         'IPOPT libraries')
+vars.Add('IPOPT_LIB',         'IPOPT libraries', default = [])
 vars.Add('IPOPT_OPT_LIB',     'IPOPT optional libraries')
 vars.Add('MATLAB_INC',        'MATLAB include directory')
 vars.Add('MATLAB_DIR',        'MATLAB directory')
 vars.Add('MATLAB_LIB',        'MATLAB libraries')
 
 
-
-# Select user environment variables that we want to honor.
+##
+# Copy the system environment.
+#
+# Update the PKG_CONFIG_PATH variable to add the package configuration
+# files contained is #external/build/lib/pkgconfig
+##
 envVars = {}
-for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH',
-             'TMP', 'TMPDIR' ]:
-        if var in os.environ:
-                envVars[var] = os.environ[var]
+for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH', 'TMP', 'TMPDIR' ]:
+    if var in os.environ:
+            envVars[var] = os.environ[var]
 
+if len(envVars['PKG_CONFIG_PATH']) > 0:
+    envVars['PKG_CONFIG_PATH'] += ':'
+envVars['PKG_CONFIG_PATH'] += os.path.abspath('external' + os.sep + 'build' + os.sep + 'lib' + os.sep + 'pkgconfig')
 env = Environment(variables = vars, ENV = envVars )
+
 
 # Generate help text for the build variables.
 Help(vars.GenerateHelpText(env))
@@ -98,11 +105,7 @@ if env['PLATFORM'] == 'darwin':
 
 	env.AppendUnique(LIBPATH = ['/opt/local/lib/'])
 	env.AppendUnique(CPPPATH = ['/opt/local/include/'])
-#elif env['PLATFORM'] == 'win32':
 
-	# Required flag for VS linker
-#	env['ENV']['TMP'] = os.environ['TMP']
-#end
 
 def CheckPKG(context, name):
         """Return True if package NAME can be found with 'pkg-config'."""
@@ -111,30 +114,36 @@ def CheckPKG(context, name):
         context.Result(ret)
         return ret
 
+
+"""
+Return True if the given library is available. First look for the LIB_VAR and
+INC_VAR construction variables, honoring them if they are defined. Then look
+for PKGSPEC using pkg-config. Last, try to build LIB with HEADER. Configure
+ENV accordingly.
+"""
 def library_available(env, pkgspec='', lib='', header='',
                       language='c++', inc_var='', lib_var=''):
-        """Return True if the given library is available.  First look for the
-        LIB_VAR and INC_VAR construction variables, honoring them if
-        they are defined.  Then look for PKGSPEC using pkg-config.
-        Last, try to build LIB with HEADER.  Configure ENV
-        accordingly.
 
-        """
-        conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+    conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-        if (lib in env) and (len(env[lib]) > 0):
-                env.AppendUnique(LIBPATH = env[lib_var])
-                env.AppendUnique(CPPPATH = env[inc_var])
-                env.AppendUnique(LIBS = env[lib])
-        elif conf.CheckPKG(pkgspec):
-                env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
+    result = False
+    # If a XXX_LIB is specified in the environment, add the various path
+    # and link flags. Check if the library is correctly compiling and
+    # linking with the header.
+    if (lib in env) and (len(env[lib]) > 0):
+        env.AppendUnique(LIBPATH = env[lib_var])
+        env.AppendUnique(CPPPATH = env[inc_var])
+        env.AppendUnique(LIBS = env[lib])
 
-        # Regardless of whether pkg-config succeeded, check whether
-        # the library is usable.
+        # Check whether the library is usable.
         result = conf.CheckLibWithHeader(env[lib], header, language)
 
-        conf.Finish()
-        return result
+    elif conf.CheckPKG(pkgspec):
+        env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
+        result = True
+
+    conf.Finish()
+    return result
 
 def openexr_available(env):
         """Return True if OpenEXR is available."""
@@ -172,9 +181,7 @@ conf.Finish()
 ##
 env.AppendUnique(LIBPATH = ['#external/build/lib'])
 env.AppendUnique(LIBPATH = ['#sources/build'])
-#env.AppendUnique(LIBPATH = ['#build/'])
 env.AppendUnique(CPPPATH = ['#external/build/include'])
-#env.AppendUnique(CPPPATH = ['#external/build/include/Eigen'])
 env.AppendUnique(CPPPATH = ['#sources'])
 
 # Consider files changed as soon as their modification time changes.

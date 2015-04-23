@@ -1,25 +1,22 @@
-Import('env')
+Import('env', 'library_available')
 env = env.Clone()
 
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-env.AppendUnique(LIBS    = env['NLOPT_LIB'])
-env.AppendUnique(LIBPATH = env['NLOPT_DIR'])
-env.AppendUnique(CPPPATH = env['NLOPT_INC'])
+#env.AppendUnique(LIBS    = env['NLOPT_LIB'])
+#env.AppendUnique(LIBPATH = env['NLOPT_DIR'])
+#env.AppendUnique(CPPPATH = env['NLOPT_INC'])
 
 build_lib = False
 
-conf = Configure(env)
+if library_available(env, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h'):
 
-if conf.CheckLib(env['NLOPT_LIB']):
-
-	if conf.CheckLib(env['NLOPT_OPT_LIB']):
-		env.AppendUnique(LIBS = env['NLOPT_OPT_LIB'])
+	#if conf.CheckLib(env['NLOPT_OPT_LIB']):
+	#	env.AppendUnique(LIBS = env['NLOPT_OPT_LIB'])
 	#end
 
 	build_lib = True
 
 #end
-env = conf.Finish()
 
 if build_lib:
 	sources = ['fitter.cpp']
