@@ -28,19 +28,12 @@ void vertical_segment::load_data_from_text(std::istream& input,
 	vec ymin, ymax;
 
 	result._nX = 0 ; result._nY = 0 ;
-	std::vector<int> vs ; int current_vs = 0 ;
 
 	header header(input);
 
 	std::pair<int, int> dim = header["DIM"];
 	result._nX = dim.first;
 	result._nY = dim.second;
-
-	vs.reserve(result.dimY()) ;
-	for(int k=0; k<result.dimY(); ++k)
-	{
-			vs[k] = 0 ;
-	}
 
 	result._min.resize(result.dimX()) ;
 	result._max.resize(result.dimX()) ;
@@ -66,8 +59,7 @@ void vertical_segment::load_data_from_text(std::istream& input,
 	result._in_param = params::parse_input(header["PARAM_IN"]);
 	result._out_param = params::parse_output(header["PARAM_OUT"]);
 
-	vs[current_vs] = header["VS"];
-	++current_vs;
+	int vs_value = header["VS"];
 
 	// Now read the body.
 	while(input.good())
@@ -142,14 +134,14 @@ void vertical_segment::load_data_from_text(std::istream& input,
 				double max_dt = 0.0;
 
 
-				if(vs[i] == 2)
+				if(i == 0 && vs_value == 2)
 				{
 					linestream >> min_dt ;
 					linestream >> max_dt ;
 					min_dt = min_dt-v[result.dimX()+i];
 					max_dt = max_dt-v[result.dimX()+i];
 				}
-				else if(vs[i] == 1)
+				else if(i == 0 && vs_value == 1)
 				{
 					double dt ;
 					linestream >> dt ;
