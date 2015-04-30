@@ -23,7 +23,6 @@ struct param_info
 	std::string info;
 };
 
-//#ifdef WIN32
 std::map<params::input, const param_info> create_map()
 {
 	std::map<params::input, const param_info> _map;
@@ -44,7 +43,7 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_TL_DPHI, param_info("ISOTROPIC_TV_TL_DPHI", 3, "Isotropic Light/View angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_VH, param_info("RUSIN_VH", 3, "Vector representation of the Half angle only")));
-  _map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_VK, param_info("SCHLICK_VH", 3, "Vector representation of the Back angle only")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TL_TV_PROJ_DPHI, param_info("ISOTROPIC_TL_TV_PROJ_DPHI", 3, "Isoptropic projected phi parametrization.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_TL_TK_PROJ_DPHI, param_info("SCHLICK_TL_TK_PROJ_DPHI", 3, "Isoptropic projected phi parametrization centered around the back vector.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RETRO_TL_TVL_PROJ_DPHI, param_info("RETRO_TL_TVL_PROJ_DPHI", 3, "Isoptropic retro projected phi parametrization.")));
@@ -62,29 +61,7 @@ std::map<params::input, const param_info> create_map()
 	return _map;
 }
 static const std::map<params::input, const param_info> input_map = create_map();
-//#else
 
-// Assing the input params map
-//static const std::map<params::input, const param_info> input_map = {
-	/* 1D Params */
-//	{params::COS_TH,                {"COS_TH",                1, "Cosine of the Half angle"}},
-
-	/* 2D Params */
-//	{params::RUSIN_TH_TD,           {"RUSIN_TH_TD",           2, "Radialy symmetric Half angle parametrization"}},
-
-	/* 3D Params */
-//	{params::RUSIN_TH_TD_PD,        {"RUSIN_TH_TD_PD",        3, "Isotropic Half angle parametrization"}},
-//	{params::ISOTROPIC_TV_TL_DPHI,  {"ISOTROPIC_TV_TL_DPHI",  3, "Isotropic Light/View angle parametrization"}},
-	
-	/* 4D Params */
-//	{params::RUSIN_TH_PH_TD_PD,     {"RUSIN_TH_PH_TD_PD",     4, "Complete Half angle parametrization"}},
-//	{params::SPHERICAL_TL_PL_TV_PV, {"SPHERICAL_TL_PL_TV_PV", 4, "Complete classical parametrization"}},
-//    {params::STEREOGRAPHIC,         {"STEREOGRAPHIC",         4, "Light/View vector in stereographic projection"}},
-
-	/* 6D Params */
-//	{params::CARTESIAN,             {"CARTESIAN",             6, "Complete vector parametrization"}}
-//};
-//#endif
 
 static std::map<params::output, std::string> create_output_map()
 {
