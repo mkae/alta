@@ -450,27 +450,25 @@ class header
 #include <iostream>
 #include <cstdlib>
 
-#ifndef _WIN32
-
-# define CATCH_FILE_IO_ERROR(file)								\
-		catch (std::ios_base::failure& e) {						\
-				std::cerr << "<<ERROR>> failed to load '"	\
-									<< (file) << "'"								\
-									<< ": " << strerror(errno)			\
-									<< std::endl;										\
-				exit(EXIT_FAILURE);												\
-		}
-
-#else
+#ifdef _WIN32
 
 // We cannot rely on 'errno' on Windows.
 
-# define CATCH_FILE_IO_ERROR(file)								\
-		catch (std::ios_base::failure& e) {						\
-				std::cerr << "<<ERROR>> failed to load '"	\
-									<< (file) << "'"								\
-									<< std::endl;										\
-				exit(EXIT_FAILURE);												\
-		}
+# define ALTA_FILE_IO_ERROR_STRING(e)						\
+    "(unspecified I/O error)"
 
-#endif	/* _WIN32 */
+#else
+
+# define ALTA_FILE_IO_ERROR_STRING(e)						\
+    (strerror(errno))
+
+#endif
+
+# define CATCH_FILE_IO_ERROR(file)												\
+		catch (std::ios_base::failure& e) {										\
+				std::cerr << "<<ERROR>> failed to load '"					\
+									<< (file) << "'"												\
+									<< ": " << ALTA_FILE_IO_ERROR_STRING(e)	\
+									<< std::endl;														\
+				exit(EXIT_FAILURE);																\
+		}
