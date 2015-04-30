@@ -33,6 +33,20 @@
 # include <unistd.h>
 #endif
 
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
+
+#define TEST_ASSERT(exp)																				\
+	do																														\
+	{																															\
+			std::cerr << "evaluating '" << STRINGIFY(exp) << "'... ";	\
+			bool result = (exp);																			\
+			std::cerr << (result ? "PASS" : "FAIL") << std::endl;			\
+			if (!result)																							\
+					abort();																							\
+	}																															\
+	while(0)
+
 // Files that are automatically deleted upon destruction.
 class temporary_file
 {
@@ -135,8 +149,9 @@ int main(int argc, char** argv)
 		}
 		CATCH_FILE_IO_ERROR(input_file);
 
-		return (sample1.equals(sample2)
-						&& files_are_equal(temp_file1, temp_file2)
-				    && sample2.equals(sample3))
-				? EXIT_SUCCESS : EXIT_FAILURE;
+		TEST_ASSERT(sample1.equals(sample2));
+		TEST_ASSERT(files_are_equal(temp_file1, temp_file2));
+		TEST_ASSERT(sample2.equals(sample3));
+
+		return EXIT_SUCCESS;
 }
