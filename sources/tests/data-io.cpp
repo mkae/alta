@@ -80,7 +80,8 @@ int main(int argc, char** argv)
 		make_temp_file_name(temp_file1);
 		make_temp_file_name(temp_file2);
 
-		std::string data_dir = getenv("TEST_DATA_DIRECTORY") ?: ".";
+		std::string data_dir = getenv("TEST_DATA_DIRECTORY") != NULL
+				? getenv("TEST_DATA_DIRECTORY") : ".";
 		std::string input_file = data_dir + "/" + data_file;
 
 		try
