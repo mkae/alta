@@ -401,9 +401,10 @@ class header
 		class value
 		{
 		protected:
-				std::string &_value;
+				const std::string &_value;
+				static const value _undefined;
 		public:
-				value(std::string& value): _value(value) { };
+				value(const std::string& value): _value(value) { };
 				const std::string& string() const { return _value; }
 				operator const std::string&() const { return _value; }
 				operator int() const;
@@ -418,6 +419,12 @@ class header
 						std::pair<T, U> result(first, second);
 						return result;
 				}
+
+				//! \brief Return true if this is the undefined value.
+				bool is_undefined() const { return this == &_undefined; }
+
+				//! \brief Return the undefined value.
+				static const value& undefined() { return _undefined; }
 		};
 
 		//! \brief Read the ALTA header on INPUT.
@@ -431,10 +438,15 @@ class header
 		}
 
 		//! \brief Return the value associated with KEY in this header.
-		value operator[](const std::string& key)
+		value operator[](const std::string& key) const
 		{
-			value v = _alist[key];
-			return v;
+				std::map<std::string, std::string>::const_iterator i;
+				i = _alist.find(key);
+				if (i == _alist.end())
+				{
+						return value::undefined();
+				}
+				return value(i->second);
 		}
 
 	protected:

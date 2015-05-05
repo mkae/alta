@@ -184,6 +184,8 @@ unsigned int timer::current_time() const
 }
 
 
+const header::value header::value::_undefined("");
+
 header::header(std::istream& input)
 {
 	while(input.good())
