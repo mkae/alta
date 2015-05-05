@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include "data.h"
+#include "common.h"
 
 // Write DATA to OUT in ALTA's text format.
 void save_data_as_text(std::ostream& out, const data &data);
@@ -20,4 +21,5 @@ void save_data_as_text(std::ostream& out, const data &data);
 void save_data_as_binary(std::ostream& out, const data& data);
 
 // Initialize DATA from the binary-formatted stream IN.
-void load_data_from_binary(std::istream& in, data &data);
+void load_data_from_binary(std::istream& in, const header& header,
+													 data &data);

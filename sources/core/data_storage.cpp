@@ -21,6 +21,7 @@
 #endif
 
 void vertical_segment::load_data_from_text(std::istream& input,
+																					 const header& header,
 																					 vertical_segment& result,
 																					 const arguments& args)
 {
@@ -28,8 +29,6 @@ void vertical_segment::load_data_from_text(std::istream& input,
 	vec ymin, ymax;
 
 	result._nX = 0 ; result._nY = 0 ;
-
-	header header(input);
 
 	std::pair<int, int> dim = header["DIM"];
 	result._nX = dim.first;
@@ -255,10 +254,8 @@ void save_data_as_binary(std::ostream &out, const data& data)
 		out << std::endl << "#END_STREAM" << std::endl;
 }
 
-void load_data_from_binary(std::istream& in, data& data)
+void load_data_from_binary(std::istream& in, const header& header, data& data)
 {
-		header header(in);
-
 		// FIXME: For now we make a number of assumptions.
 		assert(header["FORMAT"].string() == "binary");
 		assert(header["VERSION"] == 0);

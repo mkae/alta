@@ -184,6 +184,8 @@ unsigned int timer::current_time() const
 }
 
 
+static const std::string _text_string("text");
+const header::value header::_text_value(_text_string);
 const header::value header::value::_undefined("");
 
 header::header(std::istream& input)

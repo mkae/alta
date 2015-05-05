@@ -142,10 +142,8 @@ int main(int argc, char** argv)
 				save_data_as_binary(out, sample2);
 				out.close();
 
-				std::ifstream in;
-				in.open(temp_file3.name().c_str());
-				load_data_from_binary(in, sample3);
-				in.close();
+				// This should automatically load using the binary format loader.
+				sample3.load(temp_file3);
 		}
 		CATCH_FILE_IO_ERROR(input_file);
 

@@ -444,7 +444,10 @@ class header
 				i = _alist.find(key);
 				if (i == _alist.end())
 				{
-						return value::undefined();
+						// For backward compatibility, when the 'FORMAT' entry is
+						// missing, we assume it means 'text'.
+						return key == "FORMAT" ?
+								_text_value : value::undefined();
 				}
 				return value(i->second);
 		}
@@ -452,6 +455,8 @@ class header
 	protected:
 		std::string _kind;
 		std::map<std::string, std::string> _alist;
+
+		static const value _text_value;
 };
 
 

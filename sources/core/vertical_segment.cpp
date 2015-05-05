@@ -68,7 +68,13 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	file.open(filename.c_str());
 	file.exceptions (std::ios::goodbit);
 
-	load_data_from_text(file, *this, args);
+	header header(file);
+
+	if (header["FORMAT"].string() == "binary")
+			load_data_from_binary(file, header, *this);
+	else if (header["FORMAT"].string() == "text")
+			load_data_from_text(file, header, *this, args);
+	else throw;															// FIXME: Throw a usable exception.
 
 	file.close();
 }
