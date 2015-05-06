@@ -18,6 +18,7 @@
 #else
     #include <dlfcn.h>
 #endif
+#include <cstdlib>
 #include <stdio.h>
 #include <list>
 
@@ -60,9 +61,8 @@ void get_library_dirs(std::list<std::string>& dirs)
 {
 	dirs.push_back("");
 
-#ifndef _WIN32
 	std::string obj_str ;
-	const char *env_str = getenv("ALTA_LIB") ;
+	const char *env_str = std::getenv("ALTA_LIB") ;
 
 	if(env_str == NULL) {
 		obj_str = "" ;
@@ -81,7 +81,6 @@ void get_library_dirs(std::list<std::string>& dirs)
 			break ;
 		}
 	}
-#endif
 }
 
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
@@ -107,8 +106,10 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 
         if(res == NULL)
         {
-            std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
-            continue;
+#ifdef DEBUG_CORE
+			  std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+#endif
+			  continue;
         }
 #ifdef DEBUG_CORE
         std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
@@ -117,9 +118,11 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     }
     else
     {
+#ifdef DEBUG_CORE
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
         std::cerr << "          cause: \"" << GetLastError() << "\"" << std::endl;
-        continue;
+#endif
+		 continue;
     }
 #else
     void* handle = dlopen(libname.c_str(), RTLD_GLOBAL | RTLD_LAZY);
@@ -131,7 +134,9 @@ template<typename T> T open_library(const std::string& filename, const char* fun
 
         if(dlerror() != NULL)
         {
+#ifdef DEBUG_CORE
             std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << libname << std::endl;
+#endif
             continue;
         }
 #ifdef DEBUG_CORE
@@ -141,13 +146,17 @@ template<typename T> T open_library(const std::string& filename, const char* fun
     }
     else
     {
+#ifdef DEBUG_CORE
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
 		  std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
+#endif
         continue;
     }
 #endif
 	}
-return NULL;
+   
+	std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+	return NULL;
 }
 
 //! \brief load a function from the ALTA input file.
