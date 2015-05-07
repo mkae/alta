@@ -96,6 +96,9 @@ class params
                                  Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
   										 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
 
+        // Params goes from (-1,-1) to (1,1)
+        STARK_2D,
+
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
                                We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
   									  v.z, l.x, l.y, l.z] \f$*/

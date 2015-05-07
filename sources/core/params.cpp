@@ -36,6 +36,7 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD, param_info("RUSIN_TH_TD", 2, "Radialy symmetric Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TH_TD, param_info("COS_TH_TD", 2, "Cosines of the elevation angles of the Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::STARK_2D, param_info("STARK_2D", 2, "Stark parametrization H, B but without third component.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
@@ -139,6 +140,26 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[3] = 0.0;
 			outvec[4] = 0.0;
 			outvec[5] = 1.0;
+		}
+			break;
+		// invec[0] = ||Hp|| Norm of the projected normalized Half vector H=(L+V)/2
+		// invec[1] = ||B||  Norm of the unormalized Back vector B=(L-V)/2
+		case STARK_2D:
+		{
+			const double Hx = invec[0];
+			const double Hy = 0;
+			const double Hz = sqrt(1.0 - Hx*Hx);
+			// Ensuring that <H,B> = 0
+			const double Bx =-invec[1]*Hz;
+			const double By = 0.0;
+			const double Bz = invec[1]*Hx;
+
+			outvec[0] = Hx-Bx;
+			outvec[1] = Hy-By;
+			outvec[2] = Hz-Bz;
+			outvec[3] = Hx+Bx; 
+			outvec[4] = Hy+By;
+			outvec[5] = Hz+Bz;
 		}
 			break;
 
@@ -343,6 +364,20 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			const double dphi  = atan2(invec[1], invec[0]) - atan2(invec[4], invec[3]);
 			outvec[0] = theta * cos(dphi);
 			outvec[1] = theta * sin(dphi);
+		}
+			break;
+		// outvec[0] = ||Hp|| Norm of the projected unormalized Half vector (V+L)/2
+		// outvec[1] = ||B||  Norm of the unormalized Back vector (L-V)/2
+		case STARK_2D:
+		{
+			double Hx = 0.5*(invec[0]+invec[3]);
+			double Hy = 0.5*(invec[1]+invec[4]);
+			outvec[0] = sqrt(Hx*Hx + Hy*Hy);
+
+			double Bx = 0.5*(invec[3]-invec[0]);
+			double By = 0.5*(invec[4]-invec[1]);
+			double Bz = 0.5*(invec[5]-invec[2]);
+			outvec[1] = sqrt(Bx*Bx + By*By + Bz*Bz);
 		}
 			break;
 
