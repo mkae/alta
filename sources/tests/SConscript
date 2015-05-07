@@ -27,11 +27,12 @@ def run_unit_test(env, target, source):
 	envvars = os.environ
 	envvars['TEST_DATA_DIRECTORY'] = test_data_directory
 
-	if os.spawnle(os.P_WAIT, executable(program), program, envvars) == 0:
+	if os.spawnle(os.P_WAIT, program, program, envvars) == 0:
 		open(str(target[0]),'w').write("PASS\n")
 	else:
 		open(str(target[0]),'w').write("FAIL\n")
 		return 1
 
-env.Alias('tests', env.Command("test.passed", 'build/data-io-test',
+env.Alias('tests', env.Command("test.passed",
+															 executable('build/data-io-test'),
 															 run_unit_test))
