@@ -23,13 +23,30 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <unistd.h>
 
-static void make_temp_file_name(std::string &result)
+// Files that are automatically deleted upon destruction.
+class temporary_file
 {
-		static std::string suffix;
-		result = "t-data-io" + suffix;
-		suffix += "-";
-}
+public:
+		temporary_file()
+		{
+				static std::string suffix;
+				_name = "t-data-io" + suffix;
+				suffix += "-";
+		}
+
+		~temporary_file()
+		{
+				::unlink(_name.c_str());
+		}
+
+		const std::string& name() { return _name; };
+		operator const std::string& () { return _name; }
+
+private:
+		std::string _name;
+};
 
 // Try hard to read N bytes from INPUT into BUF.
 static std::streamsize read_exactly(std::istream &input, char *buf, std::streamsize n)
@@ -72,11 +89,9 @@ static bool files_are_equal(const std::string &file1, const std::string &file2)
 
 int main(int argc, char** argv)
 {
-		std::string input_file, temp_file1, temp_file2;
+		std::string input_file;
+		temporary_file temp_file1, temp_file2;
 		vertical_segment sample1, sample2;
-
-		make_temp_file_name(temp_file1);
-		make_temp_file_name(temp_file2);
 
 		if (argc > 1)
 				// Process the user-specified file.
