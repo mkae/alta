@@ -24,8 +24,6 @@
 #include <cstring>
 #include <cstdlib>
 
-static const std::string data_file = "Kirby2.dat";
-
 static void make_temp_file_name(std::string &result)
 {
 		static std::string suffix;
@@ -74,15 +72,23 @@ static bool files_are_equal(const std::string &file1, const std::string &file2)
 
 int main(int argc, char** argv)
 {
-		std::string temp_file1, temp_file2;
+		std::string input_file, temp_file1, temp_file2;
 		vertical_segment sample1, sample2;
 
 		make_temp_file_name(temp_file1);
 		make_temp_file_name(temp_file2);
 
-		std::string data_dir = getenv("TEST_DATA_DIRECTORY") != NULL
-				? getenv("TEST_DATA_DIRECTORY") : ".";
-		std::string input_file = data_dir + "/" + data_file;
+		if (argc > 1)
+				// Process the user-specified file.
+				input_file = argv[1];
+		else
+		{
+				// Process the default test file.
+				static const std::string data_file = "Kirby2.dat";
+				std::string data_dir = getenv("TEST_DATA_DIRECTORY") != NULL
+						? getenv("TEST_DATA_DIRECTORY") : ".";
+				input_file = data_dir + "/" + data_file;
+		}
 
 		try
 		{
