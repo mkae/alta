@@ -280,6 +280,15 @@ void load_data_from_binary(std::istream& in, const header& header, data& data)
 
 		int sample_count = header["SAMPLE_COUNT"];
 
+		// Initialize the mininum and maximum values.
+		vec min(dim.first), max(dim.first);
+
+		for(int k = 0; k < dim.first; k++)
+		{
+				min[k] =  std::numeric_limits<double>::max();
+				max[k] = -std::numeric_limits<double>::max();
+		}
+
 		// TODO: Arrage to use mmap and make it zero-alloc and zero-copy.
 		for (int i = 0; i < sample_count; i++)
 		{
@@ -294,7 +303,16 @@ void load_data_from_binary(std::istream& in, const header& header, data& data)
 				}
 
 				data.set(row);
+
+				// Update min and max.
+				for(int k = 0; k < dim.first; k++)
+				{
+						min[k] = std::min(min[k], row[k]);
+						max[k] = std::max(max[k], row[k]);
+				}
 		}
 
+		// TODO: Factorize this in data::set.
+		data.setMin(min);
+		data.setMax(max);
 }
-

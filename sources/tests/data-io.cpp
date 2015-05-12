@@ -151,5 +151,13 @@ int main(int argc, char** argv)
 		TEST_ASSERT(files_are_equal(temp_file1, temp_file2));
 		TEST_ASSERT(sample2.equals(sample3));
 
+		TEST_ASSERT(sample1.min().size() == sample1.dimX());
+		TEST_ASSERT(sample1.max().size() == sample1.dimX());
+
+		TEST_ASSERT(sample1.min() == sample2.min());
+		TEST_ASSERT(sample1.max() == sample2.max());
+		TEST_ASSERT(sample1.min() == sample3.min());
+		TEST_ASSERT(sample1.max() == sample3.max());
+
 		return EXIT_SUCCESS;
 }
