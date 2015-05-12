@@ -15,3 +15,6 @@
 
 // Write DATA to OUT in ALTA's text format.
 void save_data_as_text(std::ostream& out, const data &data);
+
+// Write DATA to OUT in a compact binary format.
+void save_data_as_binary(std::ostream& out, const data& data);

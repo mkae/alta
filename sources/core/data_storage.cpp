@@ -15,6 +15,10 @@
 #include <iostream>
 #include <limits>
 
+#ifdef __GLIBC__
+# include <endian.h>
+#endif
+
 void vertical_segment::load_data_from_text(std::istream& input,
 																					 vertical_segment& result,
 																					 const arguments& args)
@@ -240,4 +244,37 @@ void save_data_as_text(std::ostream& out, const data &data)
 				}
 				out << std::endl;
 		}
+}
+
+void save_data_as_binary(std::ostream &out, const data& data)
+{
+		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
+		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
+		out << "#PARAM_OUT " << params::get_name(data.output_parametrization()) << std::endl;
+		out << "#FORMAT binary" << std::endl;
+		out << "#VERSION 0" << std::endl;
+		out << "#PRECISION ieee754-double" << std::endl;
+		out << "#SAMPLE_COUNT " << data.size() << std::endl;
+
+		// FIXME: Note: on non-glibc systems, both macros may be undefined, so
+		// the conditional is equivalent to "#if 0 == 0", which is usually what
+		// we want.
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		out << "#ENDIAN little" << std::endl;
+#else
+		out << "#ENDIAN big" << std::endl;
+#endif
+
+		out << "#BEGIN_STREAM" << std::endl;
+
+		for(int i=0; i < data.size(); ++i)
+		{
+				vec sample = data.get(i);
+				const double *numbers = sample.data();
+
+				assert(sample.size() == data.dimX() + data.dimY());
+				out.write((const char *)numbers, sample.size() * sizeof(*numbers));
+		}
+
+		out << std::endl << "#END_STREAM" << std::endl;
 }
