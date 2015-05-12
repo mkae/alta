@@ -74,6 +74,10 @@ class data : public parametrized
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;
 
+		//! \brief Return true if this object is equal to DATA ±ε.
+		virtual bool equals(const data& data,
+												double epsilon = std::numeric_limits<float>::min());
+
 	protected: // data
 } ;
 
