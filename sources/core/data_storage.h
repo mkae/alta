@@ -18,3 +18,6 @@ void save_data_as_text(std::ostream& out, const data &data);
 
 // Write DATA to OUT in a compact binary format.
 void save_data_as_binary(std::ostream& out, const data& data);
+
+// Initialize DATA from the binary-formatted stream IN.
+void load_data_from_binary(std::istream& in, data &data);

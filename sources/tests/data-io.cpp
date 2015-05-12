@@ -16,6 +16,7 @@
 
 #include <core/args.h>
 #include <core/data.h>
+#include <core/data_storage.h>
 #include <core/vertical_segment.h>
 
 #include <string>
@@ -97,8 +98,8 @@ static bool files_are_equal(const std::string &file1, const std::string &file2)
 int main(int argc, char** argv)
 {
 		std::string input_file;
-		temporary_file temp_file1, temp_file2;
-		vertical_segment sample1, sample2;
+		temporary_file temp_file1, temp_file2, temp_file3;
+		vertical_segment sample1, sample2, sample3;
 
 		if (argc > 1)
 				// Process the user-specified file.
@@ -120,10 +121,22 @@ int main(int argc, char** argv)
 
 				sample2.load(temp_file1);
 				sample2.save(temp_file2);
+
+				// Now use the binary output format.
+				std::ofstream out;
+				out.open(temp_file3.name().c_str());
+				save_data_as_binary(out, sample2);
+				out.close();
+
+				std::ifstream in;
+				in.open(temp_file3.name().c_str());
+				load_data_from_binary(in, sample3);
+				in.close();
 		}
 		CATCH_FILE_IO_ERROR(input_file);
 
 		return (sample1.equals(sample2)
-						&& files_are_equal(temp_file1, temp_file2))
+						&& files_are_equal(temp_file1, temp_file2)
+				    && sample2.equals(sample3))
 				? EXIT_SUCCESS : EXIT_FAILURE;
 }

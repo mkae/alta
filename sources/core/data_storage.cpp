@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <cassert>
 
 #ifdef __GLIBC__
 # include <endian.h>
@@ -261,3 +262,50 @@ void save_data_as_binary(std::ostream &out, const data& data)
 
 		out << std::endl << "#END_STREAM" << std::endl;
 }
+
+void load_data_from_binary(std::istream& in, data& data)
+{
+		header header(in);
+
+		// FIXME: For now we make a number of assumptions.
+		assert(header["FORMAT"].string() == "binary");
+		assert(header["VERSION"] == 0);
+		assert(header["PRECISION"].string() == "ieee754-double");
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		assert(header["ENDIAN"].string() == "little");
+#else
+		assert(header["ENDIAN"].string() == "big");
+#endif
+
+		std::pair<int, int> dim = header["DIM"];
+		data.setDimX(dim.first);
+		data.setDimY(dim.second);
+
+		data._min.resize(dim.first);
+		data._max.resize(dim.first);
+
+		data.setParametrizations(params::parse_input(header["PARAM_IN"]),
+														 params::parse_output(header["PARAM_OUT"]));
+
+		in.exceptions(std::ios_base::failbit);
+
+		int sample_count = header["SAMPLE_COUNT"];
+
+		// TODO: Arrage to use mmap and make it zero-alloc and zero-copy.
+		for (int i = 0; i < sample_count; i++)
+		{
+				vec row = vec::Zero(data.dimX() + data.dimY());
+				std::streamsize expected = row.size() * sizeof(double);
+
+				for (std::streamsize total = 0;
+						 total < expected && !in.eof();
+						 total += in.gcount())
+				{
+						in.read((char *)row.data() + total, expected);
+				}
+
+				data.set(row);
+		}
+
+}
+

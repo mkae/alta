@@ -78,6 +78,8 @@ class data : public parametrized
 		virtual bool equals(const data& data,
 												double epsilon = std::numeric_limits<float>::min());
 
+		friend void load_data_from_binary(std::istream& in, data& data);
+
 	protected: // data
 } ;
 
