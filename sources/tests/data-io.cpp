@@ -23,7 +23,14 @@
 
 #include <cstring>
 #include <cstdlib>
-#include <unistd.h>
+
+// Get the 'unlink' declaration.
+#ifdef _WIN32
+# include <io.h>
+# define unlink _unlink
+#else
+# include <unistd.h>
+#endif
 
 // Files that are automatically deleted upon destruction.
 class temporary_file
