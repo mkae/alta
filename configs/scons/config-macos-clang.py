@@ -14,7 +14,7 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'clang++'
-CCFLAGS        = ['-O3', '-g', '-Wall', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
+CCFLAGS        = ['-O3', '-g', '-Wall', '-Xarch_x86_64', '-mmacosx-version-min=10.9', '-std=c++11']
 LINKFLAGS      = ['-headerpad_max_install_names', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
 
 

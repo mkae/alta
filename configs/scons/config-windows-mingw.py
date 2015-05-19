@@ -10,7 +10,7 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'g++'
-CCFLAGS        = ['-O2', '-g']
+CCFLAGS        = ['-O3', '-g', '-Wall', '-std=c++11']
 
 # This is not the best place to past static linking since plugins need the -shared options 
 #LINKFLAGS			 = [ '-static-libgcc', '-static-libstdc++']
