@@ -142,13 +142,14 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[5] = 1.0;
 		}
 			break;
-		// invec[0] = ||Hp|| Norm of the projected normalized Half vector H=(L+V)/2
-		// invec[1] = ||B||  Norm of the unormalized Back vector B=(L-V)/2
+		// invec[0] = ||Hp|| Norm of the projected normalized Half vector
+		// H=(L+V)/2 invec[1] = ||B||  Norm of the unormalized Back vector
+		// B=(L-V)/2
 		case STARK_2D:
 		{
 			const double Hx = invec[0];
 			const double Hy = 0;
-			const double Hz = sqrt(1.0 - Hx*Hx);
+			const double Hz = sqrt(1.0 - Hx*Hx - invec[1]*invec[1]);
 			// Ensuring that <H,B> = 0
 			const double Bx =-invec[1]*Hz;
 			const double By = 0.0;

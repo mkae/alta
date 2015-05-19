@@ -187,14 +187,23 @@ int main(int argc, char** argv)
 		}
 
 		vec temp(d_in->dimX());
+		vec cart(6);
+		vec y(d_in->dimY());
 		for(int i=0; i<d_out->size(); ++i)
 		{
 			// Copy the input vector
 			vec x = d_out->get(i);
-			params::convert(&x[0], d_out->parametrization(), d_in->parametrization(), &temp[0]);
+			params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
 
-			vec y = d_in->value(temp);
+			if(cart[2] >= 0.0 || cart[5] >= 0.0) {
+				params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
+				y = d_in->value(temp);
+			} else {
+				y.setZero();
+			}
+			
 			params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
+			
 			d_out->set(x);
 		}	
 	}	
