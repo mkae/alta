@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
 	// Get the function file
 	function* f = NULL;
-	f = plugins_manager::get_function(args["input"]);
+	f = plugins_manager::load_function(args["input"]);
 	if(f == NULL)
 	{
 		std::cerr << "<<ERROR>> cannot open the function file" << std::endl;

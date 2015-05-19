@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
 
 	// Load a function file
-	function* f = plugins_manager::get_function(args["input"]) ;
+	function* f = plugins_manager::load_function(args["input"]) ;
 	if(f == NULL)
 	{
 		return 1;

@@ -7,7 +7,15 @@ build_lib = False
 if library_available(env, pkgspec='python-2.7',
 										 inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
 										 lib='PYTHON_LIB', header='Python.h'):
+	
 	conf = Configure(env)
+	
+	# Check if OpenMP is available
+	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
+	if conf.CheckLib(env['OPENMP_LIB']):
+		env.AppendUnique(LIBS    = env['OPENMP_LIB'])
+	#end
+
 
 	# On GNU/Linux the '-mt' suffix is no longer used, but it is still
 	# used on some other platforms (see

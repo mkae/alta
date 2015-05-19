@@ -99,8 +99,8 @@ ptr<data> load_data(const std::string& plugin_name, const std::string& filename)
  *       Those function should disapear when the return type of get_Function
  *       in the plugin_manager will be ptr<function>.
  */
-ptr<function> get_function(const std::string& filename) {
-    ptr<function> func(plugins_manager::get_function(filename));
+ptr<function> get_function(const std::string& plugin_name) {
+    ptr<function> func(plugins_manager::get_function(plugin_name));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
     }
@@ -143,6 +143,10 @@ void data2data(const data* d_in, data* d_out) {
 	}	
 }
 
+void fit_data(ptr<fitter>& f, const ptr<data>& d, ptr<function>& fn, const arguments& args) {
+	f->fit_data(d, fn, args);
+}
+
 
 /* Exporting the ALTA module 
  */
@@ -173,10 +177,11 @@ BOOST_PYTHON_MODULE(alta)
 	//
 	bp::class_<function, ptr<function>, boost::noncopyable>("function", bp::no_init)
 		.def("value", &function::value)
-		.def("load",  &function::load)
+		.def("load", &function::load)
 		.def("save",  &function::save);
 	bp::def("get_function", get_function);
 	bp::def("get_function", get_function_from_args);
+
 
 
 	// Data interface
@@ -196,7 +201,7 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
 		.def("fit_data", &fitter::fit_data);
 	bp::def("get_fitter", plugins_manager::get_fitter);
-
+	bp::def("fit_data", &fit_data);
 
 	// Softs
 	//

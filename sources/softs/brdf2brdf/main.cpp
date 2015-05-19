@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 	}
 
     // Load the function
-    function* f = plugins_manager::get_function(args["input"]);
+    function* f = plugins_manager::load_function(args["input"]);
 
     // Save it
     f->save(args["output"], args) ;

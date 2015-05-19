@@ -151,7 +151,7 @@ return NULL;
 }
 
 //! \brief load a function from the ALTA input file.
-function* plugins_manager::get_function(const std::string& filename)
+function* plugins_manager::load_function(const std::string& filename)
 {
 	std::ifstream file;
 	file.open(filename.c_str()) ;
@@ -409,6 +409,34 @@ function* plugins_manager::get_function(const arguments& args)
 
     return func;
 }
+
+
+ptr<function> plugins_manager::get_function(const std::string& n)
+{
+    if(n.empty())
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> no function plugin specified, returning nothing" << std::endl;
+#endif
+        return NULL;
+    }
+
+	 FunctionPrototype myFunc = open_library<FunctionPrototype>(n, "provide_function");
+    if(myFunc != NULL)
+    {
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
+#endif
+        return myFunc();
+    }
+    else
+    {
+        std::cerr << "<<ERROR>> no function provider found in file \"" << n << "\"" << std::endl;
+        return NULL;
+    }
+}
+
+
 ptr<data> plugins_manager::get_data(const std::string& n)
 {
     if(n.empty())

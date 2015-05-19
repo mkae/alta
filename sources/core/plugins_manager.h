@@ -43,7 +43,10 @@ class plugins_manager
 		static function* get_function(const arguments& args) ;
 
 		//! \brief load a function from the ALTA input file.
-		static function* get_function(const std::string& filename);
+		static function* load_function(const std::string& filename);
+		
+		//! \brief load a function from the ALTA input file.
+		static ptr<function> get_function(const std::string& n);
 
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
