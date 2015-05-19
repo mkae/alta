@@ -51,7 +51,7 @@ struct python_vec : public vec {
     python_vec() : vec() {}
 	python_vec(const vec& x) : vec(x) {}
     python_vec(const bp::list& l) : vec(bp::len(l)) {
-        for(size_t i=0; i<bp::len(l); ++i) {
+        for(auto i=0; i<bp::len(l); ++i) {
             (*this)[i] = bp::extract<double>(l[i]);
         }
     }
@@ -115,6 +115,35 @@ ptr<function> get_function_from_args(const python_arguments& args) {
 }
 
 
+/* Softs functions. Those function recopy the softs main function, without
+ * the command line arguments.
+ * TODO: Add the command line arguments in the parameters
+ */
+void data2data(const data* d_in, data* d_out) {
+	vec temp(d_in->dimX());
+	vec cart(6);
+	vec y(d_in->dimY());
+	#pragma omp parallel for
+	for(int i=0; i<d_out->size(); ++i)
+	{
+		// Copy the input vector
+		vec x = d_out->get(i);
+		params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
+
+		if(cart[2] >= 0.0 || cart[5] >= 0.0) {
+			params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
+			y = d_in->value(temp);
+		} else {
+			y.setZero();
+		}
+
+		params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
+
+		d_out->set(x);
+	}	
+}
+
+
 /* Exporting the ALTA module 
  */
 BOOST_PYTHON_MODULE(alta)
@@ -167,4 +196,9 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
 		.def("fit_data", &fitter::fit_data);
 	bp::def("get_fitter", plugins_manager::get_fitter);
+
+
+	// Softs
+	//
+	bp::def("data2data", &data2data);	
 }

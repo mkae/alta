@@ -391,8 +391,10 @@ private: //methods
 	bool read_brdf(const char *filename, double* &brdf)
 	{
 		FILE *f = fopen(filename, "rb");
-		if (!f)
+		if (!f) {
+			std::cerr << "<<ERROR>> File \"" << filename << "\" is not present, please check path and use absolute path." << std::endl;
 			return false;
+		}
 
 		int dims[3];
 		fread(dims, sizeof(int), 3, f);

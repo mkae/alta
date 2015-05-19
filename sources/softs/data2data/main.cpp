@@ -189,6 +189,7 @@ int main(int argc, char** argv)
 		vec temp(d_in->dimX());
 		vec cart(6);
 		vec y(d_in->dimY());
+		#pragma omp parallel for
 		for(int i=0; i<d_out->size(); ++i)
 		{
 			// Copy the input vector
