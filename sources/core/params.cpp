@@ -151,9 +151,9 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double Hy = 0;
 			const double Hz = sqrt(1.0 - Hx*Hx - invec[1]*invec[1]);
 			// Ensuring that <H,B> = 0
-			const double Bx =-invec[1]*Hz;
-			const double By = 0.0;
-			const double Bz = invec[1]*Hx;
+			const double Bx = 0.0;
+			const double By = invec[1];
+			const double Bz = 0.0;
 
 			outvec[0] = Hx-Bx;
 			outvec[1] = Hy-By;
@@ -367,8 +367,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[1] = theta * sin(dphi);
 		}
 			break;
-		// outvec[0] = ||Hp|| Norm of the projected unormalized Half vector (V+L)/2
-		// outvec[1] = ||B||  Norm of the unormalized Back vector (L-V)/2
+		// outvec[0] = ||Hp|| Norm of the projected unormalized Half vector
+		//             H = (V+L)/2 
+		// outvec[1] = ||B|| Norm of the unormalized Back vector B = (L-V)/2
 		case STARK_2D:
 		{
 			double Hx = 0.5*(invec[0]+invec[3]);

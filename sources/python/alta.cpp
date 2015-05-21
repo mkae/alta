@@ -120,12 +120,13 @@ ptr<function> get_function_from_args(const python_arguments& args) {
  * TODO: Add the command line arguments in the parameters
  */
 void data2data(const data* d_in, data* d_out) {
-	vec temp(d_in->dimX());
-	vec cart(6);
-	vec y(d_in->dimY());
 	#pragma omp parallel for
 	for(int i=0; i<d_out->size(); ++i)
 	{
+		vec temp(d_in->dimX());
+		vec cart(6);
+		vec y(d_in->dimY());
+
 		// Copy the input vector
 		vec x = d_out->get(i);
 		params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
