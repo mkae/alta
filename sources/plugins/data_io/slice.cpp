@@ -47,9 +47,21 @@ class BrdfSlice : public data {
 			delete[] _data;
 			t_EXR_IO<double>::LoadEXR(filename.c_str(), width, height, _data);
 		}
-		void load(const std::string& filename, const arguments&)
+		void load(const std::string& filename, const arguments& args)
 		{
 			load(filename);
+
+			// Allow to load a different parametrization depending on the 
+			// parameters provided.
+			if(args.is_defined("param")) {
+				params::input param = params::parse_input(args["param"]);
+				if(params::dimension(param) == 2) {
+					this->setParametrization(param);
+				} else {
+					std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;
+					std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
+				}
+			}
 		}
 
 		void save(const std::string& filename) const 
@@ -111,11 +123,20 @@ class BrdfSlice : public data {
 
 		vec value(const vec& x) const
 		{
-			assert(x[0] <= /*0.5*M_PI*/ 1.0 && x[0] >= 0.0);
-			assert(x[1] <= /*0.5*M_PI*/ 1.0 && x[1] >= 0.0);
+			// Safeguard. We can use either asserting or returning zero in case
+			// the query values are not within reach.
+			if(x[0] > 1.0 || x[0] < 0.0 || x[1] > 1.0 || x[1] < 0.0 ||
+				isnan(x[0]) || isnan(x[1])) {
+					vec res(3);
+					return res;
+			}
+			/*
+			assert(x[0] <= 1.0 && x[0] >= 0.0);
+			assert(x[1] <= 1.0 && x[1] >= 0.0);
+			*/
 
-			const int i  = floor(x[0] * width  / /*(0.5*M_PI)*/ 1.0);
-			const int j  = floor(x[1] * height / /*(0.5*M_PI)*/ 1.0);
+			const int i  = floor(x[0] * width  / 1.0);
+			const int j  = floor(x[1] * height / 1.0);
 			const int k  = 1; 
 			//const int k  = floor(x[2] * slice  / (M_PI));
 			const int id = (i + j*width)*k;
