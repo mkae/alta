@@ -397,7 +397,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[1] = invec[1];
 			diff[2] = invec[2];
 
-			// TODO Not sure for the rotation angle
+			// TODO Not sure for the rotation angle about the normal
 			rotate_normal(diff, -atan2(half[1], half[0])); 
 			rotate_binormal(diff, outvec[0]);
 
