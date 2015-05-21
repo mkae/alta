@@ -367,7 +367,11 @@ private: //methods
 		   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
 		   fi_diff > M_PI)
 		{
-	        std::cerr << "<<ERROR>> the input vec is incorrect: TH = " << theta_half << ", TD = " << theta_diff << ", PD = " << fi_diff << std::endl;
+	        //std::cerr << "<<ERROR>> the input vec is incorrect: TH = " << theta_half << ", TD = " << theta_diff << ", PD = " << fi_diff << std::endl;
+			  red_val   = 0.0;
+			  green_val = 0.0;
+			  blue_val  = 0.0;
+			  return;
 			throw; //! \todo Add exception list
 		}
 		// Find index.

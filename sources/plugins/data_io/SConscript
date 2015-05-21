@@ -8,5 +8,6 @@ env.SharedLibrary('../../build/data_merl', ['merl.cpp'])
 
 if openexr_available(env):
 	env.SharedLibrary('../../build/data_utia', ['utia.cpp'])
+	env.SharedLibrary('../../build/data_brdf_slice', ['slice.cpp'])
 
 #env.SharedLibrary('../../build/data_astm', ['astm.cpp'])

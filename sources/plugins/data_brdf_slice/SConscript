@@ -1,9 +1,0 @@
-Import('env', 'openexr_available')
-env = env.Clone()
-
-env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-
-if openexr_available(env):
-	sources = ['data.cpp']
-	env.SharedLibrary('../../build/data_brdf_slice', sources)
-#end
