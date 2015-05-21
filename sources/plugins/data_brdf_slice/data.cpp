@@ -110,7 +110,7 @@ vec data_brdf_slice::value(const vec& x) const
 
 	const int i  = floor(x[0] * width  / /*(0.5*M_PI)*/ 1.0);
 	const int j  = floor(x[1] * height / /*(0.5*M_PI)*/ 1.0);
-	const int k  = 0; 
+	const int k  = 1; 
 	//const int k  = floor(x[2] * slice  / (M_PI));
 	const int id = (i + j*width)*k;
 

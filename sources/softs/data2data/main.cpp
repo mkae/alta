@@ -186,12 +186,13 @@ int main(int argc, char** argv)
 			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
 		}
 
-		vec temp(d_in->dimX());
-		vec cart(6);
-		vec y(d_in->dimY());
 		#pragma omp parallel for
 		for(int i=0; i<d_out->size(); ++i)
 		{
+			vec temp(d_in->dimX());
+			vec cart(6);
+			vec y(d_in->dimY());
+
 			// Copy the input vector
 			vec x = d_out->get(i);
 			params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);

@@ -4,6 +4,14 @@ env = env.Clone()
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
 
+# Check if OpenMP is available
+conf = Configure(env)
+if conf.CheckLib(env['OPENMP_LIB']):
+	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
+	env.AppendUnique(LIBS = env['OPENMP_LIB'])
+#end
+conf.Finish()
+
 # Soft Sources
 sources = ['main.cpp']
 
