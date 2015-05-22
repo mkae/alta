@@ -361,19 +361,22 @@ private: //methods
 				  double theta_diff, double fi_diff, 
 				  double& red_val,double& green_val,double& blue_val) const 
 	{
+		// The data is symmetric on fi_diff with respect to PI
+		if(fi_diff > M_PI) {
+			fi_diff = 2.0*M_PI - fi_diff;
+		}
 		
-	    // Testing the input domain
+	    // Testing the input domain to avoid indexing outside of the
+		 // allocated memory.
 		if(theta_half < 0.0 || theta_half > 0.5*M_PI || 
 		   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
-		   fi_diff > M_PI)
-		{
-	        //std::cerr << "<<ERROR>> the input vec is incorrect: TH = " << theta_half << ", TD = " << theta_diff << ", PD = " << fi_diff << std::endl;
-			  red_val   = 0.0;
-			  green_val = 0.0;
-			  blue_val  = 0.0;
-			  return;
-			throw; //! \todo Add exception list
+		   std::abs(fi_diff) > M_PI) {
+			red_val   = 0.0;
+			green_val = 0.0;
+			blue_val  = 0.0;
+			return;
 		}
+
 		// Find index.
 		// Note that phi_half is ignored, since isotropic BRDFs are assumed
 		int ind = phi_diff_index(fi_diff) +

@@ -163,7 +163,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[4] = Hy+By;
 			outvec[5] = Hz+Bz;
 		}
-			break;
+		break;
 		case NEUMANN_2D:
 		{
 			outvec[0] =   invec[0];
@@ -173,7 +173,8 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[4] = - invec[1];
 			outvec[5] =   sqrt(1.0 - outvec[3]*outvec[3] - outvec[4]*outvec[4]);
 		}
-			break;
+		break;
+
 
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
@@ -395,15 +396,16 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			break;
 		case NEUMANN_2D:
 		{
-			double Hx = 0.5*(invec[0]+invec[3]);
-			double Hy = 0.5*(invec[1]+invec[4]);
-			outvec[0] = sqrt(Hx*Hx + Hy*Hy);
+				double Hx = 0.5*(invec[0]+invec[3]);
+				double Hy = 0.5*(invec[1]+invec[4]);
+				outvec[0] = sqrt(Hx*Hx + Hy*Hy);
 
-			double Bx = 0.5*(invec[3]-invec[0]);
-			double By = 0.5*(invec[4]-invec[1]);
-			outvec[1] = sqrt(Bx*Bx + By*By);
+				double Bx = 0.5*(invec[3]-invec[0]);
+				double By = 0.5*(invec[4]-invec[1]);
+				outvec[1] = sqrt(Bx*Bx + By*By);
 		}
 			break;
+
 
 			// 3D Parametrization
 		case params::RUSIN_TH_PH_TD:
@@ -419,9 +421,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[1] = invec[1];
 			diff[2] = invec[2];
 
-			// TODO Not sure for the rotation angle about the normal
+			// TODO Not sure for the rotation angle
 			rotate_normal(diff, -atan2(half[1], half[0])); 
-			rotate_binormal(diff, outvec[0]);
+			rotate_binormal(diff, -outvec[0]);
 
 			outvec[1] = acos(diff[2]);
 			outvec[2] = atan2(diff[1], diff[0]);
