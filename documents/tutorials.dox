@@ -77,6 +77,15 @@ In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/
 This command line is rather long. To help you design complex command line in a more intuitive way, ALTA comes with a python script that creates command lines from XML files (see \ref format for an example).
 
 
+### Python scripts
+
+All actions can be done using Python scripts. We provide a python interface that can be loaded with:
+
+	>>> import alta
+
+The complete python interface of ALTA can be found here : \ref python.
+
+
 ### XML scripts
 
 Here is the script to perform the same fitting as the previous example. It performs the fitting of the blue metallic paint from the MERL database using a Beckmann lobe (note there is no shadowing term, nor Fresnel term):

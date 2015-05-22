@@ -1,0 +1,27 @@
+/**
+\page python Python Interface
+
+To have access to the python interface, you need to compile the python module. This can be done using the *python* tag in the scons call:
+
+	$ scons --cfg=myconfig.py python
+
+Once the python interface (alta.so) is compiled, you need to update the PYTHONPATH environment variable to the build directory. If not, you will not have access to the interface. On UNIX-like systems, it can be done using by sourcing the *setpath.sh* script. On MS-Windows, you need to update the variable by hand.
+
+In python, the ALTA module is simply loaded using:
+
+	>>> import alta
+
+You can obtain \ref functions, \ref datas and \ref fitters objects using the get_function, get_data and get_fitter functions:
+
+	>>> func   = alta.get_function('nonlinear_function_blinn')
+	>>> dat    = alta.get_data('data_merl')
+	>>> fitter = alta.get_fitter('nonlinear_fitter_ceres')
+
+The different \ref softs are available as python functions:
+
+	>>> dat1 = alta.load_data('data_merl', 'blue-metallic-paint.binary')
+	>>> dat2 = alta.get_data('data_utia')
+	>>> alta.data2data(dat1, dat2)
+
+This will perform a data conversion from the *blue-metallic-paint* of the MERL database to the UTIA format.
+*/
