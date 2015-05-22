@@ -120,7 +120,7 @@ public: //methods
 	}
 };
 
-ALTA_DLL_EXPORT data* provide_data()
+ALTA_DLL_EXPORT data* provide_data(const arguments&)
 {
     return new ASTM();
 }

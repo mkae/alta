@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     fit->set_parameters(args) ;
 
     ptr<function> f = plugins_manager::get_function(args);
-    ptr<data>     d = plugins_manager::get_data(args["data"]);
+    ptr<data>     d = plugins_manager::get_data(args["data"], args);
 
 		try
 		{

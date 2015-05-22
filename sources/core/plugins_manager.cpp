@@ -437,7 +437,7 @@ ptr<function> plugins_manager::get_function(const std::string& n)
 }
 
 
-ptr<data> plugins_manager::get_data(const std::string& n)
+ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
 {
     if(n.empty())
     {
@@ -453,7 +453,7 @@ ptr<data> plugins_manager::get_data(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using data provider in file \"" << n << "\"" << std::endl;
 #endif
-        return myData();
+        return myData(args);
     }
     else
     {

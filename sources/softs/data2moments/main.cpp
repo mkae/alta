@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 
 	// Import data
 	ptr<data> d = NULL ;
-	d = plugins_manager::get_data(args["data"]) ;
+	d = plugins_manager::get_data(args["data"], args) ;
 
 	if(dynamic_pointer_cast<vertical_segment>(d)) {
 		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;

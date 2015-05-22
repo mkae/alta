@@ -50,7 +50,7 @@ class plugins_manager
 
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-		static ptr<data> get_data(const std::string& n) ;
+		static ptr<data> get_data(const std::string& n, const arguments& args = arguments());
 
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
@@ -75,5 +75,5 @@ class plugins_manager
 		// Object provider prototypes
 		typedef function* (*FunctionPrototype)();
 		typedef fitter*   (*FitterPrototype)();
-		typedef data*     (*DataPrototype)();
+		typedef data*     (*DataPrototype)(const arguments&);
 } ;

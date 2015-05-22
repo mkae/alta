@@ -186,7 +186,7 @@ int data_interpolant::size() const
 	return _data->size();
 }
 
-ALTA_DLL_EXPORT data* provide_data()
+ALTA_DLL_EXPORT data* provide_data(const arguments&)
 {
     return new data_interpolant();
 }

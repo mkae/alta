@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 	// Load a data file
 	if(args.is_defined("data") || args.is_defined("data-file"))
 	{
-		ptr<data> d = plugins_manager::get_data(args["data"]);
+		ptr<data> d = plugins_manager::get_data(args["data"], args);
 
 		// Load data file if the plugin manager created a plugin object.
 		if(d)

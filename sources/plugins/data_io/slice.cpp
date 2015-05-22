@@ -22,7 +22,7 @@ class BrdfSlice : public data {
 		int width, height, slice;
 		double* _data;
 
-		BrdfSlice() : data()
+		BrdfSlice(const arguments& args) : data()
 		{
 			// Allocate data
 			width = 512; height = 512;
@@ -34,6 +34,19 @@ class BrdfSlice : public data {
 			_out_param = params::RGB_COLOR;
 			_nX = 2;
 			_nY = 3;
+			
+			// Allow to load a different parametrization depending on the 
+			// parameters provided.
+			if(args.is_defined("param")) {
+				params::input param = params::parse_input(args["param"]);
+				if(params::dimension(param) == 2) {
+					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
+					this->setParametrization(param);
+				} else {
+					std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;
+					std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
+				}
+			}
 		}
 
 		~BrdfSlice()
@@ -51,18 +64,6 @@ class BrdfSlice : public data {
 		{
 			load(filename);
 
-			// Allow to load a different parametrization depending on the 
-			// parameters provided.
-			if(args.is_defined("param")) {
-				params::input param = params::parse_input(args["param"]);
-				if(params::dimension(param) == 2) {
-					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
-					this->setParametrization(param);
-				} else {
-					std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;
-					std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
-				}
-			}
 		}
 
 		void save(const std::string& filename) const 
@@ -186,9 +187,9 @@ class BrdfSlice : public data {
 		}
 };
 
-ALTA_DLL_EXPORT data* provide_data()
+ALTA_DLL_EXPORT data* provide_data(const arguments& args)
 {
-    return new BrdfSlice();
+    return new BrdfSlice(args);
 }
 
 

@@ -91,7 +91,12 @@ ptr<data> load_data(const std::string& plugin_name, const std::string& filename)
 	d->load(filename);
 	return d;
 }
-
+ptr<data> get_data_with_args(const std::string& plugin_name, const python_arguments& args) {
+	return plugins_manager::get_data(plugin_name, args);
+}
+ptr<data> get_data(const std::string& plugin_name) {
+	return plugins_manager::get_data(plugin_name);
+}
 
 /* Creating functions for the plugins_manager calls
  * 
@@ -159,6 +164,7 @@ BOOST_PYTHON_MODULE(alta)
 		.def(bp::init<>())
 		.def(bp::init<bp::dict>())
 		.def("update", &arguments::update);
+	bp::implicitly_convertible<bp::dict, python_arguments>();
 
 
 	// Vector class
@@ -193,7 +199,8 @@ BOOST_PYTHON_MODULE(alta)
 		//.def("set",  &data::set)
 		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
 		.def("save", &data::save);
-	bp::def("get_data",  plugins_manager::get_data);
+	bp::def("get_data",  get_data);
+	bp::def("get_data",  get_data_with_args);
 	bp::def("load_data", load_data);
 
 
@@ -202,9 +209,9 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
 		.def("fit_data", &fitter::fit_data);
 	bp::def("get_fitter", plugins_manager::get_fitter);
-	bp::def("fit_data", &fit_data);
+	bp::def("fit_data",   fit_data);
 
 	// Softs
 	//
-	bp::def("data2data", &data2data);	
+	bp::def("data2data", data2data);	
 }
