@@ -43,6 +43,15 @@
 #define BLUE_SCALE  (1.66/1500.0)
 
 
+/*! \ingroup datas
+ *  \brief Data interface for the MERL file format.
+ *  Plugin name: *data_merl*
+ *
+ *  \details 
+ *
+ *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  \author Original code from Mitsubishi Electric Research Laboratories
+ */
 class MERL : public data
 {
 private: // data

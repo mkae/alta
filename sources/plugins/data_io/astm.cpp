@@ -20,6 +20,15 @@
 #include <cstdlib>
 #include <cmath>
 
+/*! \ingroup datas
+ *  \brief Data interface for the ASTM file format.
+ *  Plugin name: *data_astm*
+ *
+ *  \details 
+ *
+ *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *
+ */
 class ASTM : public data
 {
 

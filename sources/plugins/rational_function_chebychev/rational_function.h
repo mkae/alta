@@ -38,6 +38,15 @@ protected:  // methods
 
 } ;
 
+/*! \ingroup functions
+ *  \brief Rational function using Chebychev polynomials.
+ *  Plugin name: *rational_function_chebychev*
+ *
+ *  \details 
+ *
+ *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *
+ */
 class rational_function_chebychev : public rational_function
 {
 	public: // methods

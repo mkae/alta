@@ -29,7 +29,7 @@ You are working on BRDFs and you want to **benchmark new BRDF models** and compa
 
 Here is a list of the major features in the ALTA library (you can find the complete list in the \ref features page):
 
- + Open common BRDF data formats (MERL, ASTM)
+ + Open common BRDF data formats (see \ref datas)
  + Non-linear fitting of BRDF (using third party packages)
  + Rational interpolation of BRDF
  + Analytic BRDF models (see \ref functions)

@@ -34,7 +34,7 @@
  *  \f$G_1( k, half) = \chi\Big( \frac{k \cdot half}{k \cdot normal} \Big) \f$
  * 
  *  
- *  \author Romain Pacanowski romain.pacanowski@institutoptique.fr
+ *  \author Romain Pacanowski <romain.pacanowski@institutoptique.fr>
  *  
  *  \todo Finish implementation and documentation
  */

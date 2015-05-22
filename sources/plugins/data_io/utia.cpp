@@ -28,6 +28,20 @@
 
 #include "EXR_IO.h"
 
+/*! \ingroup datas
+ *  \brief Data interface for the UTIA file format.
+ *  Plugin name: *data_utia*
+ *
+ *  \details 
+ *
+ *  This format is an HDR image based format using OpenEXR or a
+ *  binary format if not available. The data is stored as an array of
+ *  azimuth slices for various elevation angles.
+ *
+ *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  \author Original code from Jiri Filip
+ *
+ */
 class UTIA : public data {
 private:
 

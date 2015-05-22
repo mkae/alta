@@ -36,19 +36,10 @@ Parametrization format
 Input Parametrization
 ---------------------
 
-ALTA can automaticaly convert samples (either data sample or BRDF 
-evaluation) into a different coordinate system. Here is a non-complete
-list of possible parametrizations:
-
-
-    RUSIN_TH_PH_TD,
-    RUSIN_TH_TD_PD,
-    RUSIN_TH_PH_TD_PD,
-    COS_TH_TD, // cosine theta_h, cosine theta_d
-    ISOTROPIC_TV_TL_DPHI, // isotropic formulation with theta view, theta light and |dphi|
-    CARTESIAN, // 6D (directions: 3d + 3d)
-    SPHERICAL_TL_PL_TV_PV
-    ISOTROPIC_TV_PROJ_DPHI  //2D Param. (theta_v * cos(|\delta \Phi|), theta_v * sin(|\delta \Phi)|)
+ALTA can automaticaly convert samples (either data sample or BRDF evaluation)
+into a different coordinate system.
+[Here](classparams.html#af530b9dd3ed0c1117aef8dd3159e3080) is the list of all
+input parametrizations.
 
 
 Output Parametrization
@@ -70,10 +61,12 @@ to match in size.
 For a text data file with <em>n</em> data entries where the input domain has <em>N</em> dimensions and a <em>input_param</em> parametrization and the output domain has <em>P</em> dimensions and a <em>output_param</em> parametrization, our file format is the following:
 
 \verbatim
+#ALTA DATA HEADER
 #DIM N P 
 #PARAM_IN  %input_param%
 #PARAM_OUT %output_param%
 #VS [0|1|2] (P times)
+#ALTA HEADER END
 x_{1,1} ... x_{1,N}  y_{1,1} ... y_{1,P}
 ...
 x_{i,1} ... x_{i,N}  y_{i,1} ... y_{i,P}

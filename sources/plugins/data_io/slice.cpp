@@ -16,6 +16,24 @@
 
 #include "EXR_IO.h"
 
+/*! \ingroup datas
+ *  \brief Data interface for the BRDF slice file format.
+ *  Plugin name: *data_brdf_slice*
+ *
+ *  \details 
+ *
+ *  This BRDF data format implements the 2D representation of a BRDF presented
+ *  by Brent Burley in BRDF Explorer. It only stores a slice of the BRDF for
+ *  different 2D parametrizations. This plugin stores the BRDF data into an
+ *  EXR file.
+ *
+ *  It is possible to select the parametrization using the --param NAME 
+ *  argument when loading the BRDF. The default parametrization is
+ *  \ref STARK_2D
+ *
+ *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *
+ */
 class BrdfSlice : public data {
 	public:
 

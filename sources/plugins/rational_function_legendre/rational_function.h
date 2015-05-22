@@ -40,6 +40,15 @@ class rational_function_legendre_1d : public rational_function_1d
 		double legendre(double x, int i) const;
 } ;
 
+/*! \ingroup functions
+ *  \brief Rational function using Legendre polynomials.
+ *  Plugin name: *rational_function_legendre*
+ *
+ *  \details 
+ *
+ *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *
+ */
 class rational_function_legendre : public rational_function
 {
 	public: // methods
