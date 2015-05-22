@@ -40,26 +40,29 @@ class params
     public: // data
 
 		 //! \brief list of all supported parametrization for the input space.
-		 //! An unsupported parametrization will go under the name
-		 //! <em>unknown</em>. We use the following notations:
-		 //!   * The view vector is \f$\vec{v}\f$
-		 //!   * The light vector is \f$\vec{l}\f$
-		 //!   * The normal vector is \f$\vec{n}\f$
-		 //!   * The reflected vector is \f$\vec{r} = 2\mbox{dot}(\vec{v}, \vec{n})\vec{n} - \vec{v}\f$
+		 //! An unsupported parametrization will go under the name ! *unknown*. We
+		 //!use the following notations:
+		 //!   * The View vector is \f$V\f$
+		 //!   * The Light vector is \f$L\f$
+		 //!   * The Normal vector is \f$N\f$
+		 //!   * The Reflected vector is \f$R = 2\mbox{dot}(\vec{V}, \vec{N})\vec{N} - \vec{V}\f$
+		 //!   * The Half vector is \f$H = \frac{V+L}{||V+L||}\f$
+		 //!   * The Back vector is \f$K = \frac{V-L}{||V-L||}\f$
+		 //!   * The elevation angle of vector \f$V\f$ is \f$\theta_V\f$
+		 //!   * The azimuth angle of vector \f$V\f$ is \f$\phi_V\f$
 		 enum input
 		 {
-       RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described in [Rusinkiewicz'98] */
+       RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described by Rusinkiewicz [1998] */
        RUSIN_TH_PH_TD,
        RUSIN_TH_TD_PD,
        RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
        RUSIN_VH_VD,           /*!< Half-angle parametrization in vector format. Coordinates are:
-                               [\f$\vec{h}_x, \vec{h}_y, \vec{h}_z, \vec{d}_x, \vec{d}_y, 
-  									  \vec{d}_z \f$].*/
+                                   \f$ [H_x, H_y, H_z, D_x, D_y, D_z] \f$.*/
        RUSIN_VH,              /*!< Half-angle parametrization with no difference direction in 
-  								     vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
-  									  \vec{h}_z\f$]. */
-       COS_TH_TD,      /*!< Cosine of the RUSIN_TH_TD parametrization: Coordinates are in 
-                         $[\cos_\theta_h,\cos_\theta_d]$. */
+  								           vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
+  									        \vec{h}_z\f$]. */
+       COS_TH_TD,             /*!< Cosine of the RUSIN_TH_TD parametrization: Coordinates are in 
+                                   \f$ [\cos_{\theta_H},\cos_{\theta_D}] \f$. */
        COS_TH,
 
        SCHLICK_TK_PK,         /*!< Schlick's back vector parametrization */
@@ -93,16 +96,20 @@ class params
        ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
        BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined input Stark et al. [2004].
-                                 Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - \vec{l}\vec{v}), 
-  										 (1-(\vec{h}.\vec{n})^2)(1 - \alpha)]\f$ */
+                                 Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - (L.V)), 
+  										 (1-(H.N)^2)(1 - \alpha)]\f$ */
 
-        // Params goes from (-1,-1) to (1,1)
-        STARK_2D,
-        NEUMANN_2D,
+        STARK_2D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
+		                             is defined by the couple \f$ \vec{x} = ||\tilde{H}_p||, 
+											  ||\tilde{B}|| \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
+											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
+											  is the projected coordinates of \f$ \tilde{H} \f$ on the
+											  tanget plane. */
+        NEUMANN_2D,           /*!< Neumann and Neumann parametrization.*/
 
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
-                               We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
-  									  v.z, l.x, l.y, l.z] \f$*/
+                               We always pack the view vector first: \f$[V.x, V.y, 
+  									  V.z, L.x, L.y, L.z] \f$*/
 
        UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data */
 		 };
