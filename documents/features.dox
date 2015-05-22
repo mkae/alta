@@ -63,5 +63,5 @@ Scripting mechanisms
 
 Writing command lines can be burdensome. To avoid having to write lengthy
 command lines, we provide a scripting mechanism to launch ALTA's commands
-from XML formatted files.
+from XML formatted files or [Python bidings](python.html).
 */
