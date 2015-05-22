@@ -56,6 +56,7 @@ class BrdfSlice : public data {
 			if(args.is_defined("param")) {
 				params::input param = params::parse_input(args["param"]);
 				if(params::dimension(param) == 2) {
+					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
 					this->setParametrization(param);
 				} else {
 					std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;

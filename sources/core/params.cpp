@@ -37,6 +37,7 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::COS_TH_TD, param_info("COS_TH_TD", 2, "Cosines of the elevation angles of the Half angle parametrization")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TV_PROJ_DPHI, param_info("ISOTROPIC_TV_PROJ_DPHI", 2, "Isoptropic projected phi parametrization without a light direction.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::STARK_2D, param_info("STARK_2D", 2, "Stark parametrization H, B but without third component.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::NEUMANN_2D, param_info("NEUMANN_2D", 2, "Neumann parametrization H, B but without third component.")));
 
 	/* 3D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_TD_PD, param_info("RUSIN_TH_TD_PD", 3, "Isotropic Half angle parametrization")));
@@ -161,6 +162,16 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[3] = Hx+Bx; 
 			outvec[4] = Hy+By;
 			outvec[5] = Hz+Bz;
+		}
+			break;
+		case NEUMANN_2D:
+		{
+			outvec[0] =   invec[0];
+			outvec[1] =   invec[1];
+			outvec[2] =   sqrt(1.0 - outvec[0]*outvec[0] - outvec[1]*outvec[1]);
+			outvec[3] =   invec[0];
+			outvec[4] = - invec[1];
+			outvec[5] =   sqrt(1.0 - outvec[3]*outvec[3] - outvec[4]*outvec[4]);
 		}
 			break;
 
@@ -380,6 +391,17 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			double By = 0.5*(invec[4]-invec[1]);
 			double Bz = 0.5*(invec[5]-invec[2]);
 			outvec[1] = sqrt(Bx*Bx + By*By + Bz*Bz);
+		}
+			break;
+		case NEUMANN_2D:
+		{
+			double Hx = 0.5*(invec[0]+invec[3]);
+			double Hy = 0.5*(invec[1]+invec[4]);
+			outvec[0] = sqrt(Hx*Hx + Hy*Hy);
+
+			double Bx = 0.5*(invec[3]-invec[0]);
+			double By = 0.5*(invec[4]-invec[1]);
+			outvec[1] = sqrt(Bx*Bx + By*By);
 		}
 			break;
 

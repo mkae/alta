@@ -98,6 +98,7 @@ class params
 
         // Params goes from (-1,-1) to (1,1)
         STARK_2D,
+        NEUMANN_2D,
 
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
                                We always pack the view vector first: \f$\vec{c} = [v.x, v.y, 
