@@ -69,6 +69,19 @@ std::ostream &operator<<(std::ostream &out, const python_vec &x) {
 
 /* This class is a wrapper to ALTA's arguments class to add Python specific
  * behaviour such as dictionnary initialization.
+ *
+ * Right now it does not handle automatic conversion in function call for 
+ * example. The following code is not possible:
+ *
+ *    import alta
+ *    alta.get_data('data_merl', {'params' : 'STARK_2D'})
+ *
+ * Instead, one has to construct the arguments object from the ALTA library
+ * to use it afterwards:
+ *
+ *    import alta
+ *    args = alta.arguments({'params' : 'STARK_2D'})
+ *    alta.get_data('data_merl', args)
  */
 struct python_arguments : public arguments {
 	python_arguments() : arguments() {}
@@ -81,7 +94,6 @@ struct python_arguments : public arguments {
 		}
 	}
 };
-
 
 /* Create a data object from a plugin's name and the data filename. This 
  * function is here to accelerate the loading of data file.
@@ -164,7 +176,6 @@ BOOST_PYTHON_MODULE(alta)
 		.def(bp::init<>())
 		.def(bp::init<bp::dict>())
 		.def("update", &arguments::update);
-	bp::implicitly_convertible<bp::dict, python_arguments>();
 
 
 	// Vector class
