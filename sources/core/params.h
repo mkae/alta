@@ -105,8 +105,19 @@ class params
 											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
 											  is the projected coordinates of \f$ \tilde{H} \f$ on the
 											  tanget plane. */
-        NEUMANN_2D,           /*!< Neumann and Neumann parametrization.*/
+        NEUMANN_2D,           /*!< Neumann and Neumann [1996] parametrization. This parametrization
+		                             is defined by the couple \f$ \vec{x} = ||\tilde{H}_p||, 
+											  ||\tilde{B}_p|| \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
+											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
+											  is the projected coordinates of \f$ \tilde{H} \f$ on the
+											  tanget plane.*/
 
+        STARK_3D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
+		                             is defined by the tuple \f$ \vec{x} = ||\tilde{H}_p||, 
+											  ||\tilde{B}||, \phi_B-\phi_H \f$. */
+        NEUMANN_3D,           /*!< Neumann and Neumann [1996] 3D parametrization. This parametrization
+		                             is defined by the tuple \f$ \vec{x} = ||\tilde{H}_p||, 
+											  ||\tilde{B}_p||, \phi_B-\phi_H \f$.*/
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
                                We always pack the view vector first: \f$[V.x, V.y, 
   									  V.z, L.x, L.y, L.z] \f$*/

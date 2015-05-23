@@ -47,6 +47,8 @@ std::map<params::input, const param_info> create_map()
 	_map.insert(std::make_pair<params::input, const param_info>(params::ISOTROPIC_TL_TV_PROJ_DPHI, param_info("ISOTROPIC_TL_TV_PROJ_DPHI", 3, "Isoptropic projected phi parametrization.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::SCHLICK_TL_TK_PROJ_DPHI, param_info("SCHLICK_TL_TK_PROJ_DPHI", 3, "Isoptropic projected phi parametrization centered around the back vector.")));
 	_map.insert(std::make_pair<params::input, const param_info>(params::RETRO_TL_TVL_PROJ_DPHI, param_info("RETRO_TL_TVL_PROJ_DPHI", 3, "Isoptropic retro projected phi parametrization.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::STARK_3D, param_info("STARK_3D", 3, "Stark parametrization H, B.")));
+	_map.insert(std::make_pair<params::input, const param_info>(params::NEUMANN_3D, param_info("NEUMANN_3D", 3, "Neumann parametrization H, B.")));
 
 	/* 4D Params */
 	_map.insert(std::make_pair<params::input, const param_info>(params::RUSIN_TH_PH_TD_PD, param_info("RUSIN_TH_PH_TD_PD", 4, "Complete Half angle parametrization")));
@@ -277,6 +279,43 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[5] = cos(invec[0]);
 		}
 			break;
+		// TODO: Add the phi into the reparametrization.
+		//
+		case STARK_3D:
+		{
+			const double Hx = invec[0];
+			const double Hy = 0;
+			const double Hz = sqrt(1.0 - Hx*Hx - invec[1]*invec[1]);
+			// Ensuring that <H,B> = 0
+			const double cosPhi = cos(invec[2]);
+			const double sinPhi = sin(invec[2]);
+			const double cosThe = 1.0;
+			const double sinThe = sqrt(1.0 - cosThe*cosThe);
+			const double Bx = invec[1]*sinThe*cosPhi;
+			const double By = invec[1]*sinThe*sinPhi;
+			const double Bz = invec[1]*cosThe;
+
+			outvec[0] = Hx-Bx;
+			outvec[1] = Hy-By;
+			outvec[2] = Hz-Bz;
+			outvec[3] = Hx+Bx; 
+			outvec[4] = Hy+By;
+			outvec[5] = Hz+Bz;
+		}
+		break;
+		case NEUMANN_3D:
+		{
+			const double cosPhi = cos(invec[2]);
+			const double sinPhi = sin(invec[2]);
+
+			outvec[0] =   invec[0] + cosPhi*invec[1];
+			outvec[1] =   sinPhi*invec[1];
+			outvec[2] =   sqrt(1.0 - outvec[0]*outvec[0] - outvec[1]*outvec[1]);
+			outvec[3] =   invec[0] + cosPhi*invec[1];
+			outvec[4] = - sinPhi*invec[1];
+			outvec[5] =   sqrt(1.0 - outvec[3]*outvec[3] - outvec[4]*outvec[4]);
+		}
+		break;
 
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:
@@ -514,6 +553,31 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[0] = acos(invec[5]);
 			outvec[1] = theta_k * cos(dphi);
 			outvec[2] = theta_k * sin(dphi);
+		}
+			break;
+		case STARK_3D:
+		{
+			double Hx = 0.5*(invec[0]+invec[3]);
+			double Hy = 0.5*(invec[1]+invec[4]);
+			outvec[0] = sqrt(Hx*Hx + Hy*Hy);
+
+			double Bx = 0.5*(invec[3]-invec[0]);
+			double By = 0.5*(invec[4]-invec[1]);
+			double Bz = 0.5*(invec[5]-invec[2]);
+			outvec[1] = sqrt(Bx*Bx + By*By + Bz*Bz);
+			outvec[2] = atan2(Hy, Hx) - atan2(By, Bx);
+		}
+			break;
+		case NEUMANN_3D:
+		{
+				double Hx = 0.5*(invec[0]+invec[3]);
+				double Hy = 0.5*(invec[1]+invec[4]);
+				outvec[0] = sqrt(Hx*Hx + Hy*Hy);
+
+				double Bx = 0.5*(invec[3]-invec[0]);
+				double By = 0.5*(invec[4]-invec[1]);
+				outvec[1] = sqrt(Bx*Bx + By*By);
+				outvec[2] = atan2(Hy, Hx) - atan2(By, Bx);
 		}
 			break;
 

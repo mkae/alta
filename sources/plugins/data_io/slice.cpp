@@ -38,6 +38,7 @@ class BrdfSlice : public data {
 	public:
 
 		int width, height, slice;
+		double _phi;
 		double* _data;
 
 		BrdfSlice(const arguments& args) : data()
@@ -46,6 +47,7 @@ class BrdfSlice : public data {
 			width = 512; height = 512;
 			slice = 1;
 			_data = new double[3*width*height*slice];
+			_phi = 0.5*M_PI;
 	
 			// Set the input and output parametrization
 			_in_param  = params::STARK_2D;
@@ -57,9 +59,20 @@ class BrdfSlice : public data {
 			// parameters provided.
 			if(args.is_defined("param")) {
 				params::input param = params::parse_input(args["param"]);
+
+				// The param is a 2D param
 				if(params::dimension(param) == 2) {
 					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
 					this->setParametrization(param);
+
+				// The oaram is a 3D param
+				} else if(params::dimension(param) == 3) {
+					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
+					this->setParametrization(param);
+					this->_phi = (M_PI / 180.0) * args.get_float("phi", 90);
+					_nX = 3;
+
+
 				} else {
 					std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;
 					std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
@@ -95,18 +108,20 @@ class BrdfSlice : public data {
 		// Acces to data
 		vec get(int id) const 
 		{
-			vec res(5) ;
+			vec res(_nX+_nY) ;
 			const int i = id % width;
 			const int k = id / (width*height);
 			const int j = (id - k*width*height) / width;
 
 			res[0] = (i+0.5) / double(width);
 			res[1] = (j+0.5) / double(height);
-			//res[2] = M_PI*(k+0.5) / double(slice);
+			if(_nX == 3) {
+				res[2] = _phi;
+			}
 
-			res[2] = _data[3*id + 0];
-			res[3] = _data[3*id + 1];
-			res[4] = _data[3*id + 2];
+			res[_nX+0] = _data[3*id + 0];
+			res[_nX+1] = _data[3*id + 1];
+			res[_nX+2] = _data[3*id + 2];
 
 			return res ;
 		}
@@ -118,7 +133,7 @@ class BrdfSlice : public data {
 		//! \todo Test this function
 		void set(const vec& x)
 		{
-			assert(x.size() == 5);
+			assert(x.size() == _nX+_nY);
 			assert(x[0] <= 1.0/*0.5*M_PI*/ && x[0] >= 0.0);
 			assert(x[1] <= 1.0/*0.5*M_PI*/ && x[1] >= 0.0);
 
@@ -128,9 +143,9 @@ class BrdfSlice : public data {
 			//const int k  = floor(x[2] * slice  / (M_PI));
 			const int id = i + j*width + k*width*height;
 
-			_data[3*id + 0] = x[2];
-			_data[3*id + 1] = x[3];
-			_data[3*id + 2] = x[4];
+			_data[3*id + 0] = x[_nX+0];
+			_data[3*id + 1] = x[_nX+1];
+			_data[3*id + 2] = x[_nX+2];
 		}
 		void set(int id, const vec& x)
 		{
@@ -180,10 +195,12 @@ class BrdfSlice : public data {
 		// Get min and max input space values
 		vec min() const 
 		{
-			vec res(2);
+			vec res(_nX);
 			res[0] = 0.0 ;
 			res[1] = 0.0 ;
-			//res[2] = 0.0 ;
+			if(_nX == 3) {
+				res[2] = 0.0 ;
+			}
 			return res ;
 		}
 		vec max() const
@@ -191,13 +208,15 @@ class BrdfSlice : public data {
 			vec res(2);
 			res[0] = M_PI / 2 ;
 			res[1] = M_PI / 2 ;
-			//res[2] = M_PI;
+			if(_nX == 3) {
+				res[2] = 0.0 ;
+			}
 			return res ;
 		}
 
 		int dimX() const 
 		{ 
-			return 2 ; 
+			return _nX ; 
 		}
 		int dimY() const 
 		{ 
