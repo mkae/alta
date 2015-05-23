@@ -289,7 +289,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			// Ensuring that <H,B> = 0
 			const double cosPhi = cos(invec[2]);
 			const double sinPhi = sin(invec[2]);
-			const double cosThe = 1.0;
+			const double cosThe = cos(atan(-sqrt(1-invec[0]*invec[0]-invec[1]*invec[1]) / (invec[0]*cos(invec[2]))));
 			const double sinThe = sqrt(1.0 - cosThe*cosThe);
 			const double Bx = invec[1]*sinThe*cosPhi;
 			const double By = invec[1]*sinThe*sinPhi;
