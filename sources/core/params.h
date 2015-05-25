@@ -366,9 +366,9 @@ class params
 			  const double cost = cos(theta);
 			  const double sint = sin(theta);
 
-			  const double temp = cost * vec[0] + sint * vec[1];
+			  const double temp = cost * vec[0] - sint * vec[1];
 
-			  vec[1] = cost * vec[1] - sint * vec[0];
+			  vec[1] = cost * vec[1] + sint * vec[0];
 			  vec[0] = temp;
 		  }
 

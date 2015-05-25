@@ -279,8 +279,6 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[5] = cos(invec[0]);
 		}
 			break;
-		// TODO: Add the phi into the reparametrization.
-		//
 		case STARK_3D:
 		{
 			const double Hx = invec[0];
@@ -311,7 +309,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[0] =   invec[0] + cosPhi*invec[1];
 			outvec[1] =   sinPhi*invec[1];
 			outvec[2] =   sqrt(1.0 - outvec[0]*outvec[0] - outvec[1]*outvec[1]);
-			outvec[3] =   invec[0] + cosPhi*invec[1];
+			outvec[3] =   invec[0] - cosPhi*invec[1];
 			outvec[4] = - sinPhi*invec[1];
 			outvec[5] =   sqrt(1.0 - outvec[3]*outvec[3] - outvec[4]*outvec[4]);
 		}
