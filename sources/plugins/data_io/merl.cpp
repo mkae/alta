@@ -370,6 +370,11 @@ private: //methods
 				  double theta_diff, double fi_diff, 
 				  double& red_val,double& green_val,double& blue_val) const 
 	{
+		// The phi index needs to be positive.
+		if(fi_diff < 0.0) {
+			fi_diff = - fi_diff;
+		}
+
 		// The data is symmetric on fi_diff with respect to PI
 		if(fi_diff > M_PI) {
 			fi_diff = 2.0*M_PI - fi_diff;
@@ -379,7 +384,7 @@ private: //methods
 		 // allocated memory.
 		if(theta_half < 0.0 || theta_half > 0.5*M_PI || 
 		   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
-		   std::abs(fi_diff) > M_PI) {
+		   fi_diff > M_PI || fi_diff < 0.0) {
 			red_val   = 0.0;
 			green_val = 0.0;
 			blue_val  = 0.0;
