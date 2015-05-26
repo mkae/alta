@@ -364,6 +364,10 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[4] = Hy+By;
 			outvec[5] = Hz+Bz;
 
+			assert( outvec[2] >= 0.0);
+			assert( outvec[5] >= 0.0);
+
+
 			#ifdef DEBUG_PARAM
 			std::cout << __FILE__ << " " << __LINE__ << std::endl;
 			std::cout << " outvec = " << outvec[0] << " " << outvec[1] << "  " << outvec[2] <<  " " << outvec[3]
