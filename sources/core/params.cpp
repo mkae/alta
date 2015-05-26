@@ -576,8 +576,8 @@ params::output params::parse_output(const std::string& txt)
 		return params::UNKNOWN_OUTPUT;
 	}
 }
-		  
-std::string params::get_name(const params::input param)
+
+const std::string& params::get_name(const params::input param)
 {
 	std::map<params::input, const param_info>::const_iterator it = input_map.find(param);
 	if(it != input_map.end())
@@ -588,10 +588,12 @@ std::string params::get_name(const params::input param)
 #ifdef DEBUG
 	std::cerr << "<<WARNING>> Unknown parametrization, n°" << param << ", "<< __FILE__ << ":" << __LINE__ << std::endl;
 #endif
-	return std::string("UNKNOWN_INPUT");
+
+	static const std::string unknown = "UNKNOWN_INPUT";
+	return unknown;
 }
 
-std::string params::get_name(const params::output param)
+const std::string& params::get_name(const params::output param)
 {
 		std::map<params::output, std::string>::const_iterator it = output_map.find(param);
 		if (it != output_map.end())
