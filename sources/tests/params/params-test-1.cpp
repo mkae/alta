@@ -10,7 +10,7 @@ bool closeTo(double a, double b) {
 }
 
 /* Test different configurations for the Half / Cartesian parametrization
- * Returns: 0 is every test passes
+ * Returns: 0 if every test passes
  *          n > 0 when n tests did no pass
  */
 int main(int argc, char** argv) {
