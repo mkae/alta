@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -135,10 +135,7 @@ class params
 		  //! type.
 		  //! \todo Finish this implementation. It requires another static
 		  //! object.
-		  static std::string get_name(const params::output)
-		  {
-			  return std::string("UNKNOWN_OUTPUT");
-		  }
+		  static std::string get_name(const params::output);
 
         //! \brief static function for input type convertion. This
         //! function allocate the resulting vector.
