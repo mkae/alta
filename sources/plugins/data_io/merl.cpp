@@ -167,12 +167,27 @@ public: // methods
 
 	vec value(const vec& in) const {
 	    double r, g, b;
+
 	    lookup_brdf_val(brdf, in[0], in[1], in[2], r, g, b) ;
 
 	    vec res(3);
-	    res[0] = r;
-	    res[1] = g;
-	    res[2] = b;
+	    res[0] = r ;
+	    res[1] = g ;
+	    res[2] = b ;
+
+	    if( res[0] < 0.0 || res[1] < 0.0 || res[2] < 0.0 )
+	    {
+	    	
+	    	std::cout << __FILE__ << " " << __LINE__ << " in[0] = " << in[0]
+	    						<< " in[1] = " << in[1] << " in[2] = " << in[2] << std::endl;
+	    	std::cout <<  "res = " << res << std::endl;
+
+	    	res[0] = 0.0;
+	    	res[1] = 0.0;
+	    	res[2] = 0.0;
+ 
+	    	assert(0);
+	    }
 	    return res;
 	}
 
@@ -382,6 +397,8 @@ private: //methods
 		
 	    // Testing the input domain to avoid indexing outside of the
 		 // allocated memory.
+		 
+		 //ROMAIN PAC:  fi_diff IS ALWAYS >= 0.0 ACCORDING TO WHAT IS DONE BEFORE!!!
 		if(theta_half < 0.0 || theta_half > 0.5*M_PI || 
 		   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
 		   fi_diff > M_PI || fi_diff < 0.0) {
@@ -402,10 +419,15 @@ private: //methods
 		green_val = brdf[ind + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 		blue_val = brdf[ind + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
 
-	#ifdef DEBUG
+	//#ifdef DEBUG
 		if (red_val < 0.0 || green_val < 0.0 || blue_val < 0.0)
-	        fprintf(stderr, "Negative value [%f, %f, %f].\n", theta_half, theta_diff, fi_diff);
-	#endif
+		{
+			fprintf(stderr, "Negative value [%f, %f, %f].\n", theta_half, theta_diff, fi_diff);
+	    std::cerr << " red_val = " << red_val << " green_val = " << green_val << " blue_val = " << blue_val << std::endl;
+	    std::cerr << " AT INDEX = " << ind << std::endl;
+		}
+
+	//#endif
 	}
 
 	// Read BRDF data
