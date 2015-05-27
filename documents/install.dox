@@ -3,26 +3,20 @@
 
 <h2>Dependencies</h2>
 
-ALTA is decomposed into three parts: the <b>core</b>, <b>plugins</b>, and
-command line <b>softwares</b>. The third party dependencies of each part
-follow those rules:
+ALTA is decomposed into three parts: the \ref core, \ref plugins, and \ref
+commands. The third party dependencies of each part follow those rules:
 
- + The <b>core</b> depends only on Eigen library for its vector class.
- + <b>Plugins</b> depend on whatever library they need. The dependency of a particular plugin and how to install it must be provided in its documentation.
- + <b>Softwares</b> only depend on the core.
+ + The **core** depends only on Eigen library for its vector class.
+ + **Plugins** depend on whatever library they need. The dependency of a particular plugin and how to install it must be provided in its documentation.
+ + **Commands** only depend on the core and on OpenMP.
 
 To ease the installation of ALTA, we provide scripts to install some of the
 dependencies in the <em>$ALTA/external</em> directory. Each script is a python
 script and has the form <i>obtain_{name}.py</i>. For example, to obtain the
 Eigen library, the commands are:
 
-\verbatim
-$ cd $ALTA/external
-$ python obtain_eigen.py
-\endverbatim
-
-<b>Note: </b> if you plan to use <b>scons</b> to compile ALTA, those scripts
-will be called automatically.
+	$ cd $ALTA/external
+	$ python obtain_eigen.py
 
 <h3>List of common plugin dependencies:</h3>
 <ul>
@@ -30,43 +24,46 @@ will be called automatically.
 	(for core and plugins). You will need a version >= 3.0 to have access
 	to the Eigen implementation of Levenberg-Marquardt.</li>
 	<li><a href="http://quadprog.sourceforge.net/">Quadprog++</a> library 
-	(for \a rational_fitter_quadprog, provided in the external directory)</li>
+	(for \ref rational_fitter_quadprog, provided in the external directory)</li>
 	<li><a href="http://www.mathworks.fr/products/matlab/">Matlab</a> with 
 	the Engine library (for some plugins)</li>
 	<li><a href="http://www.cgal.org"/>CGAL</a> library (for some plugins)</li>
 	<li><a href="https://code.google.com/p/ceres-solver/">CERES</a> solver 
-	library (for \a nonlinear_fitter_ceres)</li>
+	library (for \ref nonlinear_fitter_ceres)</li>
 	<li><a href="http://www.cs.ubc.ca/research/flann/">libFLANN</a> (for 
-	the \a data_interpolant plugin). Note that this library is available
+	the \ref data_interpolant plugin). Note that this library is available
 	through Debian's packages and MacOS ports.</li>
 </ul>
 
 You can find more information on the dependencies in the \ref dependencies
 page.
 
+
+
 ### Obtaining additional depedencies
 
 #### Ubuntu/Debian
 
-Most of the dependencies can be obtain using the 'apt-get' command from Ubuntu/Debian. Other dependancies are automatically obtained using the python scripts provided (see above).
+Most of the dependencies can be obtain using the 'apt-get' command from Ubuntu/Debian. Other dependencies are automatically obtained using the python scripts provided (see above).
 
- 	$ sudo apt-get install libgomp1 libcgal-dev libflann-dev
+ 	$ sudo apt-get install libeigen3-dev libgomp1 libcgal-dev libflann-dev libopenexr-dev
 
 #### OSX
 
-We advise to install the port package manager.
+We advise to install the MacPorts package manager.
 
-	$ sudo port install libgomp1 libcgal-dev libflann-dev
-
-<br />
+	$ sudo port install libeigen3-dev libcgal-dev libflann-dev libopenexr-dev
 
 
-<h2>Cross platform</h2>
+
+### Cross platform
 
 ALTA is developed as a cross platform library. However, we do not test it
-against any possible combination of platform/compiler/architecture. 
-Here is a  recap of the currently tested combinations:
+against any possible combination of platform/compiler/architecture. The
+latest version is regularly tested using *continuous integration*. See our
+[Jenkins logs](https://ci.inria.fr/alta/).
 
+Here is a  recap of the currently tested combinations:
 <center>
 <table>
 	<tr>
@@ -81,7 +78,7 @@ Here is a  recap of the currently tested combinations:
 		<td>GCC 4.7.2</td>
 		<td>x86_64</td>
 		<td>Works</td>
-		<td>Compiled using qmake</td>
+		<td></td>
 	</tr>
 	<tr>
 		<td>OS X 10.9.1</td>
@@ -89,7 +86,6 @@ Here is a  recap of the currently tested combinations:
 		<td>x86_64</td>
 		<td>Works</td>
 		<td>Matlab plugins are not tested on this configuration<br />
-		Compiled using scons
 		</td>
 	</tr>
 	<tr>
@@ -98,22 +94,19 @@ Here is a  recap of the currently tested combinations:
 		<td>x86_64</td>
 		<td>Works</td>
 		<td>Matlab plugins are not tested on this configuration<br />
-		Compiled using qmake
 		</td>
 	</tr>
 </table>
 </center>
 
-<br />
 
-<h2>Scons</h2>
+
+### Scons 
 
 Using scons, the compilation of ALTA is straightforward:
 
-\verbatim
-$ cd $ALTA
-$ scons --cfg=[filename]
-\endverbatim
+	$ cd $ALTA
+	$ scons --cfg=[filename]
 
 You need to provide a system dependant configuration file. You will find
 examples of such configuration files in the <em>$ALTA/configs/scons</em>
@@ -122,49 +115,8 @@ ALTA core and plugins.
 
 All the resulting elements of ALTA (binaries, dynamic and static libraries)
 are outputted in: <em>$ALTA/sources/build</em> directory. The dependencies
-(Eigen, ceres, ...) will be compiled in the <em>$ALTA/external/build</em>
+(ipopt, ceres, nlopt, ...) will be compiled in the <em>$ALTA/external/build</em>
 directory.
 
-<br />
-
-
-<h2>Qmake</h2>
-
-How to install the various components using <b>qmake</b>.
-
-<h3>.prf files</h3>
-
-Qt rely on user specified .prf files to look for external libraries.
-.prf files describe where to find libraries' headers and shared objects
-in a qmake fashion. Here is an example for the <i>quadprog.prf</i> file:
-
-\verbatim
-INCLUDEPATH += $(HOME)/Projects/alta/external/quadprog++
-LIBS += -L$(HOME)/Projects/alta/build -lquadprog++
-\endverbatim
-
-ALTA rely on the user to specify a .prf file for each dependency. Major
-ones are: eigen.prf, quadprog.prf, ceres.prf, cgal.prf, matlab.prf.
-
-You need to set the environment variable QMAKEFEATURES to the directory
-where you will be storing your .prf files. If you are not familiar with
-this process, we advise to store your .prf files in the external directory
-of ALTA.
-
-<h3>Installation</h3>
-
-Once you have the required libraries, the installation of the fitting
-tools is straightforward. Assuming that the environment variable $ALTA
-contains the path to the alta files:
-
-\verbatim
-$ cd $ALTA
-$ qmake && make -i
-\endverbatim
-
-All the resulting elements (binaries, dynamic and static libraries)
-are outputed in: <em>$ALTA/sources/build</em> directory.
-
-<br />
 
 */

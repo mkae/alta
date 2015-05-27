@@ -342,6 +342,12 @@ template<typename T> T erfc( T x )
 {
   return 1 - erf(x);
 }
+#else
+
+template<typename T> bool isnan(T x)
+{
+	return x==std::numeric_limits<T>::signaling_NaN();
+}
 
 #endif
 

@@ -79,9 +79,9 @@ Under MS Windows, you will need to update/set 'PATH', 'ALTA_LIB', and 'PYTHON_PA
 How to use it
 -------------
 
-ALTA uses command line programs to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions which correspond to BRDF models, \ref datas which correspond to BRDF measurments, and \ref fitters which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
+ALTA uses \ref commands to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions which correspond to BRDF models, \ref datas which correspond to BRDF measurments, and \ref fitters which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
 
-After compiling the different programss and plugins, go to the sources directory and launch this command line (for Linux users only):
+After compiling the different programs, plugins, and updating your environment, launch this command line:
 
     $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter rational_fitter_eigen
 
@@ -123,6 +123,7 @@ There are many ways in which you can extend ALTA. Please refer to
 \defgroup commands
 \defgroup plugins
 \defgroup softs
+\defgroup fitters
 \defgroup functions
 \defgroup datas
 */

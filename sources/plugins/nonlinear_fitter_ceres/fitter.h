@@ -26,6 +26,7 @@
 
 /*! \brief A non-linear fitter using the CERES solver
  *  \ingroup plugins
+ *  \ingroup fitters
  *
  *  \details
  *  <h3>Third party requirements</h3>
