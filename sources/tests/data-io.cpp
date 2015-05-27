@@ -16,6 +16,7 @@
 
 #include <core/args.h>
 #include <core/data.h>
+#include <core/data_storage.h>
 #include <core/vertical_segment.h>
 
 #include <string>
@@ -24,14 +25,50 @@
 #include <cstring>
 #include <cstdlib>
 
-static const std::string data_file = "Kirby2.dat";
+// Get the 'unlink' declaration.
+#ifdef _WIN32
+# include <io.h>
+# define unlink _unlink
+#else
+# include <unistd.h>
+#endif
 
-static void make_temp_file_name(std::string &result)
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
+
+#define TEST_ASSERT(exp)																				\
+	do																														\
+	{																															\
+			std::cerr << "evaluating '" << STRINGIFY(exp) << "'... ";	\
+			bool result = (exp);																			\
+			std::cerr << (result ? "PASS" : "FAIL") << std::endl;			\
+			if (!result)																							\
+					abort();																							\
+	}																															\
+	while(0)
+
+// Files that are automatically deleted upon destruction.
+class temporary_file
 {
-		static std::string suffix;
-		result = "t-data-io" + suffix;
-		suffix += "-";
-}
+public:
+		temporary_file()
+		{
+				static std::string suffix;
+				_name = "t-data-io" + suffix;
+				suffix += "-";
+		}
+
+		~temporary_file()
+		{
+				::unlink(_name.c_str());
+		}
+
+		const std::string& name() { return _name; };
+		operator const std::string& () { return _name; }
+
+private:
+		std::string _name;
+};
 
 // Try hard to read N bytes from INPUT into BUF.
 static std::streamsize read_exactly(std::istream &input, char *buf, std::streamsize n)
@@ -74,14 +111,21 @@ static bool files_are_equal(const std::string &file1, const std::string &file2)
 
 int main(int argc, char** argv)
 {
-		std::string temp_file1, temp_file2;
-		vertical_segment sample1, sample2;
+		std::string input_file;
+		temporary_file temp_file1, temp_file2, temp_file3;
+		vertical_segment sample1, sample2, sample3;
 
-		make_temp_file_name(temp_file1);
-		make_temp_file_name(temp_file2);
-
-		std::string data_dir = getenv("TEST_DATA_DIRECTORY") ?: ".";
-		std::string input_file = data_dir + "/" + data_file;
+		if (argc > 1)
+				// Process the user-specified file.
+				input_file = argv[1];
+		else
+		{
+				// Process the default test file.
+				static const std::string data_file = "Kirby2.dat";
+				std::string data_dir = getenv("TEST_DATA_DIRECTORY") != NULL
+						? getenv("TEST_DATA_DIRECTORY") : ".";
+				input_file = data_dir + "/" + data_file;
+		}
 
 		try
 		{
@@ -91,9 +135,29 @@ int main(int argc, char** argv)
 
 				sample2.load(temp_file1);
 				sample2.save(temp_file2);
+
+				// Now use the binary output format.
+				std::ofstream out;
+				out.open(temp_file3.name().c_str());
+				save_data_as_binary(out, sample2);
+				out.close();
+
+				// This should automatically load using the binary format loader.
+				sample3.load(temp_file3);
 		}
 		CATCH_FILE_IO_ERROR(input_file);
 
-		return files_are_equal(temp_file1, temp_file2)
-				? EXIT_SUCCESS : EXIT_FAILURE;
+		TEST_ASSERT(sample1.equals(sample2));
+		TEST_ASSERT(files_are_equal(temp_file1, temp_file2));
+		TEST_ASSERT(sample2.equals(sample3));
+
+		TEST_ASSERT(sample1.min().size() == sample1.dimX());
+		TEST_ASSERT(sample1.max().size() == sample1.dimX());
+
+		TEST_ASSERT(sample1.min() == sample2.min());
+		TEST_ASSERT(sample1.max() == sample2.max());
+		TEST_ASSERT(sample1.min() == sample3.min());
+		TEST_ASSERT(sample1.max() == sample3.max());
+
+		return EXIT_SUCCESS;
 }

@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -84,6 +84,31 @@ static const std::map<params::input, const param_info> input_map = create_map();
 //	{params::CARTESIAN,             {"CARTESIAN",             6, "Complete vector parametrization"}}
 //};
 //#endif
+
+static std::map<params::output, std::string> create_output_map()
+{
+		std::map<params::output, std::string> result;
+
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
+#define DEFINE_MAPPING(name)										\
+		result[params::name] = STRINGIFY(name);
+
+		DEFINE_MAPPING(INV_STERADIAN);
+		DEFINE_MAPPING(INV_STERADIAN_COSINE_FACTOR);
+		DEFINE_MAPPING(ENERGY);
+		DEFINE_MAPPING(RGB_COLOR);
+		DEFINE_MAPPING(XYZ_COLOR);
+
+#undef DEFINE_MAPPING
+#undef STRINGIFY
+#undef STRINGIFY_
+
+		return result;
+}
+
+static const std::map<params::output, std::string> output_map =
+		create_output_map();
 
 void params::to_cartesian(const double* invec, params::input intype,
 		double* outvec)
@@ -714,8 +739,8 @@ params::output params::parse_output(const std::string& txt)
 		return params::UNKNOWN_OUTPUT;
 	}
 }
-		  
-std::string params::get_name(const params::input param)
+
+const std::string& params::get_name(const params::input param)
 {
 	std::map<params::input, const param_info>::const_iterator it = input_map.find(param);
 	if(it != input_map.end())
@@ -726,7 +751,21 @@ std::string params::get_name(const params::input param)
 #ifdef DEBUG
 	std::cerr << "<<WARNING>> Unknown parametrization, n°" << param << ", "<< __FILE__ << ":" << __LINE__ << std::endl;
 #endif
-	return std::string("UNKNOWN_INPUT");
+
+	static const std::string unknown = "UNKNOWN_INPUT";
+	return unknown;
+}
+
+const std::string& params::get_name(const params::output param)
+{
+		std::map<params::output, std::string>::const_iterator it = output_map.find(param);
+		if (it != output_map.end())
+		{
+				return it->second;
+		}
+
+		static const std::string unknown = "UNKNOWN_OUTPUT";
+		return unknown;
 }
 
 int  params::dimension(params::input t)

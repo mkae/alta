@@ -14,6 +14,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <cstring>
 
 // Math Constants exist in Windows but they need to be included
 // by defining the constant _USE_MATH_DEFINES
@@ -28,6 +29,9 @@
 
 #include <cstring>
 #include <algorithm>
+
+#include <string>
+#include <map>
 
 #ifdef OLD
 /*! \brief A core implementation of a vector of double.
@@ -387,32 +391,101 @@ class timer
 };
 
 
+// Reading the ALTA header of data and function files.
+
+
+// Key/value association list.
+class header
+{
+	public:
+		class value
+		{
+		protected:
+				const std::string &_value;
+				static const value _undefined;
+		public:
+				value(const std::string& value): _value(value) { };
+				const std::string& string() const { return _value; }
+				operator const std::string&() const { return _value; }
+				operator int() const;
+
+				template<class T, class U>
+				operator std::pair<T, U>() const
+				{
+						std::stringstream input(_value);
+						T first; U second;
+
+						input >> first >> second;
+						std::pair<T, U> result(first, second);
+						return result;
+				}
+
+				//! \brief Return true if this is the undefined value.
+				bool is_undefined() const { return this == &_undefined; }
+
+				//! \brief Return the undefined value.
+				static const value& undefined() { return _undefined; }
+		};
+
+		//! \brief Read the ALTA header on INPUT.
+		header(std::istream &input);
+
+		//! \brief Return the type of this header--i.e., the "FOO" in
+		// "#ALTA FOO HEADER".
+		const std::string& kind() const
+		{
+			return _kind;
+		}
+
+		//! \brief Return the value associated with KEY in this header.
+		value operator[](const std::string& key) const
+		{
+				std::map<std::string, std::string>::const_iterator i;
+				i = _alist.find(key);
+				if (i == _alist.end())
+				{
+						// For backward compatibility, when the 'FORMAT' entry is
+						// missing, we assume it means 'text'.
+						return key == "FORMAT" ?
+								_text_value : value::undefined();
+				}
+				return value(i->second);
+		}
+
+	protected:
+		std::string _kind;
+		std::map<std::string, std::string> _alist;
+
+		static const value _text_value;
+};
+
+
+
+
 // I/O error handling in user interfaces.
 
 #include <iostream>
 #include <cstdlib>
 
-#ifndef _WIN32
-
-# define CATCH_FILE_IO_ERROR(file)								\
-		catch (std::ios_base::failure& e) {						\
-				std::cerr << "<<ERROR>> failed to load '"	\
-									<< (file) << "'"								\
-									<< ": " << strerror(errno)			\
-									<< std::endl;										\
-				exit(EXIT_FAILURE);												\
-		}
-
-#else
+#ifdef _WIN32
 
 // We cannot rely on 'errno' on Windows.
 
-# define CATCH_FILE_IO_ERROR(file)								\
-		catch (std::ios_base::failure& e) {						\
-				std::cerr << "<<ERROR>> failed to load '"	\
-									<< (file) << "'"								\
-									<< std::endl;										\
-				exit(EXIT_FAILURE);												\
-		}
+# define ALTA_FILE_IO_ERROR_STRING(e)						\
+    "(unspecified I/O error)"
 
-#endif	/* _WIN32 */
+#else
+
+# define ALTA_FILE_IO_ERROR_STRING(e)						\
+    (strerror(errno))
+
+#endif
+
+# define CATCH_FILE_IO_ERROR(file)												\
+		catch (std::ios_base::failure& e) {										\
+				std::cerr << "<<ERROR>> failed to load '"					\
+									<< (file) << "'"												\
+									<< ": " << ALTA_FILE_IO_ERROR_STRING(e)	\
+									<< std::endl;														\
+				exit(EXIT_FAILURE);																\
+		}

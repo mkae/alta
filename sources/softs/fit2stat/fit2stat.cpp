@@ -677,19 +677,19 @@ main(int argc, char* argv[])
 
 
   //Comparisons with the norm methods provided in function.cpp
-  // t.start();
-  // double const L2   = brdf->L2_distance( generic_data ) ;
-  // t.stop();
-  // std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
-  //           << " (computed in " << t << ")" << std::endl;
-  // t.reset();
+  t.start();
+  double const L2   = brdf->L2_distance( generic_data ) ;
+  t.stop();
+  std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
+            << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
-  // t.start();
-  // double const Linf = brdf->Linf_distance( generic_data );  
-  // t.stop();
-  // std::cout << "<<INFO>> Linf distance to data = " << Linf 
-  //           << " (computed in " << t << ")" << std::endl;
-  // t.reset();
+  t.start();
+  double const Linf = brdf->Linf_distance( generic_data );  
+  t.stop();
+  std::cout << "<<INFO>> Linf distance to data = " << Linf 
+            << " (computed in " << t << ")" << std::endl;
+  t.reset();
 
   return EXIT_SUCCESS;
 }

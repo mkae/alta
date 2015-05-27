@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 Import('env', 'ALTA_LIBS')
 env = env.Clone()
@@ -15,6 +15,13 @@ env.Alias('tests', env.Program('./build/data-io-test', 'data-io.cpp'))
 test_file = File('Kirby2.dat').srcnode().abspath
 test_data_directory = os.path.dirname(test_file)
 
+def executable(file):
+	'''Append '.exe' to FILE if needed.'''
+	if sys.platform.startswith('win'):
+		return file + '.exe'
+	else:
+		return file
+
 # Inspired by <http://www.scons.org/wiki/UnitTests>.
 def run_unit_test(env, target, source):
 	program = str(source[0].abspath)
@@ -27,5 +34,6 @@ def run_unit_test(env, target, source):
 		open(str(target[0]),'w').write("FAIL\n")
 		return 1
 
-env.Alias('tests', env.Command("test.passed", 'build/data-io-test',
+env.Alias('tests', env.Command("test.passed",
+															 executable('build/data-io-test'),
 															 run_unit_test))

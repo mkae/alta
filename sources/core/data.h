@@ -51,23 +51,7 @@ class data : public parametrized
 		virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
 		// Save the data to a file
-		virtual void save(const std::string& filename) const
-		{
-			std::ofstream file(filename.c_str(), std::ios_base::trunc);
-			file << "#DIM " << _nX << " " << _nY << std::endl;
-			file << "#PARAM_IN  " << params::get_name(input_parametrization())  << std::endl;
-			file << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;
-			for(int i=0; i<size(); ++i)
-			{
-				vec x = this->get(i);
-				for(int j=0; j<_nX+_nY; ++j)
-				{
-					file << x[j] << "\t";
-				}
-				file << std::endl;
-			}
-			file.close();
-		}
+		virtual void save(const std::string& filename) const;
 
 		// Acces to data
 		virtual vec get(int i) const = 0 ;
@@ -89,6 +73,13 @@ class data : public parametrized
 
 		// Get data size, e.g. the number of samples to fit
 		virtual int size() const = 0 ;
+
+		//! \brief Return true if this object is equal to DATA ±ε.
+		virtual bool equals(const data& data,
+												double epsilon = std::numeric_limits<float>::min());
+
+		friend void load_data_from_binary(std::istream& in, const header& header,
+																			data& data);
 
 	protected: // data
 } ;
@@ -189,3 +180,5 @@ class data_params : public data
 
 		std::vector<vec> _data;
 };
+
+/* -*- c++ -*- */
