@@ -60,15 +60,20 @@ git clone https://gforge.inria.fr/git/alta/alta.git
 
 ### Build
 
-You can build ALTA using either [qmake](http://qt-project.org) or [scons](http://www.scons.org). To start, we advise to use scons as it is lightweight and only requires Python to be installed (ALTA uses Python for its high level scripting mechanism). To build using scons, go to the root directory of ALTA and type:
+You can build ALTA using [scons](http://www.scons.org). Scons is lightweight and only requires Python to be installed (ALTA uses Python for its high level scripting mechanism). To build, go to the root directory of ALTA and type:
 
-    $ scons --cfg=[filename] -i
+    $ scons --cfg=[filename]
 
 
 You need to provide a platform dependant configuration file. You will find examples of such configuration files in the `$ALTA/configs/scons` directory. Running this command should obtain some of ALTA's dependencies (such as Eigen) and compile the main package of the library (i.e. the core, the programs, and some plugins).
 
-To use qmake, or for a more detailed view of ALTA's building scripts and dependencies, please refer to \ref install.
+For a more detailed view of ALTA's building scripts and dependencies, please refer to \ref install.
 
+Once the packages are compiled, you will need to update some environment variables. Under GNU/Linux and OSX this is automatically done using the setpath.sh script (at the root):
+
+    $ source setpath.sh
+
+Under MS Windows, you will need to update/set 'PATH', 'ALTA_LIB', and 'PYTHON_PATH'. See \ref install for more information about it.
 
 
 How to use it
@@ -78,7 +83,7 @@ ALTA uses command line programs to perform actions such as BRDF fitting, data co
 
 After compiling the different programss and plugins, go to the sources directory and launch this command line (for Linux users only):
 
-    $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter ./build/librational_fitter_eigen.so
+    $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter rational_fitter_eigen
 
 Tada! You have produced your first fit. The produced output is a 1D rational function, using a monomial basis, interpolating the [Kirby2](http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml) dataset. You can find an ALTA compatible version of this dataset [here](http://alta.gforge.inria.fr/data/Kirby2.dat). Note that this fit is not a BRDF.
 
