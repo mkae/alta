@@ -95,10 +95,6 @@ class params
   										  \theta_v \sin(\Delta\phi).\f$]*/
        ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
-       BARYCENTRIC_ALPHA_SIGMA, /*!< Barycentric parametrization defined input Stark et al. [2004].
-                                 Coordinates are: \f$[\alpha, \sigma] = [{1\over 2}(1 - (L.V)), 
-  										 (1-(H.N)^2)(1 - \alpha)]\f$ */
-
         STARK_2D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
 		                             is defined by the couple \f$ \vec{x} = ||\tilde{H}_p||, 
 											  ||\tilde{B}|| \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$

@@ -178,15 +178,16 @@ public: // methods
 	    if( res[0] < 0.0 || res[1] < 0.0 || res[2] < 0.0 )
 	    {
 	    	
+#ifdef DEBUG
 	    	std::cout << __FILE__ << " " << __LINE__ << " in[0] = " << in[0]
 	    						<< " in[1] = " << in[1] << " in[2] = " << in[2] << std::endl;
 	    	std::cout <<  "res = " << res << std::endl;
-
+#endif
 	    	res[0] = 0.0;
 	    	res[1] = 0.0;
 	    	res[2] = 0.0;
  
-	    	assert(0);
+	    	//assert(0);
 	    }
 	    return res;
 	}
@@ -419,7 +420,7 @@ private: //methods
 		green_val = brdf[ind + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] * GREEN_SCALE;
 		blue_val = brdf[ind + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
 
-	//#ifdef DEBUG
+	#ifdef DEBUG
 		if (red_val < 0.0 || green_val < 0.0 || blue_val < 0.0)
 		{
 			fprintf(stderr, "Negative value [%f, %f, %f].\n", theta_half, theta_diff, fi_diff);
@@ -427,7 +428,7 @@ private: //methods
 	    std::cerr << " AT INDEX = " << ind << std::endl;
 		}
 
-	//#endif
+	#endif
 	}
 
 	// Read BRDF data

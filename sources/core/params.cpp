@@ -285,97 +285,38 @@ void params::to_cartesian(const double* invec, params::input intype,
 			break;
 		case STARK_3D:
 		{
+			// Constructing the Half vector
 			const double Hx = invec[0];
 			const double Hy = 0;
+			const double Hz = sqrt(1.0 - invec[0]*invec[0] - invec[1]*invec[1]);
 
-			double const sqr_norm_H_bar = invec[0] * invec[0];
-			double const sqr_norm_K = invec[1] * invec[1];
-			double const test2 = sqr_norm_H_bar + sqr_norm_K;
-
-			// First TEST TO DONE BEFIRE THE NEXT ONE
-			if( test2 > 1.0 )
-			{
-				#ifdef DEBUG
-				std::cout << " RADIUS superior to 1. Below Hemisphere " << test2 << std::endl;
-				std::cout << " sqr_norm_H_bar = " << sqr_norm_H_bar << " sqr_norm_K = " << sqr_norm_K << std::endl;
-				std::cout << " invec = " << invec << std::endl;
-				#endif
-
-				//Returning an invalid CONFIGURATION
-				outvec[0] = 0.0;
-				outvec[1] = 0.0;
-				outvec[2] = -1.0;
-				outvec[3] = 0.0;
-				outvec[4] = 0.0;
-				outvec[5] = -1.0;
-				return;
-			}
-
-
-			const double Hz = sqrt(1.0 - sqr_norm_H_bar - sqr_norm_K);
-
-			// Ensuring that <H,B> = 0
+			// Constructing the Back vector using azimuth and elevation angles
 			const double cosPhi = cos(invec[2]);
 			const double sinPhi = sin(invec[2]);
-			
-			assert( Hx * cos( invec[2]) > 0.0 );
 
-			const double cosThe = cos(atan(-Hz / (Hx*cos(invec[2]))));
-			//Another way to compute it
-			//double const cosThe = cos( atan2( -Hz , Hx*cos(invec[2])) );
+#define STARK_BUILDING_THETA
 
-			
-
-			double const test = sqr_norm_H_bar + sqr_norm_K *(1.0+cosThe*cosThe);
-			if( test > 1.0)
-			{
-				#ifdef DEBUG_PARAM
-				std::cout << " BELOW HEMISPHERE" << std::endl;
-				std::cout << " sqr_norm_H_bar = " << sqr_norm_H_bar << " sqr_norm_K = " << sqr_norm_K << std::endl;
-				std::cout << " invec[0] = " << invec[0] << " " << invec[1] << " " << invec[2] << " " << invec[3] << " " << std::endl;
-				#endif
-
-				//Returning an invalid CONFIGURATION
-				outvec[0] = 0.0;
-				outvec[1] = 0.0;
-				outvec[2] = -1.0;
-				outvec[3] = 0.0;
-				outvec[4] = 0.0;
-				outvec[5] = -1.0;
-				return;
-			}
-
-			assert( (1.0 - Hx*Hx - invec[1]*invec[1]) >= 0.0 );
-			assert( !std::isinf(cosThe) ); assert( !isnan(cosThe) );
-			assert( cosThe >= 0.0 );
-			assert( cosThe <= 1.0 );
-
-			const double sinThe = sqrt(1.0 - cosThe*cosThe);
+#ifdef STARK_BUILDING_THETA
+			const double Theta  = atan2(-Hz, invec[0]*cosPhi);
+			const double cosThe = cos(Theta);
+			const double sinThe = sin(Theta);
+#else
+			// Pascal Barla's way to do it
+			const double cosThe = -cosPhi*invec[0] / sqrt(Hz*Hz + cosPhi*cosPhi*invec[0]*invec[0]);
+			const double sinThe = Hz / (sqrt(Hz*Hz + cosPhi*cosPhi * invec[0]*invec[0]));
+#endif
 			const double Bx = invec[1]*sinThe*cosPhi;
 			const double By = invec[1]*sinThe*sinPhi;
 			const double Bz = invec[1]*cosThe;
-
 			
-
 			outvec[0] = Hx-Bx;
 			outvec[1] = Hy-By;
 			outvec[2] = Hz-Bz;
 			outvec[3] = Hx+Bx; 
 			outvec[4] = Hy+By;
 			outvec[5] = Hz+Bz;
-
-			assert( outvec[2] >= 0.0);
-			assert( outvec[5] >= 0.0);
-
-
-			#ifdef DEBUG_PARAM
-			std::cout << __FILE__ << " " << __LINE__ << std::endl;
-			std::cout << " outvec = " << outvec[0] << " " << outvec[1] << "  " << outvec[2] <<  " " << outvec[3]
-								<< " " << outvec[4] << " " << outvec[5] << std::endl;
-			#endif
-
 		}
-		break;
+			break;
 		case NEUMANN_3D:
 		{
 			const double cosPhi = cos(invec[2]);
@@ -388,7 +329,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[4] = - sinPhi*invec[1];
 			outvec[5] =   sqrt(1.0 - outvec[3]*outvec[3] - outvec[4]*outvec[4]);
 		}
-		break;
+			break;
 
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:

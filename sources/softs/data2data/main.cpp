@@ -197,13 +197,24 @@ int main(int argc, char** argv)
 			vec x = d_out->get(i);
 			params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
 
+
+			// Check if the output configuration is below the hemisphere when converted to
+			// cartesian coordinates. Note that this prevent from converting BTDF data.
 			if(cart[2] >= 0.0 || cart[5] >= 0.0) {
 				params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
+				/*
+				y[0] = temp[0];
+				y[1] = temp[1];
+				y[2] = temp[2];
+				/*/
 				y = d_in->value(temp);
+				//*/
 			} else {
 				y.setZero();
 			}
 			
+			// Convert the value stored in the input data in the value format of the output
+			// data file.
 			params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
 			
 			d_out->set(x);

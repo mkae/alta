@@ -38,8 +38,10 @@ class BrdfSlice : public data {
 	public:
 
 		int width, height, slice;
+		vec _max, _min;
 		double _phi;
 		double* _data;
+		bool _reverse;
 
 		BrdfSlice(const arguments& args) : data()
 		{
@@ -54,7 +56,7 @@ class BrdfSlice : public data {
 			_out_param = params::RGB_COLOR;
 			_nX = 2;
 			_nY = 3;
-			
+
 			// Allow to load a different parametrization depending on the 
 			// parameters provided.
 			if(args.is_defined("param")) {
@@ -78,6 +80,16 @@ class BrdfSlice : public data {
 					std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
 				}
 			}
+
+			// Is the position of the slice componnent (third coordinate)
+			// reversed? This ensure that some params can be displayed.
+			_reverse = _in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+			           _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
+						  _in_param == params::RETRO_TL_TVL_PROJ_DPHI;
+			
+			// Update the domain
+			_max = max();
+			_min = min();
 		}
 
 		~BrdfSlice()
@@ -113,10 +125,15 @@ class BrdfSlice : public data {
 			const int k = id / (width*height);
 			const int j = (id - k*width*height) / width;
 
-			res[0] = (i+0.5) / double(width);
-			res[1] = (j+0.5) / double(height);
+			res[0] = (i+0.5) * (_max[0]-_min[0]) / double(width)  + _min[0];
+			res[1] = (j+0.5) * (_max[1]-_min[1]) / double(height) + _min[1];
 			if(_nX == 3) {
 				res[2] = _phi;
+			}
+
+			// Reverse the first part of the vector
+			if(_reverse) {
+				res.segment(0, _nX).reverseInPlace();
 			}
 
 			res[_nX+0] = _data[3*id + 0];
@@ -133,19 +150,27 @@ class BrdfSlice : public data {
 		//! \todo Test this function
 		void set(const vec& x)
 		{
-			assert(x.size() == _nX+_nY);
-			assert(x[0] <= 1.0/*0.5*M_PI*/ && x[0] >= 0.0);
-			assert(x[1] <= 1.0/*0.5*M_PI*/ && x[1] >= 0.0);
+			// Copy vector is required
+			vec _x = x;
 
-			const int i  = floor(x[0] * width  / /*(0.5*M_PI)*/ 1.0);
-			const int j  = floor(x[1] * height / /*(0.5*M_PI)*/ 1.0);
+			// Reverse the first part of the vector
+			if(_reverse) {
+				_x.segment(0, _nX).reverseInPlace();
+			}
+
+			assert(_x.size() == _nX+_nY);
+			assert(_x[0] <= _max[0] && _x[0] >= _min[0]);
+			assert(_x[1] <= _max[1] && _x[1] >= _min[1]);
+
+			const int i  = floor((_x[0]-_min[0]) * width  / (_max[0] - _min[0]));
+			const int j  = floor((_x[1]-_min[1]) * height / (_max[1] - _min[1]));
 			const int k  = 0; 
 			//const int k  = floor(x[2] * slice  / (M_PI));
 			const int id = i + j*width + k*width*height;
 
-			_data[3*id + 0] = x[_nX+0];
-			_data[3*id + 1] = x[_nX+1];
-			_data[3*id + 2] = x[_nX+2];
+			_data[3*id + 0] = _x[_nX+0];
+			_data[3*id + 1] = _x[_nX+1];
+			_data[3*id + 2] = _x[_nX+2];
 		}
 		void set(int id, const vec& x)
 		{
@@ -158,22 +183,29 @@ class BrdfSlice : public data {
 
 		vec value(const vec& x) const
 		{
+			// Copy vector is required
+			vec _x = x;
+
+			// Reverse the first part of the vector
+			if(_reverse) {
+				_x.segment(0, _nX).reverseInPlace();
+			}
+
 			// Safeguard. We can use either asserting or returning zero in case
 			// the query values are not within reach.
-			if(x[0] > 1.0 || x[0] < 0.0 || x[1] > 1.0 || x[1] < 0.0 ||
-				isnan(x[0]) || isnan(x[1])) {
+			if(_x[0] > _max[0] || x[0] < _min[0] || x[1] > _max[1] || x[1] < _min[1] ||
+				isnan(_x[0]) || isnan(x[1])) {
 					vec res(3);
 					return res;
 			}
 			/*
-			assert(x[0] <= 1.0 && x[0] >= 0.0);
-			assert(x[1] <= 1.0 && x[1] >= 0.0);
+			assert(_x[0] <= 1.0 && x[0] >= 0.0);
+			assert(_x[1] <= 1.0 && x[1] >= 0.0);
 			*/
-
-			const int i  = floor(x[0] * width  / 1.0);
-			const int j  = floor(x[1] * height / 1.0);
+			const int i  = floor((_x[0]-_min[0]) * width  / (_max[0] - _min[0]));
+			const int j  = floor((_x[1]-_min[1]) * height / (_max[1] - _min[1]));
 			const int k  = 1; 
-			//const int k  = floor(x[2] * slice  / (M_PI));
+			//const int k  = floor(_x[2] * slice  / (M_PI));
 			const int id = (i + j*width)*k;
 
 			if(i < 0 || i >= width)  { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
@@ -196,20 +228,56 @@ class BrdfSlice : public data {
 		vec min() const 
 		{
 			vec res(_nX);
-			res[0] = 0.0 ;
-			res[1] = 0.0 ;
+			
+			// First fill the third dimension. It can be overwritten by the next
+			// part when the parametrization is reversed (projected ones).
 			if(_nX == 3) {
 				res[2] = 0.0 ;
+			}
+
+			// Fill the first two dimension unless the parametrization is a
+			// projected one then it will fill the three components.
+			if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+				_in_param == params::ISOTROPIC_TV_TL_DPHI) {	
+				res[0] = -0.5*M_PI ;
+				res[1] = -0.5*M_PI ;
+			} else if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+					    _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
+						 _in_param == params::RETRO_TL_TVL_PROJ_DPHI) {
+				res[0] = -0.5*M_PI ;
+				res[1] = -0.5*M_PI ;
+				res[2] = -0.5*M_PI ;
+			} else {
+				res[0] = 0.0 ;
+				res[1] = 0.0 ;
 			}
 			return res ;
 		}
 		vec max() const
 		{
-			vec res(2);
-			res[0] = M_PI / 2 ;
-			res[1] = M_PI / 2 ;
+			vec res(_nX);
+
+			// First fill the third dimension. It can be overwritten by the next
+			// part when the parametrization is reversed (projected ones).
 			if(_nX == 3) {
-				res[2] = 0.0 ;
+				res[2] = 2.0*M_PI;
+			}
+
+			// Fill the first two dimension unless the parametrization is a
+			// projected one then it will fill the three components.
+			if(_in_param == params::RUSIN_TH_TD_PD || 
+				_in_param == params::ISOTROPIC_TV_TL_DPHI) {	
+				res[0] = 0.5*M_PI ;
+				res[1] = 0.5*M_PI ;
+			} else if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+					    _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
+						 _in_param == params::RETRO_TL_TVL_PROJ_DPHI) {
+				res[0] = 0.5*M_PI ;
+				res[1] = 0.5*M_PI ;
+				res[2] = 0.5*M_PI ;
+			} else {
+				res[0] = 1.0 ;
+				res[1] = 1.0 ;
 			}
 			return res ;
 		}
