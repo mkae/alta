@@ -29,6 +29,7 @@ PLUGIN_LIB     = ['core', 'stdc++']
 ## or Homebrew (http://brew.sh/)
 #PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
 #PYTHON_DIR    = ['/opt/local/lib']
+#PYTHON_LIB    = ['boost_python-mt', 'python2.7']
 
 
 ## Eigen library
