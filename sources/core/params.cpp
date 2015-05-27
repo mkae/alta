@@ -322,11 +322,27 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double cosPhi = cos(invec[2]);
 			const double sinPhi = sin(invec[2]);
 
+			// Build the projected Half and Back vectors
 			outvec[0] =   invec[0] + cosPhi*invec[1];
 			outvec[1] =   sinPhi*invec[1];
-			outvec[2] =   sqrt(1.0 - outvec[0]*outvec[0] - outvec[1]*outvec[1]);
 			outvec[3] =   invec[0] - cosPhi*invec[1];
 			outvec[4] = - sinPhi*invec[1];
+	
+			// Safeguard, if the vectors are not under unit length return an
+			// invalid configuration
+			if(outvec[0]*outvec[0]+outvec[1]*outvec[1] > 1.0 ||
+				outvec[3]*outvec[3]+outvec[4]*outvec[4] > 1.0) {
+				outvec[0] =  0.0;
+				outvec[1] =  0.0;
+				outvec[2] = -1.0;
+				outvec[3] =  0.0;
+				outvec[4] =  0.0;
+				outvec[5] = -1.0;
+				break;
+			}
+
+			// Project the vectorx on the hemisphere.
+			outvec[2] =   sqrt(1.0 - outvec[0]*outvec[0] - outvec[1]*outvec[1]);
 			outvec[5] =   sqrt(1.0 - outvec[3]*outvec[3] - outvec[4]*outvec[4]);
 		}
 			break;
