@@ -501,8 +501,6 @@ class parametrized
 		virtual void setDimY(int nY) {
 			if(_nY != nY) {
 				_nY = nY;
-				_min.resize(nY);
-				_max.resize(nY);
 			}
 		}
 
