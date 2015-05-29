@@ -8,9 +8,9 @@
      (python-indent-offset . 2)))
  (c-mode
   . ((tab-width . 2)
-     (indent-tabs-mode . t)
+     (indent-tabs-mode . nil)
      (eval . (c-set-style "stroustrup"))))
  (c++-mode
   . ((tab-width . 2)
-     (indent-tabs-mode . t)
+     (indent-tabs-mode . nil)
      (eval . (c-set-style "stroustrup")))))
