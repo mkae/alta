@@ -15,6 +15,7 @@
 #include <iostream>
 #include <limits>
 #include <fstream>
+#include <cmath>
 
 #include "common.h"
 #include "args.h"
@@ -77,7 +78,7 @@ class data : public parametrized
 		//! \brief Return true if this object is equal to DATA ±ε.
 		virtual bool equals(const data& data,
 												double epsilon =
-                        std::pow(1, -(std::numeric_limits<double>::digits10 - 1)));
+                        std::pow(1.0, -int(std::numeric_limits<double>::digits10 - 1)));
 
 		friend void load_data_from_binary(std::istream& in, const arguments& header,
 																			data& data);

@@ -15,6 +15,7 @@
 #include <map>
 #include <cstdlib>
 #include <iostream>
+#include <cctype>
 
 #include "common.h"
 
