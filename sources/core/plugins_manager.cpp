@@ -192,14 +192,14 @@ function* plugins_manager::load_function(const std::string& filename)
 
 	// Parse the header for the function command line and the dimension
 	// of the function
-	header header(file);
+	arguments header = arguments::parse_header(file);
 
-	std::pair<int, int> dim = header["DIM"];
+	std::pair<int, int> dim = header.get_pair<int>("DIM");
 	nX = dim.first;
 	nY = dim.second;
 
-	param_in = params::parse_input(header["PARAM_IN"]);
-	param_out = params::parse_output(header["PARAM_OUT"]);
+	param_in = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
+	param_out = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
 	args = arguments::create_arguments(header["CMD"]);
 
 	// Create the function from the command line
@@ -256,12 +256,11 @@ function* plugins_manager::get_function(const arguments& args)
         return NULL;
     }
 
-    //! create a <em>compound</em> class to store multiple
-    //! functions in it.
+	 //! create a *compound* class to store multiple ! functions in it.
     compound_function* compound = new compound_function();
 
-    //! For each args_vec element, create a function object and add
-    //! it to the compound one.
+	 //! For each args_vec element, create a function object and add ! it to the
+	 //compound one.
     for(unsigned int i=0; i<args_vec.size(); ++i)
     {
       std::string n("--func ");

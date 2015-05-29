@@ -68,13 +68,19 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	file.open(filename.c_str());
 	file.exceptions (std::ios::goodbit);
 
-	header header(file);
+	arguments header = arguments::parse_header(file);
 
-	if (header["FORMAT"].string() == "binary")
-			load_data_from_binary(file, header, *this);
-	else if (header["FORMAT"].string() == "text")
-			load_data_from_text(file, header, *this, args);
-	else throw;															// FIXME: Throw a usable exception.
+	// Default behaviour: parsing a file as TEXT file. Send a message error in case
+	// the user did not set it.
+	if(! header.is_defined("FORMAT")) {
+		std::cerr << "<<DEBUG>> The file format is undefined, assuming TEXT" << std::endl;
+	}
+
+	if (header["FORMAT"] == "binary") {
+		load_data_from_binary(file, header, *this);
+	} else {
+		load_data_from_text(file, header, *this, args);
+	}
 
 	file.close();
 }

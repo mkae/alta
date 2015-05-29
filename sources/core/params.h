@@ -490,9 +490,21 @@ class parametrized
 		virtual int dimY() const { return _nY ; }
 
 		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX) { _nX = nX ; }
+		virtual void setDimX(int nX) { 
+			if(_nX != nX) {
+				_nX = nX;
+				_min.resize(nX);
+				_max.resize(nX);
+			}
+		}
 		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY) { _nY = nY ; }
+		virtual void setDimY(int nY) {
+			if(_nY != nY) {
+				_nY = nY;
+				_min.resize(nY);
+				_max.resize(nY);
+			}
+		}
 
 
 		/* DEFINITION DOMAIN OF THE FUNCTION */

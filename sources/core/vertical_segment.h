@@ -133,7 +133,7 @@ class vertical_segment : public data
     void initializeToZero( unsigned int number_of_data_elements );
 
 		static void load_data_from_text(std::istream& input,
-																		const header& header,
+																		const arguments& header,
 																		vertical_segment& result,
 																		const arguments& args);
 

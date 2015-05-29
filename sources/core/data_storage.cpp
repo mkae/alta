@@ -21,7 +21,7 @@
 #endif
 
 void vertical_segment::load_data_from_text(std::istream& input,
-																					 const header& header,
+																					 const arguments& header,
 																					 vertical_segment& result,
 																					 const arguments& args)
 {
@@ -30,12 +30,19 @@ void vertical_segment::load_data_from_text(std::istream& input,
 
 	result._nX = 0 ; result._nY = 0 ;
 
-	std::pair<int, int> dim = header["DIM"];
-	result._nX = dim.first;
-	result._nY = dim.second;
+	if(! header.is_defined("DIM")) {
+		std::cerr << "<<ERROR>> Undefined dimensions ! ";
+		std::cerr << "Please add DIM [int] [int] into the file header." << std::endl;
+		throw;
+	}
 
-	result._min.resize(result.dimX()) ;
-	result._max.resize(result.dimX()) ;
+	params::input  in_param  = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
+	params::output out_param = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
+	result.setParametrizations(in_param, out_param);
+
+	std::pair<int, int> dim = header.get_pair<int>("DIM");
+	result.setDimX(dim.first);
+	result.setDimY(dim.second);
 
 	min = args.get_vec("min", result._nX, -std::numeric_limits<float>::max()) ;
 	max = args.get_vec("max", result._nX,  std::numeric_limits<float>::max()) ;
@@ -55,10 +62,7 @@ void vertical_segment::load_data_from_text(std::istream& input,
 			result._max[k] = -std::numeric_limits<double>::max() ;
 	}
 
-	result._in_param = params::parse_input(header["PARAM_IN"]);
-	result._out_param = params::parse_output(header["PARAM_OUT"]);
-
-	int vs_value = header["VS"];
+	int vs_value = header.get_int("VS");
 
 	// Now read the body.
 	while(input.good())
@@ -254,31 +258,28 @@ void save_data_as_binary(std::ostream &out, const data& data)
 		out << std::endl << "#END_STREAM" << std::endl;
 }
 
-void load_data_from_binary(std::istream& in, const header& header, data& data)
+void load_data_from_binary(std::istream& in, const arguments& header, data& data)
 {
 		// FIXME: For now we make a number of assumptions.
-		assert(header["FORMAT"].string() == "binary");
-		assert(header["VERSION"] == 0);
-		assert(header["PRECISION"].string() == "ieee754-double");
+		assert(header["FORMAT"] == "binary");
+		assert(header.get_int("VERSION") == 0);
+		assert(header["PRECISION"] == "ieee754-double");
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-		assert(header["ENDIAN"].string() == "little");
+		assert(header["ENDIAN"] == "little");
 #else
-		assert(header["ENDIAN"].string() == "big");
+		assert(header["ENDIAN"] == "big");
 #endif
 
-		std::pair<int, int> dim = header["DIM"];
+		data.setParametrizations(params::parse_input(header["PARAM_IN"]),
+										 params::parse_output(header["PARAM_OUT"]));
+
+		std::pair<int, int> dim = header.get_pair<int>("DIM");
 		data.setDimX(dim.first);
 		data.setDimY(dim.second);
 
-		data._min.resize(dim.first);
-		data._max.resize(dim.first);
-
-		data.setParametrizations(params::parse_input(header["PARAM_IN"]),
-														 params::parse_output(header["PARAM_OUT"]));
-
 		in.exceptions(std::ios_base::failbit);
 
-		int sample_count = header["SAMPLE_COUNT"];
+		int sample_count = header.get_int("SAMPLE_COUNT");
 
 		// Initialize the mininum and maximum values.
 		vec min(dim.first), max(dim.first);

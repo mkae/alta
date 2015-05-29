@@ -329,6 +329,33 @@ class arguments
         }
       return res;
     }
+		
+		//! \brief access a pair of element of type \a T.
+		//! the string associated with the key \a key should have the form
+		//! "a b" where a, b are compatible with type \a T.
+		template<typename T>
+		std::pair<T, T> get_pair(const std::string& key) const {
+
+			std::pair<T, T> res;
+
+			//TODO: RP: it is not very efficient to call count + find 
+			// because find is called twice !!! 
+			// My advice: find should be called once, check if the key exist
+			// and if yes use the iterator returned by find
+			if(_map.count(key) > 0) {
+
+				std::string str = _map.find(key)->second;
+				std::stringstream sstream(str);
+
+				T first, second;
+				sstream >> first >> second;
+
+				// Update the pair
+				res.first  = first;
+				res.second = second;
+			}
+			return res;
+		}
 
 		  //! \brief get the reconstructed command line arguments (without
 		  //! the executable name
@@ -397,6 +424,80 @@ class arguments
           }
           return out;
       }
+
+		//! \brief Parse a data file header.
+		//
+		//! \detail
+		//! ALTA file header should appear at the beginning of each file. Each
+		//! line starts with '#' and describe a couple key, value. For example,
+		//! parametrizations are described as:
+		//!	#PARAM_IN NAME
+		//!
+		//! Note: A header should always start and ends by:
+		//!	#ALTA HEADER BEGIN
+		//!	#ALTA HEADER END
+		//!
+		static arguments parse_header(std::istream &input) {
+
+			// Argument object to be returned
+			arguments args;
+
+			while(input.good())
+			{
+				if (input.peek() == '#')
+				{
+					// consume the hash sign
+					input.get();
+
+					// Get the line
+					std::string line;
+					std::getline(input, line);
+					std::stringstream linestream(line);
+
+					// Lines starting with '# ' are real comments and we ignore
+					// them.  Others are key/value associations that we want to use.
+					if (linestream.peek() != ' ')	{
+
+						linestream.flags(std::ios_base::skipws);
+
+						std::string key, data;
+						linestream >> key;
+						if (!key.empty()) {
+
+							// ALTA header starts and ends with '#ALTA'
+							if (key == "ALTA") {
+								std::string first, second;
+								linestream >> first >> second;
+								if (second == "HEADER")	{
+
+									// Add the header type
+									if (first != "END") {
+										args.update("TYPE", second);
+									} else {
+										break;
+									}
+								}
+
+							// Store the line into the argument 
+							} else {
+								while(!linestream.eof()	&& std::isspace(linestream.peek()))	{
+									linestream.get();
+								}
+
+								getline(linestream, data);
+								args.update(key, data) ;
+							}
+						}
+					}
+					
+				// The first non-comment line terminates the header.
+				} else {
+					break;
+				}
+			}
+
+			return args;
+		}
 
 
 	private: // data
