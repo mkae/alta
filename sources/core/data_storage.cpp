@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <iomanip>
 #include <cassert>
 
 #ifdef __GLIBC__
@@ -219,7 +220,8 @@ void save_data_as_text(std::ostream& out, const data &data)
 				vec x = data.get(i);
 				for(int j=0; j< data.dimX() + data.dimY(); ++j)
 				{
-						out << x[j] << "\t";
+            out << std::setprecision(std::numeric_limits<double>::digits10)
+                << x[j] << "\t";
 				}
 				out << std::endl;
 		}
