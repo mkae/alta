@@ -26,18 +26,21 @@
 /* The following code register ALTA's shared pointer as a valid shared ptr
  * to be used by boost::python .
  */
-template <typename T> 
-T* get_pointer(ptr<T> const& p) {
-  return const_cast<T*>(p.get());
+template <typename T> T* get_pointer(ptr<T>& p) {
+   return const_cast<T*>(p.get());
+}
+
+template <typename T> const T* get_pointer(const ptr<T>& p) {
+   return p.get();
 }
 
 namespace boost {
-	namespace python {
-   		template <typename T>
-    	struct pointee< ::ptr<T> > {
-        	typedef T type;
-    	};
-	}
+   namespace python {
+
+      template <typename T> struct pointee< ::ptr<T> > {
+         typedef T type;
+      };
+   }
 }
 
 
@@ -161,18 +164,17 @@ void data2data(const data* d_in, data* d_out) {
 	}	
 }
 
-void fit_data(ptr<fitter>& f, const ptr<data>& d, ptr<function>& fn, const arguments& args) {
-	f->fit_data(d, fn, args);
-}
 
-
-/* Exporting the ALTA module 
+/*! \inpage python 
+ *  Exporting the ALTA module 
+ *  The interface currently contains data2data and fitter.fit
  */
 BOOST_PYTHON_MODULE(alta)
 {
 	// Argument class
 	//
-	bp::class_<python_arguments>("arguments")
+	bp::class_<arguments>("_arguments");
+	bp::class_<python_arguments, bp::bases<arguments>>("arguments")
 		.def(bp::init<>())
 		.def(bp::init<bp::dict>())
 		.def("update", &arguments::update);
@@ -220,7 +222,6 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
 		.def("fit_data", &fitter::fit_data);
 	bp::def("get_fitter", plugins_manager::get_fitter);
-	bp::def("fit_data",   fit_data);
 
 	// Softs
 	//
