@@ -164,6 +164,39 @@ void data2data(const data* d_in, data* d_out) {
 	}	
 }
 
+/* This function provides a similar behaviour that the brdf2data function.
+ * An input function object is evaluated on the input position of a data
+ * object. To do so, the data object must contains some positions. It can
+ * be so when the data object is a laoded data sample or when the data type
+ * has predefined sample sets.
+ */
+void brdf2data(const ptr<function>& f, ptr<data>& d) {
+	if(d->size() == 0) {
+		std::cerr << "<<ERROR>> Please provide a data object with a sample structure or load a data file with defined positions." << std::endl;
+		return;
+	}
+
+	vec temp(f->dimX());
+	for(int i=0; i<d->size(); ++i) {
+		// Copy the input vector
+		vec x = d->get(i);
+
+		// Convert the data to the function's input space.
+	    if(f->input_parametrization() == params::UNKNOWN_INPUT) {
+	    	memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
+	    } else {
+			params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
+		}
+		vec y = f->value(temp);
+
+		for(int j=0; j<d->dimY(); ++j) {
+			x[d->dimX() + j] = y[j];
+		}
+
+		d->set(i, y);
+	}	
+}
+
 
 /*! \inpage python 
  *  Exporting the ALTA module 
@@ -225,5 +258,6 @@ BOOST_PYTHON_MODULE(alta)
 
 	// Softs
 	//
-	bp::def("data2data", data2data);	
+	bp::def("data2data", data2data);
+	bp::def("brdf2data", brdf2data);	
 }
