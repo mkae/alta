@@ -10,8 +10,8 @@ if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_D
 	for lib in env['CERES_OPT_LIB']:		
 		if conf.CheckLib(lib):
 			env.AppendUnique(LIBS = lib)
-		else:
-			W.warn(W.WarningOnByDefault, "could not find library " + lib)
+		#else:
+		#	W.warn(W.DependencyWarning, "could not find library " + lib)
 	env = conf.Finish()
 
 	env.SharedLibrary('../../build/nonlinear_fitter_ceres', 'fitter.cpp')

@@ -16,7 +16,7 @@ if conf.CheckLib(env['MATLAB_LIB']):
 
 	build_lib = True
 else:
-	W.warn(W.WarningOnByDefault, "unable to find MATLAB for Rational Fitter")
+	W.warn(W.DependencyWarning, "unable to find MATLAB for Rational Fitter")
 
 conf.Finish()
 

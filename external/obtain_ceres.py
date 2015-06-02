@@ -19,7 +19,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
 		if sys.platform == 'darwin' and not exists_archive:
 			obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
 		C.progress_display('configuring and building GLOG')
-		obtain.configure_build('glog-0.3.3', '--enable-static=no --enable-shared=true --with-pic=true')
+		obtain.configure_build('glog-0.3.3', '--enable-static=no --enable-shared=true --with-pic=true CFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\"')
 else:
 	C.progress_display('GLOG is already installed')
 
@@ -52,17 +52,14 @@ if compile_test:
 	os.chdir('.' + os.sep + 'ceres-solver-' + version)
 	build_dir = os.pardir + os.sep + 'build' + os.sep
 
-	libname = ''
-	if os.name == 'posix':
-		libname = 'libglog.so'
-	elif os.name == 'nt':
-		libname = 'glog.lib'
+	glog_config = ''
+	if os.name == 'nt':
+		glog_config = '-DMINIGLOG=ON'
 	else:
-		libname = 'libglog.dylib'
+		glog_config = '-DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + ' -DMINIGLOG=OFF'
 	#end
 
-	#cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
-	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF -DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=OFF -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
+	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF ' + glog_config + ' include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release'
 	
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')

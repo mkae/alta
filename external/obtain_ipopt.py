@@ -6,15 +6,16 @@ import subprocess
 import SCons.Warnings as W
 import SCons.SConf as C
 
-
-if os.path.exists('.' + os.sep + 'Ipopt-3.11.8.tgz') :
-	C.progress_display('the IpOpt package is already downloaded or installed')
-	C.progress_display('if the plugins using IpOpt fail to build, \
-check this installation')
+# On OSX, the c++11 flags are working. However, they are not on GNU/Linux
+flags = ''
+if sys.platform == 'darwin':
+    flags = ' CXXFLAGS=\"--std=c++11\" CFLAGS=\"--std=c11\"'
+#end
 
 else:
 	# Download IpOpt.
-	obtain.obtain('IpOpt v3.11.8', 'Ipopt-3.11.8',
+	if not os.path.exists('.' + os.sep + 'Ipopt-3.11.8.tgz'):
+		obtain.obtain('IpOpt v3.11.8', 'Ipopt-3.11.8',
               'http://www.coin-or.org/download/source/Ipopt/Ipopt-3.11.8.tgz', 'Ipopt-3.11.8.tgz',
               '9f9b76075fbd9315286ea4d7c159c94cab4a4fb16122fb172b24910af5b5b75b')
 
@@ -36,9 +37,11 @@ else:
 			ret = os.system('./get.Mumps')
 
 			os.chdir(path)
-			obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking CXXFLAGS=\"--std=c++11\" CFLAGS=\"--std=c11\"')
+			obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking' + flags)
 		#end
 	else:
 		C.progress_display('IpOpt is already installed')
+		C.progress_display('if the plugins using IpOpt fail to build, \
+check its installation')
 	#end
 #end

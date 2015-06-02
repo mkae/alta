@@ -20,8 +20,9 @@ PLUGIN_LIB     = ['core']
 
 ## Python and boost-python library
 ##
-#PYTHON_INC    = ['/usr/include/python2.7']
-#PYTHON_DIR    = []
+PYTHON_INC    = ['/usr/include/python2.7']
+PYTHON_DIR    = ['/usr/lib/x86_64-linux-gnu']
+PYTHON_LIB    = ['boost_python-py27', 'python2.7']
 
 
 ## Eigen library
@@ -60,33 +61,37 @@ QUADPROG_LIB      = ['quadprog++']
 
 ## CERES library
 ##
-## You have to specify both the directory of the CERES library
-## and the glog library
+## There is no 'ceres' or 'glog' packages available on Debian. If they are not
+## provided by the user, the automatic installation tool will be runnned.
 ##
 CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
-CERES_LIB      = ['ceres', 'miniglog']
+CERES_LIB      = ['ceres']
 CERES_OPT_LIB  = ['gomp', 'lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse']
 
 
 ## NlOpt library
 ##
-## You have to specify the directory of the NlOpt library
+## NlOpt has a default pkgconfig configuration file. If you want to use you
+## own NlOpt installation with no support of pkgconfig (not advised), please
+## uncomment and update the following variables.
 ##
-NLOPT_INC      = ['#external/build/include']
-NLOPT_DIR      = ['#external/build/lib']
-NLOPT_LIB      = ['nlopt']
-NLOPT_OPT_LIB  = []
+#NLOPT_INC      = ['#external/build/include']
+#NLOPT_DIR      = ['#external/build/lib']
+#NLOPT_LIB      = ['nlopt']
+#NLOPT_OPT_LIB  = []
 
 
 ## coin IpOpt library
 ##
-## You have to specify the directory of the IpOpt library
+## IpOpt has a default pkgconfig configuration file. If you want to use you
+## own IpOpt installation with no support of pkgconfig (not advised), please
+## uncomment and update the following variables.
 ##
-IPOPT_INC      = ['#external/build/include']
-IPOPT_DIR      = ['#external/build/lib']
-IPOPT_LIB      = ['ipopt']
-IPOPT_OPT_LIB  = []
+#IPOPT_INC      = ['#external/build/include']
+#IPOPT_DIR      = ['#external/build/lib']
+#IPOPT_LIB      = ['ipopt']
+#IPOPT_OPT_LIB  = []
 
 
 ## MATLAB library and Engine
