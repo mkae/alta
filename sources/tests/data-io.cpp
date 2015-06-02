@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 
 				// Now use the binary output format.
 				std::ofstream out;
-				out.open(temp_file3.name().c_str());
+				out.open(temp_file3.name().c_str(), std::ofstream::binary);
 				save_data_as_binary(out, sample2);
 				out.close();
 
