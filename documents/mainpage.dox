@@ -62,10 +62,10 @@ git clone https://gforge.inria.fr/git/alta/alta.git
 
 You can build ALTA using [scons](http://www.scons.org). Scons is lightweight and only requires Python to be installed (ALTA uses Python for its high level scripting mechanism). To build, go to the root directory of ALTA and type:
 
-    $ scons --cfg=[filename]
+    $ scons
 
 
-You need to provide a platform dependant configuration file. You will find examples of such configuration files in the `$ALTA/configs/scons` directory. Running this command should obtain some of ALTA's dependencies (such as Eigen) and compile the main package of the library (i.e. the core, the programs, and some plugins).
+You might want to provide a platform dependant configuration file using the `--cfg=[file]` argument. You will find examples of such configuration files in the `$ALTA/configs/scons` directory. Running this command should obtain some of ALTA's dependencies (such as Eigen) and compile the main package of the library (i.e. the core, the programs, and some plugins).
 
 For a more detailed view of ALTA's building scripts and dependencies, please refer to \ref install.
 
