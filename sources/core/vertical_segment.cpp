@@ -82,7 +82,7 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
       // On MS Windows strange things happen when the ifstream is not opened in
       // binary mode.  To avoid having badbit set after a few entries read, we
       // close and re-open the file with correct flags.
-      file.close()
+      file.close();
       file.open(filename.c_str(), std::ifstream::binary);
       header = arguments::parse_header(file);
 #endif
