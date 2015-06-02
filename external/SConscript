@@ -4,6 +4,8 @@ import SCons.SConf as C
 
 Import('env', 'CheckPKG', 'library_available')
 
+on_windows = os.name == 'nt'
+
 if env.GetOption('clean'):
 	print "Removing all the third party packages"
 
@@ -32,7 +34,6 @@ else:
 	# The env variable is cloned for IpOpt, NlOpt and CERES to avoid
 	# propagating the link flags for them in the main build script.
 	##
-	env2 = env.Clone()
 
     ##
     # Check for optional dependencies, downloading them if they
@@ -48,20 +49,27 @@ else:
 	##
 	#   IpOpt dependencies
 	##
-	if not library_available(env2, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp'):
+	env2 = env.Clone()
+	if not on_windows and not library_available(env2, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp'):
 		execfile('obtain_ipopt.py')
 
 	##
 	#   NlOpt dependencies
 	##
-	if not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h'):
+	env2 = env.Clone()
+	if not on_windows and not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h'):
 	        execfile('obtain_nlopt.py')
 
 	##
 	#   CERES dependencies
 	##
+	env2 = env.Clone()
 	if not library_available(env2, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h'):
 		execfile('obtain_ceres.py')
+		env['CERES_INC'] = ['#external/build/include']
+		env['CERES_DIR'] = ['#external/build/lib']
+		env['CERES_LIB'] = ['ceres', 'glog']
+		env['CERES_OPT_LIB'] = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse', 'atlas']
 
 	C.progress_display("external libraries are built as shared libraries")
 	C.progress_display("please adjust the shared library search path \
@@ -69,9 +77,11 @@ else:
 
 	##
 	#   QuadProg++
+	#   TODO: Change to the QuadProg v2 code
 	##
-	qp_target  = 'build' + os.sep + 'lib' + os.sep + 'quadprog++'
-	qp_base    = 'quadprog++' + os.sep
+	qp_dir     = 'quadprog++'
+	qp_target  = 'build' + os.sep + 'lib' + os.sep + qp_dir
+	qp_base    = qp_dir + os.sep
 	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
 	qp_env     = env.Clone()
 	qp_env.Append(CPPPATH = ['build' + os.sep + 'include'])

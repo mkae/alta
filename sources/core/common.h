@@ -344,10 +344,15 @@ template<typename T> T erfc( T x )
 }
 #else
 
+// Laurent: This code is required under Debian (and most GNU/Linux), but 
+// is not compatible with OSX with default STL that comes with clang.
+// TODO: Find a better way to have isnan defined all the time.
+#if !defined(__APPLE__) || !defined(__clang__)
 template<typename T> bool isnan(T x)
 {
 	return x==std::numeric_limits<T>::signaling_NaN();
 }
+#endif
 
 #endif
 

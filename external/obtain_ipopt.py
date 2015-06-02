@@ -36,7 +36,7 @@ else:
 			ret = os.system('./get.Mumps')
 
 			os.chdir(path)
-			obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking')
+			obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking CXXFLAGS=\"--std=c++11\" CFLAGS=\"--std=c11\"')
 		#end
 	else:
 		C.progress_display('IpOpt is already installed')

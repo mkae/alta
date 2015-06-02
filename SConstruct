@@ -22,15 +22,25 @@ AddOption('--cfg', help='Specify a configuration file (see config.example')
 ##
 configFile = GetOption('cfg')
 if configFile == None:
-	print '<<ERROR>> You need to specify a configuration file using:'
-	print '<<ERROR>>    scons --cfg=[filename]'
-	print '<<ERROR>> Please find example of configuration files in ${ALTA}/configs/scons/'
-	Exit(1)
+    
+    if sys.platform == 'win32':
+        configFile = "./configs/scons/config-windows-cl.py"
+    elif sys.platform == 'darwin':
+        configFile = "./configs/scons/config-macos-clang.py"
+    elif sys.platform == 'linux2':
+        configFile = "./configs/scons/config-linux-gcc.py"
+    else:
+    	print '<<ERROR>> You need to specify a configuration file using:'
+    	print '<<ERROR>>    scons --cfg=[filename]'
+    	print '<<ERROR>> Please find example of configuration files in ${ALTA}/configs/scons/'
+    	Exit(1)
 #end
 
 if not os.path.exists(configFile):
-	print '<<ERROR>> the config file you specified does not exists'
+	print '<<ERROR>> the config file you specified \"' + configFile + '\" does not exists'
 	Exit(1)
+else:
+    print '<<INFO>> Using config file \"' + configFile + '\"'
 #end
 
 vars = Variables(configFile)
@@ -62,7 +72,7 @@ vars.Add('CERES_OPT_LIB',     'CERES optional libraries')
 vars.Add('NLOPT_INC',         'NLOPT include directory')
 vars.Add('NLOPT_DIR',         'NLOPT libraries directory')
 vars.Add('NLOPT_LIB',         'NLOPT libraries', default = [])
-vars.Add('NLOPT_OPT_LIB',     'NLOPT optional libraries')
+vars.Add('NLOPT_OPT_LIB',     'NLOPT optional libraries', default = [])
 vars.Add('IPOPT_INC',         'IPOPT include directory')
 vars.Add('IPOPT_DIR',         'IPOPT libraries directory')
 vars.Add('IPOPT_LIB',         'IPOPT libraries', default = [])

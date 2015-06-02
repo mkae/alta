@@ -62,7 +62,7 @@ if compile_test:
 	#end
 
 	#cmake_cmd = 'cmake -DGLOG_LIB=' + build_dir + 'lib' + os.sep + libname + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
-	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF -DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=ON'
+	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF -DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + 'include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=OFF -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DMINIGLOG=OFF'
 	
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
