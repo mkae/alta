@@ -14,8 +14,8 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'clang++'
-CCFLAGS        = ['-O3', '-g', '-Wall', '-Xarch_x86_64', '-mmacosx-version-min=10.9', '-std=c++11']
-LINKFLAGS      = ['-headerpad_max_install_names', '-Xarch_x86_64', '-mmacosx-version-min=10.9']
+CCFLAGS        = ['-std=c++11', '-O3', '-g', '-Wall']
+LINKFLAGS      = []
 
 
 ## ALTA internal flags
@@ -24,12 +24,14 @@ PLUGIN_LIB     = ['core', 'stdc++']
 
 
 ## Python and boost-python library
+##
 ## Be sure to install boost-python and python
 ## You can do this by using Macports (http://www.macports.org/) 
 ## or Homebrew (http://brew.sh/)
-#PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
-#PYTHON_DIR    = ['/opt/local/lib']
-#PYTHON_LIB    = ['boost_python-mt', 'python2.7']
+##
+PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
+PYTHON_DIR    = ['/opt/local/lib']
+PYTHON_LIB    = ['boost_python-mt', 'python2.7']
 
 
 ## Eigen library
@@ -39,11 +41,17 @@ EIGEN_INC     = ['#external/build/include/Eigen']
 
 ## OpenMP flags
 ##
+## There is no support for OpenMP on OSX + clang right now. We advise to use
+## a gcc compiler if performances are required.
+##
 OPENMP_FLAG   = []
 OPENMP_LIB    = []
 
 
 ## OpenEXR library
+##
+## OpenEXR in ports has a default pkgconfig file. If you want to specify your
+## own compilation of OpenEXR, please uncomment and update the two variables.
 ##
 #OPENEXR_INC    = ['/opt/local/include/OpenEXR']
 #OPENEXR_DIR    = ['/opt/local/lib']
@@ -67,33 +75,38 @@ QUADPROG_LIB      = ['quadprog++']
 
 ## CERES library
 ##
-## You have to specify both the directory of the CERES library
-## and the glog library
+## On OSX with ports, 'ceres' and 'glog' packages are available. By defaults
+## we try to get them. If they are not provided by the user, the automatic
+## installation tool will be runnned.
 ##
-CERES_INC      = ['#external/build/include']
-CERES_DIR      = ['#external/build/lib']
-CERES_LIB      = ['ceres', 'miniglog']
-CERES_OPT_LIB  = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse']
+CERES_INC      = ['/opt/local/include']
+CERES_DIR      = ['/opt/local/lib']
+CERES_LIB      = ['ceres', 'glog']
+CERES_OPT_LIB  = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse', 'atlas']
 
 
 ## NlOpt library
 ##
-## You have to specify the directory of the NlOpt library
+## NlOpt has a default pkgconfig configuration file. If you want to use you
+## own NlOpt installation with no support of pkgconfig (not advised), please
+## uncomment and update the following variables.
 ##
-NLOPT_INC      = ['#external/build/include']
-NLOPT_DIR      = ['#external/build/lib']
-NLOPT_LIB      = ['nlopt']
-NLOPT_OPT_LIB  = []
+# NLOPT_INC      = ['#external/build/include']
+# NLOPT_DIR      = ['#external/build/lib']
+# NLOPT_LIB      = ['nlopt']
+# NLOPT_OPT_LIB  = []
 
 
 ## coin IpOpt library
 ##
-## You have to specify the directory of the IpOpt library
+## IpOpt has a default pkgconfig configuration file. If you want to use you
+## own IpOpt installation with no support of pkgconfig (not advised), please
+## uncomment and update the following variables.
 ##
-IPOPT_INC      = ['#external/build/include']
-IPOPT_DIR      = ['#external/build/lib']
-IPOPT_LIB      = ['ipopt']
-IPOPT_OPT_LIB  = []
+# IPOPT_INC      = ['#external/build/include']
+# IPOPT_DIR      = ['#external/build/lib']
+# IPOPT_LIB      = ['ipopt']
+# IPOPT_OPT_LIB  = []
 
 
 ## MATLAB library and Engine

@@ -278,42 +278,47 @@ void load_data_from_binary(std::istream& in, const arguments& header, data& data
 		std::pair<int, int> dim = header.get_pair<int>("DIM");
 		data.setDimX(dim.first);
 		data.setDimY(dim.second);
+      assert(data.dimX() > 0 && data.dimY() > 0);
 
 		in.exceptions(std::ios_base::failbit);
 
 		int sample_count = header.get_int("SAMPLE_COUNT");
+      if(sample_count <= 0) {
+         std::cerr << "<<ERROR>> Uncorrect or not samples count in the header, please check \'SAMPLE_COUNT\'" << std::endl;
+      }
 
 		// Initialize the mininum and maximum values.
 		vec min(dim.first), max(dim.first);
 
-		for(int k = 0; k < dim.first; k++)
-		{
-				min[k] =  std::numeric_limits<double>::max();
-				max[k] = -std::numeric_limits<double>::max();
-		}
+      for(int k = 0; k < dim.first; k++)
+      {
+         min[k] =  std::numeric_limits<double>::max();
+         max[k] = -std::numeric_limits<double>::max();
+      }
 
 		// TODO: Arrage to use mmap and make it zero-alloc and zero-copy.
-		for (int i = 0; i < sample_count; i++)
-		{
-				vec row = vec::Zero(data.dimX() + data.dimY());
-				std::streamsize expected = row.size() * sizeof(double);
+      for (int i = 0; i < sample_count; i++)
+      {
+         vec row = vec::Zero(data.dimX() + data.dimY());
+         std::streamsize expected = row.size() * sizeof(double);
 
-				for (std::streamsize total = 0;
-						 total < expected && !in.eof();
-						 total += in.gcount())
-				{
-						in.read((char *)row.data() + total, expected);
-				}
+         for (std::streamsize total = 0;
+               total < expected && !in.eof();
+               total += in.gcount())
+         {
+            char* ptr = (char*)row.data();
+            in.read(ptr + total, expected - total);
+         }
 
-				data.set(row);
+         data.set(row);
 
-				// Update min and max.
-				for(int k = 0; k < dim.first; k++)
-				{
-						min[k] = std::min(min[k], row[k]);
-						max[k] = std::max(max[k], row[k]);
-				}
-		}
+         // Update min and max.
+         for(int k = 0; k < dim.first; k++)
+         {
+            min[k] = std::min(min[k], row[k]);
+            max[k] = std::max(max[k], row[k]);
+         }
+      }
 
 		// TODO: Factorize this in data::set.
 		data.setMin(min);

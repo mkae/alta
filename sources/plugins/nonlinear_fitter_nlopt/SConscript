@@ -10,9 +10,9 @@ build_lib = False
 
 if library_available(env, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h'):
 
-	#if conf.CheckLib(env['NLOPT_OPT_LIB']):
-	#	env.AppendUnique(LIBS = env['NLOPT_OPT_LIB'])
-	#end
+	# if conf.CheckLib(env['NLOPT_OPT_LIB']):
+	# 	env.AppendUnique(LIBS = env['NLOPT_OPT_LIB'])
+	# #end
 
 	build_lib = True
 
