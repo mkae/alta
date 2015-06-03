@@ -15,6 +15,7 @@
 #include <core/common.h>
 #include <core/ptr.h>
 #include <core/function.h>
+#include <core/rational_function.h>
 #include <core/plugins_manager.h>
 
 // STL include
@@ -134,6 +135,48 @@ ptr<function> get_function_from_args(const python_arguments& args) {
     return func;
 }
 
+/* Setting/Get the parameters of a function object
+ *
+ * TODO: Add the rational function interface
+ */
+void set_function_params(ptr<function>& f, const vec& v) {
+
+	// Try to set the parameter as a nonlinear function
+	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
+	if(nf) {
+		if(nf->nbParameters() == v.size()) {
+			nf->setParameters(v);
+		} else {
+			std::cerr << "<<ERROR>> Vector of params and function have different sizes." << std::endl;
+		}
+		return;
+	}
+
+	// ptr<rational_function> rf = dynamic_pointer_cast<rational_function>(f);
+	// if(rf) {
+	// 	int np, nq;
+	// 	rf->size(np, nq);
+
+	// 	if(np+nq == v.size()) {
+	// 		rf->setParameters(v);
+	// 	} else {
+	// 		std::cerr << "<<ERROR>> Vector of parameters has different size that the functions number of parameters" << std::endl;
+	// 	}
+	// 	return;
+	// }
+}
+
+python_vec get_function_params(ptr<function>& f) {
+		// Try to set the parameter as a nonlinear function
+	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
+	if(nf) {
+		return nf->parameters();
+	}
+
+	std::cerr << "<<ERROR>> Parameters cannot be retrieved" << std::endl;
+	vec res(1);
+	return res;
+}
 
 /* Softs functions. Those function recopy the softs main function, without
  * the command line arguments.
@@ -231,7 +274,9 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<function, ptr<function>, boost::noncopyable>("function", bp::no_init)
 		.def("value", &function::value)
 		.def("load", &function::load)
-		.def("save",  &function::save);
+		.def("save",  &function::save)
+		.def("set", &set_function_params)
+		.def("get", &get_function_params);
 	bp::def("get_function", get_function);
 	bp::def("get_function", get_function_from_args);
 

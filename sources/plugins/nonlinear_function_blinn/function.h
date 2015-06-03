@@ -39,7 +39,8 @@ class blinn_function : public nonlinear_function
 		blinn_function()
 		{
 			setParametrization(params::COS_TH);
-			setDimX(1);			
+			setDimX(1);
+			setDimY(1);	
 		}
 
 		// Overload the function operator
