@@ -172,7 +172,7 @@ ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
 		return ptr<function>(NULL);
 	}
 
-	product_function* pf = new product_function(nf1.get(), nf2.get());
+	product_function* pf = new product_function(nf1, nf2);
 	return ptr<function>(pf);
 }
 

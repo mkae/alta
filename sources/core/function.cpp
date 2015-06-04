@@ -833,8 +833,9 @@ void compound_function::save_call(std::ostream& out, const arguments& args) cons
 
 /*--- Product functions implementation ----*/
 
-product_function::product_function( nonlinear_function* g1, nonlinear_function* g2,
-																	  bool is_g1_fixed, bool is_g2_fixed) 
+product_function::product_function(const ptr<nonlinear_function>& g1, 
+                                   const ptr<nonlinear_function>& g2,
+                                   bool is_g1_fixed, bool is_g2_fixed) 
 : f1( g1 ),
 	f2( g2 ),
 	_is_fixed( std::pair<bool,bool>( is_g1_fixed, is_g2_fixed) )
@@ -855,8 +856,6 @@ product_function::product_function( nonlinear_function* g1, nonlinear_function* 
 
 product_function::~product_function()
 {
-  delete f1;
-  delete f2;
 }
 
 
@@ -891,8 +890,7 @@ bool product_function::load(std::istream& in)
 	std::streampos pos = in.tellg();
 
 	// Load the first function
-	if(f1 != NULL)
-	{
+	if(f1) {
 		loaded_f1 = f1->load(in);
 		if(! loaded_f1)
 		{
@@ -902,8 +900,7 @@ bool product_function::load(std::istream& in)
 
 	pos = in.tellg();
 	// Load the second function
-	if(f2 != NULL)
-	{
+	if(f2) {
 		loaded_f2 = f2->load(in);
 		if(! loaded_f2)
 		{
@@ -1292,10 +1289,10 @@ void product_function::setParametrization(params::output new_param)
 
 nonlinear_function* product_function::first() const
 {
-	return f1;
+	return f1.get();
 }
 
 nonlinear_function* product_function::second() const
 {
-	return f2;
+	return f2.get();
 }

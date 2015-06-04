@@ -289,9 +289,8 @@ class product_function : public nonlinear_function
 
 		//! \brief Constructor of the product function, affect the two function
 		//! to already created nonlinear_function objects.
-		product_function(nonlinear_function* g1, nonlinear_function* g2, 
-										 bool is_g1_fixed = false,
-										 bool is_g2_fixed = false);
+		product_function(const ptr<nonlinear_function>& g1, const ptr<nonlinear_function>& g2, 
+                         bool is_g1_fixed = false, bool is_g2_fixed = false);
 
 		~product_function();
 
@@ -372,7 +371,7 @@ class product_function : public nonlinear_function
 	private: // data
 
 		// Function composing the product
-		nonlinear_function *f1, *f2;
+		ptr<nonlinear_function> f1, f2;
 		
 		std::pair<bool,bool> _is_fixed; /*!< represents whether or not the parameters of each function is fixed regardint the optimizer */
 
