@@ -135,6 +135,47 @@ ptr<function> get_function_from_args(const python_arguments& args) {
     return func;
 }
 
+/* Operators on function object. This provide the ability to create compounds
+ * and product in the command line. This is only possible for nonlinear_functions
+ * 
+ * TODO: The compound and product function should store the shared pointer to the
+ * function objects. They might stay in memory longer than the input functions.
+ */
+ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
+	// Convert to a nonlinear function
+	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
+	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
+
+	arguments args;
+	compound_function* cf = new compound_function();
+
+	if(nf1 && nf2) {
+		cf->push_back(nf1.get(), args);
+		cf->push_back(nf2.get(), args);
+	
+		return ptr<function>(cf);
+
+	// Failure case, one of the function is a NULL ptr.
+	} else {
+		std::cerr << "<<ERROR>> One of the input functions is NULL" << std::endl;
+		return ptr<function>(NULL);
+	}
+}
+ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
+	// Convert to a nonlinear function
+	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
+	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
+
+	// Check
+	if(!nf1 || !nf2) {
+		std::cerr << "<<ERROR>> One of the input function of the product is NULL" << std::endl;
+		return ptr<function>(NULL);
+	}
+
+	product_function* pf = new product_function(nf1.get(), nf2.get());
+	return ptr<function>(pf);
+}
+
 /* Setting/Get the parameters of a function object
  *
  * TODO: Add the rational function interface
@@ -272,6 +313,9 @@ BOOST_PYTHON_MODULE(alta)
 	// Function interface
 	//
 	bp::class_<function, ptr<function>, boost::noncopyable>("function", bp::no_init)
+		.def("__add__", &add_function)
+		.def("__mul__", &mult_function)
+		.def("__rmul__", &mult_function)
 		.def("value", &function::value)
 		.def("load", &function::load)
 		.def("save",  &function::save)
