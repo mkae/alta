@@ -381,10 +381,6 @@ vec nonlinear_function::getParametersMin() const
 /*--- Compound functions implementation ----*/
 compound_function::~compound_function()
 {
-	for( unsigned int i=0; i < fs.size(); i++)
-	{
-		delete fs[i];
-	}
 }
 
 vec compound_function::operator()(const vec& x) const
@@ -413,7 +409,7 @@ vec compound_function::parametersJacobian(const vec& x) const
 	// Export the sub-Jacobian for each function
 	for(unsigned int f=0; f<fs.size(); ++f)
 	{
-		nonlinear_function* func = fs[f];
+		const ptr<nonlinear_function>& func = fs[f];
 		int nb_f_params = func->nbParameters(); 
 
 		// Only export Jacobian if there are non-linear parameters
@@ -439,7 +435,7 @@ vec compound_function::parametersJacobian(const vec& x) const
 	return jac;
 }
 
-void compound_function::push_back(nonlinear_function* f, const arguments& f_args)
+void compound_function::push_back(const ptr<nonlinear_function>& f, const arguments& f_args)
 {
 	// Update the input param
 	if(input_parametrization() == params::UNKNOWN_INPUT)
@@ -472,7 +468,7 @@ nonlinear_function* compound_function::operator[](int i) const
 #ifdef DEBUG
 	assert(i >= 0 && i < fs.size());
 #endif
-	return fs[i];
+	return fs[i].get();
 }
 		
 unsigned int compound_function::size() const
@@ -580,9 +576,9 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 				{
 					std::streampos pos = file.tellg();
 					
-					if(dynamic_cast<product_function*>(fs[i]) != NULL)
-					{
-						product_function* p = dynamic_cast<product_function*>(fs[i]);
+					ptr<product_function> p = dynamic_pointer_cast<product_function>(fs[i]);
+					if(p) {
+
 						nonlinear_function* f1 = p->first();
 						nonlinear_function* f2 = p->second();
 

@@ -150,8 +150,8 @@ ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 	compound_function* cf = new compound_function();
 
 	if(nf1 && nf2) {
-		cf->push_back(nf1.get(), args);
-		cf->push_back(nf2.get(), args);
+		cf->push_back(nf1, args);
+		cf->push_back(nf2, args);
 	
 		return ptr<function>(cf);
 
