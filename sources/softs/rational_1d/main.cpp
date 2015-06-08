@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <cstdlib>
 
 #include <core/args.h>
 
@@ -98,6 +99,7 @@ int main(int argc, char** argv)
 	else
 	{
 		std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
+    return EXIT_FAILURE;
 	}
 
 	// Clean data
