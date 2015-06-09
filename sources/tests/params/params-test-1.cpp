@@ -12,23 +12,20 @@
 // ALTA includes
 #include <core/params.h>
 
-// STL includes
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 
-bool closeTo(double a, double b) {
+static bool closeTo(double a, double b) {
 	return std::abs(a-b) < 1.0E-6;
 }
 
-/* Test different configurations for the Half / Cartesian parametrization
- * Returns: 0 if every test passes
- *          n > 0 when n tests did no pass
- */
+/* Test different configurations for the Half / Cartesian parametrization.  */
 int main(int argc, char** argv) {
 
 	// Number of failed tests
 	int n = 0;
-	
+
 	const int K = 100;
 	const int L = 100;
 	for(int k=0; k<=K; ++k) {
@@ -57,8 +54,9 @@ int main(int argc, char** argv) {
 	}
 
 	if(n > 0) {
-		std::cerr << "<<ERROR>> " << n << " tests of conversion CARTESIAN -> HALF failed" << std::endl;
+      std::cerr << "<<ERROR>> " << n << " out of " << K * L
+                << " tests of conversion CARTESIAN -> HALF failed" << std::endl;
 	}
 
-	return n;
+	return n > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }
