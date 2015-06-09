@@ -101,9 +101,10 @@ Here is a  recap of the currently tested combinations:
 
 
 
-### Scons 
+### SCons 
 
-Using scons, the compilation of ALTA is straightforward:
+Using [SCons](http://www.scons.org), the compilation of ALTA is
+straightforward:
 
 	$ cd $ALTA
 	$ scons --cfg=[filename]

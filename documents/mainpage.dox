@@ -60,7 +60,7 @@ git clone https://gforge.inria.fr/git/alta/alta.git
 
 ### Build
 
-You can build ALTA using [scons](http://www.scons.org). Scons is lightweight and only requires Python to be installed (ALTA uses Python for its high level scripting mechanism). To build, go to the root directory of ALTA and type:
+You can build ALTA using [SCons](http://www.scons.org). SCons is lightweight and only requires Python to be installed (ALTA uses Python for its high level scripting mechanism). To build, go to the root directory of ALTA and type:
 
     $ scons
 
