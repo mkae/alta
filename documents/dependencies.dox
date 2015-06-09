@@ -41,7 +41,7 @@ $ python obtain_eigen.py
 (for \a rational_fitter_quadprog, provided in the external directory).
 
 You can obtain Quadprog++ and install it in <em>$ALTA/external/build</em>
-directory using the SCons script or Qmake .pro file in
+directory using the SCons script in
 <em>$ALTA/external</em>.
 
 <br />
@@ -94,8 +94,6 @@ $ cd $ALTA/external
 $ python obtain_ceres.py
 \endverbatim
 
-If you are using Qmake, you need to provide a ceres.prf file to ensure
-that the compilation tools will find ceres headers and library files.
 If you want to use your own compilation of CERES in SCons, you need to
 update the CERES_INC, CERES_DIR, CERES_LIB, and CERES_OPT_LIBS variables
 to the SCons configuration file.
@@ -114,8 +112,6 @@ $ cd $ALTA/external
 $ python obtain_nlopt.py
 \endverbatim
 
-If you are using Qmake, you need to provide a nlopt.prf file to ensure
-that the compilation tools will find ceres headers and library files.
 If you want to use your own compilation of NLOPT in SCons, you need to
 update the NLOPT_INC, NLOPT_DIR, NLOPT_LIB, and NLOPT_OPT_LIBS variables
 to the SCons configuration file.
