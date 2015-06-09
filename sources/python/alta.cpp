@@ -135,6 +135,43 @@ ptr<function> get_function_from_args(const python_arguments& args) {
     return func;
 }
 
+/* Load a function object from a file. The arguments object is never used here.
+ * The file is supposed to load the function correctly.
+ */
+ptr<function> load_function(const std::string& filename) {
+   return plugins_manager::load_function(filename);
+}
+ptr<function> load_function_with_args(const std::string& filename, const arguments&) {
+   return plugins_manager::load_function(filename);
+}
+
+/* Loading a function object from file
+ *
+ * TODO: Add exceptions
+ */
+void load_from_file_with_args(const ptr<function>& func, const std::string& filename,
+                              const arguments& args) {
+
+   // Open a stream
+   std::ifstream file;
+   file.open(filename.c_str()) ;
+   if(!file.is_open()) {
+      std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+      return;
+   }
+
+   // Parse the associated header
+   arguments header = arguments::parse_header(file);
+
+   // Load the function stream
+   func->load(file);
+}
+void load_from_file(const ptr<function>& func, const std::string& filename) {
+
+   arguments args;
+   load_from_file_with_args(func, filename, args);
+}
+
 /* Operators on function object. This provide the ability to create compounds
  * and product in the command line. This is only possible for nonlinear_functions
  * 
@@ -218,6 +255,15 @@ python_vec get_function_params(ptr<function>& f) {
 	vec res(1);
 	return res;
 }
+
+/* Save a function object to a file, without any argument option. This will save the function
+ * object in ALTA's format.
+ */
+void save_function_without_args(const ptr<function>& f, const std::string& filename) {
+   arguments args;
+   f->save(filename, args);
+}
+
 
 /* Softs functions. Those function recopy the softs main function, without
  * the command line arguments.
@@ -317,12 +363,16 @@ BOOST_PYTHON_MODULE(alta)
 		.def("__mul__", &mult_function)
 		.def("__rmul__", &mult_function)
 		.def("value", &function::value)
-		.def("load", &function::load)
+		.def("load", &load_from_file)
+		.def("load", &load_from_file_with_args)
 		.def("save",  &function::save)
+      .def("save", &save_function_without_args)
 		.def("set", &set_function_params)
 		.def("get", &get_function_params);
 	bp::def("get_function", get_function);
 	bp::def("get_function", get_function_from_args);
+	bp::def("load_function", load_function);
+	bp::def("load_function", load_function_with_args);
 
 
 

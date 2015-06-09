@@ -5,23 +5,41 @@ To have access to the python interface, you need to compile the python module. T
 
 	$ scons --cfg=myconfig.py python
 
-Once the python interface (alta.so) is compiled, you need to update the PYTHONPATH environment variable to the build directory. If not, you will not have access to the interface. On UNIX-like systems, it can be done using by sourcing the *setpath.sh* script. On MS-Windows, you need to update the variable by hand.
+Once the python interface (alta.so) is compiled, you need to update the `PYTHONPATH` environment variable to the build directory. If not, you will not have access to the interface. On UNIX-like systems, it can be done using by sourcing the *setpath.sh* script. On MS-Windows, you need to update the variable by hand.
 
 In python, the ALTA module is simply loaded using:
 
 	>>> import alta
 
+This module provide different basic types such as `arguments` and `vec`. They have the same behaviour as ALTA C++ classes \ref arguments and \ref vec. However, they can be intialized from Python types. An `arguments` object can be created using a dictionnary:
+
+    >>> args = alta.arguments({'foo' : 'bar', 'hello' : 'world'})
+
+This correspond to the argument `--foo bar --hello world`. Similarly, a `vec` type can be created from a list of floatting point values.
+
 You can obtain \ref functions, \ref datas and \ref fitters objects using the get_function, get_data and get_fitter functions:
 
-	>>> func   = alta.get_function('nonlinear_function_blinn')
-	>>> dat    = alta.get_data('data_merl')
-	>>> fitter = alta.get_fitter('nonlinear_fitter_ceres')
+    >>> func   = alta.get_function('nonlinear_function_blinn')
+    >>> dat    = alta.get_data('data_merl')
+    >>> fitter = alta.get_fitter('nonlinear_fitter_ceres')
 
-The different \ref softs are available as python functions:
+\ref functions and \ref datas can load from files and save to files:
 
-	>>> dat1 = alta.load_data('data_merl', 'blue-metallic-paint.binary')
-	>>> dat2 = alta.get_data('data_utia')
-	>>> alta.data2data(dat1, dat2)
+    >>> dat = alta.get_data('data_merl')
+    >>> dat.load('blue_metallic_paint.binary')
+    >>> dat.save('blue_metallic_paint.copy.binary')
+
+In both cases, an \ref arguments object can be passed to control the behaviour of the load or save functions. For example, if you want to save a function in a specific format, you can use the `export` argument:
+
+    >>> args = alta.arguments({'export' : 'shader'})
+    >>> func = alta.get_function('nonlinear_function_blinn')
+    >>> func.save('my_function.func', args)
+
+Most of \ref softs are available as python functions:
+
+    >>> dat1 = alta.load_data('data_merl', 'blue-metallic-paint.binary')
+    >>> dat2 = alta.get_data('data_utia')
+    >>> alta.data2data(dat1, dat2)
 
 This will perform a data conversion from the *blue-metallic-paint* of the MERL database to the UTIA format.
 */
