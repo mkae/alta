@@ -1,5 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
+   Copyright (C) 2014, 2015 Universite de Montreal
    Copyright (C) 2013, 2014 Inria
 
    This file is part of ALTA.
@@ -435,8 +436,10 @@ class arguments
 		//!	#PARAM_IN NAME
 		//!
 		//! Note: A header should always start and ends by:
-		//!	#ALTA HEADER BEGIN
+		//!	#ALTA {TYPE} HEADER BEGIN
 		//!	#ALTA HEADER END
+      //!
+      //! Where TYPE can either be FUNC or DATA
 		//!
 		static arguments parse_header(std::istream &input) {
 
@@ -466,18 +469,19 @@ class arguments
 						if (!key.empty()) {
 
 							// ALTA header starts and ends with '#ALTA'
+                     // The second word determines the type of the HEADER or
+                     // if it is the begin of end of the header.
 							if (key == "ALTA") {
 								std::string first, second;
 								linestream >> first >> second;
 								if (second == "HEADER")	{
-
-									// Add the header type
-									if (first != "END") {
 										args.update("TYPE", second);
 									} else {
 										break;
 									}
-								}
+								} else {
+									args.update("TYPE", second);
+                        }
 
 							// Store the line into the argument 
 							} else {
