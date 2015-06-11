@@ -17,6 +17,7 @@
 #include <core/function.h>
 #include <core/rational_function.h>
 #include <core/plugins_manager.h>
+#include <core/vertical_segment.h>
 
 // STL include
 #include <iostream>
@@ -269,29 +270,48 @@ void save_function_without_args(const ptr<function>& f, const std::string& filen
  * the command line arguments.
  * TODO: Add the command line arguments in the parameters
  */
-void data2data(const data* d_in, data* d_out) {
-	#pragma omp parallel for
-	for(int i=0; i<d_out->size(); ++i)
-	{
-		vec temp(d_in->dimX());
-		vec cart(6);
-		vec y(d_in->dimY());
+void data2data(const data* d_in, data* d_out)
+{
+    if(dynamic_cast<vertical_segment*>(d_out)!=NULL)
+    {
+        d_out->setParametrization(d_in->input_parametrization());
+        d_out->setDimX(params::dimension(d_in->input_parametrization()));
+        d_out->setDimY(d_in->dimY());
+    		vec temp(d_out->dimX() + d_out->dimY());
+        for(int i=0; i<d_in->size(); ++i)
+        {
+            // Copy the input vector
+            vec x = d_in->get(i);
+            params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
+            params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
+            d_out->set(temp);
+        }
+    }
+    else
+    {
+#pragma omp parallel for
+        for(int i=0; i<d_out->size(); ++i)
+        {
+            vec temp(d_in->dimX());
+            vec cart(6);
+            vec y(d_in->dimY());
 
-		// Copy the input vector
-		vec x = d_out->get(i);
-		params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
+            // Copy the input vector
+            vec x = d_out->get(i);
+            params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
 
-		if(cart[2] >= 0.0 || cart[5] >= 0.0) {
-			params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
-			y = d_in->value(temp);
-		} else {
-			y.setZero();
-		}
+            if(cart[2] >= 0.0 || cart[5] >= 0.0) {
+                params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
+                y = d_in->value(temp);
+            } else {
+                y.setZero();
+            }
 
-		params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
+            params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
 
-		d_out->set(x);
-	}	
+            d_out->set(x);
+        }
+    }
 }
 
 /* This function provides a similar behaviour that the brdf2data function.
