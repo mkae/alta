@@ -2,6 +2,7 @@
 #
 # Copyright (C) 2014, 2015 CNRS
 # Copyright (C) 2013, 2014, 2015 Inria
+# Copyright (C) 2015 Universite de Montreal
 #
 # This file is part of ALTA.
 #
