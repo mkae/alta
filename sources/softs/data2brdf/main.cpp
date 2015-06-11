@@ -169,7 +169,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        std::cout << "<<ERROR>> unable to fit the data" << std::endl ;
+        std::cout << "<<ERROR>> data2brdf: unable to fit the data" << std::endl ;
         return 1;
     }
 
