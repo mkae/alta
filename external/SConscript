@@ -50,21 +50,21 @@ else:
 	#   IpOpt dependencies
 	##
 	env2 = env.Clone()
-	if not on_windows and not library_available(env2, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp'):
+	if not on_windows and not library_available(env2, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp') and env['DL_EXTERNALS']:
 		execfile('obtain_ipopt.py')
 
 	##
 	#   NlOpt dependencies
 	##
 	env2 = env.Clone()
-	if not on_windows and not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h'):
+	if not on_windows and not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h') and env['DL_EXTERNALS']:
 	        execfile('obtain_nlopt.py')
 
 	##
 	#   CERES dependencies
 	##
 	env2 = env.Clone()
-	if not library_available(env2, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h'):
+	if not library_available(env2, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h') and env['DL_EXTERNALS']:
 		execfile('obtain_ceres.py')
 		env['CERES_INC'] = ['#external/build/include']
 		env['CERES_DIR'] = ['#external/build/lib']
