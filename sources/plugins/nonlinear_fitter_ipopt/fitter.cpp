@@ -105,13 +105,18 @@ class altaNLP : public Ipopt::TNLP
 			obj_value = 0.0;
 			for(int s=0; s<_d->size(); ++s)
 			{
-				vec _x  = _d->get(s);
+				vec _x = _d->get(s);
+
+				// This plugin can for the moment only account for function and data
+				// of the same output size. TODO: Add conversion between spaces.
+				assert(_d->dimY() == _f->dimY());
+				const int dDimX = _d->dimX();
 
 				// Extract the objective from the current vector
 				vec _di = vec(_f->dimY());
 				for(int i=0; i<_f->dimY(); ++i)
 				{
-					_di[i] = _x[_f->dimX() + i];
+					_di[i] = _x[dDimX + i];
 				}
 
 				// Convert the sample point into the function space
@@ -144,13 +149,15 @@ class altaNLP : public Ipopt::TNLP
 			// Add all the gradients
 			for(int s=0; s<_d->size(); ++s)
 			{
-				vec _x  = _d->get(s);
-				
+				vec _x = _d->get(s);
+
+				const int dDimX = _d->dimX();
+
 				// Extract the objective from the current vector
 				vec _di = vec(_f->dimY());
 				for(int i=0; i<_f->dimY(); ++i)
 				{
-					_di[i] = _x[_f->dimX() + i];
+					_di[i] = _x[dDimX + i];
 				}
 				
 				// Convert the sample point into the function space
