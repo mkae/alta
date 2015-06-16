@@ -19,7 +19,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
 		if sys.platform == 'darwin' and not exists_archive:
 			obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
 		C.progress_display('configuring and building GLOG')
-		obtain.configure_build('glog-0.3.3', '--enable-static=no --enable-shared=true --with-pic=true CFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\"')
+		obtain.configure_build('glog-0.3.3', '--enable-static --with-pic')
 else:
 	C.progress_display('GLOG is already installed')
 
@@ -56,11 +56,12 @@ if compile_test:
 	if os.name == 'nt':
 		glog_config = '-DMINIGLOG=ON'
 	else:
-		glog_config = '-DGLOG_LIB=' + build_dir + 'lib' + ' -DGLOG_INCLUDE=' + build_dir + ' -DMINIGLOG=OFF'
+		glog_config = '-DGLOG_LIBRARY=' + build_dir + 'lib' + os.sep + 'libglog.a' + ' -DGLOG_INCLUDE_DIR=' + build_dir + 'include' + ' -DMINIGLOG=OFF'
 	#end
 
-	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF ' + glog_config + ' include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DDISABLE_TR1=ON -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release'
-	
+	cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF ' + glog_config + ' include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE_DIR=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release'
+	#cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=ON ' + glog_config + ' include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE_DIR=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release'
+
 	if os.name == 'nt':
 		ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
 		ret = os.system('nmake install')

@@ -6,12 +6,6 @@ import subprocess
 import SCons.Warnings as W
 import SCons.SConf as C
 
-# On OSX, the c++11 flags are working. However, they are not on GNU/Linux
-flags = ''
-if sys.platform == 'darwin':
-    flags = ' CXXFLAGS=\"--std=c++11\" CFLAGS=\"--std=c11\"'
-#end
-
 # Download IpOpt.
 if not os.path.exists('.' + os.sep + 'Ipopt-3.11.8.tgz'):
 	obtain.obtain('IpOpt v3.11.8', 'Ipopt-3.11.8',
@@ -36,7 +30,8 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'co
 		ret = os.system('./get.Mumps')
 
 		os.chdir(path)
-		obtain.configure_build('Ipopt-3.11.8', '--enable-dependency-linking' + flags)
+		obtain.configure_build('Ipopt-3.11.8', '--enable-static --enable-dependency-linking')
+		#obtain.configure_build('Ipopt-3.11.8', '--enable-shared --enable-dependency-linking')
 	#end
 else:
 	C.progress_display('IpOpt is already installed')

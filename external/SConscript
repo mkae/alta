@@ -22,13 +22,17 @@ if env.GetOption('clean'):
 else:
 	##
 	#   Eigen dependency
+	#   TODO: Add automatic DL of Eigen only if it is not present. However it
+	#         requires to ensure that the correct PATH to Eigen is provided
+	#         CERES cmake call.
 	##
-	conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-	if conf.CheckPKG('eigen3 >= 3.2.0'):
-		env.ParseConfig('pkg-config --cflags --libs eigen3')
-	if not conf.CheckCXXHeader('Eigen/Core'):
-		execfile('obtain_eigen.py')
-	env = conf.Finish()
+	# conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+	# if conf.CheckPKG('eigen3 >= 3.2.0'):
+	# 	env.ParseConfig('pkg-config --cflags --libs eigen3')
+	# if not conf.CheckCXXHeader('Eigen/Core'):
+	# 	execfile('obtain_eigen.py')
+	# env = conf.Finish()
+	execfile('obtain_eigen.py')
 
 	##
 	# The env variable is cloned for IpOpt, NlOpt and CERES to avoid
@@ -69,7 +73,7 @@ else:
 		env['CERES_INC'] = ['#external/build/include']
 		env['CERES_DIR'] = ['#external/build/lib']
 		env['CERES_LIB'] = ['ceres', 'glog']
-		env['CERES_OPT_LIB'] = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse', 'atlas']
+		env['CERES_OPT_LIB'] = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse', 'atlas', 'gomp']
 
 	C.progress_display("external libraries are built as shared libraries")
 	C.progress_display("please adjust the shared library search path \
