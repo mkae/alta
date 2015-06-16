@@ -70,10 +70,6 @@ else:
 	env2 = env.Clone()
 	if not library_available(env2, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h'):
 		execfile('obtain_ceres.py')
-		env['CERES_INC'] = ['#external/build/include']
-		env['CERES_DIR'] = ['#external/build/lib']
-		env['CERES_LIB'] = ['ceres', 'glog']
-		env['CERES_OPT_LIB'] = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod', 'cxsparse', 'atlas', 'gomp']
 
 	C.progress_display("external libraries are built as shared libraries")
 	C.progress_display("please adjust the shared library search path \
