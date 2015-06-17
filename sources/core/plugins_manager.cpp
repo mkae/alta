@@ -424,7 +424,7 @@ ptr<function> plugins_manager::get_function(const std::string& n)
 
 ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
 {
-    if(n.empty())
+    if(n.empty() || n == "vertical_segment")
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no data plugin specified, returning a vertical_segment loader" << std::endl;
