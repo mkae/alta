@@ -38,12 +38,31 @@ Here is a list of the major features in the ALTA library (you can find the compl
 
 ### Sample results
 
-<center>
-|          `blue-metallic-paint`          |       `gold-metallic-paint`          |             `black-phenolic`           |
-|---------------------------------------- | ------------------------------------ | -------------------------------------- |
-| ![Lafortune lobe](sample_result_01.png) | ![Blinn lobe](sample_result_02.png)  | ![Beckmann lobe](sample_result_03.png) |
-</center>
 
+@htmlonly
+<center >
+<table style="border-spacing:10px 0px">
+	<tr>
+		<td style="text-align:center">Non-linear fitting</td>
+		<td style="text-align:center">Rational fitting</td>
+		<td style="text-align:center">Data conversion</td>
+	</tr>
+	<tr>
+		<td><div id="compare-nonlinear"></div></td>
+		<td><div id="compare-rational"></div></td>
+		<td><div id="compare-data-conversion"></div></td>
+	</tr>
+	<tr>
+		<td style="text-align:center"><tt>blue-metallic-paint</tt></td>
+		<td style="text-align:center"><tt>gold-metallic-paint</tt></td>
+		<td style="text-align:center"><tt>red-fabric</tt></td>
+	</tr>
+</table>
+</center>
+@endhtmlonly
+
+Those images have been produced using [Mitsuba renderer](http://www.mitsuba-renderer.org/) and the ALTA plugin designed for it. Check its [GitHub page](https://github.com/belcour/AltaBRDF) for more information on how to integrate Mitsuba and ALTA.
+<br /><br />
 
 
 Download and install
@@ -74,6 +93,7 @@ Once the packages are compiled, you will need to update some environment variabl
     $ source setpath.sh
 
 Under MS Windows, you will need to update/set 'PATH', 'ALTA_LIB', and 'PYTHON_PATH'. See \ref install for more information about it.
+<br /><br />
 
 
 How to use it
@@ -99,7 +119,7 @@ To convert this brdf file (in ALTA \ref format), you will need another command:
 \a brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g. converting a Blinn lobe to a Beckmann distribution).
 
 You can find more examples of how to use ALTA on the \ref tutorials page.
-
+<br /><br />
 
 
 Contribute
@@ -119,6 +139,29 @@ There are many ways in which you can extend ALTA. Please refer to
 	</tr>
 </table>
 </center>
+
+
+@htmlonly
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareNonlinear = Compare('compare-nonlinear', 250, 200);
+compareNonlinear.add('nonlinear_example_01_ref.png', 'MERL');
+compareNonlinear.add('nonlinear_example_01_alta.png', 'Blinn');
+
+var compareRational = Compare('compare-rational', 250, 200);
+compareRational.add('rational_example_01_ref.png', 'MERL');
+compareRational.add('rational_example_01_alta.png', 'Rational');
+
+var compareData = Compare('compare-data-conversion', 250, 200);
+compareData.add('data_example_01_ref.png', 'MERL');
+compareData.add('data_example_01_alta.png', 'Stark 2D');
+
+compareNonlinear.update()
+compareRational.update()
+compareData.update()
+</script>
+@endhtmlonly
+
 \defgroup core
 \defgroup commands
 \defgroup plugins
