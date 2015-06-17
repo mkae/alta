@@ -265,6 +265,14 @@ void save_function_without_args(const ptr<function>& f, const std::string& filen
    f->save(filename, args);
 }
 
+/* Fitter interface to allow to launch fit without providing an arguments
+ * object.
+ */
+bool fit_data(const ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func) {
+   arguments args;
+   return _fitter->fit_data(_data, _func, args);
+}
+
 
 /* Softs functions. Those function recopy the softs main function, without
  * the command line arguments.
@@ -350,7 +358,6 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 
 /*! \inpage python 
  *  Exporting the ALTA module 
- *  The interface currently contains data2data and fitter.fit
  */
 BOOST_PYTHON_MODULE(alta)
 {
@@ -412,7 +419,8 @@ BOOST_PYTHON_MODULE(alta)
 	// Fitter interface
 	//
 	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
-		.def("fit_data", &fitter::fit_data);
+		.def("fit_data", &fitter::fit_data)
+      .def("fit_data", &fit_data);
 	bp::def("get_fitter", plugins_manager::get_fitter);
 
 	// Softs
