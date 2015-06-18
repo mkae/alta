@@ -20,13 +20,9 @@ function Compare(id, width, height) {
 	var self = this;
 
 	function handler(ev) {
-		if (ev.layerX || ev.layerX == 0) { // Firefox
-			ev._x = ev.layerX;
-			ev._y = ev.layerY;
-		} else if (ev.offsetX || ev.offsetX == 0) { // Opera
-			ev._x = ev.offsetX;
-			ev._y = ev.offsetY;
-		}
+		
+		ev._x = ev.pageX - this.offsetLeft;
+		ev._y = ev.pageY - this.offsetBottom;
 
 		var eventHandler = self[ev.type];
 		if (typeof eventHandler == 'function') {
@@ -77,7 +73,7 @@ function Compare(id, width, height) {
 }
 
 Compare.prototype = {
-	add: function (src, text='Hello world') {
+	add: function (src, text) {
 		var img = createImage(src, onload.bind(this));
 
 		function onload(event) {
@@ -135,6 +131,7 @@ Compare.prototype = {
 
 	mousedown: function (event) {
 		var divide = (event._x - this.posX) / this.width;
+		//var divide = event._x / this.width;
 		this.divide = divide;
 
 		this.dragstart = true;

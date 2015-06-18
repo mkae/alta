@@ -133,9 +133,11 @@ There are many ways in which you can extend ALTA. Please refer to
 <center>
 <table border="0px">
 	<tr>
-		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" width="100px"></td>
+		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" height="50px" /></td>
 		<td width="30px"></td>
-		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS"></td>
+		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS" height="50px"/></td>
+		<td width="30px"></td>
+		<td><img class="idpic" src="http://www.umontreal.ca/images/iu/logo-udem.gif" alt="UdeM"  height="50px" /></td>
 	</tr>
 </table>
 </center>
