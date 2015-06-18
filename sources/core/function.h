@@ -183,7 +183,7 @@ class compound_function: public nonlinear_function
 		//! This function allows to put a new nonlinear function \a f in the 
 		//! compound object. This function will be processed for nonlinear
 		//! optimisation only if \a fixed equals true.
-		virtual void push_back(nonlinear_function* f, const arguments& f_args);
+		virtual void push_back(const ptr<nonlinear_function>& f, const arguments& f_args);
 
 		//! \brief Access to the i-th function of the compound
 		nonlinear_function* operator[](int i) const;
@@ -214,7 +214,7 @@ class compound_function: public nonlinear_function
 		//!
 		//! <u>Local/Global policy:</u></br />
 		//! Local bootstrap can not overload the global bootstrap.
-		virtual void bootstrap(const ::ptr<data> d, const arguments& args);
+		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
 		//! Set the dimension of the input space of the function
 		virtual void setDimX(int nX);
@@ -272,7 +272,7 @@ class compound_function: public nonlinear_function
 		virtual void save_call(std::ostream& out, const arguments& args) const;
 
 	protected:
-		std::vector<nonlinear_function*> fs;
+		std::vector<ptr<nonlinear_function>> fs;
 		std::vector<arguments> fs_args;
 		std::vector<bool> is_fixed;
 
@@ -289,9 +289,8 @@ class product_function : public nonlinear_function
 
 		//! \brief Constructor of the product function, affect the two function
 		//! to already created nonlinear_function objects.
-		product_function(nonlinear_function* g1, nonlinear_function* g2, 
-										 bool is_g1_fixed = false,
-										 bool is_g2_fixed = false);
+		product_function(const ptr<nonlinear_function>& g1, const ptr<nonlinear_function>& g2, 
+                         bool is_g1_fixed = false, bool is_g2_fixed = false);
 
 		~product_function();
 
@@ -372,7 +371,7 @@ class product_function : public nonlinear_function
 	private: // data
 
 		// Function composing the product
-		nonlinear_function *f1, *f2;
+		ptr<nonlinear_function> f1, f2;
 		
 		std::pair<bool,bool> _is_fixed; /*!< represents whether or not the parameters of each function is fixed regardint the optimizer */
 

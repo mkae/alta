@@ -1,5 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
+   Copyright (C) 2014, 2015 Universtie de Montreal
    Copyright (C) 2013, 2014 Inria
 
    This file is part of ALTA.

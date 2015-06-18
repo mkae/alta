@@ -2,6 +2,7 @@
 #
 # Copyright (C) 2014, 2015 CNRS
 # Copyright (C) 2013, 2014, 2015 Inria
+# Copyright (C) 2015 Universite de Montreal
 #
 # This file is part of ALTA.
 #
@@ -15,7 +16,8 @@ import SCons.SConf as C
 
 ## Add ALTA custom cmd configurations
 ##
-AddOption('--cfg', help='Specify a configuration file (see config.example')
+AddOption('--cfg', help='Specify a configuration file')
+AddOption('--no-externals', action="store_false", dest="obtain_externals", default=True, help='Do not download and build externals')
 
 
 ## Import configuration from a config file
@@ -99,6 +101,7 @@ if len(envVars['PKG_CONFIG_PATH']) > 0:
     envVars['PKG_CONFIG_PATH'] += ':'
 envVars['PKG_CONFIG_PATH'] += os.path.abspath('external' + os.sep + 'build' + os.sep + 'lib' + os.sep + 'pkgconfig')
 env = Environment(variables = vars, ENV = envVars )
+env['DL_EXTERNALS'] = GetOption('obtain_externals')
 
 
 # Generate help text for the build variables.

@@ -217,7 +217,7 @@ class rational_function : public function
 			this->nq = nq;
 			clear();
 		}
-
+		
 		//! \brief Clear the vector of 1D rational functions.
 		virtual void clear()
 		{
