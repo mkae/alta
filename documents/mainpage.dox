@@ -61,7 +61,7 @@ Here is a list of the major features in the ALTA library (you can find the compl
 </center>
 @endhtmlonly
 
-Those images have been produced using [Mitsuba renderer](http://www.mitsuba-renderer.org/) and the ALTA plugin designed for it. Check its [GitHub page](https://github.com/belcour/AltaBRDF) for more information on how to integrate Mitsuba and ALTA.
+Those images have been produced using [Mitsuba renderer](http://www.mitsuba-renderer.org/) and the ALTA plugin designed for it. Check its [GitHub page](https://github.com/belcour/AltaBRDF) for more information on how to integrate Mitsuba and ALTA. The scene and envirnoment map were create by Jonas Pilo and Bernhard Vogl respectively.
 <br /><br />
 
 
