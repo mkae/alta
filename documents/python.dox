@@ -15,7 +15,9 @@ This module provide different basic types such as `arguments` and `vec`. They ha
 
     >>> args = alta.arguments({'foo' : 'bar', 'hello' : 'world'})
 
-This correspond to the argument `--foo bar --hello world`. Similarly, a `vec` type can be created from a list of floatting point values.
+This correspond to the argument `--foo bar --hello world`. Similarly, a `vec` type can be created from a list of floatting point values:
+
+    >>> v = alta.vec([0.0, 0.0, 0.0])
 
 You can obtain \ref functions, \ref datas and \ref fitters objects using the `get_function`, `get_data` and `get_fitter` functions with the name of the plugin to load as argument:
 
