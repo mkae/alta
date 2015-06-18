@@ -22,7 +22,9 @@
 #include <core/common.h>
 
 /*! 
+ *	 \class nonlinear_function_ward
  *  \ingroup functions
+ *  \ingroup plugins
  *  \brief Ward's anisotropic BRDF model.
  *
  *  \details

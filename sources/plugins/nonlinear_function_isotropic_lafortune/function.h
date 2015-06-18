@@ -22,20 +22,37 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A isotropic_lafortune lobe class. It is provided for testing with the nonlinear
- *  fitting algorithms.
+/*! 
+ * \class nonlinear_function_lafortune
+ * \ingroup plugins
+ * \ingroup functions
+ * \brief An isotropic Lafortune BRDF.
  *
  *  \details
- *  A isotropic_lafortune lobe is defined as \f$k_d + (L^T M V)^n\f$. We fit the restricted
- *  version where the M matrix is diagonal of coefficients \f$(Cx, Cy, Cz)\f$
+ *  An Lafortune lobe is defined as:
+ *  <center>
+ *  \f$\rho_M(L, V) = (L^T M V)^n\f$. 
+ *  </center>
  *
- *  Options: the <em>bootstrap</em> function will read the arguments to set the first value 
- *  of the function. By default, each lobe is defined as a forward lobe [-1,-1,1] using the 
- *  number of the lobe as the exponent.
+ *  We fit the restricted version where the M matrix is diagonal of
+ *  coefficients \f$(Cx, Cx, Cz)\f$. Multiple lobes can be summed together to
+ *  build a complex BRDF model:
+ *  <center>
+ *  \f$\rho(L, V) = \sum_i \rho_{M_i}(L, V)\f$. 
+ *  </center>
  *
- *  Another initialization method <em>--booststrap</em> will put either a forward lobe, 
- *  a retro-reflective lobe [1,1,1] or the dot product [0,0,1]. The exponent will also 
- *  be the number of the lobe.
+ *  **Options:** 
+ *   + The number of lobes can be set using the *lobes* arguments during loading.
+ *
+ *   + The <em>bootstrap</em> function will read the arguments to set the
+ *  first value of the function. By default, each lobe is defined as a forward
+ *  lobe [-1,-1,1] using the number of the lobe as the exponent.
+ *
+ *   + Another initialization method <em>--booststrap</em> will put either a
+ *  forward lobe, a retro-reflective lobe [1,1,1] or the dot product [0,0,1].
+ *  The exponent will also be the number of the lobe.
+ *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class isotropic_lafortune_function : public nonlinear_function
 {

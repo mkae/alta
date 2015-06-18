@@ -22,8 +22,16 @@
 
 
 /*!
+ * \class nonlinear_function_diffuse
  * \ingroup functions
- * \brief A Lambertian component class.
+ * \brief A diffuse BRDF model.
+ *
+ * \details
+ * This BRDF model has a constant value for any couple of light-view directions.
+ * However, it is not directly used during the fitting procedure. The diffuse
+ * function's values are set to be the minimum value in the dataset.
+ *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class diffuse_function : public nonlinear_function
 {

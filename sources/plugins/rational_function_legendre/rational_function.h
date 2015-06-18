@@ -41,12 +41,22 @@ class rational_function_legendre_1d : public rational_function_1d
 } ;
 
 /*! \ingroup functions
- *  \brief Rational function using Legendre polynomials.
- *  Plugin name: *rational_function_legendre*
+ *  \class rational_function_legendre
+ *  \brief Rational function using 
+ *  [Legendre polynomials](https://en.wikipedia.org/wiki/Legendre_polynomials).
  *
  *  \details 
+ *  This rational function uses Legendre polynomials as the basis function for the
+ *  numerator and the denominator of the rational function: 
+ *  <center>
+ *  \f$ f(x) = \sum a_i p_i(x) / b_i q_{i}(x) \f$, with \f$ p_i = q_i\f$.
+ *  </center>
  *
- *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  Legendre polynomials can be defined using a recursive formulation (see Wikipedia
+ *  page). Consequently, they qre less performant compared to Chebychev polynomials
+ *  for higher order expansions. The first terms of the basis are hard coded.
+ *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  *
  */
 class rational_function_legendre : public rational_function

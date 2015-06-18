@@ -24,12 +24,22 @@
 /*!
  * \ingroup functions
  * \ingroup plugins
- *	\brief  The ABC distribution for micro-facets models.
+ * \class nonlinear_function_abc
+ *	\brief  The ABC distribution of 
+ *	[Low et al. [2012]](http://dl.acm.org/citation.cfm?id=2077341.2077350).
+ *
  *  \details
- *  Follows the implementation of Löw <i>et al.</i> [2012].
+ * 
+ *  The ABC model has three parameters and models the distribution of
+ *  microfacets by the following function:
+ *  <center>
+ *	 \f$ D(H) = \frac{A}{\left(1 + B  \cos(\theta_{H})\right)^C} \f$
+ *  </center>
  *
- *  <h3>Plugin parameters</h3>
- *
+ *  This model aims to better reproduce the tail of model acquired BRDF models
+ *  compared to a Beckmann distribution for example.
+ * 
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class abc_function : public nonlinear_function
 {

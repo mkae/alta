@@ -21,7 +21,11 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A spherical Gaussian lobe class.
+/*! 
+ * \class nonlinear_function_sg
+ * \ingroup plugins
+ * \ingroup functions
+ * \brief A spherical Gaussian lobe class.
  *
  *  \details
  *  A spherical_gaussian lobe is defined as \f$k_s exp(n (v.p - 

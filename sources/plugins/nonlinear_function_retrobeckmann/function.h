@@ -21,13 +21,18 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief A Microfacet model using a Gaussian distribution for the
- *  micro-gemeotry distribution parametrized by the half-angle.
+/*! 
+ *  \class nonlinear_function_retrobeckmann
+ *  \ingroup functions
+ *  \ingroup plugins
+ *  \brief An empirical retro-reflecting BRDF model based on a Beckmann distribution 
+ *  (see [Belcour et al. [2014]](https://hal.inria.fr/hal-01083366)).
  *
  *  \details
+ *  This BRDF model uses the Beckmann distribution with the back vector 
+ *  \f$ K = \frac{L - V}{||L - V||} \f$ in place of the standard Half vector.
  *
- *  <h3>Plugin parameters</h3>
- *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class beckmann_function : public nonlinear_function
 {

@@ -21,15 +21,20 @@
 #include <core/args.h>
 #include <core/common.h>
 
-/*! \brief  A retro-reflective model using biological tissues model [Yoo et al. 1990].
- *  The 1D retro profile is a modified Gaussain.
+/*! 
+ * 
+ *  \class nonlinear_function_retroyoo
+ *
+ *  \brief  A retro-reflective model using biological tissues model [Yoo et al. 1990].
+ *  The 1D retro profile is a modified Gaussian.
  *
  *  \details
- *  This model is wavelength dependant, but we removed this by considering a 633nm spectrum
+ *  This model is wavelength dependant, but we removed this by considering a
+ *  633nm spectrum.
  *
  *  <h3>Plugin parameters</h3>
- *  This model has three parameters: \f$k_r\f$ the relative albedo of the retroreflection, 
- *  and \f$l_t\f$, the mean free path.
+ *  This model has three parameters: \f$k_r\f$ the relative albedo of the
+ *  retroreflection, and \f$l_t\f$, the mean free path.
  *
  */
 class yoo_function : public nonlinear_function

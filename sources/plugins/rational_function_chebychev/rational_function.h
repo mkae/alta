@@ -39,13 +39,21 @@ protected:  // methods
 } ;
 
 /*! \ingroup functions
- *  \brief Rational function using Chebychev polynomials.
- *  Plugin name: *rational_function_chebychev*
+ *  \class rational_function_chebychev
+ *  \brief Rational function using 
+ *  [Chebychev polynomials](https://en.wikipedia.org/wiki/Chebyshev_polynomials).
  *
  *  \details 
+ *  This rational function uses Chebychev polynomials as the basis function for the
+ *  numerator and the denominator of the rational function: 
+ *  <center>
+ *  \f$ f(x) = \sum a_i p_i(x) / b_i q_{i}(x) \f$, with \f$ p_i = q_i\f$.
+ *  </center>
  *
- *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  Chebychev polynomials can be defined using trigonometric functions:
+ *  \f$ p_i(x) = \cos\left( i \; \mbox{acos}(x) \right)\f$. We use this formulation.
  *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class rational_function_chebychev : public rational_function
 {

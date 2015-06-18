@@ -23,13 +23,17 @@
 
 
 /*! 
+ *  \class nonlinear_function_blinn
  *  \ingroup functions
- *	 \brief A blinn lobe class. It is provided for testing with the nonlinear
- *  fitting algorithms.
+ *	 \brief A Blinn-Phong lobe.
  *
  *  \details
- *  A blinn lobe is defined as \f$k_s |N.H|^a\f$
- *  \todo Finish implementation
+ *  A Blinn-Phong lobe has two parameters and is defined as:
+ *  <center>
+ *  \f$\rho(L, V)k_s |N.H|^a\f$, where \f$ H = \frac{L+V}{|| L+V ||}\f$.
+ *  </center>
+ *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class blinn_function : public nonlinear_function
 {

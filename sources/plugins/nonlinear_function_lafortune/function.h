@@ -34,6 +34,8 @@
  *  A lafortune lobe is defined as \f$k_d + (L^T M V)^n\f$. We fit the restricted
  *  version where the M matrix is diagonal of coefficients \f$(Cx, Cy, Cz)\f$
  *  \todo Fitting the diffuse part is not stable
+ *
+ *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
  */
 class lafortune_function : public nonlinear_function
 {
