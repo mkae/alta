@@ -22,12 +22,11 @@
 #include <core/common.h>
 
 /*!
+ * \class nonlinear_function_beckmann function.h
  * \ingroup functions
  * \brief A Gaussian distribution for micro-facets models.
  *
  *  \details
- *
- *  <h3>Plugin parameters</h3>
  *
  */
 class beckmann_function : public nonlinear_function

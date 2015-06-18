@@ -23,6 +23,7 @@
 #include "args.h"
 
 /*! \ingroup core
+ *  \ingroup datas
  *
  *  \brief
  *  A vertical segment data class
