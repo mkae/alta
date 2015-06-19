@@ -183,4 +183,53 @@ int main(int argc, char** argv) {
 
 The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
 
+
+\page tutorial1 Non-Linear Fitting Tutorial
+
+In this tutorial, we will see how to fit a Blinn-Phong BRDF model to the `blue-metallic-paint` dataset from the [MERL][merl] library (please click on the picture to change the horizontal position of the vertical cut):
+@htmlonly
+<center>
+<div id="compare-nonlinear"></div>
+</center>
+@endhtmlonly
+
+
+### Data conversion
+
+The first step is download and convert the dataset into ALTA internal format. This will ease the manipulation of data afterwards:
+
+    $ wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/blue-metallic-paint.binary
+
+will download the dataset and
+
+    $ data2data --input blue-metallic-paint.binary --in-data data_merl --output blue-metallic-paint.dat
+
+this conversion requires to use the \ref data_merl plugin to load MERL binary files and convert them into ALTA's internal format. This format allows to filter elements using the `min` and `max` option for example. Those options enable to specify the minimun and maximum abscissa of the data used during fitting. For example:
+
+    $ data2data --input blue-metallic-paint.dat --max [0.8, 0.01, 0.01] --output blue-filtered.dat
+
+will remove data elements such that \f$ \theta_H > 0.8 \;\mbox{rad} \f$,  \f$ \theta_D > 0.01 \;\mbox{rad} \f$, and \f$ \phi_D > 0.01 \;\mbox{rad} \f$. This will allow us to fit only the configuration close to \f$ L = V \f$.
+
+
+### Fitting
+
+Finally, we fit the sum of a Lambertian term and the Blinn-Phong lobe. To generate this compound we use the bracket operator in command line and the \ref nonlinear_function_diffuse and \ref nonlinear_function_blinn plugins:
+
+    $ data2brdf --input blue-filtered.dat --output blue-metallic-paint.func --func [nonlinear_function_diffuse, nonlinear_function_blinn] --fitter nonlinear_fitter_ceres
+
+In this example, we used the \ref nonlinear_fitter_ceres fitting plugin, but any other nonlinear fitter would be good as well. Notice that you might experience different results depending of the fitter you used, due to the difference in the underlying fitting procedure (CERES uses a Levenberg-Marquardt algorithm).
+
+@htmlonly
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareNonlinear = Compare('compare-nonlinear', 250, 200);
+compareNonlinear.add('nonlinear_example_01_ref.png', 'MERL');
+compareNonlinear.add('nonlinear_example_01_alta.png', 'Blinn');
+compareNonlinear.update()
+</script>
+@endhtmlonly
+
+  [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
+  [gold-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary
+  [blue-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/blue-metallic-paint.binary
 */

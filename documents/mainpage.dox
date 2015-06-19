@@ -15,10 +15,6 @@ ALTA is a multi-platform software library to analyze, fit and understand BRDFs. 
 
   [alta-wk]: http://hal.inria.fr/hal-01016531
 
-ALTA is part of the [ANR 11-BS02-006][alta-anr], a research project on light transport analysis.
-
-  [alta-anr]: http://hal.inria.fr/hal-01016531
-
 
 ### Target audience
 
@@ -38,12 +34,13 @@ Here is a list of the major features in the ALTA library (you can find the compl
 
 ### Sample results
 
+Here are presented some of the result one can obtain using ALTA for *nonlinear fitting*, *rational fitting* and *data conversion* of BRDF data (please click on the picture to change the horizontal position of the vertical cut). To see how those results where generated, follow the link above the picture.
 
 @htmlonly
 <center >
 <table style="border-spacing:10px 0px">
 	<tr>
-		<td style="text-align:center">Non-linear fitting</td>
+		<td style="text-align:center"><a href="tutorial1.html" >Non-linear fitting</a></td>
 		<td style="text-align:center">Rational fitting</td>
 		<td style="text-align:center">Data conversion</td>
 	</tr>
@@ -92,7 +89,7 @@ Once the packages are compiled, you will need to update some environment variabl
 
     $ source setpath.sh
 
-Under MS Windows, you will need to update/set 'PATH', 'ALTA_LIB', and 'PYTHON_PATH'. See \ref install for more information about it.
+Under MS Windows, you will need to update/set `PATH`, `ALTA_LIB`, and `PYTHON_PATH`. See \ref install for more information about it.
 <br /><br />
 
 
@@ -128,6 +125,11 @@ Contribute
 There are many ways in which you can extend ALTA. Please refer to 
 \ref contribute for more information.
 
+
+<br />
+ALTA is part of the [ANR 11-BS02-006][alta-anr], a research project on light transport analysis.
+
+  [alta-anr]: http://hal.inria.fr/hal-01016531
 
 <br />
 <center>
