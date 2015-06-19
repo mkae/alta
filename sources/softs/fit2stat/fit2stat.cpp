@@ -482,7 +482,7 @@ main(int argc, char* argv[])
 
 
   // Load a function file representing the BRDF
-  ptr<function> brdf = plugins_manager::get_function(args["brdf"]) ;
+  ptr<function> brdf = plugins_manager::load_function(args["brdf"]) ;
   if(brdf.get() == NULL)
   {  
     std::cout << "<<ERROR>> Could not load the BRDF. Check your file. ABORTING !!!! "  << std::endl;
