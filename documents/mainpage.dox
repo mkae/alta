@@ -135,7 +135,7 @@ If you are a happy user of ALTA and use it in one of your publication, you are m
     @misc{alta-lib,
       title = {{ALTA: A BRDF Analysis Library}},
       author = {Belcour, Laurent and Courtes, Ludovic and Pacanowski, Romain and others},
-      year = {2014},
+      year = {2013-2015},
       howpublished = {http://alta.gforge.inria.fr/}
     }
 <br /><br />
