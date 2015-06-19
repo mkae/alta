@@ -14,6 +14,14 @@ import os
 import sys
 import SCons.SConf as C
 
+## Build the documentation. This is independant of everything else and
+## should return afterwards, speeding-up the process of generating doc.
+##
+if 'doc' in COMMAND_LINE_TARGETS:
+   os.chdir('documents')
+   Alias('doc', os.system('doxygen doxygen.conf'))
+   Exit(0)
+
 ## Add ALTA custom cmd configurations
 ##
 AddOption('--cfg', help='Specify a configuration file')
@@ -221,5 +229,3 @@ if 'tests' in COMMAND_LINE_TARGETS:
 
 env.Depends(plugins, core)
 env.Depends(softs, core)
-#env.Depends(python, core)
-#env.NoClean(external)
