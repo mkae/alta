@@ -69,9 +69,7 @@ Download and install
 
 To access the sources of ALTA, you can clone the public git repository:
 
-<center>
-git clone https://gforge.inria.fr/git/alta/alta.git
-</center>
+    $ git clone https://gforge.inria.fr/git/alta/alta.git
 
 
 ### Build
@@ -104,7 +102,11 @@ After compiling the different programs, plugins, and updating your environment, 
 
 Tada! You have produced your first fit. The produced output is a 1D rational function, using a monomial basis, interpolating the [Kirby2](http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml) dataset. You can find an ALTA compatible version of this dataset [here](http://alta.gforge.inria.fr/data/Kirby2.dat). Note that this fit is not a BRDF.
 
-![Fitting the Kirby2 dataset with a rational polynomial](Kirby2.png) 
+@htmlonly
+<center>
+   <img src="Kirby2.png" width="60% alt="Fitting the Kirby2 dataset with a rational polynomial" /> 
+</center>
+@endhtmlonly
 
 The \a data2brdf is one of many \ref commands available in ALTA. It allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
 
