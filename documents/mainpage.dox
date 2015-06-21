@@ -45,9 +45,9 @@ Here are presented some of the result one can obtain using ALTA for *nonlinear f
 		<td style="text-align:center">Data conversion</td>
 	</tr>
 	<tr>
-		<td><div id="compare-nonlinear"></div></td>
-		<td><div id="compare-rational"></div></td>
-		<td><div id="compare-data-conversion"></div></td>
+		<td><div class="image" id="compare-nonlinear"></div></td>
+		<td><div class="image" id="compare-rational"></div></td>
+		<td><div class="image" id="compare-data-conversion"></div></td>
 	</tr>
 	<tr>
 		<td style="text-align:center"><tt>blue-metallic-paint</tt></td>
@@ -149,16 +149,18 @@ ALTA is part of the [ANR 11-BS02-006][alta-anr], a research project on light tra
   [egsr-mam]: http://dx.doi.org/10.2312/mam.20141293
 
 <br />
+@htmlonly
 <center>
 <table border="0px">
 	<tr>
-		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" height="50px" /></td>
+		<td><img src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" height="50px" /></td>
 		<td width="30px"></td>
-		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS" height="50px"/></td>
+		<td><img src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS" height="50px"/></td>
 		<td width="30px"></td>
-		<td><img class="idpic" src="http://www.umontreal.ca/images/iu/logo-udem.gif" alt="UdeM"  height="50px" /></td>
+		<td><img src="http://www.umontreal.ca/images/iu/logo-udem.gif" alt="UdeM"  height="50px" /></td>
 	</tr>
 </table>
+@endhtmlonly
 </center>
 
 
