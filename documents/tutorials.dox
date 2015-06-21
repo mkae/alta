@@ -1,6 +1,6 @@
 /*!
 \page tutorials Tutorials
-[TOC]
+\tableofcontents
 
 ### Fitting using the command line
 
@@ -20,7 +20,11 @@ The \a brdf2data allows you to export a function into a data file. If no data pl
 
 You should obtain gnuplot data files like the following image:
 
-\image html Kirby2.png
+@htmlonly
+<center>
+<img src="Kirby2.png" alt="Kirby2" height="512px"/>
+</center>
+@endhtmlonly
 
 To convert this brdf file to be used in another software (here matlab), you will need the following command:
 
@@ -40,7 +44,11 @@ The first command we will execute will convert the three dimensional data in a 2
 
 The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image files (.exr format), while the \a data_merl plugin opens MERL's binary format. This is the format used by Pacanowski et al. [[2012]](http://hal.inria.fr/hal-00678885/en) to perform fitting. The output of this command should look like:
 
-\image html gold-met-merl.png "gold-metallic-paint slice"
+@htmlonly
+<center>
+<img src="gold-met-merl.png" alt="gold-metallic-paint slice" />
+</center>
+@endhtmlonly
 
 Then, we search for a fit of this 2D BRDF slice using the \a rational_fitter_parallel and a Chebychev basis for 60 to 100 coefficients in total:
 
@@ -52,18 +60,20 @@ This outputs a BRDF file which cannot be displayed directly. To see the result o
 
 It is now possible to perform side by side comparison of the original data, and the interpolated rational function:
 
+@htmlonly
 <center>
   <table  border="0" style='text-align:center'>
   <tr>
     <td>
-      \image html gold-met-merl.png "gold-metallic-paint slice"
+      <img src="gold-met-merl.png" alt="gold-metallic-paint slice" />
     </td>
     <td>
-      \image html gold-met-rat.png "gold-metallic-paint slice fitting using R-BRDFs"
+      <img src="gold-met-rat.png" alt="gold-metallic-paint slice fitting using R-BRDFs" />
     </td>
   </tr>
   </table>
 </center>
+@endhtmlonly
 
 
 #### Non-linear fitting
@@ -184,12 +194,23 @@ int main(int argc, char** argv) {
 The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
 
 
+
+
+
+
 \page tutorial1 Non-Linear Fitting Tutorial
 
 In this tutorial, we will see how to fit a Blinn-Phong BRDF model to the `blue-metallic-paint` dataset from the [MERL][merl] library (please click on the picture to change the horizontal position of the vertical cut):
 @htmlonly
 <center>
-<div id="compare-nonlinear"></div>
+<table>
+   <tr>
+      <td><div class="image" id="compare-nonlinear"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>blue-metallic-paint</tt></td>
+   </tr>
+</table>
 </center>
 @endhtmlonly
 

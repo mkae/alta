@@ -47,6 +47,10 @@ div.image {
    border-color: #000000;
 }
 
+a#details + h2.groupheader {
+   display : none;
+}
+
 /* DOXYGEN Code Styles - These are from doxygen but can be changed to fit the theme
 ----------------------------------- */
 
