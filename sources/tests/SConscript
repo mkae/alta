@@ -1,15 +1,11 @@
 import os, sys
+from os.path import basename, splitext
 
 Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
-
-env.Alias('tests', env.Program('./build/half-test-1', './params/half-test-1.cpp'))
-env.Alias('tests', env.Program('./build/half-test-2', './params/half-test-2.cpp'))
-env.Alias('tests', env.Program('./build/params-test-1', './params/params-test-1.cpp'))
-env.Alias('tests', env.Program('./build/data-io-test', 'data-io.cpp'))
 
 # Data files used by the tests.
 test_file = File('Kirby2.dat').srcnode().abspath
@@ -34,6 +30,17 @@ def run_unit_test(env, target, source):
 		open(str(target[0]),'w').write("FAIL\n")
 		return 1
 
-env.Alias('tests', env.Command("test.passed",
-															 executable('build/data-io-test'),
-															 run_unit_test))
+def make_test_alias(source):
+	program = 'build/' + splitext(basename(source))[0]
+	env.Alias('tests', env.Program(program, source))
+	env.Alias('tests', env.Command(basename(program) + '.passed',
+																 executable(program),
+																 run_unit_test))
+
+TESTS = [ 'params/half-test-1.cpp',
+					'params/half-test-2.cpp',
+					'params/params-test-1.cpp',
+					'data-io.cpp' ]
+
+for test in TESTS:
+	make_test_alias(test)
