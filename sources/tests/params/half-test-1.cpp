@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 		params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_TD_PD, &x[0]);
 
 		if(!closeTo(x[0], 0.0) || !closeTo(x[1], theta) || !closeTo(x[2], 0.0)) {
-			std::cout << "<<ERROR>> configuration " <<  cart << " -> " << x << " failed" << std::endl;
+			std::cout << "<<ERROR>> configuration CART -> RUSIN3D " <<  cart << " -> " << x << " failed" << std::endl;
 			++n;
 		}
 	}
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 		params::convert(&half[0], params::RUSIN_TH_TD_PD, params::CARTESIAN, &cart[0]);
 
 		if(!closeTo(cart[2], cos(theta)) || !closeTo(cart[2], cos(theta))) {
-			std::cout << "<<ERROR>> configuration " <<  half << " -> " << cart << " failed" << std::endl;
+			std::cout << "<<ERROR>> configuration RUSIN3D -> CART " <<  half << " -> " << cart << " failed" << std::endl;
 			++n;
 		}
 	}
