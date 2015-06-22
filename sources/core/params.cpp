@@ -419,6 +419,27 @@ void params::to_cartesian(const double* invec, params::input intype,
 
 }
 
+// Return in HALF the half vector for the two vectors in INVEC.
+static void half_vector(double const *invec, vec &half)
+{
+    half[0] = invec[0] + invec[3];
+    half[1] = invec[1] + invec[4];
+    half[2] = invec[2] + invec[5];
+    double sqnorm = half[0]*half[0] + half[1]*half[1] + half[2]*half[2];
+
+    if (sqnorm <= 0.) {
+        half[0] = 0;
+        half[1] = 0;
+        half[2] = 1;
+    }
+    else {
+        half /= sqrt(sqnorm);
+    }
+
+    assert(half[2] <= 1.);
+    assert(half[2] >= 0.);
+}
+
 void params::from_cartesian(const double* invec, params::input outtype,
 		double* outvec)
 {
@@ -428,15 +449,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 						<< "  " << invec[4] << " " << invec[5] << std::endl;
 	#endif 
 
-	// Compute the half vector
-	double half[3] ;
-	half[0] = invec[0] + invec[3];
-	half[1] = invec[1] + invec[4];
-	half[2] = invec[2] + invec[5];
-	double half_norm = sqrt(half[0]*half[0] + half[1]*half[1] + half[2]*half[2]);
-	half[0] /= half_norm;
-	half[1] /= half_norm;
-	half[2] /= half_norm;
+	// Compute the half vector.
+  vec half(3);
+  half_vector(invec, half);
 
 	// Difference vector 
 	double diff[3];
