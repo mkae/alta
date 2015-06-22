@@ -24,7 +24,7 @@ static bool closeTo(double a, double b) {
 int main(int argc, char** argv) {
 
 	// Number of failed tests
-	int n = 0;
+  unsigned int n = 0, total = 0;
 
 	const int K = 100;
 	const int L = 100;
@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
 			if(x[0]*x[0] + x[1]*x[1] > 1.0)
 				continue;
 
+      total++;
 			params::convert(&x[0], params::STARK_2D, params::CARTESIAN, &cart[0]);
 			params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_TD_PD, &y[0]);
 			params::convert(&y[0], params::RUSIN_TH_TD_PD, params::STARK_2D, &xx[0]);
@@ -55,7 +56,8 @@ int main(int argc, char** argv) {
 
 	if(n > 0) {
       std::cerr << "<<ERROR>> " << n << " out of " << K * L
-                << " tests of conversion CARTESIAN -> HALF failed" << std::endl;
+                << " conversions tests STARK -> CARTESIAN "
+                << "-> HALF -> STARK failed" << std::endl;
 	}
 
 	return n > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
