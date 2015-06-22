@@ -38,11 +38,11 @@ Here are presented some of the result one can obtain using ALTA for *nonlinear f
 
 @htmlonly
 <center >
-<table style="border-spacing:10px 0px">
+<table id="image-table" style="border-spacing:10px 0px">
 	<tr>
 		<td style="text-align:center"><a href="tutorial1.html" >Non-linear fitting</a></td>
-		<td style="text-align:center">Rational fitting</td>
-		<td style="text-align:center">Data conversion</td>
+		<td style="text-align:center"><a href="tutorial2.html" >Rational fitting</a></td>
+		<td style="text-align:center"><a href="tutorial3.html" >Data conversion</a></td>
 	</tr>
 	<tr>
 		<td><div class="image" id="compare-nonlinear"></div></td>
@@ -179,9 +179,22 @@ var compareData = Compare('compare-data-conversion', 250, 200);
 compareData.add('data_example_01_ref.png', 'MERL');
 compareData.add('data_example_01_alta.png', 'Stark 2D');
 
-compareNonlinear.update()
-compareRational.update()
-compareData.update()
+compareNonlinear.update();
+compareRational.update();
+compareData.update();
+
+/* Test if the image table is not larger than the body */
+var elemImg = document.getElementById('image-table');
+var rectImg = elemImg.getBoundingClientRect();
+var rectBdy = document.body.getBoundingClientRect();
+
+var widthImg = elemImg.offsetWidth;
+var parentNd = elemImg.parentNode;
+var widthBdy = parentNd.offsetWidth;
+if(widthImg > widthBdy) {
+	elemImg.style.transform = 'scale(' + widthBdy/widthImg + ')';
+}
+
 </script>
 @endhtmlonly
 

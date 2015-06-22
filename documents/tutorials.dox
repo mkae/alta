@@ -246,11 +246,111 @@ In this example, we used the \ref nonlinear_fitter_ceres fitting plugin, but any
 var compareNonlinear = Compare('compare-nonlinear', 250, 200);
 compareNonlinear.add('nonlinear_example_01_ref.png', 'MERL');
 compareNonlinear.add('nonlinear_example_01_alta.png', 'Blinn');
-compareNonlinear.update()
+compareNonlinear.update();
 </script>
 @endhtmlonly
+
+
+
+
+\page tutorial2 Rational Fitting Tutorial
+
+In this tutorial, we will see how to fit a rational BRDF model to the `gold-metallic-paint` dataset from the [MERL][merl] library (please click on the picture to change the horizontal position of the vertical cut):
+@htmlonly
+<center>
+<table>
+   <tr>
+      <td><div class="image" id="compare-rational"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>gold-metallic-paint</tt></td>
+   </tr>
+</table>
+</center>
+@endhtmlonly
+
+
+### Data conversion
+
+The first step is download and convert the dataset into ALTA internal format. This will ease the manipulation of data afterwards:
+
+    $ wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary
+
+will download the dataset and
+
+    $ data2data --input gold-metallic-paint.binary --in-data data_merl --output gold-metallic-paint.exr --out-data data_brdf_slice
+
+this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice.
+
+
+### Fitting
+
+We use the least square rational fitter: \ref rational_fitter_leastsquare. This fitter alternatively fit the numerator and the denominator of the rational function. We also use a Chebychev polynomial as the basis for the rational function by selecting the \ref rational_function_chebychev plugin using 100 coefficients at the numerator and 50 at the denominator:
+
+    $ data2brdf --input gold-metallic-paint.exr --output gold-metallic-paint.func --func rational_function_chebychev --fitter rational_fitter_leastsquare --np 100 --nq 50
+
+@htmlonly
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareRational = Compare('compare-rational', 250, 200);
+compareRational.add('rational_example_01_ref.png', 'MERL');
+compareRational.add('rational_example_01_alta.png', 'Rational BRDF');
+compareRational.update();
+</script>
+@endhtmlonly
+
+
+
+\page tutorial3 Data Conversion Tutorial
+
+In this tutorial, we will see how to convert data from the `red-fabric` dataset from the [MERL][merl] library to a 2D slice in different parametrizations (please click on the picture to change the horizontal position of the vertical cut):
+@htmlonly
+<center>
+<table>
+   <tr>
+      <td><div class="image" id="compare-data"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>red-fabric</tt></td>
+   </tr>
+</table>
+</center>
+@endhtmlonly
+
+
+### Data conversion
+
+The first step is download and convert the dataset into ALTA internal format. This will ease the manipulation of data afterwards:
+
+    $ wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/red-fabric.binary
+
+will download the dataset and
+
+    $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice
+
+this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice. By default, the \ref data_brdf_slice exports in the  \ref params::STARK_2D "STARK_2D" parametrization. But it is also possible to use other kind of 2D parametrization such as \ref params::RUSIN_TH_TD "RUSIN_TH_TD" using the `--param [string]` option (see \ref params for the complete list): 
+
+    $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice --param RUSIN_TH_TD
+
+It is also possible to select 3D parametrization and complete the third component with the `--angle [float]` parameter. Note that this parameter accept angles in degrees:
+
+    $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice --param RUSIN_TH_TD_PD --angle 90
+
+@htmlonly
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareRational = Compare('compare-data', 250, 200);
+compareRational.add('data_example_01_ref.png', 'MERL');
+compareRational.add('data_example_01_alta.png', 'Stark 2D');
+compareRational.update();
+</script>
+@endhtmlonly
+
+
 
   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
   [gold-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary
   [blue-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/blue-metallic-paint.binary
+
+
 */

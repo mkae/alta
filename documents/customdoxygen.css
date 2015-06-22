@@ -30,6 +30,10 @@ div.contents {
    padding-bottom: 10px;
 }
 
+#image-table {
+    transform-origin: 0% 0%;
+}
+
 #titlearea {
    margin-top: 10px;
 }
