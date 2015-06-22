@@ -16,8 +16,8 @@
 #include <cmath>
 #include <iostream>
 
-bool closeTo(double a, double b) {
-	return std::abs(a-b) < 1.0E-10;
+static bool closeTo(double a, double b, double epsilon = 1.0E-7) {
+	return std::abs(a-b) < epsilon;
 }
 
 /* Test different configurations for the Half / Cartesian parametrization

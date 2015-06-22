@@ -545,7 +545,16 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			rotate_normal(diff, -atan2(half[1], half[0])); 
 			rotate_binormal(diff, -outvec[0]);
 
-			outvec[1] = acos(diff[2]);
+      // Note: the following approach is numerically more stable (up to
+      // 1e-12) but slower.
+      // {
+      //     vec view(3);
+      //     view[0] = invec[0];
+      //     view[1] = invec[1];
+      //     view[2] = invec[2];
+      //     outvec[1] = acos(clamp(half.dot(view),0.,1.));
+      // }
+      outvec[1] = acos(diff[2]);
 			outvec[2] = atan2(diff[1], diff[0]);
 
 			break;
