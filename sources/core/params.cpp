@@ -11,6 +11,7 @@
 
 #include "params.h"
 #include "common.h"
+#include <cassert>
 
 struct param_info
 {
@@ -181,12 +182,16 @@ void params::to_cartesian(const double* invec, params::input intype,
 		{
 			const double Hx = invec[0];
 			const double Hy = 0;
-			const double Hz = sqrt(1.0 - Hx*Hx - invec[1]*invec[1]);
-			// Ensuring that <H,B> = 0
+      const double sum = Hx*Hx + invec[1]*invec[1];
+      assert(sum <= 1.);
+			const double Hz = sqrt(1.0 - sum);
+                             ;
+			// Ensuring that <H,B> = 0.
 			const double Bx = 0.0;
 			const double By = invec[1];
 			const double Bz = 0.0;
 
+      assert(Hz >= 0 && Hz <= 1);
 			outvec[0] = Hx-Bx;
 			outvec[1] = Hy-By;
 			outvec[2] = Hz-Bz;
