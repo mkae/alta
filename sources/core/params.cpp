@@ -183,8 +183,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double Hx = invec[0];
 			const double Hy = 0;
       const double sum = Hx*Hx + invec[1]*invec[1];
-      assert(sum <= 1.);
-			const double Hz = sqrt(1.0 - sum);
+			const double Hz = sqrt(1.0 - std::min(sum, 1.0));
                              ;
 			// Ensuring that <H,B> = 0.
 			const double Bx = 0.0;
