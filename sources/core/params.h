@@ -54,7 +54,9 @@ class params
 		 {
        RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described by Rusinkiewicz [1998] */
        RUSIN_TH_PH_TD,
-       RUSIN_TH_TD_PD,
+		 RUSIN_TH_TD_PD,			/*!< Isotropic Half-angle parametrization. This
+										  parametrization is defined by the tuple \f$
+										  \vec{x} = [\theta_H, \theta_D, \phi_D] \f$*/
        RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
        RUSIN_VH_VD,           /*!< Half-angle parametrization in vector format. Coordinates are:
                                    \f$ [H_x, H_y, H_z, D_x, D_y, D_z] \f$.*/
@@ -96,24 +98,24 @@ class params
        ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
         STARK_2D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
-		                             is defined by the couple \f$ \vec{x} = ||\tilde{H}_p||, 
-											  ||\tilde{B}|| \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
+		                             is defined by the couple \f$ \vec{x} = [||\tilde{H}_p||, 
+											  ||\tilde{B}||] \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
 											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
 											  is the projected coordinates of \f$ \tilde{H} \f$ on the
 											  tanget plane. */
         NEUMANN_2D,           /*!< Neumann and Neumann [1996] parametrization. This parametrization
-		                             is defined by the couple \f$ \vec{x} = ||\tilde{H}_p||, 
-											  ||\tilde{B}_p|| \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
+		                             is defined by the couple \f$ \vec{x} = [||\tilde{H}_p||, 
+											  ||\tilde{B}_p||] \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
 											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
 											  is the projected coordinates of \f$ \tilde{H} \f$ on the
 											  tanget plane.*/
 
         STARK_3D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
-		                             is defined by the tuple \f$ \vec{x} = ||\tilde{H}_p||, 
-											  ||\tilde{B}||, \phi_B-\phi_H \f$. */
+		                             is defined by the tuple \f$ \vec{x} = [||\tilde{H}_p||, 
+											  ||\tilde{B}||, \phi_B-\phi_H] \f$. */
         NEUMANN_3D,           /*!< Neumann and Neumann [1996] 3D parametrization. This parametrization
-		                             is defined by the tuple \f$ \vec{x} = ||\tilde{H}_p||, 
-											  ||\tilde{B}_p||, \phi_B-\phi_H \f$.*/
+		                             is defined by the tuple \f$ \vec{x} = [||\tilde{H}_p||, 
+											  ||\tilde{B}_p||, \phi_B-\phi_H] \f$.*/
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
                                We always pack the view vector first: \f$[V.x, V.y, 
   									  V.z, L.x, L.y, L.z] \f$*/
