@@ -23,29 +23,32 @@
 
 /*! \brief A non-linear fitter using the NLOpt solver
  *  \ingroup plugins
+ *  \ingroup fitters
  *
  *  \details
- *  <h3>Third party requirements</h3>
+ *  #### Third party requirements
  *  
  *  You will need three external libraries to compile this plugin:
- *  <ul>
- *		<li><a href="http://ab-initio.mit.edu/wiki/index.php/NLopt">NLopt</a> 
- *		library, version 2.3. On some linux distributions, you can install 
- *		libnlopt-dev using the package manager.</li>
- *  </ul>
- *
- *  You need to provide your own nlopt.prf file for qmake to generate the correct
- *  Makefile or Visual Studio solution. In particular this configuration file
- *  should provide:
- *
- *  <pre>
- *  INCLUDEPATH += [path-to-nlopt-include]
- *  LIBS += -L[path-to-nlopt-lib] -lnlopt -lm
- *  </pre>
+ *   
+ *   + The [NlOpt library, version 2.3][nlopt]. On some linux distributions, you
+ *     can install libnlopt-dev using the package manager.
+ *   + If NlOpt is not installed on your system, it will be downloaded in the
+ *     `external` directory and compiled on Unix systems (GNU/Linux, OSX, ...).
+ *     However, this compilation requires a Fortran compiler.
  *
  *
- *  <h3>Plugin parameters</h3>
+ *  #### Plugin parameters
  *
+ *   + `--nlopt-optimizer [string]` permits to select one of [NlOpt's various
+ *     optimizer][optimizers]. By default it selects the Local Sequential
+ *     Quadratic Programming algorithm (NLOPT_LD_SLSQP).
+ *
+ *   + `nlop-max-num-iterations [int]` permits to change the number of iterations
+ *     of NlOpt before stopping and returning a result. By default, the value is
+ *     `10`.
+ *
+ *  [nlopt]: http://ab-initio.mit.edu/wiki/index.php/NLopt
+ *  [optimizers]: http://ab-initio.mit.edu/wiki/index.php/NLopt
  */
 class nonlinear_fitter_nlopt: public fitter
 {

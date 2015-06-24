@@ -24,27 +24,16 @@
 /*! \brief A fitter for non-linear BRDF models that uses Eigen's
  *  Levenberg-Marquardt solver.
  *  \ingroup plugins
+ *  \ingroup fitters
  *
- * You will need the Eigen unsupported library (available with mercurial)
- *  <ul>
- *		<li>Eigen latest version.</li>
- *  </ul>
+ *  \details
+ *  You will need the Eigen unsupported library (available with mercurial)
  *
- *  You need to provide your own eigen.prf file for qmake to generate the correct
- *  Makefile or Visual Studio solution. In particular this configuration file
- *  should provide:
+ *  #### Plugin parameters
  *
- *  <pre>
- *  INCLUDEPATH += [path-to-eigen-include]
- *  </pre>
- *
- *
- *  <h3>Plugin parameters</h3>
- *  <ul>
- *		<li><b>--fit-compound</b> to control how the fitting procedure is
- *		done. If this flag is set, any compound function will be decomposed
- *      during the fit. The fitting will be done incrementally. <b>in progress</b></li>
- *  </ul>
+ *	 + `--fit-compound` to control how the fitting procedure is done. If this
+ *	 flag is set, any compound function will be decomposed during the fit. The
+ *	 fitting will be done incrementally. *in progress*
  */
 class nonlinear_fitter_eigen: public fitter
 {
