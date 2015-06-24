@@ -1,35 +1,69 @@
 #! /bin/sh
 
-#./build/plugin_loader --input ../data/6d/data.txt --output ericc.rational --fitter /build/librational_fitter_quadprog.so --func /build/librational_function_chebychev.so --min-np 50 --np 150 --nq 1 --dt 0.2
-#./build/plugin_loader --input ../data/6d/data.txt --output ericc.rational --fitter /build/librational_fitter_quadprog.so --min-np 50 --np 150 --nq 1 --dt 0.2
+check_exit_code() {
+	if [ $2 != 0 ]; then
+		echo $1 " -> failed"
+	fi
+}
 
-#./build/plugin_loader --input ../data/6d/data_full.txt --output eric_full.rational --fitter /build/librational_fitter_parallel.so --min-np 60 --np 60 --dt 0.2
+# Check executables
+echo ">> Checking executables"
+data2data --help &> /dev/null
+check_exit_code "data2data" $?
+data2brdf --help &> /dev/null
+check_exit_code "data2brdf" $?
+brdf2data --help &> /dev/null
+check_exit_code "brdf2data" $?
+fit2stats --help &> /dev/null
+check_exit_code "fit2stat" $?
 
-#./build/plugin_loader --input ../data/6d/data.txt --output ericb.rational --fitter /build/librational_fitter_parallel.so --min-np 150 --np 150 --dt 0.2
 
-#./build/plugin_loader --input ../data/6d/data.txt --output eric.rational --fitter /build/librational_fitter_parallel.so --min-np 100 --np 100 --dt 0.2
+# Tutorial 1: nonlinear fitting
+echo ">> Checking nonlinear fitting"
+if [ ! -e "blue-metallic-paint.binary" ]; then
+	wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/blue-metallic-paint.binary &> /dev/null
+fi
+data2data --input blue-metallic-paint.binary --in-data data_merl --output blue-metallic-paint.dat &> /dev/null
+check_exit_code "data2data" $?
+data2data --input blue-metallic-paint.dat --max [0.8, 0.01, 0.01] --output blue-filtered.dat &> /dev/null
+check_exit_code "data2data" $?
+data2brdf --input blue-filtered.dat --output blue-metallic-paint.func --func [nonlinear_function_diffuse, nonlinear_function_blinn] --fitter nonlinear_fitter_ceres &> /dev/null
+check_exit_code "data2brdf" $?
 
-#./build/plugin_loader --input ../data/6d/data.txt --output eric2.rational --fitter /build/librational_fitter_leastsquare.so --np 100 --nq 50
-
-#./build/plugin_loader --input ../data/6d/data.txt --output eric3.rational --fitter /build/librational_fitter_eigen.so --np 100 --nq 50
-
-
-## Fitting using Chebychev poly
-#./build/plugin_loader --input ../data/6d/data.txt --output eric_cheby_leastsquare.rational --func /build/librational_function_chebychev.so --fitter /build/librational_fitter_eigen.so --np 10 --nq 1
-
-use_cheby=0
-if $use_cheby
-then
-	function="--func /build/librational_function_chebychev.so"
-	function_append="_cheby"
+if [ ! -e "blue-metallic-paint.dat" ] || [ ! -e "blue-filtered.dat" ] || [ ! -e "blue-metallic-paint.func" ]; then
+	echo "Nonlinear fitting test -> failed"
 fi
 
-nq_min=6; nq_max=6
-np_min=6; np_max=60
-for i in `seq $np_min $np_max`
-do
-	for j in `seq $nq_min $nq_max`
-	do
-		 ./build/plugin_loader --input ../data/6d/data.txt --output output/6d/eric_leastsquare/eric${function_append}_leastsquare_np=$i-nq=$j.rational $function --fitter /build/librational_fitter_leastsquare.so --np $i --nq $j
-	done
-done
+
+# Tutorial 2: rational fitting
+echo ">> Checking rational fitting"
+if [ ! -e "gold-metallic-paint.binary" ]; then
+	wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary &> /dev/null
+fi
+data2data --input gold-metallic-paint.binary --in-data data_merl --output gold-metallic-paint.exr --out-data data_brdf_slice --param RUSIN_TH_TD &> /dev/null
+check_exit_code "data2data" $?
+data2data --input gold-metallic-paint.exr --in-data data_brdf_slice --output gold-metallic-paint.alta &> /dev/null
+check_exit_code "data2data" $?
+data2brdf --input gold-metallic-paint.alta --output gold-metallic-paint.func --func rational_function_chebychev --fitter rational_fitter_leastsquare --np 10 --nq 10 &> /dev/null
+check_exit_code "data2brdf" $?
+
+if [ ! -e "gold-metallic-paint.exr" ] || [ ! -e "gold-metallic-paint.alta" ] || [ ! -e "gold-metallic-paint.func" ]; then
+	echo "Rational fitting test -> failed"
+fi
+
+
+# Tutorial 3: data conversion
+echo ">> Checking data conversion"
+if [ ! -e "red-fabric.binary" ]; then
+	wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/red-fabric.binary &> /dev/null
+fi
+data2data --input red-fabric.binary --in-data data_merl --output red-fabric-1.exr --out-data data_brdf_slice &> /dev/null
+check_exit_code "data2data" $?
+data2data --input red-fabric.binary --in-data data_merl --output red-fabric-2.exr --out-data data_brdf_slice --param RUSIN_TH_TD &> /dev/null
+check_exit_code "data2data" $?
+data2data --input red-fabric.binary --in-data data_merl --output red-fabric-3.exr --out-data data_brdf_slice --param RUSIN_TH_TD_PD --angle 90 &> /dev/null
+check_exit_code "data2data" $?
+
+if [ ! -e "red-fabric-1.exr" ] || [ ! -e "red-fabric-2.exr" ] || [ ! -e "red-fabric-3.exr" ]; then
+	echo "Data conversion test -> failed"
+fi
