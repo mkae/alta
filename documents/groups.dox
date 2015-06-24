@@ -34,6 +34,8 @@ In a XML script:
 
     <function name="rational_function_chebychev" />
 
+
+
 @defgroup datas Data plugins list
 
 This page reference the different \ref data plugins available in ALTA. A data
@@ -49,7 +51,7 @@ From the command line:
 
 In the \ref python interface:
 
-    alta.get_function('data_merl')
+    alta.get_data('data_merl')
 
 In a XML script:
 
@@ -58,6 +60,32 @@ In a XML script:
 The plugin \ref vertical_segment is ALTA's internal format and can be used to store
 and load either ASCII gnuplot compatible or binary data. It located in ALTA's core
 and not exposed as a shared library.
+
+
+
+@defgroup fitters Fitting plugins list
+
+This page reference the different \ref fitter plugins available in ALTA. A
+fitter plugin enables to perform regression of a BRDF model with respect to
+data measurments.
+
+We list below all accessible fitter plugins in ALTA. To use one of those, please
+use the name referenced here. For example, to load and use the CERES nonlinear
+fitter use:
+
+From the command line:
+
+    --fitter nonlinear_fitter_ceres
+
+In the \ref python interface:
+
+    alta.get_fitter('nonlinear_fitter_ceres')
+
+In a XML script:
+
+    <plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+
 
 @defgroup commands Commands list
 
@@ -70,6 +98,5 @@ type its name in a terminal (assuming you configured it properly, see \ref insta
 For example, to show the documentation of the command \ref data2brdf, type:
 
     $ data2brdf --help
-
 
 */

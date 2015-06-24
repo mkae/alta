@@ -21,12 +21,16 @@
 #include <cmath>
 
 /*! \ingroup datas
- *  \brief Data interface for the ASTM file format.
- *  Plugin name: *data_astm*
+ *  \class data_astm
+ *  \brief Data interface for the ASTM file format from [Cornell University][cornell].
+ *  [cornell]: http://www.graphics.cornell.edu/online/measurements/reflectance/
  *
  *  \details 
+ *  This plugin enables to load data measurments from Cornell University
+ *  program of Computer Graphics (see [here][cornell]). 
+ *  [cornell]: http://www.graphics.cornell.edu/online/measurements/reflectance/
  *
- *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  \author Laurent Belcour <laurent.belcour@umontreal.ca>
  *
  */
 class ASTM : public data
@@ -97,7 +101,7 @@ public: //methods
 	}
 	virtual vec value(const vec& in) const
 	{
-		std::cout << "<<ERROR>> not implemented" << std::endl;
+		NOT_IMPLEMENTED();
 		vec res(4);
 		return res;
 	}

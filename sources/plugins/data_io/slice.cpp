@@ -17,8 +17,8 @@
 #include "EXR_IO.h"
 
 /*! \ingroup datas
+ *  \class data_brdf_slice
  *  \brief Data interface for the BRDF slice file format.
- *  Plugin name: *data_brdf_slice*
  *
  *  \details 
  *
@@ -29,9 +29,9 @@
  *
  *  It is possible to select the parametrization using the --param NAME 
  *  argument when loading the BRDF. The default parametrization is
- *  \ref STARK_2D
+ *  \ref params::STARK_2D "STARK_2D"
  *
- *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  \author Laurent Belcour <laurent.belcour@umontreal.ca>
  *
  */
 class BrdfSlice : public data {
