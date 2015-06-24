@@ -26,7 +26,7 @@ From the command line:
 
     --func rational_function_chebychev
 
-In the \ref python interface:
+In the \ref python "python" interface:
 
     alta.get_function('rationl_function_chebychev')
 
@@ -49,7 +49,7 @@ From the command line:
 
     --data data_merl
 
-In the \ref python interface:
+In the \ref python "python" interface:
 
     alta.get_data('data_merl')
 

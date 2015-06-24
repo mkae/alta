@@ -93,7 +93,7 @@ Under MS Windows, you will need to update/set `PATH`, `ALTA_LIB`, and `PYTHON_PA
 How to use it
 -------------
 
-ALTA uses \ref commands to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions which correspond to BRDF models, \ref datas which correspond to BRDF measurments, and \ref fitters which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
+ALTA uses \ref commands "commands" to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions "functions" which correspond to BRDF models, \ref datas "datas" which correspond to BRDF measurments, and \ref fitters "fitters" which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
 
 After compiling the different programs, plugins, and updating your environment, launch this command line:
 
@@ -107,7 +107,7 @@ Tada! You have produced your first fit. The produced output is a 1D rational fun
 </center>
 @endhtmlonly
 
-The \a data2brdf is one of many \ref commands available in ALTA. It allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
+The \a data2brdf is one of many \ref commands "commands" available in ALTA. It allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
 
 To convert this brdf file (in ALTA \ref format), you will need another command:
 
