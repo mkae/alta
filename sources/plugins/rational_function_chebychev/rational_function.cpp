@@ -42,24 +42,32 @@ rational_function_chebychev_1d::rational_function_chebychev_1d(int nX, int np, i
 {
 }
 		
+double recursive_chebychev(double x, int i) {
+   switch(i) {
+      case 0:
+         return 1.0;
+      case 1:
+         return x;
+      case 2:
+         return 2*x*x - 1;
+      case 3:
+         return (4*x*x - 3)*x;
+      case 4:
+         return 8.0*(x*x - 1.0)*x*x + 1.0;
+      default:
+         return 2.0*x*recursive_chebychev(x, i-1) - recursive_chebychev(x, i-2);
+   }
+}
 
-double chebychev(double x, int i)
-{
+double chebychev(double x, int i) {
 #ifdef RECURSIVE_FORM
-	if(i == 0)
-	{
-		return 1;
-	}
-	else if(i == 1)
-	{
-		return x;
-	}
-	else
-	{
-		return 2.0*x*chebychev(x, i-1) - chebychev(x, i-2) ;
-	}
+   recursive_chebychev(x, i);
 #else
-    return cos(i * acos(x));
+   if(std::abs(x) <= 1.0) {
+      return cos(i * acos(x));
+   } else {
+      return recursive_chebychev(x, i);
+   }
 #endif
 }
 
