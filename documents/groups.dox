@@ -58,4 +58,18 @@ In a XML script:
 The plugin \ref vertical_segment is ALTA's internal format and can be used to store
 and load either ASCII gnuplot compatible or binary data. It located in ALTA's core
 and not exposed as a shared library.
+
+@defgroup commands Commands list
+
+This page reference the different \ref soft available in ALTA. A soft is a
+command line tool that process data and function object to perform actions such
+as data conversion, data fitting (if a fitter plugin is provided), ...
+
+We list below all the accessible commands in ALTA. To use a command, you can
+type its name in a terminal (assuming you configured it properly, see \ref install).
+For example, to show the documentation of the command \ref data2brdf, type:
+
+    $ data2brdf --help
+
+
 */
