@@ -250,6 +250,7 @@ compareNonlinear.update();
 </script>
 @endhtmlonly
 
+  [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
 
 
 
@@ -278,16 +279,21 @@ The first step is download and convert the dataset into ALTA internal format. Th
 
 will download the dataset and
 
-    $ data2data --input gold-metallic-paint.binary --in-data data_merl --output gold-metallic-paint.exr --out-data data_brdf_slice
+    $ data2data --input gold-metallic-paint.binary --in-data data_merl --output gold-metallic-paint.exr --out-data data_brdf_slice --param RUSIN_TH_TD
 
-this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice.
+this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice. This allows us to slice the 3D data contained in the MERL binary file to a 2D data format.
+
+However, the rational fitter only works with \ref vertical_segment objects. We need to convert the 2D data into ALTA's internal format. This is done by:
+
+    $ data2data --input gold-metallic-paint.exr --in-data data_brdf_slice --output gold-metallic-paint.alta
+
 
 
 ### Fitting
 
 We use the least square rational fitter: \ref rational_fitter_leastsquare. This fitter alternatively fit the numerator and the denominator of the rational function. We also use a Chebychev polynomial as the basis for the rational function by selecting the \ref rational_function_chebychev plugin using 100 coefficients at the numerator and 50 at the denominator:
 
-    $ data2brdf --input gold-metallic-paint.exr --output gold-metallic-paint.func --func rational_function_chebychev --fitter rational_fitter_leastsquare --np 100 --nq 50
+    $ data2brdf --input gold-metallic-paint.alta --output gold-metallic-paint.func --func rational_function_chebychev --fitter rational_fitter_leastsquare --np 100 --nq 50
 
 @htmlonly
 <script type="text/javascript" src="script.js"></script>
@@ -299,6 +305,7 @@ compareRational.update();
 </script>
 @endhtmlonly
 
+  [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
 
 
 \page tutorial3 Data Conversion Tutorial
