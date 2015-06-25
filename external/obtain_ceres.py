@@ -19,7 +19,7 @@ if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'gl
 		if sys.platform == 'darwin' and not exists_archive:
 			obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
 		C.progress_display('configuring and building GLOG')
-		obtain.configure_build('glog-0.3.3', '--enable-static --with-pic')
+		obtain.configure_build('glog-0.3.3', '--disable-shared --enable-static --with-pic')
 else:
 	C.progress_display('GLOG is already installed')
 
