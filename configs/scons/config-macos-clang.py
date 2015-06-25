@@ -14,7 +14,7 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'clang++'
-CCFLAGS        = ['-std=c++11', '-O3', '-g', '-Wall']
+CCFLAGS        = ['-std=c++11', '-O3', '-g', '-Wall', '-DNDEBUG']
 LINKFLAGS      = []
 
 
