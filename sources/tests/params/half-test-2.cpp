@@ -72,7 +72,9 @@ int main(int argc, char** argv) {
 						++n;
 					}
 
-					std::cout << "<<INFO>> Check configuration " << po + nphi*(to + ntheta*(pi + nphi*ti)) << " / " << ntheta*ntheta*nphi*nphi << "      \r";
+          if (po % 10000 == 0) {
+              std::cout << "<<INFO>> Check configuration " << po + nphi*(to + ntheta*(pi + nphi*ti)) << " / " << ntheta*ntheta*nphi*nphi << "      \r";
+          }
 				}
 			}
 		}
