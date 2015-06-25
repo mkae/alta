@@ -70,7 +70,9 @@ int main(int argc, char** argv) {
 	}
 
 	if(n > 0) {
-		std::cerr << "<<ERROR>> " << n << " tests of conversion CARTESIAN -> HALF failed" << std::endl;
+		std::cerr << "<<ERROR>> " << n
+              << " tests of conversion CART -> RUSIN3D failed"
+              << std::endl;
 	}
 
 	return n;
