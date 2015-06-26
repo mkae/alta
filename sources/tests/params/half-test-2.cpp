@@ -20,7 +20,7 @@ bool closeTo(double a, double b) {
 	return std::abs(a-b) < 1.0E-10;
 }
 
-bool inRange(double x, double a, double b) {
+static bool inRange(double x, double a, double b) {
 	return x >= a && x <= b;
 }
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 
 	// Sample the full hemisphere for both wi and wo. Check if the converted
 	// vector is within the range of the parametrization. Theta_h and Theta_d
-	// should be within [0..pi/2] and Phi_d should be within [0..2Pi].
+	// should be within [0..π/2] and Phi_d should be within [-π..π].
 	for(int ti=0; ti<=ntheta; ti+=step) {
 		for(int pi=0; pi<=nphi; pi+=step) {
 
@@ -66,7 +66,8 @@ int main(int argc, char** argv) {
 					params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_PH_TD_PD, &x[0]);
 
 					#pragma omp critical (n)
-					if(!inRange(x[0], 0.0, M_PI_2) || !inRange(x[2], 0.0, M_PI_2)) {
+					if(!inRange(x[0], 0.0, M_PI_2) || !inRange(x[2], 0.0, M_PI_2)
+             || !inRange(x[3], -M_PI, M_PI)) {
 						std::cout << "<<ERROR>> configuration " <<  cart << " -> " << x << " failed" << std::endl;
 						++n;
 					}
