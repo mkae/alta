@@ -38,9 +38,9 @@ int main(int argc, char** argv) {
 	const int ntheta = 90;
 	const int step   = 10;
 
-	// Sample the full hemisphere for both wi and wo. Check if the converted
-	// vector is within the range of the parametrization. Theta_h and Theta_d
-	// should be within [0..π/2] and Phi_d should be within [-π..π].
+	// Sample the full hemisphere for both ωi and ωo.  Check if the converted
+	// vector is within the range of the parametrization.  θh and θd should be
+	// within [0..π/2], and Φd should be within [-π..π].
 	for(int ti=0; ti<=ntheta; ti+=step) {
 		for(int pi=0; pi<=nphi; pi+=step) {
 
