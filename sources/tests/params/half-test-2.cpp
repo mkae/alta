@@ -11,18 +11,12 @@
 
 // ALTA includes
 #include <core/params.h>
+#include <tests.h>
 
 // STL includes
 #include <cmath>
 #include <iostream>
 
-bool closeTo(double a, double b) {
-	return std::abs(a-b) < 1.0E-10;
-}
-
-static bool inRange(double x, double a, double b) {
-	return x >= a && x <= b;
-}
 
 /* Test different configurations for the Half / Cartesian parametrization
  * Returns: 0 is every test passes
@@ -33,7 +27,6 @@ int main(int argc, char** argv) {
 	// Number of failed tests
 	int n = 0;
 
-	const double d2r = M_PI / 180.0;
 	const int nphi   = 360;
 	const int ntheta = 90;
 	const int step   = 10;
@@ -44,15 +37,15 @@ int main(int argc, char** argv) {
 	for(int ti=0; ti<=ntheta; ti+=step) {
 		for(int pi=0; pi<=nphi; pi+=step) {
 
-			const double theta_i = d2r*double(ti);
-			const double phi_i   = d2r*double(pi);
+      const double theta_i = degrees_to_radians(double(ti));
+			const double phi_i   = degrees_to_radians(double(pi));
 
 			#pragma omp parallel for
 			for(int to=0; to<=ntheta; to+=step) {
 				for(int po=0; po<=nphi; po+=step) {
 
-					const double theta_o = d2r*double(to);
-					const double phi_o   = d2r*double(po);
+          const double theta_o = degrees_to_radians(double(to));
+					const double phi_o   = degrees_to_radians(double(po));
 
 					vec cart(6);
 					cart[0] = cos(phi_i)*sin(theta_i);
@@ -66,8 +59,8 @@ int main(int argc, char** argv) {
 					params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_PH_TD_PD, &x[0]);
 
 					#pragma omp critical (n)
-					if(!inRange(x[0], 0.0, M_PI_2) || !inRange(x[2], 0.0, M_PI_2)
-             || !inRange(x[3], -M_PI, M_PI)) {
+					if(!in_range(x[0], 0.0, M_PI_2) || !in_range(x[2], 0.0, M_PI_2)
+             || !in_range(x[3], -M_PI, M_PI)) {
 						std::cout << "<<ERROR>> configuration " <<  cart << " -> " << x << " failed" << std::endl;
 						++n;
 					}

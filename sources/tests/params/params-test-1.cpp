@@ -11,14 +11,11 @@
 
 // ALTA includes
 #include <core/params.h>
+#include <tests.h>
 
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-
-static bool closeTo(double a, double b) {
-	return std::abs(a-b) < 1.0E-6;
-}
 
 /* Test different configurations for the Half / Cartesian parametrization.  */
 int main(int argc, char** argv) {
@@ -44,7 +41,7 @@ int main(int argc, char** argv) {
 			params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_TD_PD, &y[0]);
 			params::convert(&y[0], params::RUSIN_TH_TD_PD, params::STARK_2D, &xx[0]);
 
-			if(!closeTo(x[0], xx[0]) || !closeTo(x[1], xx[1])) {
+			if(!close_to(x[0], xx[0]) || !close_to(x[1], xx[1])) {
 				std::cerr << "x  = " << x << std::endl;
 				std::cerr << "c  = " << cart << std::endl;
 				std::cerr << "y  = " << y << std::endl;

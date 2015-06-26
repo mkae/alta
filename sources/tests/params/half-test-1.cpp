@@ -11,14 +11,11 @@
 
 // ALTA includes
 #include <core/params.h>
+#include <tests.h>
 
 // STL includes
 #include <cmath>
 #include <iostream>
-
-static bool closeTo(double a, double b, double epsilon = 1.0E-7) {
-	return std::abs(a-b) < epsilon;
-}
 
 /* Test different configurations for the Half / Cartesian parametrization
  * Returns: 0 is every test passes
@@ -45,7 +42,7 @@ int main(int argc, char** argv) {
 
 		params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_TD_PD, &x[0]);
 
-		if(!closeTo(x[0], 0.0) || !closeTo(x[1], theta) || !closeTo(x[2], 0.0)) {
+		if(!close_to(x[0], 0.0) || !close_to(x[1], theta) || !close_to(x[2], 0.0)) {
 			std::cout << "<<ERROR>> configuration CART -> RUSIN3D " <<  cart << " -> " << x << " failed" << std::endl;
 			++n;
 		}
@@ -63,7 +60,7 @@ int main(int argc, char** argv) {
 
 		params::convert(&half[0], params::RUSIN_TH_TD_PD, params::CARTESIAN, &cart[0]);
 
-		if(!closeTo(cart[2], cos(theta)) || !closeTo(cart[2], cos(theta))) {
+		if(!close_to(cart[2], cos(theta)) || !close_to(cart[2], cos(theta))) {
 			std::cout << "<<ERROR>> configuration RUSIN3D -> CART " <<  half << " -> " << cart << " failed" << std::endl;
 			++n;
 		}

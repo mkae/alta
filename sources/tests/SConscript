@@ -4,6 +4,9 @@ from os.path import basename, splitext
 Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
+# Add the directory of <tests.h> to the include path.
+env.AppendUnique(CPPPATH = ['#sources/tests'])
+
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
 
