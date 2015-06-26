@@ -33,7 +33,6 @@ int main(int argc, char** argv) {
 	// Number of failed tests
 	int n = 0;
 
-	const double PI2 = 0.5*M_PI;
 	const double d2r = M_PI / 180.0;
 	const int nphi   = 360;
 	const int ntheta = 90;
@@ -67,7 +66,7 @@ int main(int argc, char** argv) {
 					params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_PH_TD_PD, &x[0]);
 
 					#pragma omp critical (n)
-					if(!inRange(x[0], 0.0, PI2) || !inRange(x[2], 0.0, PI2)) {
+					if(!inRange(x[0], 0.0, M_PI_2) || !inRange(x[2], 0.0, M_PI_2)) {
 						std::cout << "<<ERROR>> configuration " <<  cart << " -> " << x << " failed" << std::endl;
 						++n;
 					}
