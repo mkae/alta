@@ -18,6 +18,7 @@
 #include <core/data.h>
 #include <core/data_storage.h>
 #include <core/vertical_segment.h>
+#include <tests.h>
 
 #include <string>
 #include <iostream>
@@ -32,20 +33,6 @@
 #else
 # include <unistd.h>
 #endif
-
-#define STRINGIFY_(x) #x
-#define STRINGIFY(x)  STRINGIFY_(x)
-
-#define TEST_ASSERT(exp)																				\
-	do																														\
-	{																															\
-			std::cerr << "evaluating '" << STRINGIFY(exp) << "'... ";	\
-			bool result = (exp);																			\
-			std::cerr << (result ? "PASS" : "FAIL") << std::endl;			\
-			if (!result)																							\
-					abort();																							\
-	}																															\
-	while(0)
 
 // Files that are automatically deleted upon destruction.
 class temporary_file
