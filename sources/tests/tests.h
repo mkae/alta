@@ -13,10 +13,28 @@
 
 #pragma once
 
+#include <iostream>
+#include <cstdlib>
 #include <cmath>
 
 namespace alta { namespace tests
 {
+
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
+
+#define TEST_ASSERT(exp)                                          \
+    do																														\
+    {																															\
+        std::cerr << "evaluating '" << STRINGIFY(exp) << "'... ";	\
+        bool result = (exp);																			\
+        std::cerr << (result ? "PASS" : "FAIL") << std::endl;			\
+        if (!result)																							\
+            abort();																							\
+    }																															\
+    while(0)
+
+
     template<typename T>
     static bool close_to(const T a, const T b, const T epsilon = 1E-7)
     {
