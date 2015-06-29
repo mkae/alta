@@ -45,14 +45,22 @@ class params
 		 //!   * The View vector is \f$V\f$
 		 //!   * The Light vector is \f$L\f$
 		 //!   * The Normal vector is \f$N\f$
-		 //!   * The Reflected vector is \f$R = 2\mbox{dot}(\vec{V}, \vec{N})\vec{N} - \vec{V}\f$
+		 //!   * The Reflected vector is \f$R = 2\mbox{dot}({V}, {N}){N} - {V}\f$
 		 //!   * The Half vector is \f$H = \frac{V+L}{||V+L||}\f$
 		 //!   * The Back vector is \f$K = \frac{V-L}{||V-L||}\f$
 		 //!   * The elevation angle of vector \f$V\f$ is \f$\theta_V\f$
 		 //!   * The azimuth angle of vector \f$V\f$ is \f$\phi_V\f$
+       //!
+       //! [stark]: http://dl.acm.org/citation.cfm?id=1042387
+       //! [neumann]: https://www.cg.tuwien.ac.at/research/publications/1996/Neumann-1996-NCB/
+       //!
 		 enum input
 		 {
-       RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described by Rusinkiewicz [1998] */
+       RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described by Rusinkiewicz 
+                                  [[1998]][rusin] described in spherical coordinates. Coordinates
+                                  are: \f$ \left[ \theta_H, \phi_H, \theta_D, \phi_D \right] \f$.
+                                  [rusin]: http://link.springer.com/chapter/10.1007/978-3-7091-6453-2_2
+                               */
        RUSIN_TH_PH_TD,
 		 RUSIN_TH_TD_PD,			/*!< Isotropic Half-angle parametrization. This
 										  parametrization is defined by the tuple \f$
@@ -90,37 +98,50 @@ class params
        ISOTROPIC_TV_TL_DPHI,  /*!< Light and View vectors represented in spherical coordinates,
                                    with the difference of azimutal coordinates in the last component  */
        ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
-                               Coordinates are: [\f$\theta_v \cos(\Delta\phi), \theta_v 
-  									  \sin(\Delta\phi).\f$]*/
+                               Coordinates are: \f$\left[\theta_v \cos(\Delta\phi), \theta_v 
+  									  \sin(\Delta\phi)\right]\f$.*/
        ISOTROPIC_TL_TV_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected.
-                                  Coordinates are: [\f$\theta_l, \theta_v \cos(\Delta\phi), 
-  										  \theta_v \sin(\Delta\phi).\f$]*/
+                                  Coordinates are: \f$\left[\theta_l, \theta_v \cos(\Delta\phi), 
+  										  \theta_v \sin(\Delta\phi)\right]\f$.*/
        ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
-        STARK_2D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
-		                             is defined by the couple \f$ \vec{x} = [||\tilde{H}_p||, 
-											  ||\tilde{B}||] \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
+        STARK_2D,             /*!< Modified Stark et al. [[2005]][stark] 2D parametrization by 
+                                   Barla et al. [[2015]][barla]. This parametrization is defined 
+                                   by the couple \f$ \vec{x} = ||\tilde{H}_p||, ||\tilde{B}|| \f$, 
+                                   where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
 											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
 											  is the projected coordinates of \f$ \tilde{H} \f$ on the
-											  tanget plane. */
-        NEUMANN_2D,           /*!< Neumann and Neumann [1996] parametrization. This parametrization
-		                             is defined by the couple \f$ \vec{x} = [||\tilde{H}_p||, 
-											  ||\tilde{B}_p||] \f$, where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
-											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
-											  is the projected coordinates of \f$ \tilde{H} \f$ on the
-											  tanget plane.*/
+											  tangent plane.
+                                      [stark]: http://dl.acm.org/citation.cfm?id=1042387 
+                                      [barla]: http://todo/
+                               */
 
-        STARK_3D,             /*!< Modified Stark et al. 2D parametrization. This parametrization
-		                             is defined by the tuple \f$ \vec{x} = [||\tilde{H}_p||, 
-											  ||\tilde{B}||, \phi_B-\phi_H] \f$. */
-        NEUMANN_3D,           /*!< Neumann and Neumann [1996] 3D parametrization. This parametrization
-		                             is defined by the tuple \f$ \vec{x} = [||\tilde{H}_p||, 
-											  ||\tilde{B}_p||, \phi_B-\phi_H] \f$.*/
+        STARK_3D,             /*!< Modified Stark et al. [[2005]][stark] 2D parametrization by 
+                                   Barla et al. [[2015]][barla]. This parametrization is defined 
+                                   by the tuple \f$ \vec{x} = \left[||\tilde{H}_p||, ||\tilde{B}||,
+                                   \phi_B-\phi_H \right] \f$. 
+                                      [stark]: http://dl.acm.org/citation.cfm?id=1042387 
+                                      [barla]: http://todo/
+                               */
+        NEUMANN_2D,           /*!< Neumann and Neumann [[1996]][neumann] parametrization. This 
+                                   parametrization is defined by the couple \f$ \vec{x} = \left[
+                                   ||\tilde{H}_p||, ||\tilde{B}_p||\right] \f$, where \f$ 
+                                   \tilde{H} = \frac{1}{2}(L+V) \f$
+											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
+											  is the projected coordinates of \f$ \tilde{H} \f$ on the
+											  tangent plane.
+                                      [neumann]: https://www.cg.tuwien.ac.at/research/publications/1996/Neumann-1996-NCB/
+                               */
+        NEUMANN_3D,           /*!< Neumann and Neumann [[1996]][neumann] 3D parametrization. This 
+                                   parametrization is defined by the tuple \f$ \vec{x} = 
+                                   [||\tilde{H}_p||, ||\tilde{B}_p||, \phi_B-\phi_H] \f$.
+                                      [neumann]: https://www.cg.tuwien.ac.at/research/publications/1996/Neumann-1996-NCB/
+                               */
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
                                We always pack the view vector first: \f$[V.x, V.y, 
   									  V.z, L.x, L.y, L.z] \f$*/
 
-       UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data */
+       UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data. */
 		 };
 
 		 //! \brief list of all supported parametrization for the output space.
