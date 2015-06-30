@@ -25,11 +25,10 @@ You are working on BRDFs and you want to **benchmark new BRDF models** and compa
 
 Here is a list of the major features in the ALTA library (you can find the complete list in the \ref features page):
 
- + Open common BRDF data formats (see \ref datas)
- + Non-linear fitting of BRDF (using third party packages)
- + Rational interpolation of BRDF
- + Analytic BRDF models (see \ref functions)
- + Scripting mechanism to automatize fitting
+ + Open common BRDF data formats (see the \ref datas "data plugins list")
+ + Rational \& Non-linear fitting of BRDF (see the  \ref fitters "fitter plugins list")
+ + Analytic BRDF models (see the \ref functions "function plugins list")
+ + Scripting mechanism to automatize processing
 
 
 ### Sample results
@@ -38,16 +37,16 @@ Here are presented some of the result one can obtain using ALTA for *nonlinear f
 
 @htmlonly
 <center >
-<table style="border-spacing:10px 0px">
+<table id="image-table" style="border-spacing:10px 0px">
 	<tr>
 		<td style="text-align:center"><a href="tutorial1.html" >Non-linear fitting</a></td>
-		<td style="text-align:center">Rational fitting</td>
-		<td style="text-align:center">Data conversion</td>
+		<td style="text-align:center"><a href="tutorial2.html" >Rational fitting</a></td>
+		<td style="text-align:center"><a href="tutorial3.html" >Data conversion</a></td>
 	</tr>
 	<tr>
-		<td><div id="compare-nonlinear"></div></td>
-		<td><div id="compare-rational"></div></td>
-		<td><div id="compare-data-conversion"></div></td>
+		<td><div class="image" id="compare-nonlinear"></div></td>
+		<td><div class="image" id="compare-rational"></div></td>
+		<td><div class="image" id="compare-data-conversion"></div></td>
 	</tr>
 	<tr>
 		<td style="text-align:center"><tt>blue-metallic-paint</tt></td>
@@ -69,9 +68,7 @@ Download and install
 
 To access the sources of ALTA, you can clone the public git repository:
 
-<center>
-git clone https://gforge.inria.fr/git/alta/alta.git
-</center>
+    $ git clone https://gforge.inria.fr/git/alta/alta.git
 
 
 ### Build
@@ -96,7 +93,7 @@ Under MS Windows, you will need to update/set `PATH`, `ALTA_LIB`, and `PYTHON_PA
 How to use it
 -------------
 
-ALTA uses \ref commands to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions which correspond to BRDF models, \ref datas which correspond to BRDF measurments, and \ref fitters which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
+ALTA uses \ref commands "commands" to perform actions such as BRDF fitting, data conversion, etc. Each program needs plugins to handle its inputs and outputs. We provide three kind of plugins: \ref functions "functions" which correspond to BRDF models, \ref datas "datas" which correspond to BRDF measurments, and \ref fitters "fitters" which correspond to  fitting algorithms. In the following, we illustrate the use of programs and plugins.
 
 After compiling the different programs, plugins, and updating your environment, launch this command line:
 
@@ -104,9 +101,13 @@ After compiling the different programs, plugins, and updating your environment, 
 
 Tada! You have produced your first fit. The produced output is a 1D rational function, using a monomial basis, interpolating the [Kirby2](http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml) dataset. You can find an ALTA compatible version of this dataset [here](http://alta.gforge.inria.fr/data/Kirby2.dat). Note that this fit is not a BRDF.
 
-![Fitting the Kirby2 dataset with a rational polynomial](Kirby2.png) 
+@htmlonly
+<center>
+   <img src="Kirby2.png" width="60% alt="Fitting the Kirby2 dataset with a rational polynomial" /> 
+</center>
+@endhtmlonly
 
-The \a data2brdf is one of many \ref commands available in ALTA. It allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
+The \a data2brdf is one of many \ref commands "commands" available in ALTA. It allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
 
 To convert this brdf file (in ALTA \ref format), you will need another command:
 
@@ -147,16 +148,18 @@ ALTA is part of the [ANR 11-BS02-006][alta-anr], a research project on light tra
   [egsr-mam]: http://dx.doi.org/10.2312/mam.20141293
 
 <br />
+@htmlonly
 <center>
 <table border="0px">
 	<tr>
-		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" height="50px" /></td>
+		<td><img src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_inria.png" alt="Inria" height="50px" /></td>
 		<td width="30px"></td>
-		<td><img class="idpic" src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS" height="50px"/></td>
+		<td><img src="http://manao.inria.fr/wp-content/uploads/2013/03/logo_cnrs.jpg" alt="CNRS" height="50px"/></td>
 		<td width="30px"></td>
-		<td><img class="idpic" src="http://www.umontreal.ca/images/iu/logo-udem.gif" alt="UdeM"  height="50px" /></td>
+		<td><img src="http://www.umontreal.ca/images/iu/logo-udem.gif" alt="UdeM"  height="50px" /></td>
 	</tr>
 </table>
+@endhtmlonly
 </center>
 
 
@@ -175,9 +178,22 @@ var compareData = Compare('compare-data-conversion', 250, 200);
 compareData.add('data_example_01_ref.png', 'MERL');
 compareData.add('data_example_01_alta.png', 'Stark 2D');
 
-compareNonlinear.update()
-compareRational.update()
-compareData.update()
+compareNonlinear.update();
+compareRational.update();
+compareData.update();
+
+/* Test if the image table is not larger than the body */
+var elemImg = document.getElementById('image-table');
+var rectImg = elemImg.getBoundingClientRect();
+var rectBdy = document.body.getBoundingClientRect();
+
+var widthImg = elemImg.offsetWidth;
+var parentNd = elemImg.parentNode;
+var widthBdy = parentNd.offsetWidth;
+if(widthImg > widthBdy) {
+	elemImg.style.transform = 'scale(' + widthBdy/widthImg + ')';
+}
+
 </script>
 @endhtmlonly
 

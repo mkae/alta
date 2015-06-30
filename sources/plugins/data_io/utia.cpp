@@ -29,18 +29,23 @@
 #include "EXR_IO.h"
 
 /*! \ingroup datas
- *  \brief Data interface for the UTIA file format.
- *  Plugin name: *data_utia*
+ *  \class data_utia
+ *  \brief Data interface for the [UTIA][utia] file format.
+ *  [utia]: http://btf.utia.cas.cz/?brdf_dat_dwn
  *
  *  \details 
  *
- *  This format is an HDR image based format using OpenEXR or a
- *  binary format if not available. The data is stored as an array of
+ *  This plugin enables to load any of the 150 measured anisotropic materials
+ *  released by Filip et al. from the Czech Institute of Information Theory and
+ *  Automation (UTIA). This format is an HDR image based format using OpenEXR
+ *  or a binary format if not available. The data is stored as an array of
  *  azimuth slices for various elevation angles.
  *
- *  \author Laurent Belcour <laurent.belcour@gmail.com>
- *  \author Original code from Jiri Filip
+ *  This format is not very dense (only 6 elevation angles per view/light
+ *  direction) but is quite large.
  *
+ *  \author Laurent Belcour <laurent.belcour@umontreal.ca>
+ *  \author Original code from Jiri Filip
  */
 class UTIA : public data {
 private:

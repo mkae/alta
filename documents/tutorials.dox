@@ -1,6 +1,6 @@
 /*!
 \page tutorials Tutorials
-[TOC]
+\tableofcontents
 
 ### Fitting using the command line
 
@@ -20,7 +20,11 @@ The \a brdf2data allows you to export a function into a data file. If no data pl
 
 You should obtain gnuplot data files like the following image:
 
-\image html Kirby2.png
+@htmlonly
+<center>
+<img src="Kirby2.png" alt="Kirby2" height="512px"/>
+</center>
+@endhtmlonly
 
 To convert this brdf file to be used in another software (here matlab), you will need the following command:
 
@@ -40,7 +44,11 @@ The first command we will execute will convert the three dimensional data in a 2
 
 The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image files (.exr format), while the \a data_merl plugin opens MERL's binary format. This is the format used by Pacanowski et al. [[2012]](http://hal.inria.fr/hal-00678885/en) to perform fitting. The output of this command should look like:
 
-\image html gold-met-merl.png "gold-metallic-paint slice"
+@htmlonly
+<center>
+<img src="gold-met-merl.png" alt="gold-metallic-paint slice" />
+</center>
+@endhtmlonly
 
 Then, we search for a fit of this 2D BRDF slice using the \a rational_fitter_parallel and a Chebychev basis for 60 to 100 coefficients in total:
 
@@ -52,18 +60,20 @@ This outputs a BRDF file which cannot be displayed directly. To see the result o
 
 It is now possible to perform side by side comparison of the original data, and the interpolated rational function:
 
+@htmlonly
 <center>
   <table  border="0" style='text-align:center'>
   <tr>
     <td>
-      \image html gold-met-merl.png "gold-metallic-paint slice"
+      <img src="gold-met-merl.png" alt="gold-metallic-paint slice" />
     </td>
     <td>
-      \image html gold-met-rat.png "gold-metallic-paint slice fitting using R-BRDFs"
+      <img src="gold-met-rat.png" alt="gold-metallic-paint slice fitting using R-BRDFs" />
     </td>
   </tr>
   </table>
 </center>
+@endhtmlonly
 
 
 #### Non-linear fitting
@@ -184,12 +194,23 @@ int main(int argc, char** argv) {
 The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
 
 
+
+
+
+
 \page tutorial1 Non-Linear Fitting Tutorial
 
 In this tutorial, we will see how to fit a Blinn-Phong BRDF model to the `blue-metallic-paint` dataset from the [MERL][merl] library (please click on the picture to change the horizontal position of the vertical cut):
 @htmlonly
 <center>
-<div id="compare-nonlinear"></div>
+<table>
+   <tr>
+      <td><div class="image" id="compare-nonlinear"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>blue-metallic-paint</tt></td>
+   </tr>
+</table>
 </center>
 @endhtmlonly
 
@@ -225,11 +246,118 @@ In this example, we used the \ref nonlinear_fitter_ceres fitting plugin, but any
 var compareNonlinear = Compare('compare-nonlinear', 250, 200);
 compareNonlinear.add('nonlinear_example_01_ref.png', 'MERL');
 compareNonlinear.add('nonlinear_example_01_alta.png', 'Blinn');
-compareNonlinear.update()
+compareNonlinear.update();
 </script>
 @endhtmlonly
 
   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
+
+
+
+\page tutorial2 Rational Fitting Tutorial
+
+In this tutorial, we will see how to fit a rational BRDF model to the `gold-metallic-paint` dataset from the [MERL][merl] library (please click on the picture to change the horizontal position of the vertical cut):
+@htmlonly
+<center>
+<table>
+   <tr>
+      <td><div class="image" id="compare-rational"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>gold-metallic-paint</tt></td>
+   </tr>
+</table>
+</center>
+@endhtmlonly
+
+
+### Data conversion
+
+The first step is download and convert the dataset into ALTA internal format. This will ease the manipulation of data afterwards:
+
+    $ wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary
+
+will download the dataset and
+
+    $ data2data --input gold-metallic-paint.binary --in-data data_merl --output gold-metallic-paint.exr --out-data data_brdf_slice --param RUSIN_TH_TD
+
+this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice. This allows us to slice the 3D data contained in the MERL binary file to a 2D data format.
+
+However, the rational fitter only works with \ref vertical_segment objects. We need to convert the 2D data into ALTA's internal format. This is done by:
+
+    $ data2data --input gold-metallic-paint.exr --in-data data_brdf_slice --output gold-metallic-paint.alta
+
+
+
+### Fitting
+
+We use the least square rational fitter: \ref rational_fitter_leastsquare. This fitter alternatively fit the numerator and the denominator of the rational function. We also use a Chebychev polynomial as the basis for the rational function by selecting the \ref rational_function_chebychev plugin using 100 coefficients at the numerator and 50 at the denominator:
+
+    $ data2brdf --input gold-metallic-paint.alta --output gold-metallic-paint.func --func rational_function_chebychev --fitter rational_fitter_leastsquare --np 100 --nq 50
+
+@htmlonly
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareRational = Compare('compare-rational', 250, 200);
+compareRational.add('rational_example_01_ref.png', 'MERL');
+compareRational.add('rational_example_01_alta.png', 'Rational BRDF');
+compareRational.update();
+</script>
+@endhtmlonly
+
+  [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
+
+
+\page tutorial3 Data Conversion Tutorial
+
+In this tutorial, we will see how to convert data from the `red-fabric` dataset from the [MERL][merl] library to a 2D slice in different parametrizations (please click on the picture to change the horizontal position of the vertical cut):
+@htmlonly
+<center>
+<table>
+   <tr>
+      <td><div class="image" id="compare-data"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>red-fabric</tt></td>
+   </tr>
+</table>
+</center>
+@endhtmlonly
+
+
+### Data conversion
+
+The first step is download and convert the dataset into ALTA internal format. This will ease the manipulation of data afterwards:
+
+    $ wget http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/red-fabric.binary
+
+will download the dataset and
+
+    $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice
+
+this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice. By default, the \ref data_brdf_slice exports in the  \ref params::STARK_2D "STARK_2D" parametrization. But it is also possible to use other kind of 2D parametrization such as \ref params::RUSIN_TH_TD "RUSIN_TH_TD" using the `--param [string]` option (see \ref params for the complete list): 
+
+    $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice --param RUSIN_TH_TD
+
+It is also possible to select 3D parametrization and complete the third component with the `--angle [float]` parameter. Note that this parameter accept angles in degrees:
+
+    $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice --param RUSIN_TH_TD_PD --angle 90
+
+@htmlonly
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareRational = Compare('compare-data', 250, 200);
+compareRational.add('data_example_01_ref.png', 'MERL');
+compareRational.add('data_example_01_alta.png', 'Stark 2D');
+compareRational.update();
+</script>
+@endhtmlonly
+
+
+
+  [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
   [gold-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary
   [blue-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/blue-metallic-paint.binary
+
+
 */

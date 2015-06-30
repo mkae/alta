@@ -44,13 +44,29 @@
 
 
 /*! \ingroup datas
- *  \brief Data interface for the MERL file format.
- *  Plugin name: *data_merl*
+ *  \class data_merl
+ *  \brief Data interface for the [MERL][merl] file format.
+ *   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/
  *
  *  \details 
+ *  This plugin enables to load data measurments from the Mitsubishi Electric
+ *  Research Laboratories. [This dataset][merl] contains 100 reflectance samples
+ *  acquired from painted spheres using an imaging system.
  *
- *  \author Laurent Belcour <laurent.belcour@gmail.com>
+ *  The data is stored as RGB tuples in the \ref params::RUSIN_TH_TD_PD
+ *  "RUSIN_TH_TD_PD" isotropic parametrization. A non-linear transformation of
+ *  the first component is used to improve the storage of specular materials.
+ *  The resolution is 90 samples for \f$ \theta_H \f$ and \f$ \theta_D \f$ and
+ *  360 samples for \f$ \phi_D \f$
+ *
+ *  Note that this plugin is not compatible with the anisotropic measurments
+ *  of [Ngan et al. [2005]][ngan].
+ *
+ *  \author Laurent Belcour <laurent.belcour@umontreal.ca>
  *  \author Original code from Mitsubishi Electric Research Laboratories
+ *
+ *   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/
+ *   [ngan]: http://people.csail.mit.edu/addy/research/brdf/
  */
 class MERL : public data
 {

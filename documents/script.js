@@ -91,7 +91,7 @@ Compare.prototype = {
 			return;
 		}
 
-		var lastIndex = this.images.length - 1,
+		var lastIndex = 1;/*this.images.length - 1,*/
 			 before = this.images[lastIndex - 1],
 			 after = this.images[lastIndex];
 
