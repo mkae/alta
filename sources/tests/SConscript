@@ -42,6 +42,7 @@ def make_test_alias(source):
 
 TESTS = [ 'params/half-test-1.cpp',
 					'params/half-test-2.cpp',
+					'params/half-test-3.cpp',
 					'params/params-test-1.cpp',
 					'data-io.cpp' ]
 
