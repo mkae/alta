@@ -673,13 +673,13 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			// 4D Parametrization
 		case params::RUSIN_TH_PH_TD_PD:
 			outvec[0] = acos(half[2]);
-			outvec[1] = atan2(half[0], half[1]);
+			outvec[1] = atan2(half[1], half[0]);
 
 			// Compute the diff vector
 			diff[0] = invec[0];
 			diff[1] = invec[1];
 			diff[2] = invec[2];
-			rotate_normal(diff, -atan2(half[1], half[0]));
+			rotate_normal(diff, -outvec[1]);
 			rotate_binormal(diff, -outvec[0]);
 
 			outvec[2] = acos(diff[2]);
