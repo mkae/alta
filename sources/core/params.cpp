@@ -540,9 +540,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[1] = invec[1];
 			diff[2] = invec[2];
 
-			// TODO Not sure for the rotation angle
-			rotate_normal(diff, -atan2(half[1], half[0])); 
-			rotate_binormal(diff, -outvec[0]);
+      rotate(diff, -atan2(half[1], half[0]), -outvec[0]);
 
       // Note: the following approach is numerically more stable (up to
       // 1e-12) but slower.
@@ -679,8 +677,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[0] = invec[0];
 			diff[1] = invec[1];
 			diff[2] = invec[2];
-			rotate_normal(diff, -outvec[1]);
-			rotate_binormal(diff, -outvec[0]);
+      rotate(diff, -outvec[1], -outvec[0]);
 
 			outvec[2] = acos(diff[2]);
 			outvec[3] = atan2(diff[1], diff[0]);

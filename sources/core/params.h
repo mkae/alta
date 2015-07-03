@@ -378,6 +378,15 @@ class params
 			  vec[0] = temp;
 		  }
 
+      //! \brief Rotate VEC by THETA around the normal, and by PHI around the
+      //! binormal.
+      static void rotate(double vec[3], double theta, double phi)
+      {
+          // Naive implementation.
+          rotate_normal(vec, theta);
+          rotate_binormal(vec, phi);
+      }
+
 		  static void print_input_params();
 
 };
