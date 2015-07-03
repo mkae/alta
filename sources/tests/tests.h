@@ -33,3 +33,52 @@ static T degrees_to_radians(const T degrees)
     static const T d2r = M_PI / 180.;
     return degrees * d2r;
 }
+
+template<typename T>
+class angle_range
+{
+public:
+    class angle_iterator
+    {
+    public:
+        angle_iterator(const T start, const T step):
+        _value(start), _step(step) { }
+
+        bool operator!=(const angle_iterator& other) const
+        {
+            return _value != other._value;
+        }
+
+        T operator*() const
+        {
+            return degrees_to_radians(_value);
+        }
+
+        const angle_iterator& operator++()
+        {
+            _value += _step;
+            return *this;
+        }
+
+    private:
+        T _value;
+        const T _step;
+    };
+
+    angle_range(T start, T end, T step)
+        : _start(start), _end(end), _step(step)
+    { }
+
+    angle_iterator begin()
+    {
+        return angle_iterator(_start, _step);
+    }
+
+    angle_iterator end()
+    {
+        return angle_iterator(_end, _step);
+    }
+
+private:
+    const T _start, _end, _step;
+};
