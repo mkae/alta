@@ -1,14 +1,51 @@
 /*!
 \page tutorials Tutorials
-\tableofcontents
 
-### Fitting using the command line
+ + <a href="gentle-intro.html">A gentle introduction to ALTA</a>
+ + Using the command line
+    + <a href="simple-tutorial1.html">A simple 1D rational fitting</a>
+    + <a href="tutorial3.html">BRDF Data conversion</a>
+    + <a href="tutorial2.html">BRDF Rational fitting</a>
+    + <a href="tutorial1.html">BRDF non-linear fitting</a>
+ + <a href="xml-tutorial1.html">Using XML scripts</a>
+ + <a href="python.html">Using the Python interface</a>
+ + <a href="cpp-tutorial1.html">Using the C++ interface</a>
 
-#### 1D Rational interpolation
 
-The \a data2brdf allows to perform a fitting procedure by converting a \ref data object into a brdf object (also named \ref function).
 
-First, download the Kirby2 dataset in ALTA format: <a href="http://alta.gforge.inria.fr/data/Kirby2.dat">Kirby2.dat</a>. Save this file in <i>$ALTA/data/1d/NIST/Kirby2</i>.
+
+\page gentle-intro A gentle introduction to ALTA
+
+ALTA organizes BRDF analysis and modeling into atomic \ref commands "programs" (coordinate transforms, sub-space integration, parameters estimation, `etc`) that are combined with plugins. Programs work on three types of plugins: \ref functions "BRDFs", \ref datas "datas", and \ref fitters "fitters". Plugins can input or output files. BRDFs, data and fitters can be provided by users through dynamic libraries. This makes ALTA easily extensible. Programs are executed using command line instructions and can be chained to generate scripts. We pro vide a higher level interface to build scripts using XML and \ref python.
+
+In every example, we denotes command line execution using:
+
+    $ do-something 
+
+And Python scripts using:
+
+    >>> import alta
+
+\todo Detail the non-linear and rational fitting procedures.
+
+
+
+
+\page simple-tutorial1 A simple 1D rational fitting
+
+In this tutorial, we will see how to use \ref commands "commands" from the command line to approximate a 1D function described by a set of points. For this, we will use the <a href="http://www.itl.nist.gov/div898/strd/nls/data/kirby2.shtml">Kirby2</a> dataset from the US National Institute of Standards and Technology. There are certified values for a rational approximation of this dataset:
+
+<center>
+\f$
+y = \frac{b_1 + b_2 x + b_3 x^2}{(1 + b_4 x + b_5 x^2)} + \epsilon,
+\f$
+</center>
+
+where \f$ b_1 \simeq 1.67, \; b_2 \simeq -1.39e^{-1}, \; b_3 \simeq 2.59e^{-3}, \; b_4 \simeq -1.72e^{-3}  , \;\mbox{and}\; b_5 \simeq 2.16e^{-5} \f$.
+
+The \ref data2brdf allows to perform a fitting procedure by converting a \ref data object into an approximate \ref function object.
+
+First, we need to download the Kirby2 dataset in ALTA format: <a href="http://alta.gforge.inria.fr/data/Kirby2.dat">Kirby2.dat</a>. Save this file in <tt>$ALTA/data/1d/NIST/Kirby2</tt>.
 
     $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter rational_fitter_eigen
 
@@ -16,9 +53,9 @@ The result can be exported using the \a brdf2data commands.
 
     $ ./build/brdf2data --input Kirby.brdf --output Kirby.dat --data-file ../data/1d/NIST/Kirby2/Kirby2.dat
 
-The \a brdf2data allows you to export a function into a data file. If no data plugin is specified, the ALTA format is used which is gnuplot compliant. The position of evaluation for the function are taken from a specified data file (here the original Kirby2 file).
+The \ref brdf2data allows you to export a function into a data file. If no data plugin is specified, the ALTA format is used which is gnuplot compliant. The position of evaluation for the function are taken from a specified data file (here the original Kirby2 file).
 
-You should obtain gnuplot data files like the following image:
+Using gnuplot for example it is possible to visualize the resulting function approximation. Here is a plot of the original data and exported data:
 
 @htmlonly
 <center>
@@ -30,11 +67,12 @@ To convert this brdf file to be used in another software (here matlab), you will
 
     $ ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
 
-\a brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann
-distribution).
+\ref brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann distribution).
 
 
-#### 2D Rational interpolation of BRDFs
+
+
+\page simple-tutorial2 2D Rational interpolation of BRDFs
 
 In this example, we will show how to perform data conversion and vertical segments interpolation of the `gold-metallic-paint` material from the MERL database using the command line programs on an OSX platform. First download the binary file [gold-metallic-paint.binary](http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary) and copy it to the `$ALTA/data/3d/merl` directory.
 
@@ -90,114 +128,12 @@ In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/
 This command line is rather long. To help you design complex command line in a more intuitive way, ALTA comes with a python script that creates command lines from XML files (see \ref format for an example).
 
 
-### Python scripts
-
-All actions can be done using Python scripts. We provide a python interface that can be loaded with:
-
-	>>> import alta
-
-The complete python interface of ALTA can be found here : \ref python.
-
-
-### XML scripts
-
-Here is the script to perform the same fitting as the previous example. It performs the fitting of the blue metallic paint from the MERL database using a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
-
-~~~{.xml}
-<?xml version="1.0"?>
-<alta>
-	<action name="data2brdf">
-		<!-- Input and output arguments of the action -->
-		<input  name="../data/3d/merl/blue-metallic-paint.binary" />
-		<output name="./results/3d/merl/blue-mettalic-paint.brdf" />
-
-		<!-- Define the function to use -->
-		<function name="nonlinear_function_diffuse" />
-		<function name="nonlinear_function_beckmann" />
-
-		<!-- Define the ftting procedure to use -->
-		<plugin type="fitter" name="nonlinear_fitter_ceres" />
-
-		<!-- Define the data loader to use -->
-		<plugin type="data" name="data_merl" />
-
-		<!-- Parameter -->
-		<parameter name="export" value="explorer" />
-	</action>
-</alta>
-~~~
-
-In this XML example, it is possible to perform fit using a compound function by concatenating multiple function plugins. This is equivalent to providing a list of plugins to the <code>\-\-func</code> argument: <code>\-\-func [nonlinear_function_diffuse, nonlinear_function_lafortune]</code>.
-
-You can perform this action using the following command, assuming that the
-xml script is in file `script.xml`:
-
-    $ ./scripts/xml_cmd.py script.xml
-
-You can put multiple `<action>` commands in the xml file. Those commands will be executed in order.
-
 
 ### Moment analysis using the command line
 
 The \a data2moment allows to perform a moment analysis on a \ref data object. It can be useful to determine whether a given data correspond to a separable function along its different axis.
 
     $ ./build/data2moments --input ../data/1d/NIST/Kirby2/Kirby2.dat --data ./build/libdata_interpolant.so
-
-
-### Using the C++ interface
-
-It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (`libcore.a` on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
-
-The following program produces slices of data files and outputs it on a gnuplot compliant data file. It requires an interpolant data format such as \ref data_merl, \ref data_interpolant (our internal data format is not):
-
-~~~{.cpp}
-#include <core/args.h>
-#include <core/data.h>
-#include <core/function.h>
-#include <core/fitter.h>
-#include <core/plugins_manager.h>
-#include <core/common.h>
-
-#include <iostream>
-#include <cmath>
-
-int main(int argc, char** argv) {
-    arguments args(argc, argv);
-
-    ptr<data> d = plugins_manager::get_data(args["data"]);
-    d->load(args["data-file"]);
-
-    std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
-
-	double theta_in = -(M_PI/180) * (double)args.get_float("theta", 0.0f);
-	double phi_in   =  (M_PI/180) * (double)args.get_float("phi", 0.0f);
-	vec cart(6);
-	cart[0] = cos(phi_in)*sin(theta_in);
-	cart[1] = sin(phi_in)*sin(theta_in);
-	cart[2] = cos(theta_in);
-
-	const int N = 1000;
-	for(int i=0; i<N; ++i) {
-		const double theta_out = M_PI * (i / (double)(N-1) - 0.5);
-		const double phi_out   = 0.0;
-		cart[3] = cos(phi_out)*sin(theta_out);
-		cart[4] = sin(phi_out)*sin(theta_out);
-		cart[5] = cos(theta_out);
-
-		params::convert(&cart[0], params::CARTESIAN, d->parametrization(), &x[0]);
-		vec v = d->value(x) ;
-
-		file << theta_out << "\t";
-		for(int u=0; u<d->dimY(); ++u) {
-			file << v[u] << "\t" ;
-		}
-		file << std::endl ;
-	}
-}
-~~~
-
-The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
-
 
 
 
@@ -266,6 +202,8 @@ compareNonlinear.update();
 
 
 
+
+
 \page tutorial2 Rational Fitting Tutorial
 
 In this tutorial, we will see how to fit a rational BRDF model to the `gold-metallic-paint` dataset from the [MERL][merl] library (please click on the picture to change the horizontal position of the vertical cut):
@@ -327,6 +265,9 @@ compareRational.update();
   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/
 
 
+
+
+
 \page tutorial3 Data Conversion Tutorial
 
 In this tutorial, we will see how to convert data from the `red-fabric` dataset from the [MERL][merl] library to a 2D slice in different parametrizations (please click on the picture to change the horizontal position of the vertical cut):
@@ -385,5 +326,113 @@ compareRational.update();
   [gold-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary
   [blue-paint]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/blue-metallic-paint.binary
 
+
+
+
+\page xml-tutorial1 Using the XML interface
+
+ALTA \ref commands "commands" can be performed using an XML specification, to simplify sharing of fitting, conversion and analysis procedures. The following script performs the fitting of the <tt>blue-metallic-paint</tt> from the MERL database using a Beckmann lobe (note there is no shadowing term, nor Fresnel term):
+
+~~~{.xml}
+<?xml version="1.0"?>
+<alta>
+  <action name="data2brdf">
+    <!-- Input and output arguments of the action -->
+    <input  name="../data/3d/merl/blue-metallic-paint.binary" />
+    <output name="./results/3d/merl/blue-mettalic-paint.brdf" />
+
+    <!-- Define the function to use -->
+    <function name="nonlinear_function_diffuse" />
+    <function name="nonlinear_function_beckmann" />
+
+    <!-- Define the ftting procedure to use -->
+    <plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+    <!-- Define the data loader to use -->
+    <plugin type="data" name="data_merl" />
+
+    <!-- Parameter -->
+    <parameter name="export" value="explorer" />
+  </action>
+</alta>
+~~~
+
+In this XML example, it is possible to perform fit using a compound function by concatenating multiple function plugins. This is equivalent to providing a list of plugins to the <code>\-\-func</code> argument: <code>\-\-func [nonlinear_function_diffuse, nonlinear_function_lafortune]</code>.
+
+You can perform this action using the following command, assuming that the
+xml script is in file `script.xml`:
+
+    $ ./scripts/xml_cmd.py script.xml
+
+You can put multiple `<action>` commands in the xml file. Those commands will be executed in order.
+
+
+
+
+
+\page python-tutorial1 Using the Python interface
+
+All actions can be done using Python scripts. We provide a python interface that can be loaded with:
+
+    >>> import alta
+
+The complete python interface of ALTA can be found here : \ref python.
+
+
+
+
+\page cpp-tutorial1 Using the C++ interface
+
+It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (`libcore.a` on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
+
+The following program produces slices of data files and outputs it on a gnuplot compliant data file. It requires an interpolant data format such as \ref data_merl, \ref data_interpolant (our internal data format is not):
+
+~~~{.cpp}
+#include <core/args.h>
+#include <core/data.h>
+#include <core/function.h>
+#include <core/fitter.h>
+#include <core/plugins_manager.h>
+#include <core/common.h>
+
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char** argv) {
+    arguments args(argc, argv);
+
+    ptr<data> d = plugins_manager::get_data(args["data"]);
+    d->load(args["data-file"]);
+
+    std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
+
+  double theta_in = -(M_PI/180) * (double)args.get_float("theta", 0.0f);
+  double phi_in   =  (M_PI/180) * (double)args.get_float("phi", 0.0f);
+  vec cart(6);
+  cart[0] = cos(phi_in)*sin(theta_in);
+  cart[1] = sin(phi_in)*sin(theta_in);
+  cart[2] = cos(theta_in);
+
+  const int N = 1000;
+  for(int i=0; i<N; ++i) {
+    const double theta_out = M_PI * (i / (double)(N-1) - 0.5);
+    const double phi_out   = 0.0;
+    cart[3] = cos(phi_out)*sin(theta_out);
+    cart[4] = sin(phi_out)*sin(theta_out);
+    cart[5] = cos(theta_out);
+
+    params::convert(&cart[0], params::CARTESIAN, d->parametrization(), &x[0]);
+    vec v = d->value(x) ;
+
+    file << theta_out << "\t";
+    for(int u=0; u<d->dimY(); ++u) {
+      file << v[u] << "\t" ;
+    }
+    file << std::endl ;
+  }
+}
+~~~
+
+The \ref arguments object allow to parse the command line and read options. The \ref plugins_manager allows to create plugin objects from shared object files. In this example, when data objects are not defined in the same parametrization than the data point we want to evaluate, the convert function from the \ref params class can be used. We advise to use it all the time.
 
 */
