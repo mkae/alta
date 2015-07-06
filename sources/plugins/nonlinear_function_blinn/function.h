@@ -33,7 +33,7 @@
  *  \f$\rho(L, V)k_s |N.H|^a\f$, where \f$ H = \frac{L+V}{|| L+V ||}\f$.
  *  </center>
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class blinn_function : public nonlinear_function
 {

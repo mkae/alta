@@ -35,7 +35,7 @@
  *  version where the M matrix is diagonal of coefficients \f$(Cx, Cy, Cz)\f$
  *  \todo Fitting the diffuse part is not stable
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class lafortune_function : public nonlinear_function
 {

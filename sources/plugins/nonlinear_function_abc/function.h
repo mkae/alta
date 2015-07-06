@@ -39,7 +39,7 @@
  *  This model aims to better reproduce the tail of model acquired BRDF models
  *  compared to a Beckmann distribution for example.
  * 
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class abc_function : public nonlinear_function
 {

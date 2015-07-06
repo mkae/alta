@@ -31,7 +31,7 @@
  * However, it is not directly used during the fitting procedure. The diffuse
  * function's values are set to be the minimum value in the dataset.
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class diffuse_function : public nonlinear_function
 {

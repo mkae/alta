@@ -52,7 +52,7 @@
  *  forward lobe, a retro-reflective lobe [1,1,1] or the dot product [0,0,1].
  *  The exponent will also be the number of the lobe.
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class isotropic_lafortune_function : public nonlinear_function
 {

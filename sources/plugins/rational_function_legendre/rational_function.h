@@ -56,7 +56,7 @@ class rational_function_legendre_1d : public rational_function_1d
  *  page). Consequently, they qre less performant compared to Chebychev polynomials
  *  for higher order expansions. The first terms of the basis are hard coded.
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  *
  */
 class rational_function_legendre : public rational_function

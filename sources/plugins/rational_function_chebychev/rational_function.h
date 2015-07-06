@@ -53,7 +53,7 @@ protected:  // methods
  *  Chebychev polynomials can be defined using trigonometric functions:
  *  \f$ p_i(x) = \cos\left( i \; \mbox{acos}(x) \right)\f$. We use this formulation.
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class rational_function_chebychev : public rational_function
 {

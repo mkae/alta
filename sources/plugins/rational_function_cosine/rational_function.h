@@ -52,7 +52,7 @@ class rational_function_legendre_1d : public rational_function_1d
  *  plugin as a basis. The resulting value is multiplied by the product of the
  *  elevation of the light and view directions.
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class rational_function_legendre : public rational_function
 {

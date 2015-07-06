@@ -29,7 +29,7 @@
  *
  * \details
  *
- *  \author Laurent Belcour \<laurent.belcour@gmail.com\>
+ *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  */
 class beckmann_function : public nonlinear_function
 {
