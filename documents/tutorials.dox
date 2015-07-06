@@ -58,21 +58,26 @@ This outputs a BRDF file which cannot be displayed directly. To see the result o
 
     $ ./build/brdf2data --input gold-met.brdf --output gold-met-rat.exr --data data_brdf_slice
 
-It is now possible to perform side by side comparison of the original data, and the interpolated rational function:
+It is now possible to perform side by side comparison of the original data, and the interpolated rational function (click on the image to move the slider):
 
 @htmlonly
 <center>
-  <table  border="0" style='text-align:center'>
-  <tr>
-    <td>
-      <img src="gold-met-merl.png" alt="gold-metallic-paint slice" />
-    </td>
-    <td>
-      <img src="gold-met-rat.png" alt="gold-metallic-paint slice fitting using R-BRDFs" />
-    </td>
-  </tr>
-  </table>
+<table>
+   <tr>
+      <td><div class="image" id="compare-data"></div></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><tt>gold-metallic-paint</tt></td>
+   </tr>
+</table>
 </center>
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+var compareRational = Compare('compare-data', 254, 254);
+compareRational.add('gold-met-merl.png', 'MERL');
+compareRational.add('gold-met-rat.png',  'Rational BRDF');
+compareRational.update();
+</script>
 @endhtmlonly
 
 
