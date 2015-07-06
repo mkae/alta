@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<alta>
+   <!-- DATA conversion -->
+   <action name="data2data">
+		<!-- Input and output arguments of the action -->
+		<input name="blue-metallic-paint.binary" />
+		<output name="blue-metallic-paint.func" />
+      
+      <!-- Define the input data plugin -->
+		<plugin type="in-data" name="data_merl" />
+   </action>
+
+   <!-- FITTING -->
+	<action name="data2brdf">
+		<!-- Input and output arguments of the action -->
+		<input name="blue-metallic-paint.dat" />
+		<output name="blue-metallic-paint.func" />
+
+		<!-- Define the function to use -->
+		<function name="nonlinear_function_diffuse" />
+      <function name="nonlinear_function_blinn" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="nonlinear_fitter_ceres" />
+
+      <!-- Data mask -->
+      <parameter name="max" value="[0.8, 0.01, 0.01]" />
+	</action>
+
+</alta>

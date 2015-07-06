@@ -241,6 +241,13 @@ Finally, we fit the sum of a Lambertian term and the Blinn-Phong lobe. To genera
 In this example, we used the \ref nonlinear_fitter_ceres fitting plugin, but any other nonlinear fitter would be good as well. Notice that you might experience different results depending of the fitter you used, due to the difference in the underlying fitting procedure (CERES uses a Levenberg-Marquardt algorithm).
 
 @htmlonly
+<br />
+Here we provide the associated python and XML scripts:
+<center>
+<a href="nonlinear-example-01.py"><img src="py.png" alt="python script" width="80px" /></a>
+<a href="nonlinear-example-01.xml"><img src="xml.png" alt="XML script" width="80px" /></a>
+</center>
+
 <script type="text/javascript" src="script.js"></script>
 <script type="text/javascript">
 var compareNonlinear = Compare('compare-nonlinear', 250, 200);
