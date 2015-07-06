@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<alta>
+   <!-- DATA conversion -->
+   <action name="data2data">
+		<!-- Input and output arguments of the action -->
+		<input name="red-fabric.binary" />
+		<output name="red-fabric.exr" />
+      
+      <!-- Define the input data plugin -->
+		<plugin type="in-data" name="data_merl" />
+		<plugin type="out-data" name="data_brdf_slice" />
+   </action>
+
+   <!-- DATA conversion -->
+   <action name="data2data">
+		<!-- Input and output arguments of the action -->
+		<input name="red-fabric.binary" />
+		<output name="red-fabric-rusin90.exr" />
+      
+      <!-- Define the input data plugin -->
+		<plugin type="in-data" name="data_merl" />
+      <plugin type="out-data" name="data_brdf_slice" />
+
+      <!-- Parameters -->
+      <parameter name="param" value="RUSIN_TH_TD" />
+   </action>
+
+   <!-- DATA conversion -->
+   <action name="data2data">
+		<!-- Input and output arguments of the action -->
+		<input name="red-fabric.binary" />
+		<output name="red-fabric-rusin50.exr" />
+      
+      <!-- Define the input data plugin -->
+		<plugin type="in-data" name="data_merl" />
+		<plugin type="out-data" name="data_brdf_slice" />
+
+      <!-- Parameters -->
+      <parameter name="param" value="RUSIN_TH_TD" />
+      <parameter name="angle" value="50" />
+   </action>
+</alta>

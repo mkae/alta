@@ -303,6 +303,13 @@ We use the least square rational fitter: \ref rational_fitter_leastsquare. This 
     $ data2brdf --input gold-metallic-paint.alta --output gold-metallic-paint.func --func rational_function_chebychev --fitter rational_fitter_leastsquare --np 100 --nq 50
 
 @htmlonly
+<br />
+Here we provide the associated python and XML scripts:
+<center>
+<a href="rational-example-01.py"><img src="py.png" alt="python script" width="80px" /></a>
+<a href="rational-example-01.xml"><img src="xml.png" alt="XML script" width="80px" /></a>
+</center>
+
 <script type="text/javascript" src="script.js"></script>
 <script type="text/javascript">
 var compareRational = Compare('compare-rational', 250, 200);
@@ -351,6 +358,13 @@ It is also possible to select 3D parametrization and complete the third componen
     $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice --param RUSIN_TH_TD_PD --angle 90
 
 @htmlonly
+<br />
+Here we provide the associated python and XML scripts:
+<center>
+<a href="data-example-01.py"><img src="py.png" alt="python script" width="80px" /></a>
+<a href="data-example-01.xml"><img src="xml.png" alt="XML script" width="80px" /></a>
+</center>
+
 <script type="text/javascript" src="script.js"></script>
 <script type="text/javascript">
 var compareRational = Compare('compare-data', 250, 200);

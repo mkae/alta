@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<alta>
+   <!-- DATA conversion -->
+   <action name="data2data">
+		<!-- Input and output arguments of the action -->
+		<input name="gold-metallic-paint.binary" />
+		<output name="gold-metallic-paint.exr" />
+      
+      <!-- Define the input data plugin -->
+		<plugin type="in-data" name="data_merl" />
+		<plugin type="out-data" name="data_brdf_slice" />
+   </action>
+
+   <!-- DATA conversion -->
+   <action name="data2data">
+		<!-- Input and output arguments of the action -->
+		<input name="gold-metallic-paint.exr" />
+		<output name="gold-metallic-paint.dat" />
+      
+      <!-- Define the input data plugin -->
+		<plugin type="in-data" name="data_brdf_slice" />
+   </action>
+
+   <!-- FITTING -->
+	<action name="data2brdf">
+		<!-- Input and output arguments of the action -->
+		<input name="gold-metallic-paint.dat" />
+		<output name="gold-metallic-paint.func" />
+
+		<!-- Define the function to use -->
+		<function name="rational_function_chebychev" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_leastsquare" />
+
+      <!-- Fitting parameters -->
+      <parameter name="np" value="100" />
+      <parameter name="nq" value="50" />
+	</action>
+
+</alta>
