@@ -13,6 +13,8 @@
 #include <core/params.h>
 #include <tests.h>
 
+using namespace alta::tests;
+
 // STL includes
 #include <cmath>
 #include <iostream>

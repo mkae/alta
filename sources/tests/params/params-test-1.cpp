@@ -13,6 +13,8 @@
 #include <core/params.h>
 #include <tests.h>
 
+using namespace alta::tests;
+
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
