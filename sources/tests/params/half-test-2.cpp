@@ -34,18 +34,12 @@ int main(int argc, char** argv) {
 	// Sample the full hemisphere for both ωi and ωo.  Check if the converted
 	// vector is within the range of the parametrization.  θh and θd should be
 	// within [0..π/2], and Φd should be within [-π..π].
-	for(int ti=0; ti<=ntheta; ti+=step) {
-		for(int pi=0; pi<=nphi; pi+=step) {
-
-      const double theta_i = degrees_to_radians(double(ti));
-			const double phi_i   = degrees_to_radians(double(pi));
+  for (auto&& theta_i : angle_range<double>(0, ntheta, step)) {
+  for (auto&& phi_i : angle_range<double>(0, nphi, step)) {
 
 			#pragma omp parallel for
-			for(int to=0; to<=ntheta; to+=step) {
-				for(int po=0; po<=nphi; po+=step) {
-
-          const double theta_o = degrees_to_radians(double(to));
-					const double phi_o   = degrees_to_radians(double(po));
+      for (auto&& theta_o : angle_range<double>(0, ntheta, step)) {
+      for (auto&& phi_o : angle_range<double>(0, nphi, step)) {
 
 					vec cart(6);
 					cart[0] = cos(phi_i)*sin(theta_i);
@@ -65,9 +59,10 @@ int main(int argc, char** argv) {
 						++n;
 					}
 
-          if (po % 10000 == 0) {
-              std::cout << "<<INFO>> Check configuration " << po + nphi*(to + ntheta*(pi + nphi*ti)) << " / " << ntheta*ntheta*nphi*nphi << "      \r";
-          }
+#if 0
+          std::cout << "<<INFO>> checked configuration "
+                    << cart << "\r";
+#endif
 				}
 			}
 		}
