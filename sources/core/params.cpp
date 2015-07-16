@@ -444,6 +444,14 @@ static void half_vector(double const *invec, vec &half)
     assert(half[2] >= 0.);
 }
 
+// Return true if X is essentially zero.  We have to resort to this hack
+// before using functions that have a high derivative around zero, such as
+// 'atan2'.
+static bool is_zero(double x)
+{
+    return std::abs(x) < 1e-14;
+}
+
 void params::from_cartesian(const double* invec, params::input outtype,
 		double* outvec)
 {
@@ -552,7 +560,12 @@ void params::from_cartesian(const double* invec, params::input outtype,
       //     outvec[1] = acos(clamp(half.dot(view),0.,1.));
       // }
       outvec[1] = acos(diff[2]);
-			outvec[2] = atan2(diff[1], diff[0]);
+
+      // By convention, when DIFF is alongside z⃗, return φd = 0.
+      if (is_zero(diff[0]) && is_zero(diff[1]))
+          outvec[2] = 0;
+      else
+          outvec[2] = atan2(diff[1], diff[0]);
 
 			break;
 		case params::ISOTROPIC_TV_TL_DPHI:
@@ -680,7 +693,12 @@ void params::from_cartesian(const double* invec, params::input outtype,
       rotate(diff, -outvec[1], -outvec[0]);
 
 			outvec[2] = acos(diff[2]);
-			outvec[3] = atan2(diff[1], diff[0]);
+
+      // By convention, when DIFF is alongside z⃗, return φd = 0.
+      if (is_zero(diff[0]) && is_zero(diff[1]))
+          outvec[3] = 0;
+      else
+          outvec[3] = atan2(diff[1], diff[0]);
 			break;
 
 		case params::SPHERICAL_TL_PL_TV_PV:
