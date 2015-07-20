@@ -20,9 +20,9 @@ PLUGIN_LIB     = ['core']
 
 ## Python and boost-python library
 ##
-PYTHON_INC    = ['/usr/include/python2.7']
-PYTHON_DIR    = ['/usr/lib/x86_64-linux-gnu']
-PYTHON_LIB    = ['boost_python-py27', 'python2.7']
+#PYTHON_INC    = ['/usr/include/python2.7']
+#PYTHON_DIR    = ['/usr/lib/x86_64-linux-gnu']
+#PYTHON_LIB    = ['boost_python-py27', 'python2.7']
 
 
 ## Eigen library
