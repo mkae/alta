@@ -53,8 +53,20 @@ else:
     print '<<INFO>> Using config file \"' + configFile + '\"'
 #end
 
+# List of C++ compilers we look for by default.
+cxx_compilers = [ 'g++', 'c++', 'clang++', 'cl' ]
+
+def default_cxx_compiler():
+	"Return the absolute file name of a C++ compiler."
+	for cxx in cxx_compilers:
+		cxx_full = WhereIs(cxx)
+		if cxx_full != None:
+			return cxx_full
+	return cxx_compilers[0]
+
 vars = Variables(configFile)
-vars.Add('CXX',               'Compiler')
+vars.Add('CXX',               'C++ compiler',
+				 default = default_cxx_compiler())
 vars.Add('CCFLAGS',           'Compiler\'s flags',
          default = ['-g', '-O2', '-Wall'])
 vars.Add('LINKFLAGS',         'Linker\'s flags',

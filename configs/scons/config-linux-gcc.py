@@ -7,9 +7,9 @@ import os, sys
 ##----------------------------------------------------------------##
 
 
-## Compilators build flags
+## Compiler and build flags.
 ##
-CXX            = 'g++'
+#CXX            = 'g++'
 CCFLAGS        = ['-O3', '-g', '-Wall', '-std=c++11', '-DNDEBUG']
 
 
