@@ -19,6 +19,8 @@
 #include <cassert>
 #include <iostream>
 
+#include <Eigen/Geometry>
+
 #include "common.h"
 
 /*! \class params
@@ -346,9 +348,17 @@ class params
             out[1] = sin(theta_d)*sin(phi_d);
             out[2] = cos(theta_d);
 
-				// Rotate the diff vector to get the output vector
-            rotate_binormal(out, theta_h);
-            rotate_normal(out, phi_h);
+            // Rotate the diff vector to get the output vector
+            // TODO: Eventually switch to 'vec' everywhere.
+            vec out2(3);
+            out2[0] = out[0];
+            out2[1] = out[1];
+            out2[2] = out[2];
+            rotate_binormal(out2, theta_h);
+            rotate_normal(out2, phi_h);
+            out[0] = out2[0];
+            out[1] = out2[1];
+            out[2] = out2[2];
 
             // Compute the out vector from the in vector and the half
             // vector.
@@ -377,33 +387,23 @@ class params
 
 		  //! \brief rotate a cartesian vector with respect to the normal of
 		  //! theta degrees.
-		  static void rotate_normal(double* vec, double theta)
+		  static void rotate_normal(vec& vec, double theta)
 		  {
-			  const double cost = cos(theta);
-			  const double sint = sin(theta);
-
-			  const double temp = cost * vec[0] - sint * vec[1];
-
-			  vec[1] = cost * vec[1] + sint * vec[0];
-			  vec[0] = temp;
+          auto rotz = Eigen::AngleAxis<double>(theta, Eigen::Vector3d(0, 0, 1));
+          vec = rotz * vec;
 		  }
 
 		  //! \brief rotate a cartesian vector with respect to the bi-normal of
 		  //! theta degrees.
-		  static void rotate_binormal(double* vec, double theta)
+		  static void rotate_binormal(vec& vec, double theta)
 		  {
-			  const double cost = cos(theta);
-			  const double sint = sin(theta);
-
-			  const double temp = cost * vec[0] + sint * vec[2];
-
-			  vec[2] = cost * vec[2] - sint * vec[0];
-			  vec[0] = temp;
+          auto roty = Eigen::AngleAxis<double>(theta, Eigen::Vector3d(0, 1, 0));
+          vec = roty * vec;
 		  }
 
       //! \brief Rotate VEC by THETA around the normal, and by PHI around the
       //! binormal.
-      static void rotate(double vec[3], double theta, double phi)
+      static void rotate(vec& vec, double theta, double phi)
       {
           // Naive implementation.
           rotate_normal(vec, theta);

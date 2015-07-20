@@ -442,8 +442,8 @@ void params::from_cartesian(const double* invec, params::input outtype,
   vec half(3);
   half_vector(invec, half);
 
-	// Difference vector 
-	double diff[3];
+	// Difference vector.
+	vec diff(3);
 
 	switch(outtype)
 	{
