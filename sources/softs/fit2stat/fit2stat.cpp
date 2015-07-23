@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -438,7 +438,7 @@ main(int argc, char* argv[])
     std::cout << "  --xmin     " << std::endl ;
     std::cout << "  --xmax    " << std::endl ;
 
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
 
   std::cout << "<<INFO>> Total System Memory:" 
