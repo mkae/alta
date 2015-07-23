@@ -44,6 +44,32 @@ def run_unit_test(env, target, source):
          open(str(target[0]),'w').write("FAIL\n")
          return 1
 
+def run_dash_dash_help(env, target, source):
+	"""Run SOURCE with '--help'."""
+	program = str(source[0].abspath)
+	pipe = os.popen(program + " --help")
+
+	seen_usage = False
+	for line in pipe:
+		if line.startswith('Usage: '):
+			seen_usage = True
+
+	status = pipe.close()
+	if status == None:
+		if seen_usage:
+			with open(str(target[0]),'w') as log:
+				log.write("PASS: congrats!\n")
+			return 0
+		else:
+			with open(str(target[0]),'w') as log:
+				log.write("FAIL: '" + program + "' lacks usage string\n")
+			return 1
+	else:
+		with open(str(target[0]),'w') as log:
+			log.write("FAIL: '" + program + " --help' returned "
+								+ str(status) + "\n")
+		return 2
+
 def make_cxx_test_alias(source):
 	program = 'build/' + splitext(basename(source))[0]
 	command = env.Command(basename(program) + '.passed',
@@ -53,12 +79,23 @@ def make_cxx_test_alias(source):
 	env.Alias('tests', env.Program(program, source))
 	env.Alias('tests', command)
 
+def make_help_test_alias(program):
+	"""Add a test that checks the '--help' output of PROGRAM."""
+	command = env.Command(basename(program) + '.help.log',
+												executable("#sources/build/" + program),
+												run_dash_dash_help)
+	AlwaysBuild(command)
+	env.Alias('tests', command)
+
 def make_test_python(script):
    command = env.Command(basename(splitext(script)[0])+ '.passed',
                          script,
                          run_unit_test)
    AlwaysBuild(command)
    env.Alias('tests', command)
+
+UTILITIES = [ 'data2data', 'data2brdf', 'brdf2data', 'fit2stat',
+              'brdf2brdf', 'brdf2data', 'brdf2gnuplot' ]
 
 CXX_TESTS = [ 'params/half-test-1.cpp',
 							'params/half-test-2.cpp',
@@ -70,6 +107,9 @@ PYTHON_TESTS = [ 'python/test-python-function.py' ]
 
 for test in CXX_TESTS:
 	make_cxx_test_alias(test)
+
+for command in UTILITIES:
+	make_help_test_alias(command)
 
 if 'python' in COMMAND_LINE_TARGETS:
    for test in PYTHON_TESTS:
