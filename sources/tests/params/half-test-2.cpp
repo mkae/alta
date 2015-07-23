@@ -18,7 +18,19 @@ using namespace alta::tests;
 // STL includes
 #include <cmath>
 #include <iostream>
+#include <functional>
 
+
+// Return true if every element of V matches PRED, false otherwise.
+static bool every(const std::function<bool (double)> &pred, const vec &v)
+{
+    for (int i = 0; i < v.size(); i++)
+    {
+        if (!pred(v[i]))
+            return false;
+    }
+    return true;
+}
 
 /* Test different configurations for the Half / Cartesian parametrization
  * Returns: 0 is every test passes
@@ -50,8 +62,14 @@ int main(int argc, char** argv) {
 					cart[3] = cos(phi_o)*sin(theta_o);
 					cart[4] = sin(phi_o)*sin(theta_o);
 					cart[5] = cos(theta_o);
-					vec x(4);
 
+          // Are all the elements of CART positive?  IOW, check whether the
+          // input coordinates are in the hemisphere.
+          if (!every([](double x) { return x >= 0; }, cart))
+              // No they aren't: skip this value.
+              continue;
+
+					vec x(4);
 					params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_PH_TD_PD, &x[0]);
 
 					#pragma omp critical (n)
