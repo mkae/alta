@@ -44,14 +44,14 @@ def run_unit_test(env, target, source):
          open(str(target[0]),'w').write("FAIL\n")
          return 1
 
-def make_test_alias(source):
-   program = 'build/' + splitext(basename(source))[0]
-   command = env.Command(basename(program) + '.passed',
-                         executable(program),
-                         run_unit_test)
-   AlwaysBuild(command)
-   env.Alias('tests', env.Program(program, source))
-   env.Alias('tests', command)
+def make_cxx_test_alias(source):
+	program = 'build/' + splitext(basename(source))[0]
+	command = env.Command(basename(program) + '.passed',
+												executable(program),
+												run_unit_test)
+	AlwaysBuild(command)
+	env.Alias('tests', env.Program(program, source))
+	env.Alias('tests', command)
 
 def make_test_python(script):
    command = env.Command(basename(splitext(script)[0])+ '.passed',
@@ -60,16 +60,16 @@ def make_test_python(script):
    AlwaysBuild(command)
    env.Alias('tests', command)
 
-TESTS = [ 'params/half-test-1.cpp',
-          'params/half-test-2.cpp',
-          'params/half-test-3.cpp',
-          'params/params-test-1.cpp',
-          'data-io.cpp' ]
+CXX_TESTS = [ 'params/half-test-1.cpp',
+							'params/half-test-2.cpp',
+							'params/half-test-3.cpp',
+							'params/params-test-1.cpp',
+							'data-io.cpp' ]
 
 PYTHON_TESTS = [ 'python/test-python-function.py' ]
 
-for test in TESTS:
-   make_test_alias(test)
+for test in CXX_TESTS:
+	make_cxx_test_alias(test)
 
 if 'python' in COMMAND_LINE_TARGETS:
    for test in PYTHON_TESTS:
