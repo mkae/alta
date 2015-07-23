@@ -4,7 +4,7 @@
   ;; For Python, we want to display tabs as two columns, and we
   ;; basically want to use only tabs for indentation.
   . ((tab-width . 2)
-     (indent-tabs-mode . t)
+     (indent-tabs-mode . nil)
      (python-indent-offset . 2)))
  (c-mode
   . ((tab-width . 2)
