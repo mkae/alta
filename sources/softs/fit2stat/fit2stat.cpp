@@ -49,7 +49,7 @@ public:
     //           data_y = dat.tail( data->dimY() );
     vec f_y = vec::Zero( f->dimY() );
     
-    for(unsigned int i=0; i < data->size(); i++)
+    for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       dat = data->get(i); 
 
@@ -88,7 +88,7 @@ class Norm
     //           data_y = dat.tail( data->dimY() );
     vec f_y = vec::Zero( f->dimY() );
     
-    for(unsigned int i=0; i < data->size(); i++)
+    for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       dat = data->get(i);
 
@@ -106,7 +106,7 @@ class Norm
 
     vec dat = vec::Zero( data->dimX() + data->dimY() );
 
-    for(unsigned int i=0; i < data->size(); i++)
+    for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       dat = data->get(i);
       l2 += ((f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )) * weights[i]).array().square().matrix();
@@ -139,7 +139,7 @@ class Norm
 
     vec dat = vec::Zero( data->dimX() + data->dimY() );
 
-    for(unsigned int i=0; i < data->size(); i++)
+    for(unsigned int i=0; i < (unsigned int ) data->size(); i++)
     {
       dat = data->get(i);          
       //vec const data_x = dat.head( data->dimX() );
@@ -172,7 +172,7 @@ class Norm
 
     //timer chrono;
     //chrono.start();
-    for(unsigned int i=0; i < data->size(); i++)
+    for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       Eigen::ArrayXd const dat = data->get(i);          
       Eigen::ArrayXd const data_x = dat.head( data->dimX() );
@@ -271,7 +271,7 @@ bool convertDataToFunctionParam(ptr<data> const & data,
       vec new_data_y = vec::Zero( f->dimY() );
       vec new_data_x = vec::Zero( f->dimX() );
 
-      for( unsigned int i=0; i < converted_data->size(); i++)
+      for( unsigned int i=0; i < (unsigned int) converted_data->size(); i++)
       {
 
         dat = data->get(i);
