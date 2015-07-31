@@ -265,11 +265,17 @@ void save_function_without_args(const ptr<function>& f, const std::string& filen
    f->save(filename, args);
 }
 
-/* Fitter interface to allow to launch fit without providing an arguments
- * object.
+/* Fitter interface to allow to launch fit with and without providing an
+ * arguments object.
  */
-bool fit_data(const ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func) {
+bool fit_data_without_args(const ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func) {
    arguments args;
+   _fitter->set_parameters(args);
+   return _fitter->fit_data(_data, _func, args);
+}
+
+bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func, const arguments& args) {
+   _fitter->set_parameters(args);
    return _fitter->fit_data(_data, _func, args);
 }
 
@@ -283,7 +289,8 @@ void data2data(const data* d_in, data* d_out)
     if(dynamic_cast<vertical_segment*>(d_out)!=NULL)
     {
         d_out->setParametrization(d_in->input_parametrization());
-        d_out->setDimX(params::dimension(d_in->input_parametrization()));
+        //d_out->setDimX(params::dimension(d_in->input_parametrization()));
+        d_out->setDimX(d_in->dimX());
         d_out->setDimY(d_in->dimY());
     		vec temp(d_out->dimX() + d_out->dimY());
         for(int i=0; i<d_in->size(); ++i)
@@ -420,8 +427,8 @@ BOOST_PYTHON_MODULE(alta)
 	// Fitter interface
 	//
 	bp::class_<fitter, ptr<fitter>, boost::noncopyable>("fitter", bp::no_init)
-		.def("fit_data", &fitter::fit_data)
-      .def("fit_data", &fit_data);
+		.def("fit_data", &fit_data_with_args)
+      .def("fit_data", &fit_data_without_args);
 	bp::def("get_fitter", plugins_manager::get_fitter);
 
 	// Softs
