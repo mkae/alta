@@ -77,7 +77,7 @@ class vertical_segment : public data
 
 
     //! \brief Default constructor that does nothing at all.
-    vertical_segment()
+    vertical_segment() : _is_absolute(true), _dt(0.1)
     {
     }
 
@@ -109,10 +109,10 @@ class vertical_segment : public data
 		virtual vec get(int i) const ;		
 		virtual vec operator[](int i) const;
 
-    virtual vec value(const vec&) const
-    {
-      NOT_IMPLEMENTED();
-    }
+      virtual vec value(const vec&) const
+      {
+         NOT_IMPLEMENTED();
+      }
 
 		//! \brief Put the sample inside the data
 		virtual void set(const vec& x);
@@ -126,7 +126,6 @@ class vertical_segment : public data
 		//! ordinate segment.
 		virtual void get(int i, vec& yl, vec& yu) const ;		
 
-
 		// Get data size
 		virtual int size() const ;
 
@@ -138,11 +137,21 @@ class vertical_segment : public data
 																		vertical_segment& result,
 																		const arguments& args);
 
+      //! \brief From a correct input configuration 'x' with size
+      //! dimX()+dimY(), generate a vertical ! segment satisfying this object's
+      //! parameters.
+      virtual vec vs(const vec& x) const;
+
 	private: // data
 
 		// Store for each point of data, the upper
 		// and lower value
 		std::vector<vec> _data ;
+
+      // Store the different arguments for the vertical segment: is it using
+      // relative or absolute intervals? What is the dt used ?
+      bool   _is_absolute;
+      double _dt;
 } ;
 
 /* -*- c++ -*- */
