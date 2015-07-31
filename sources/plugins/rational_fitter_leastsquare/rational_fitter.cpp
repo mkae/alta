@@ -50,21 +50,23 @@ bool rational_fitter_leastsquare::fit_data(const ptr<data>& dat, ptr<function>& 
 	r->setDimY(d->dimY()) ;
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
+
+   _np = args.get_int("np", _np);
+   _nq = args.get_int("nq", _nq);
 	r->setSize(_np, _nq);
 
-	std::cout << "<<INFO>> np =" << _np << "& nq =" << _nq  << std::endl ;
+   std::cout << "<<INFO>> Fitting using np = " << _np <<  " & nq = " << _nq  << std::endl ;
+    
 
-
-    timer time ;
+   timer time ;
 	time.start() ;
 
 
 	if(fit_data(d, _np, _nq, r))
 	{
-        time.stop();
-		std::cout << "<<INFO>> got a fit" << std::endl ;
-        std::cout << "<<INFO>> it took " << time << std::endl ;
-		return true ;
+      time.stop();
+      std::cout << "<<INFO>> got a fit, it took " << time << std::endl ;
+      return true ;
 	}
 
 	std::cout << "<<INFO>> fit failed\r"  ;
@@ -75,9 +77,9 @@ bool rational_fitter_leastsquare::fit_data(const ptr<data>& dat, ptr<function>& 
 
 void rational_fitter_leastsquare::set_parameters(const arguments& args)
 {
-	_np = args.get_float("np", 10) ;
-	_nq = args.get_float("nq", 10) ;
-  _max_iter = args.get_float("max-iter", 1) ;
+   _np = args.get_int("np", 10) ;
+   _nq = args.get_int("nq", 10) ;
+   _max_iter = args.get_int("max-iter", 1) ;
 }
 		
 bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& r) 
@@ -144,7 +146,6 @@ bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int n
   // By default we iterate only once (usually successive iteration introduced more errors)
   for(int iter=0; iter<_max_iter; ++iter)
   {
-    
     // Step 1 fit 1/f_i using 1/q only
     {
       // Theoretically best weighting scheme to approcimate the true LS problem, which is: sum_i (1/q(x_i) - f_i)^2
