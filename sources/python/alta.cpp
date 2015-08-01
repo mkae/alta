@@ -286,47 +286,65 @@ bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<functi
  */
 void data2data(const data* d_in, data* d_out)
 {
-    if(dynamic_cast<vertical_segment*>(d_out)!=NULL)
-    {
-        d_out->setParametrization(d_in->input_parametrization());
-        //d_out->setDimX(params::dimension(d_in->input_parametrization()));
-        d_out->setDimX(d_in->dimX());
-        d_out->setDimY(d_in->dimY());
-    		vec temp(d_out->dimX() + d_out->dimY());
-        for(int i=0; i<d_in->size(); ++i)
-        {
-            // Copy the input vector
-            vec x = d_in->get(i);
-            params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
-            params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
-            d_out->set(temp);
-        }
-    }
-    else
-    {
-#pragma omp parallel for
-        for(int i=0; i<d_out->size(); ++i)
-        {
-            vec temp(d_in->dimX());
-            vec cart(6);
-            vec y(d_in->dimY());
+   if(dynamic_cast<vertical_segment*>(d_out)!=NULL)
+   {
+      d_out->setParametrization(d_in->input_parametrization());
+      d_out->setDimX(d_in->dimX());
+      d_out->setDimY(d_in->dimY());
 
-            // Copy the input vector
-            vec x = d_out->get(i);
-            params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
+      // Init the min and max
+      vec _min(d_out->dimX()), _max(d_out->dimX());
+      for(unsigned int k=0; k<d_out->dimX(); ++k)
+      {
+         _min[k] =  std::numeric_limits<double>::max() ;
+         _max[k] = -std::numeric_limits<double>::max() ;
+      }
 
-            if(cart[2] >= 0.0 || cart[5] >= 0.0) {
-                params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
-                y = d_in->value(temp);
-            } else {
-                y.setZero();
-            }
+      vec temp(d_out->dimX() + d_out->dimY());
+      for(unsigned int i=0; i<d_in->size(); ++i)
+      {
+         // Copy the input vector
+         vec x = d_in->get(i);
+         params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
+         params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
+         d_out->set(temp);
 
-            params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
+         // Update min and max
+         for(unsigned int k=0; k<d_out->dimX(); ++k)
+         {
+            _min[k] = std::min(_min[k], temp[k]) ;
+            _max[k] = std::max(_max[k], temp[k]) ;
+         }
+      }
 
-            d_out->set(x);
-        }
-    }
+      // Set the min and max
+      d_out->setMin(_min);
+      d_out->setMax(_max);
+   }
+   else
+   {
+      for(int i=0; i<d_out->size(); ++i)
+      {
+         vec temp(d_in->dimX());
+         vec cart(6);
+         vec y(d_in->dimY());
+
+         // Copy the input vector
+         vec x = d_out->get(i);
+         params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
+
+         if(cart[2] >= 0.0 || cart[5] >= 0.0) {
+            params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
+            y = d_in->value(temp);
+         } else {
+            y.setZero();
+         }
+
+         params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
+
+         d_out->set(x);
+      }
+   }
 }
 
 /* This function provides a similar behaviour that the brdf2data function.
