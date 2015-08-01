@@ -27,7 +27,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
     return new rational_fitter_leastsquare();
 }
 
-rational_fitter_leastsquare::rational_fitter_leastsquare() 
+rational_fitter_leastsquare::rational_fitter_leastsquare() : _np(10), _nq(10), _max_iter(1)
 {
 }
 rational_fitter_leastsquare::~rational_fitter_leastsquare() 
@@ -113,9 +113,7 @@ bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int n
   VectorXd Y(d->size());
   for(int i=0; i<d->size(); ++i) 
   {
-    vec yl, yu ;
-    d->get(i, yl, yu);
-    const double y  = 0.5*(yl[ny] + yu[ny]) ;
+    const double y = d->get(i)[d->dimX() + ny];
     Y[i] = y;
     vec x = d->get(i);
     VectorXd::Map(&x[0], 1) /= scale;
