@@ -42,7 +42,7 @@ vertical_segment::initializeToZero( unsigned int number_of_data_elements )
 {
 	_data.clear();
 
-	unsigned int const  size_of_one_element = dimX() + dimY();
+	unsigned int const  size_of_one_element = dimX() + 3*dimY();
 	
 	for( unsigned int i=0; i < number_of_data_elements; i++)
 	{
@@ -103,14 +103,13 @@ void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
     x.resize(dimX()); yl.resize(dimY()) ; yu.resize(dimY()) ;
     for(int j=0; j<dimX(); ++j)
     {
-        x[j] = _data[i][j] ;
+        x[j] = _data[i][j];
     }
     for(int j=0; j<dimY(); ++j)
     {
-        yl[j] = _data[i][dimX() + dimY() + j] ;
-        yu[j] = _data[i][dimX() + 2*dimY() + j] ;
+        yl[j] = _data[i][dimX() + 1*dimY() + j];
+        yu[j] = _data[i][dimX() + 2*dimY() + j];
     }
-
 }
 		
 void vertical_segment::get(int i, vec& yl, vec& yu) const
@@ -132,12 +131,8 @@ vec vertical_segment::get(int i) const
 	//SLOW !!!!! and useless 
 	// call _data[i]
     const int n = dimX() + dimY();
-    vec res(n);
+    vec res = _data[i].head(n);
     
-    for(int k=0; k<n; ++k) 
-    { 
-			res[k] = _data[i][k]; 
-    }    
     return res ;
 }
 
@@ -151,7 +146,6 @@ void vertical_segment::set(const vec& x)
       _data.push_back(x);
 
    } else if(x.size() == dimX() + dimY()) {
-      vec y(dimX() + 3*dimY());
       _data.push_back(vs(x));
 
    } else {
@@ -183,14 +177,19 @@ int vertical_segment::size() const
 
 vec vertical_segment::vs(const vec& x) const {
    vec y(dimX() + 3*dimY());
-   for(unsigned int i=0; i<dimX()+dimY(); ++i) {
-      y[i] = x[i];
-   }
+
+   // Copy the head of each vector
+   y.head(dimX() + dimY()) = x.head(dimX() + dimY());
    
    for(unsigned int i=0; i<dimY(); ++i) {
       const double val = x[i + dimX()];
-      y[i + dimX()+1*dimY()] = val - ((_is_absolute) ? _dt : _dt*val);
-      y[i + dimX()+2*dimY()] = val + ((_is_absolute) ? _dt : _dt*val);
+      if(_is_absolute) {
+         y[i + dimX()+1*dimY()] = val - _dt;
+         y[i + dimX()+2*dimY()] = val + _dt;
+      } else {
+         y[i + dimX()+1*dimY()] = val * (1.0 - _dt);
+         y[i + dimX()+2*dimY()] = val * (1.0 + _dt);
+      }
    }
 
    return y;
