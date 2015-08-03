@@ -32,33 +32,33 @@ AddOption('--no-externals', action="store_false", dest="obtain_externals", defau
 ##
 configFile = GetOption('cfg')
 if configFile == None:
-    
-    if sys.platform == 'win32':
-        configFile = "./configs/scons/config-windows-cl.py"
-    elif sys.platform == 'darwin':
-        configFile = "./configs/scons/config-macos-clang.py"
-    elif sys.platform == 'linux2':
-        configFile = "./configs/scons/config-linux-gcc.py"
-    else:
-    	print '<<ERROR>> You need to specify a configuration file using:'
-    	print '<<ERROR>>    scons --cfg=[filename]'
-    	print '<<ERROR>> Please find example of configuration files in ${ALTA}/configs/scons/'
-    	Exit(1)
+	
+	if sys.platform == 'win32':
+		configFile = "./configs/scons/config-windows-cl.py"
+	elif sys.platform == 'darwin':
+		configFile = "./configs/scons/config-macos-clang.py"
+	elif sys.platform == 'linux2':
+		configFile = "./configs/scons/config-linux-gcc.py"
+	else:
+		print '<<ERROR>> You need to specify a configuration file using:'
+		print '<<ERROR>>    scons --cfg=[filename]'
+		print '<<ERROR>> Please find example of configuration files in ${ALTA}/configs/scons/'
+		Exit(1)
 #end
 
 if not os.path.exists(configFile):
 	print '<<ERROR>> the config file you specified \"' + configFile + '\" does not exists'
 	Exit(1)
 else:
-    print '<<INFO>> Using config file \"' + configFile + '\"'
+	print '<<INFO>> Using config file \"' + configFile + '\"'
 #end
 
 vars = Variables(configFile)
 vars.Add('CXX',               'Compiler')
 vars.Add('CCFLAGS',           'Compiler\'s flags',
-         default = ['-g', '-O2', '-Wall'])
+		 default = ['-g', '-O2', '-Wall'])
 vars.Add('LINKFLAGS',         'Linker\'s flags',
-         default = [])
+		 default = [])
 vars.Add('PLUGIN_LIB',        'Special links for ALTA plugin')
 vars.Add('EIGEN_INC',         'Eigen include directory (mandatory)')
 vars.Add('PYTHON_INC',        'Python and boost-python include directory')
@@ -100,13 +100,13 @@ vars.Add('MATLAB_LIB',        'MATLAB libraries')
 ##
 envVars = {}
 for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH', 'TMP', 'TMPDIR' ]:
-    if var in os.environ:
-        envVars[var] = os.environ[var]
-    else:
-        envVars[var] = '';
+	if var in os.environ:
+		envVars[var] = os.environ[var]
+	else:
+		envVars[var] = '';
 
 if len(envVars['PKG_CONFIG_PATH']) > 0:
-    envVars['PKG_CONFIG_PATH'] += ':'
+	envVars['PKG_CONFIG_PATH'] += ':'
 envVars['PKG_CONFIG_PATH'] += os.path.abspath('external' + os.sep + 'build' + os.sep + 'lib' + os.sep + 'pkgconfig')
 env = Environment(variables = vars, ENV = envVars )
 env['DL_EXTERNALS'] = GetOption('obtain_externals')
@@ -131,11 +131,11 @@ if env['PLATFORM'] == 'darwin':
 
 
 def CheckPKG(context, name):
-        """Return True if package NAME can be found with 'pkg-config'."""
-        context.Message('Checking for %s using pkg-config... ' % name)
-        ret = context.TryAction('pkg-config --exists \'%s\'' % name)[0]
-        context.Result(ret)
-        return ret
+		"""Return True if package NAME can be found with 'pkg-config'."""
+		context.Message('Checking for %s using pkg-config... ' % name)
+		ret = context.TryAction('pkg-config --exists \'%s\'' % name)[0]
+		context.Result(ret)
+		return ret
 
 
 """
@@ -145,36 +145,36 @@ for PKGSPEC using pkg-config. Last, try to build LIB with HEADER. Configure
 ENV accordingly.
 """
 def library_available(env, pkgspec='', lib='', header='',
-                      language='c++', inc_var='', lib_var=''):
+					  language='c++', inc_var='', lib_var=''):
 
-    conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+	conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-    result = False
-    # If a XXX_LIB is specified in the environment, add the various path
-    # and link flags. Check if the library is correctly compiling and
-    # linking with the header.
-    if (lib in env) and (len(env[lib]) > 0):
-        env.AppendUnique(LIBPATH = env[lib_var])
-        env.AppendUnique(CPPPATH = env[inc_var])
-        env.AppendUnique(LIBS = env[lib])
+	result = False
+	# If a XXX_LIB is specified in the environment, add the various path
+	# and link flags. Check if the library is correctly compiling and
+	# linking with the header.
+	if (lib in env) and (len(env[lib]) > 0):
+		env.AppendUnique(LIBPATH = env[lib_var])
+		env.AppendUnique(CPPPATH = env[inc_var])
+		env.AppendUnique(LIBS = env[lib])
 
-        # Check whether the library is usable.
-        result = conf.CheckLibWithHeader(env[lib], header, language)
+		# Check whether the library is usable.
+		result = conf.CheckLibWithHeader(env[lib], header, language)
 
-    elif conf.CheckPKG(pkgspec):
-        env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
-        result = True
+	elif conf.CheckPKG(pkgspec):
+		env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
+		result = True
 
-    conf.Finish()
-    return result
+	conf.Finish()
+	return result
 
 def openexr_available(env):
-        """Return True if OpenEXR is available."""
-        return library_available(env, pkgspec='OpenEXR',
-                                 inc_var='OPENEXR_INC',
-                                 lib_var='OPENEXR_DIR',
-                                 lib='OPENEXR_LIB',
-                                 header='ImfRgbaFile.h')
+		"""Return True if OpenEXR is available."""
+		return library_available(env, pkgspec='OpenEXR',
+								 inc_var='OPENEXR_INC',
+								 lib_var='OPENEXR_DIR',
+								 lib='OPENEXR_LIB',
+								 header='ImfRgbaFile.h')
 
 # Export these for use in SConscripts.
 Export('CheckPKG', 'library_available', 'openexr_available')
@@ -188,11 +188,11 @@ ALTA_LIBS = []
 
 # Libcore's uses 'dlopen', which is in libdl in GNU libc.
 if conf.CheckLibWithHeader('dl', 'dlfcn.h', 'c++'):
-        ALTA_LIBS = ['dl']
+		ALTA_LIBS = ['dl']
 
 # Libcore uses 'clock_gettime', which is in librt in GNU libc.
 if conf.CheckLibWithHeader('rt', 'sched.h', 'c++'):
-        ALTA_LIBS = ALTA_LIBS + ['rt']
+		ALTA_LIBS = ALTA_LIBS + ['rt']
 
 Export('ALTA_LIBS')
 
@@ -226,6 +226,8 @@ if 'python' in COMMAND_LINE_TARGETS:
 if 'tests' in COMMAND_LINE_TARGETS:
 	tests = env.SConscript('sources/tests/SConscript')
 	env.Depends(tests, core)
+	if 'python' in COMMAND_LINE_TARGETS:
+		env.Depends(tests, python)
 
 env.Depends(plugins, core)
 env.Depends(softs, core)

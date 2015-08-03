@@ -67,5 +67,6 @@ PYTHON_TESTS = [ 'python/test-python-function.py' ]
 for test in TESTS:
    make_test_alias(test)
 
-for test in PYTHON_TESTS:
-   make_test_python(test)
+if 'python' in COMMAND_LINE_TARGETS:
+   for test in PYTHON_TESTS:
+      make_test_python(test)
