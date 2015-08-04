@@ -15,18 +15,13 @@ your BRDF data.
 data/:      contains the data for which the fitting techniques are tested
             against. Files are separated by dimension of the input domain
             (e.g. 1d, 2d, 3d, ...).
-configs/:   contains platform dependent configuration files for qmake and
-            scons.
-documents/: contains the documentation, should be build using doxygen into
-            that directiory.
+configs/:   contains platform dependent configuration files for scons.
+documents/: contains the documentation in doxygen format.
 external/:  contains any third party library that needs to be used by ALTA.
             Contains a modified QuadProg++ library using Eigen. You can
             download and compile automaticaly some third party libraries using
             provided python scripts obtain_[libname].py.
-sources/:   contains all the source files. A Makefile or VS project can be
-            created there from the .pro file. Scons generation of the
-            project is also supported.
-
+sources/:   contains all the source files. 
 
 
 2. Building
@@ -36,32 +31,34 @@ ALTA uses SCons, a Python-based build system:
 
   http://scons.org/
 
-To build ALTA, run a command like the following from the top-level
-source directory (noted ${ALTA} in the remainder of this document):
+To build ALTA, run a command like the following from the top-level source
+directory (noted ${ALTA} in the remainder of this document):
 
-  $ scons --cfg=config-file.py
+  $ scons
 
-Here, 'config-file.py' must be replaced with a suitable configuration
-file for your platform.  For instance, when building with GCC on
-GNU/Linux, you may run:
+If you want to use a specifi configuration (i.e. change the default compiler,
+specify where some libaries should be found) you can use a configuration file
+using the '--cfg [file]' option:
+
+  $ scons --cfg=[config-file.py]
+
+Here, 'config-file.py' must be replaced with a suitable configuration file for
+your platform. For instance, when building with GCC on GNU/Linux, you may run:
 
   $ scons --cfg=configs/scons/config-linux-gcc.py
 
+ALTA provide a Python interface for non command-line experts. However, this
+interface is not build automatically. To build the Python interface, please
+run the following command at the root of the repository:
 
-3. Building Advises (for Qt enthousiasts)
-==========================================
+  $ scons python
 
-We use heavily the Qt profile functionality. To build some of the plugins you
-will be required to create your own system dependant .prf for any used library.
-For example ALTA core use the Eigen library. Therefore it is mandatory that
-you provide a eigen.prf file and that this file is in your QMAKEFEATURES
-directory. We provide example of such file in the ${ALTA}/configs/qt directory.
-To ease the configuration for a first installation of ALTA, we advise to use
-this directory as the main QMAKEFEATURES directory.
+You can as well use a plateform specific configuration file using the '--cfg'
+option.
 
 
-3.1. Dependencies:
-------------------
+3. Dependencies:
+================
 
  ALTA core: Eigen
  Plugin rational_eigen:     Eigen 3.x
@@ -76,49 +73,29 @@ this directory as the main QMAKEFEATURES directory.
  Plugin nonlinear_ipopt:    IpOpt library and its dependencies
 
 
-3.2. Eigen Plugins
--------------------
- You must provide an eigen.prf file that contains
+4. Use ALTA
+===========
 
- INCLUDEPATH *= PATH_TO_EIGEN_DIRECTORY
+Once ALTA is compiled with its plugins, you can access the executables and
+library in ${ALTA}/sources/build. To access them directly from the shell, you
+can source the `setpath.sh` script at the root:
 
+  $ source setpath.sh
 
-3.3. Quadprog++ Plugins
------------------------
+This will expose the binary and plugins to the systeme and allow you to run
+ALTA commands from anywhere.
 
- We provide our own version of quadprog++ which uses Eigen library.
- To compile it:
-
- Go to external/quadprog++/
- Use qmake (to generale the Makefile)
- make
-
- Then create a quadprog.prf file that will include
- LIBS *= PATH_TO_LIBQUADPROG/libquadprog++.a
- QMAKE_LIBDIR *= PATH_TO_LIBQUADPROG
- INCLUDEPATH *= PATH_TO_LIBQUADPROG_HEADERS
+For further use of ALTA, please refer to the documentation and tutorials.
 
 
-3.4. Parallel Plugin that requires OpenMP
------------------------------------------
-
- Create an  openmp.prf file and add the following directives:
- QMAKE_CXXFLAGS *=-fopenmp
-
-
-3.5. Matlab Plugin
-------------------
-
- Create an matlab.prf file and add the following directives:
- The PATH_TO_MATLAB_INCLUDE_DIRECTORY must point to a directory that
- contains the file engine.h
-
- INCLUDEPATH *= PATH_TO_MATLAB_INCLUDE_DIRECTORY
-
-
-
-4. Generate the documentation using Doxygen
+5. Generate the documentation using Doxygen
 ===========================================
 
-  $ cd ${ALTA}/documents/
-  $ doxygen doxygen.conf
+If you have doxygen installed on your system, you can build the documentation
+(a static website) using the scons script:
+
+  $ scons doc
+
+The static website is then available at:
+
+  ${ALTA}/documents/doxygen/html/index.html
