@@ -374,6 +374,7 @@ BOOST_PYTHON_MODULE(alta)
 	//
 	// TODO: There is a conversion issue right now that prevents us from using vectors
 	// within Python. This needs to be investiguated.
+	bp::class_<vec>("_vec");
 	bp::class_<python_vec>("vec")
 		.def(bp::init<vec>())
 		.def(bp::init<bp::list>())
