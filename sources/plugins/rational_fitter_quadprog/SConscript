@@ -10,7 +10,7 @@ build_lib = False
 
 conf = Configure(env)
 
-if conf.CheckLib(env['QUADPROG_LIB']):
+if conf.CheckLib(env['QUADPROG_LIB'], language='c++'):
 
 	build_lib = True
 	

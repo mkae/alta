@@ -12,7 +12,7 @@ build_lib = False
 
 conf = Configure(env)
 
-if conf.CheckLib(env['MATLAB_LIB']):
+if conf.CheckLib(env['MATLAB_LIB'], language='c++'):
 
 	build_lib = True
 else:

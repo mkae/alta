@@ -9,7 +9,7 @@ if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_D
 	conf = Configure(env)
 	libs = []
 	for lib in env['CERES_OPT_LIB']:		
-		if conf.CheckLib(lib):
+		if conf.CheckLib(lib, language='c++'):
 			libs.append(lib)
 		#else:
 		#	W.warn(W.DependencyWarning, "could not find library " + lib)

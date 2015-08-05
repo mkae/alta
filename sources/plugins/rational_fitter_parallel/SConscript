@@ -10,11 +10,11 @@ conf = Configure(env)
 
 build_lib = False
 
-if conf.CheckLib(env['QUADPROG_LIB']):	
+if conf.CheckLib(env['QUADPROG_LIB'], language='c++'):	
 
 	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
-	if conf.CheckLib(env['OPENMP_LIB']):
-		env.AppendUnique(LIBS    = env['OPENMP_LIB'])
+	if env['OPENMP_LIB'] and conf.CheckLib(env['OPENMP_LIB']):
+		env.AppendUnique(LIBS = env['OPENMP_LIB'])
 	#end
 
 	build_lib = True

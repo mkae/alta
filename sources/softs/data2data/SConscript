@@ -6,9 +6,11 @@ env.AppendUnique(LIBS = ALTA_LIBS)
 
 # Check if OpenMP is available
 conf = Configure(env)
-if conf.CheckLib(env['OPENMP_LIB']):
-	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
-	env.AppendUnique(LIBS = env['OPENMP_LIB'])
+if env['OPENMP_LIB']:
+   if conf.CheckLib(env['OPENMP_LIB'], language='c++'):
+	   env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
+	   env.AppendUnique(LIBS = env['OPENMP_LIB'])
+   #end
 #end
 conf.Finish()
 
