@@ -24,7 +24,7 @@
 vertical_segment::vertical_segment(unsigned int dim_X, 
                                    unsigned int dim_Y, 
                                    unsigned int size)
-	: data(dim_X, dim_Y)
+	: data(dim_X, dim_Y), _is_absolute(true), _dt(0.1) 
 {
 	initializeToZero( size );
 }
@@ -32,7 +32,7 @@ vertical_segment::vertical_segment(unsigned int dim_X,
 vertical_segment::vertical_segment( params::input in_param, 
                                    	params::output out_param,
                                    	unsigned int size )
-	: data( in_param, out_param)
+	: data( in_param, out_param), _is_absolute(true), _dt(0.1)
 {
 	initializeToZero( size );
 }
@@ -42,7 +42,7 @@ vertical_segment::initializeToZero( unsigned int number_of_data_elements )
 {
 	_data.clear();
 
-	unsigned int const  size_of_one_element = dimX() + dimY();
+	unsigned int const  size_of_one_element = dimX() + 3*dimY();
 	
 	for( unsigned int i=0; i < number_of_data_elements; i++)
 	{
@@ -103,14 +103,13 @@ void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
     x.resize(dimX()); yl.resize(dimY()) ; yu.resize(dimY()) ;
     for(int j=0; j<dimX(); ++j)
     {
-        x[j] = _data[i][j] ;
+        x[j] = _data[i][j];
     }
     for(int j=0; j<dimY(); ++j)
     {
-        yl[j] = _data[i][dimX() + dimY() + j] ;
-        yu[j] = _data[i][dimX() + 2*dimY() + j] ;
+        yl[j] = _data[i][dimX() + 1*dimY() + j];
+        yu[j] = _data[i][dimX() + 2*dimY() + j];
     }
-
 }
 		
 void vertical_segment::get(int i, vec& yl, vec& yu) const
@@ -132,12 +131,8 @@ vec vertical_segment::get(int i) const
 	//SLOW !!!!! and useless 
 	// call _data[i]
     const int n = dimX() + dimY();
-    vec res(n);
+    vec res = _data[i].head(n);
     
-    for(int k=0; k<n; ++k) 
-    { 
-			res[k] = _data[i][k]; 
-    }    
     return res ;
 }
 
@@ -145,17 +140,57 @@ vec vertical_segment::get(int i) const
 //! is not already present.
 void vertical_segment::set(const vec& x)
 {
-//	assert(x.size() == dimX() + dimY() || x.size() == dimX() + 3*dimY());
-	_data.push_back(x);
+   // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),
+   // if it only has the size of a single value, then create the segment.
+   if(x.size() == dimX() + 3*dimY()) {
+      _data.push_back(x);
+
+   } else if(x.size() == dimX() + dimY()) {
+      _data.push_back(vs(x));
+
+   } else {
+      std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
+      throw;
+   }
 }
 
 void vertical_segment::set(int i, const vec& x)
 {
-//	assert(x.size() == dimX() + dimY() || x.size() == dimX() + 3*dimY());
-	_data[i] = x;
+   // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),
+   // if it only has the size of a single value, then create the segment.
+   if(x.size() == dimX() + 3*dimY()) {
+      _data[i] = x;
+
+   } else if(x.size() == dimX() + dimY()) {
+      _data[i] = vs(x);
+
+   } else {
+      std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
+      throw;
+   }
 }
 
 int vertical_segment::size() const
 {
 	return _data.size() ;
+}
+
+vec vertical_segment::vs(const vec& x) const {
+   vec y(dimX() + 3*dimY());
+
+   // Copy the head of each vector
+   y.head(dimX() + dimY()) = x.head(dimX() + dimY());
+   
+   for(unsigned int i=0; i<dimY(); ++i) {
+      const double val = x[i + dimX()];
+      if(_is_absolute) {
+         y[i + dimX()+1*dimY()] = val - _dt;
+         y[i + dimX()+2*dimY()] = val + _dt;
+      } else {
+         y[i + dimX()+1*dimY()] = val * (1.0 - _dt);
+         y[i + dimX()+2*dimY()] = val * (1.0 + _dt);
+      }
+   }
+
+   return y;
 }

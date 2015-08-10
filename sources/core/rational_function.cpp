@@ -32,8 +32,49 @@ rational_function_1d::rational_function_1d(int nX, unsigned int np, unsigned int
 	_separable = separable;
 }
 
-bool rational_function_1d::load(std::istream&)
+bool rational_function_1d::load(std::istream& in)
 {
+	// Variables
+	int _np, _nq;
+	std::string token;
+
+	// Shoudl have the #NP [int]
+	in >> token;
+	if(token != "#NP") { return false; }
+	in >> _np;
+
+	// Shoudl have the #NQ [int]
+	in >> token >> _nq;
+	if(token != "#NQ") { return false; }
+	vec a(_np), b(_nq);
+
+	// Parse the p_i coefficients
+	// TODO: Check if the indices match the current index?
+	for(int j=0; j<_np; ++j)
+	{
+		for(int k=0; k<_nX; ++k)
+		{
+			in >> token;
+		}
+		in >> a[j];
+	}
+
+	// Parse the q_i coefficients
+	// TODO: Check if the indices match the current index?
+	for(int j=0; j<_nq; ++j)
+	{
+		for(int k=0; k<_nX; ++k)
+		{
+			in >> token;
+		}
+		in >> b[j];
+	}
+#ifdef NONE
+	std::cout << "p_" << i << " = " << a << std::endl;
+	std::cout << "q_" << i << " = " << b << std::endl;
+#endif
+	// Update the 1D function 
+	this->update(a, b);
 	return true;
 }
 
@@ -47,6 +88,8 @@ void rational_function_1d::save_body(std::ostream& out, const arguments& args) c
 
 	 if(is_alta)
 	 {
+		 out << "#NP " << np << std::endl;
+		 out << "#NQ " << nq << std::endl;
 		 for(unsigned int i=0; i<np; ++i)
 		 {
 			 for(int j=0; j<dimX(); ++j)
@@ -105,6 +148,14 @@ void rational_function_1d::update(const vec& in_a,
 	// Get the size of the input vector
 	const int np = in_a.size();
 	const int nq = in_b.size();
+
+	// Resize the coefficient vector if they do not match
+	if(np != _p_coeffs.size()) {
+		_p_coeffs.resize(np);
+	}
+	if(nq != _q_coeffs.size()) {
+		_q_coeffs.resize(nq);
+	}
 
 #define NORMALIZE
 
@@ -544,14 +595,6 @@ bool rational_function::load(std::istream& in)
 		return false;
 	}
 
-	int _np, _nq;
-	// Shoudl have the #NP [int]
-	in >> token >> _np;
-	
-	// Shoudl have the #NQ [int]
-	in >> token >> _nq;
-	setSize(_np, _nq);
-
 	// Check for the MIN and MAX vector
 	vec min(dimX()), max(dimX());
 	in >> token;
@@ -572,34 +615,10 @@ bool rational_function::load(std::istream& in)
 	for(int k=0; k<dimX(); ++k) {in >> max[k]; }
 	setMax(max);
 
-	vec a(_np), b(_nq);
 	for(int i=0; i<_nY; ++i)
 	{
-		// Parse the p_i coefficients
-		for(int j=0; j<_np; ++j)
-		{
-			for(int k=0; k<_nX; ++k)
-			{
-				in >> token;
-			}
-			in >> a[j];
-		}
-		
-		// Parse the q_i coefficients
-		for(int j=0; j<_nq; ++j)
-		{
-			for(int k=0; k<_nX; ++k)
-			{
-				in >> token;
-			}
-			in >> b[j];
-		}
-#ifdef NONE
-        std::cout << "p_" << i << " = " << a << std::endl;
-        std::cout << "q_" << i << " = " << b << std::endl;
-#endif
 		// Update the i_th color channel
-		get(i)->update(a, b);
+		if(!get(i)->load(in)) { return false; }
 	}
 
 	return true;
@@ -611,8 +630,6 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 	out.precision(64);
 	out << std::scientific;
 	out << "#FUNC rational_function" << std::endl;
-	out << "#NP " << np << std::endl ;
-	out << "#NQ " << nq << std::endl ;
 	out << "#MIN "; for(int k=0; k<_nX; ++k) { out << _min[k] << " "; } out << std::endl;
 	out << "#MAX "; for(int k=0; k<_nX; ++k) { out << _max[k] << " "; } out << std::endl; 
 
@@ -620,6 +637,7 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 	{
         const rational_function_1d* rf = get(k);
         rf->save_body(out, args);
+		  out << std::endl;
 	}
 }
 
