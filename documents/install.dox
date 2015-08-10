@@ -46,7 +46,7 @@ page.
 
 Most of the dependencies can be obtain using the 'apt-get' command from Ubuntu/Debian. Other dependencies are automatically obtained using the python scripts provided (see above).
 
- 	$ sudo apt-get install libeigen3-dev libgomp1 libcgal-dev libflann-dev libopenexr-dev libnlopt-dev coinor-libipopt-dev
+ 	$ sudo apt-get install libeigen3-dev libgomp1 libcgal-dev libflann-dev libopenexr-dev libnlopt-dev coinor-libipopt-dev libatlas-base-dev libsuitesparse-dev
 
 #### OSX
 
