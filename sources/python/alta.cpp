@@ -54,12 +54,12 @@ namespace boost {
  */
 struct python_vec : public vec {
     python_vec() : vec() {}
-	python_vec(const vec& x) : vec(x) {}
-    python_vec(const bp::list& l) : vec(bp::len(l)) {
-        for(auto i=0; i<bp::len(l); ++i) {
-            (*this)[i] = bp::extract<double>(l[i]);
-        }
-    }
+	 python_vec(const vec& x) : vec(x) {}
+	 python_vec(const bp::list& l) : vec(bp::len(l)) {
+		 for(auto i=0; i<bp::len(l); ++i) {
+			 (*this)[i] = bp::extract<double>(l[i]);
+		 }
+	 }
 };
 std::ostream &operator<<(std::ostream &out, const python_vec &x) {
 	out << "[";
@@ -70,7 +70,62 @@ std::ostream &operator<<(std::ostream &out, const python_vec &x) {
 	return out << "]";
 }
 
+/* Create special converter from and to list/vec */
+struct list_to_vec_converter {
 
+	// Constructor add the converter to the registry
+	list_to_vec_converter() {
+		bp::converter::registry::push_back(
+				&convertible,
+				&construct,
+				bp::type_id<vec>());
+	}
+
+	// Is the Python object convertible to a vec ?
+	static void* convertible(PyObject* obj_ptr) {
+		if (!PyList_Check(obj_ptr)) return 0;
+		return obj_ptr;
+	}
+
+	// From a PyObject, construct a vector object
+	static void construct(
+			PyObject* obj_ptr,
+			bp::converter::rvalue_from_python_stage1_data* data) {
+
+		auto size = PyList_Size(obj_ptr);
+		vec* _vec = new vec(size);
+		for(auto i=0; i<size; ++i) {
+			auto pyitem = PyList_GetItem(obj_ptr, i);
+			(*_vec)[i] = PyFloat_AsDouble(pyitem);
+		}
+
+		data->convertible = (void*) _vec;;
+	}
+};
+struct vec_to_list_converter {
+
+	// From a vec, create a PyObject
+	static PyObject* convert(const vec& x) {
+		auto obj = PyList_New(x.size());
+		for(auto i=0; i<x.size(); ++i) {
+			PyList_SetItem(obj, i, PyFloat_FromDouble(x[i]));	
+		}
+
+		return obj;
+	}
+};
+
+/* Specific function call to acces a vector's element
+ */
+double vec_get_item(const vec& x, int i) {
+	return x(i);
+}
+
+/* Specific function call to set a vector's element
+ */
+void vec_set_item(vec& x, int i, double a) {
+	x(i) = a;
+}
 
 /* This class is a wrapper to ALTA's arguments class to add Python specific
  * behaviour such as dictionnary initialization.
@@ -386,6 +441,12 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
  */
 BOOST_PYTHON_MODULE(alta)
 {
+	// Custor converters
+	//
+	list_to_vec_converter();
+	vec_to_list_converter();
+
+
 	// Argument class
 	//
 	bp::class_<arguments>("_arguments");
@@ -399,11 +460,14 @@ BOOST_PYTHON_MODULE(alta)
 	//
 	// TODO: There is a conversion issue right now that prevents us from using vectors
 	// within Python. This needs to be investiguated.
+	bp::class_<vec>("_vec")
+		.def("__len__", &vec::size)
+		.def("__getitem__", &vec_get_item)
+		.def("__setitem__", &vec_set_item);
 	bp::class_<python_vec>("vec")
 		.def(bp::init<vec>())
 		.def(bp::init<bp::list>())
-		.def(bp::self_ns::str(bp::self_ns::self))
-		/*.def(" __setitem__", &my_vec::operator[])*/;
+		.def(bp::self_ns::str(bp::self_ns::self));
 	bp::implicitly_convertible<vec, python_vec>();
 	bp::implicitly_convertible<python_vec, vec>();
 
