@@ -1,4 +1,5 @@
 import os, sys
+from subprocess import call
 from os.path import basename, splitext
 
 Import('env', 'ALTA_LIBS')
@@ -15,40 +16,61 @@ test_file = File('Kirby2.dat').srcnode().abspath
 test_data_directory = os.path.dirname(test_file)
 
 def executable(file):
-	'''Append '.exe' to FILE if needed.'''
-	if sys.platform.startswith('win'):
-		return file + '.exe'
-	else:
-		return file
+   '''Append '.exe' to FILE if needed.'''
+   if sys.platform.startswith('win'):
+      return file + '.exe'
+   else:
+      return file
 
 # Inspired by <http://www.scons.org/wiki/UnitTests>.
 def run_unit_test(env, target, source):
-	program = str(source[0].abspath)
-	envvars = os.environ
-	envvars['TEST_DATA_DIRECTORY'] = test_data_directory
+   program = str(source[0].abspath)
+   envvars = os.environ
+   envvars['TEST_DATA_DIRECTORY'] = test_data_directory
+   envvars['PYTHONPATH'] = 'sources/build'
 
-	if os.spawnle(os.P_WAIT, program, program, envvars) == 0:
-		open(str(target[0]),'w').write("PASS\n")
-	else:
-		open(str(target[0]),'w').write("FAIL\n")
-		return 1
+   if splitext(program)[1] == '.py':
+      print '<<TEST>> Launching a Python script'
+      if call(['python2.7', program], env=envvars) == 0:
+         open(str(target[0]),'w').write("PASS\n")
+      else:
+         open(str(target[0]),'w').write("FAIL\n")
+         return 1
+   else:
+      print '<<TEST>> Launching a C++ program'
+      if os.spawnle(os.P_WAIT, program, program, envvars) == 0:
+         open(str(target[0]),'w').write("PASS\n")
+      else:
+         open(str(target[0]),'w').write("FAIL\n")
+         return 1
 
 def make_test_alias(source):
-	program = 'build/' + splitext(basename(source))[0]
-	command = env.Command(basename(program) + '.passed',
-												executable(program),
-												run_unit_test)
+   program = 'build/' + splitext(basename(source))[0]
+   command = env.Alias('tests', env.Command(basename(program) + '.passed',
+                                executable(program),
+                                run_unit_test))
 	AlwaysBuild(command)
 	env.Alias('tests', env.Program(program, source))
 	env.Alias('tests', command)
 
+def make_test_python(script):
+   env.Alias('tests', env.Command(basename(splitext(script)[0])+ '.passed',
+                      script,
+                      run_unit_test))
+
 TESTS = [ 'params/half-test-1.cpp',
-					'params/half-test-2.cpp',
-					'params/half-test-3.cpp',
-					'params/params-test-1.cpp',
-					'data-io.cpp' ]
+          'params/half-test-2.cpp',
+          'params/half-test-3.cpp',
+          'params/params-test-1.cpp',
+          'data-io.cpp' ]
+
+PYTHON_TESTS = [ 'python/test-python-function.py' ]
 
 for test in TESTS:
-	make_test_alias(test)
+   make_test_alias(test)
+
+if 'python' in COMMAND_LINE_TARGETS:
+   for test in PYTHON_TESTS:
+      make_test_python(test)
 
 AlwaysBuild("tests")
