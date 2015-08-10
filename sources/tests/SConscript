@@ -46,17 +46,19 @@ def run_unit_test(env, target, source):
 
 def make_test_alias(source):
    program = 'build/' + splitext(basename(source))[0]
-   command = env.Alias('tests', env.Command(basename(program) + '.passed',
-                                executable(program),
-                                run_unit_test))
-	AlwaysBuild(command)
-	env.Alias('tests', env.Program(program, source))
-	env.Alias('tests', command)
+   command = env.Command(basename(program) + '.passed',
+                         executable(program),
+                         run_unit_test)
+   AlwaysBuild(command)
+   env.Alias('tests', env.Program(program, source))
+   env.Alias('tests', command)
 
 def make_test_python(script):
-   env.Alias('tests', env.Command(basename(splitext(script)[0])+ '.passed',
-                      script,
-                      run_unit_test))
+   command = env.Command(basename(splitext(script)[0])+ '.passed',
+                         script,
+                         run_unit_test)
+   AlwaysBuild(command)
+   env.Alias('tests', command)
 
 TESTS = [ 'params/half-test-1.cpp',
           'params/half-test-2.cpp',
