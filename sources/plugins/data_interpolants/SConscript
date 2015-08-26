@@ -1,0 +1,7 @@
+Import('env')
+env = env.Clone()
+
+# Special linking flags, defined in the OS dependant configuration file
+env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+
+env.SharedLibrary('../../build/data_grid', ['grid.cpp'])

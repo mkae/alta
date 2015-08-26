@@ -129,7 +129,7 @@ class vertical_segment : public data
 		// Get data size
 		virtual int size() const ;
 
-  private: // method
+  protected: // method
     void initializeToZero( unsigned int number_of_data_elements );
 
 		static void load_data_from_text(std::istream& input,
@@ -142,7 +142,7 @@ class vertical_segment : public data
       //! parameters.
       virtual vec vs(const vec& x) const;
 
-	private: // data
+	protected: // data
 
 		// Store for each point of data, the upper
 		// and lower value

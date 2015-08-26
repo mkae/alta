@@ -137,8 +137,10 @@ int main(int argc, char** argv)
 	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->input_parametrization())
 	          << " to " << params::get_name(d_out->input_parametrization()) << std::endl;
 
+   bool is_vs = dynamic_pointer_cast<vertical_segment>(d_out) &&
+                d_out->size() == 0;
 
-	if(dynamic_pointer_cast<vertical_segment>(d_out) || args.is_defined("splat"))
+	if(is_vs || args.is_defined("splat"))
 	{
 		if(dynamic_pointer_cast<vertical_segment>(d_out))
 		{
@@ -186,6 +188,8 @@ int main(int argc, char** argv)
 			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
 		}
 
+      unsigned int stats_incorrect = 0;
+
 		#pragma omp parallel for
 		for(int i=0; i<d_out->size(); ++i)
 		{
@@ -195,30 +199,36 @@ int main(int argc, char** argv)
 
 			// Copy the input vector
 			vec x = d_out->get(i);
-			params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
+			params::convert(&x[0], d_out->parametrization(), 
+                         params::CARTESIAN, &cart[0]);
 
 
-			// Check if the output configuration is below the hemisphere when converted to
-			// cartesian coordinates. Note that this prevent from converting BTDF data.
+         // Check if the output configuration is below the hemisphere when
+         // converted to cartesian coordinates. Note that this prevent from
+         // converting BTDF data.
 			if(cart[2] >= 0.0 || cart[5] >= 0.0) {
-				params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
-				/*
-				y[0] = temp[0];
-				y[1] = temp[1];
-				y[2] = temp[2];
-				/*/
+				params::convert(&cart[0], params::CARTESIAN, 
+                            d_in->parametrization(), &temp[0]);
 				y = d_in->value(temp);
-				//*/
 			} else {
+            ++stats_incorrect;
 				y.setZero();
 			}
 			
-			// Convert the value stored in the input data in the value format of the output
-			// data file.
-			params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
+         // Convert the value stored in the input data in the value format of
+         // the output data file.
+			params::convert(&y[0], 
+                         d_in->output_parametrization(),  d_in->dimY(),
+                         d_out->output_parametrization(), d_out->dimY(), 
+                         &x[d_out->dimX()]);
 			
-			d_out->set(x);
+			d_out->set(i, x);
 		}	
+
+      if(stats_incorrect > 0) {
+         std::cerr << "<<DEBUG>> Number of incorrect configuration: " 
+                   << stats_incorrect << " / " << d_out->size() << std::endl;
+      } 
 	}	
 	d_out->save(args["output"]);
 	return 0 ;

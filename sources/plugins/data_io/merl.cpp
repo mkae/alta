@@ -90,6 +90,22 @@ public: // methods
     	delete[] brdf;
     }
 
+    virtual vec min() const {
+       vec _min(3);
+       _min[0] = 0.0;
+       _min[1] = 0.0;
+       _min[2] = 0.0;
+       return _min;
+    }
+    
+    virtual vec max() const {
+       vec _max(3);
+       _max[0] = 0.5*M_PI;
+       _max[1] = 0.5*M_PI;
+       _max[2] = 2.0*M_PI;
+       return _max;
+    }
+
 	// Load data from a file
 	void load(const std::string& filename) 
 	{

@@ -17,11 +17,9 @@
 
 #include <core/vertical_segment.h>
 
-//#define USE_DELAUNAY
 #ifdef USE_DELAUNAY
 #include <CGAL/Cartesian_d.h>
 #include <CGAL/Homogeneous_d.h>
-#include <CGAL/leda_integer.h>
 #include <CGAL/Delaunay_d.h>
 
 
@@ -140,21 +138,17 @@ vec data_interpolant::value(const vec& x) const
 	double cum_dist = 0.0;
 	for(int i=0; i<indices[0].size(); ++i)
 	{
-		int indice = indices[0][i];
+		const int indice = indices[0][i];
 		vec y = _data->get(indice);
 
-		for(int j=0; j<dimY(); ++j)
-		{
-			res[j] += dists[0][i] * y[dimX() + j];
-		}
-		cum_dist += dists[0][i];
+      const double kernel = 1.0/(1.0E-10 + dists[0][i]);
+
+		res      += kernel * y.tail(_nY);
+		cum_dist += kernel;
 	}
 	if(cum_dist > 0.0)
 	{
-		for(int j=0; j<dimY(); ++j)
-		{
-			res[j] /= cum_dist;
-		}
+		res /= cum_dist;
 	}
 #else
 

@@ -14,7 +14,10 @@
 #include <core/common.h>
 #include <core/args.h>
 
+//#define USE_DELAUNAY
+#ifndef USE_DELAUNAY
 #include <flann/flann.hpp>
+#endif
 
 /*! \brief Load a data file, but provide access to an interpolated version of
  *  the data points.
@@ -58,6 +61,8 @@ class data_interpolant : public data
 		ptr<data> _data;
 
 		// Interpolation 
+#ifndef USE_DELAUNAY
 		flann::Index< flann::L2<double> >* _kdtree;
+#endif
 		int _knn;
 } ;
