@@ -1,131 +1,121 @@
 /**
-\page install Install
+\page install Installing ALTA
+
+## Downloading
+
+To access the sources of ALTA, clone the public [Git][git] repository:
+
+    $ git clone https://gforge.inria.fr/git/alta/alta.git
 
 ## Dependencies
 
-ALTA is decomposed into three parts: the \ref core, \ref plugins, and \ref
-commands. The third party dependencies of each part follow those rules:
+ALTA consists of three parts: the \ref core, \ref plugins, and \ref
+commands.  The core has a number of mandatory dependencies, while
+plugins may have optional dependencies.
 
- + The **core** depends only on Eigen library for its vector class.
+The mandatory dependencies are:
 
- + **Plugins** depend on whatever library they need. The dependency of a particular plugin and how to install it must be provided in its documentation.
+  + the [SCons][scons] build system;
 
- + **Commands** only depend on the core and on OpenMP.
+  + a C++11 compiler, such as recent versions of [GCC][gcc] or [Clang][clang];
 
-To ease the installation of ALTA, we provide scripts to install some of the
-dependencies in the <em>$ALTA/external</em> directory. Each script is a python
-script and has the form <i>obtain_{name}.py</i>. For example, to obtain the
-Eigen library, the commands are:
+  + [Eigen][eigen] >= 3.0 (<tt>libeigen3-dev</tt> package on Debian and
+    derivatives; <tt>libeigen3</tt> in MacPorts; <tt>eigen</tt> in
+    Brew.)
 
-	$ cd $ALTA/external
-	$ python obtain_eigen.py
+Optional dependencies that will allow more plugins to be built include:
 
-### List of common plugin dependencies:
+  + [pkg-config][pkgconfig] is optional but highly recommended on
+    GNU/Linux and MacOS X to help find common dependencies and their
+    compiler and linker flags;
 
-  + [Eigen][eigen] library (for core and plugins). You will need a version >= 3.0 to have access to the Eigen implementation of Levenberg-Marquardt.
+  + [Quadprog++][quadprog], for \ref rational_fitter_quadprog; this one
+    is shipped with ALTA in the <tt>external</tt> directory;
 
-  + [Quadprog++][quadprog] library (for \ref rational_fitter_quadprog, provided in the external directory)
+  + the [NlOpt][nlopt] non-linear optimization library
+    (<tt>libnlopt-dev</tt> on Debian and derivatives);
 
-  + [Matlab][matlab] with the Engine library (for some plugins)
+  + the [IpOpt][ipopt] library for large-scale ​non-linear optimization
+    (<tt>coinor-libipopt-dev</tt> on Debian and derivatives);
 
-  + [CGAL][cgal] library (for some plugins)
+  + the [CERES][ceres] solver library, for \ref nonlinear_fitter_ceres;
 
-  + [CERES][ceres] solver library (for \ref nonlinear_fitter_ceres)
+  + the [OpenEXR][openexr] high-dynamic range file format library
+    (<tt>libopenexr-dev</tt> on Debian and derivatives);
 
-  + [libFLANN][flann] (for the \ref data_interpolant plugin). Note that this library is available	through Debian's packages and MacOS ports.
+  + [CGAL][cgal], for some plugins (<tt>libcgal-dev</tt> on Debian and
+    derivatives);
 
+  + [libFLANN][flann], for the \ref data_interpolant plugin
+    (<tt>libflann-dev</tt> on Debian and derivatives);
 
-You can find more information on the dependencies in the \ref dependencies
-page.
+  + [MATLAB][matlab] with the Engine library, for some plugins.
 
-
-
-### Obtaining additional depedencies
-
-#### Ubuntu/Debian
-
-Most of the dependencies can be obtain using the 'apt-get' command from Ubuntu/Debian. Other dependencies are automatically obtained using the python scripts provided (see above).
-
- 	$ sudo apt-get install libeigen3-dev libgomp1 libcgal-dev libflann-dev libopenexr-dev libnlopt-dev coinor-libipopt-dev libatlas-base-dev libsuitesparse-dev
-
-#### OSX
-
-We advise to install the MacPorts package manager.
-
-	$ sudo port install libeigen3 libcgal-dev libflann-dev libopenexr-dev ceres-solver
+For your convenience, some of these dependencies are shipped with ALTA,
+as noted above.  Others are automatically downloaded unless
+<tt>--no-externals</tt> is passed to <tt>scons</tt> (see below.)
 
 
+## Portability
 
-### Cross platform
+ALTA is developed as a cross-platform library, with support for several
+OSes (GNU/Linux, MacOS X, Microsoft Windows) and several C++ compilers
+(GCC, Clang, MSVC).  ALTA is under [continuous
+integration](https://ci.inria.fr/alta/), where several combinations are
+tested.
 
-ALTA is developed as a cross platform library. However, we do not test it
-against any possible combination of platform/compiler/architecture. The
-latest version is regularly tested using *continuous integration*. See our
-[Jenkins logs](https://ci.inria.fr/alta/).
 
-Here is a  recap of the currently tested combinations:
-<center>
-<table>
-	<tr>
-		<td><b>OS</b></td>
-		<td><b>Compiler</b></td>
-		<td><b>Arch</b></td>
-		<td><b>Status</b></td>
-		<td><b>Remarks</b></td>
-	</tr>
-	<tr>
-		<td>Debian 7.0</td>
-		<td>GCC 4.7.2</td>
-		<td>x86_64</td>
-		<td>Works</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>OS X 10.9.1</td>
-		<td>clang 500.2.79</td>
-		<td>x86_64</td>
-		<td>Works</td>
-		<td>Matlab plugins are not tested on this configuration<br />
-		</td>
-	</tr>
-	<tr>
-		<td>Windows 7</td>
-		<td>Visual Studio 2007</td>
-		<td>x86_64</td>
-		<td>Works</td>
-		<td>Matlab plugins are not tested on this configuration<br />
-		</td>
-	</tr>
-</table>
-</center>
+## Building
+
+To build ALTA, simply run [SCons][scons] from the top-level source
+directory:
+
+     $ scons
+
+By default, the build system automatically checks whether the required
+dependencies are met, and which of the optional dependencies are
+available.  All the compilation byproducts go to the
+<tt>sources/build</tt> sub-directory.
+
+Some of the missing dependencies, such as NlOpt, IpOpt, and CERES, are
+automatically downloaded from upstream when they are not found.  The
+downloaded files are integrity-checked, and then the software is built
+and installed under the <tt>external/build</tt> sub-directory of the
+source tree.
+
+This automatic behavior can be disabled by running:
+
+    $ scons --no-externals
+
+Lastly, the default settings of the build system, such as the compiler
+being used and locations of libraries and headers, can be overridden in
+a configuration file:
+
+    $ scons --cfg=my-config.py
+
+Here <tt>my-config.py</tt> must define SCons <em>construction
+variables</em> in Python syntax.  The list of configuration variables
+and their default values can be seen by running:
+
+    $ scons --help
+
+Examples of configuration files are provided under
+<tt>configs/scons</tt>.
 
 
 
-### SCons 
-
-Using [SCons](http://www.scons.org), the compilation of ALTA is
-straightforward:
-
-	$ cd $ALTA
-	$ scons --cfg=[filename]
-
-You need to provide a system dependant configuration file. You will find
-examples of such configuration files in the <em>$ALTA/configs/scons</em>
-directory.  This compilation command automatically download the dependencies of
-ALTA core and plugins. 
-
-All the resulting elements of ALTA (binaries, dynamic and static libraries)
-are outputted in: <em>$ALTA/sources/build</em> directory. The dependencies
-(ipopt, ceres, nlopt, ...) will be compiled in the <em>$ALTA/external/build</em>
-directory.
-
-
-
-
+[git]: http://git-scm.org/
+[scons]: http://www.scons.org/
+[gcc]: http://gcc.gnu.org/
+[clang]: http://clang.llvm.org/
 [eigen]: http://eigen.tuxfamily.org "Eigen"
+[pkgconfig]: http://freedesktop.org/Software/pkgconfig
 [quadprog]: http://quadprog.sourceforge.net/ "QuadProg++"
-[matlab]: http://www.mathworks.fr/products/matlab/ "Matlab"
+[nlopt]: http://ab-initio.mit.edu/nlopt/
+[ipopt]: https://projects.coin-or.org/Ipopt
+[openexr]: http://www.openexr.com
+[matlab]: http://www.mathworks.fr/products/matlab/ "MATLAB"
 [cgal]: http://www.cgal.org "CGAL"
-[ceres]: https://code.google.com/p/ceres-solver/ "Ceres solver"
+[ceres]: https://code.google.com/p/ceres-solver/ "CERES solver"
 [flann]: http://www.cs.ubc.ca/research/flann/ "FLANN"
 */

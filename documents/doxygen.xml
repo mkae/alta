@@ -2,7 +2,7 @@
 	<navindex>
 		<tab type="mainpage" visible="yes" title="Overview"/>
 		<tab type="user" url="@ref features" title="Features"/>
-		<tab type="user" url="@ref install" title="Install"/>
+		<tab type="user" url="@ref install" title="Installation"/>
 		<tab type="user" url="@ref tutorials" title="Tutorials"/>
 		<tab type="user" url="@ref roadmap" title="Roadmap"/>
 		<tab type="user" url="@ref license" title="License"/>
