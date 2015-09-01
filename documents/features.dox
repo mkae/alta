@@ -12,7 +12,7 @@ Gnuplot</a>.
 
 
 
-Rational interpolation
+Vertical Segment interpolation with Rational Functions
 ----------------------
 
 ALTA can perform rational interpolation in the sense of 
@@ -20,14 +20,15 @@ ALTA can perform rational interpolation in the sense of
 [2012]</a>. Multiple implementations are provided with various library
 for the quadratic solver:
 
+ + <a href="http://quadprog.sourceforge.net/">QuadProg++</a>. Note: we provide modified sources of QuadProg++ with ALTA. You should be able to use at least this plugin.
+
  + <a href="http://www.cgal.org">CGAL</a>. Warning: due to the internal representation of floatting point numbers by CGAL, this plugin is very 	slow).
 
  + <a href="http://www.mathworks.fr/products/matlab/">Matlab</a>.
 
- + <a href="http://quadprog.sourceforge.net/">QuadProg++</a>. Note: we provide modified sources of QuadProg++ with ALTA. You should be able to use at least this plugin.
 
 We also provide plugin to perform least-square interpolation of rational
-functions. Those plugins are based on Eigen's solvers. Due to the ill-posed
+functions. These plugins are based on Eigen's solvers. Due to the ill-posed
 formulation of the least-square method, the solution provided by those 
 plugins might have singularities (denominator equals to zero) in the 
 definition domain.
@@ -42,11 +43,11 @@ to data. It supports a wide variety of non-linear optimizers such as:
 
  + <a href="https://code.google.com/p/ceres-solver/">CERES</a> solver
 
- + MIT NlOpt
+ + <a href="http://ab-initio.mit.edu/wiki/index.php/NLopt"> MIT NlOpt</a>
 
- + CoinOr IpOpt
+ + <a href="http://www.coin-or.org/">CoinOr</a> <a href="https://projects.coin-or.org/Ipopt">IpOpt</a>
 
- + <a href="http://eigen.tuxfamily.org">Eigen</a> implementation of the Levenberg-Marquardt algorithm
+ + <a href="http://eigen.tuxfamily.org">Eigen</a> which provide an implementation of the Levenberg-Marquardt algorithm
 
 
 
@@ -54,7 +55,7 @@ Analytic BRDF models
 --------------------
 
 We try to provide as much parametric BRDF models as possible. You will find
-the list of currently supported models in the \ref functions page.
+the list of currently supported BRDF models in the \ref functions page.
 
 
 
@@ -62,6 +63,6 @@ Scripting mechanisms
 --------------------
 
 Writing command lines can be burdensome. To avoid having to write lengthy
-command lines, we provide a scripting mechanism to launch ALTA's commands
-from XML formatted files or [Python bidings](python.html).
+command lines, we provide a scripting mechanism to launch ALTA commands
+from XML formatted files or [Python bindings](python.html).
 */
