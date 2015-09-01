@@ -39,7 +39,7 @@ In a XML script:
 @defgroup datas Data plugins list
 
 This page reference the different \ref data plugins available in ALTA. A data
-plugin enables to load/save and evaluate data measurments.
+plugin enables to load/save and evaluate data measurements for a given position.
 
 We list below all accessible data plugins in ALTA. To use one of those, please
 use the name referenced here. For example, to load and use a data plugin compatible
@@ -57,9 +57,9 @@ In a XML script:
 
     <plugin type="data" name="data_merl" />
 
-The plugin \ref vertical_segment is ALTA's internal format and can be used to store
-and load either ASCII gnuplot compatible or binary data. It located in ALTA's core
-and not exposed as a shared library.
+The plugin \ref vertical_segment is ALTA internal format and can be used to store
+and load either ASCII gnuplot compatible or binary data. It  is fully integrated
+into the core of ALTA library and is therefore not exposed as a shared library.
 
 
 
