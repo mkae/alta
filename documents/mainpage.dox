@@ -2,12 +2,14 @@
 \mainpage A BRDF analysis library 
 
 <center style="color:red">
-ALTA is currently in an alpha stage. We provide an archive that is not 
-feature complete (see below).
-You can <a href="contacts.html">contact us</a> to get more information 
-about its features, roadmap, and missing documentation.
+ALTA is currently in an alpha stage but the current master branch
+can be freely cloned at : 
 </center>
+<!-- We provide an archive that is not  feature complete (see below). You can <a href="contacts.html">contact us</a> to get more information  about its features, roadmap, and missing documentation. -->
 
+<center >
+https://scm.gforge.inria.fr/anonscm/git/alta/alta.git
+</center>
 
 ### Description
 
@@ -21,14 +23,14 @@ ALTA is a multi-platform software library to analyze, fit and understand BRDFs. 
 You are working on BRDFs and you want to **benchmark new BRDF models** and compare them with state-of-the-art BRDF models and data easily. You have working on optical measurements and you want **experiment different fitting procedures and models**, or just perform **statistical analysis** on your data.
 
 
-### Features
+### Main Features
 
-Here is a list of the major features in the ALTA library (you can find the complete list in the \ref features page):
-
- + Open common BRDF data formats (see the \ref datas "data plugins list")
+ + Load and Save common BRDF data formats (see the \ref datas "data plugins list")
  + Rational \& Non-linear fitting of BRDF (see the  \ref fitters "fitter plugins list")
  + Analytic BRDF models (see the \ref functions "function plugins list")
- + Scripting mechanism to automatize processing
+ + Scripting (based on XML or Python language) mechanism to automatize processing 
+
+  The full list of features is available in the \ref features page.
 
 
 ### Sample results
@@ -120,7 +122,7 @@ You can find more examples of how to use ALTA on the \ref tutorials page.
 <br /><br />
 
 
-Contribute
+Contributing
 ----------
 
 There are many ways in which you can extend ALTA. Please refer to \ref
@@ -128,10 +130,11 @@ contribute for more information.
 <br /><br />
 
 
-Cite us
+Citing ALTA
 -------
 
-If you are a happy user of ALTA and use it in one of your publication, you are more welcomed to cite us! You can safely use our [EGSR MAM presentation][egsr-mam] reference or the following software citation:
+If you are a happy user of ALTA and use it in one of your publication, you are more than welcomed to cite us! 
+You can safely use our [EGSR MAM presentation][egsr-mam] reference or the following software citation:
 
     @misc{alta-lib,
       title = {{ALTA: A BRDF Analysis Library}},
