@@ -103,6 +103,18 @@ Examples of configuration files are provided under
 <tt>configs/scons</tt>.
 
 
+## Testing
+
+ALTA comes with a test suite that can be run with:
+
+    $ scons tests
+
+This command should succeed (return an exit code of zero.)  If that is
+not the case, please post the command output, the <tt>.log</tt> files
+from the <tt>sources/tests</tt> directory, and the version of ALTA and
+its dependencies to the [mailing
+list](https://lists.gforge.inria.fr/mailman/listinfo/alta-devel).
+
 
 [git]: http://git-scm.org/
 [scons]: http://www.scons.org/
