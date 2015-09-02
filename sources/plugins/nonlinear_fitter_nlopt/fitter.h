@@ -43,9 +43,11 @@
  *     optimizer][optimizers]. By default it selects the Local Sequential
  *     Quadratic Programming algorithm (NLOPT_LD_SLSQP).
  *
- *   + `nlop-max-num-iterations [int]` permits to change the number of iterations
+ *   + `--nlop-max-num-iterations [int]` permits to change the number of iterations
  *     of NlOpt before stopping and returning a result. By default, the value is
  *     `10`.
+ *   + '--nlop-relative-function-tolerance [float]'. Default value is 1e-4.
+ *   + '--nlop-abs-function-tolerance [float]'. Default valie is 1e-6.
  *
  *  [nlopt]: http://ab-initio.mit.edu/wiki/index.php/NLopt
  *  [optimizers]: http://ab-initio.mit.edu/wiki/index.php/NLopt
