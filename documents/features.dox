@@ -20,9 +20,9 @@ ALTA can perform rational interpolation in the sense of
 [2012]</a>. Multiple implementations are provided with various library
 for the quadratic solver:
 
- + <a href="http://quadprog.sourceforge.net/">QuadProg++</a>. Note: we provide modified sources of QuadProg++ with ALTA. You should be able to use at least this plugin.
+ + <a href="http://quadprog.sourceforge.net/">QuadProg++</a> for which we provide modified sources of QuadProg++ with ALTA. You should be able to use at least this plugin.
 
- + <a href="http://www.cgal.org">CGAL</a>. Warning: due to the internal representation of floatting point numbers by CGAL, this plugin is very 	slow).
+ + <a href="http://www.cgal.org">CGAL</a>. Warning: due to the internal representation of floatting point numbers by CGAL, this plugin is very 	slow.
 
  + <a href="http://www.mathworks.fr/products/matlab/">Matlab</a>.
 
@@ -47,7 +47,7 @@ to data. It supports a wide variety of non-linear optimizers such as:
 
  + <a href="http://www.coin-or.org/">CoinOr</a> <a href="https://projects.coin-or.org/Ipopt">IpOpt</a>
 
- + <a href="http://eigen.tuxfamily.org">Eigen</a> which provide an implementation of the Levenberg-Marquardt algorithm
+ + <a href="http://eigen.tuxfamily.org">Eigen</a>, which provides an implementation of the Levenberg-Marquardt algorithm
 
 
 
