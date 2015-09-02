@@ -1,0 +1,41 @@
+/*!
+\page documentation Documentation
+
+
+<!-- This page lists all documentation related to the ALTA library. -->
+
+
+### Getting Started with ALTA [NEW Users should start here]
++ \ref gentle-intro 
++ \ref tutorials 
+
+
+
+### More specific documents 
+
+#### Format  Specifications
+
++ ALTA Data File \ref format
++ ALTA Function File format
++ ALTA XML Scripting Format
+
+#### BRDF Related Documents
+
++ <a href="classparams.html" >Parametrisations </a> supported in ALTA
+
+##### Sofware Engineering 
+
++ Compilation System   
++ ALTA Plugin System 
+
+
+### Reference
++ List of plugin to convert data (cf. \ref datas)
++ List of plugins to fit data (cf. \ref fitters)
++ List of BRDF Models (cf. \ref functions)
++ List of provided ALTA sofwares (cf. \ref commands)
++ C++  API
++ Python Bindings API
+
+
+*/
