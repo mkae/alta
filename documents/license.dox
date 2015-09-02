@@ -8,4 +8,23 @@ http://mozilla.org/MPL/2.0/.
 Copyright (c) 2013-2015, Inria <br />
 Copyright (c) 2014-2015, CNRS <br />
 Copyright (c) 2014-2015, Université de Montréal
+
+
+### Credits
+
+Here are the names, affiliations, and mails of people 
+who are contributing or have contributed to ALTA.
+
+<ul>
+  <li>Pascal Barla. Inria</li>
+  <li>Laurent Belcour.  Université de Montréal</li>
+  <li>Ludovic Courtès. Inria</li>
+  <li>Mathieu Faverge. INP </li>
+  <li>Xavier Granier. LP2N - CNRS </li>
+  <li>Benjamin Michelland. Inria.</li>
+  <li>Romain Pacanowski. LP2N - CNRS</li>
+  <li>Guillaume Rincel. Inria. </li>
+</ul>
+
+
 */
