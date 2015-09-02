@@ -60,8 +60,16 @@
  *		<li><b>--ceres-max-num-iterations</b> <em>[int]</em> to control the number
  *		of iterations the non linear solver will take before returning a solution</li>
  *		<li><b>--ceres-factorizer</b> <em>[string]</em> to control the type of dense
- *		factorization method used to solve the <a href="http://homes.cs.washington.edu/~sagarwal/ceres-solver/stable/solving.html?highlight=dense_qr#equation-normal">normal equations</a></li>
+ *		factorization method used to solve the <a href="http://ceres-solver.org/nnls_solving.html?highlight=normal%20equations">normal equations</a></li>
+ *    <li><b>--ceres-debug</b> will enable the debugging mode of ceres providing more information </li>
  *  </ul>
+ *  We also provide options that control the solver behavior regarding its stopping criteria:
+ *  <ul>
+ *    <li><b>--ceres-function-tolerance</b> <em>[float]</em> to control the epsilon of the functional that is optimized</li>
+ *    <li><b>--ceres-gradient-tolerance"</b><em>[float]</em> to control the epsilon of the gradient</li>
+ *    <li><b>--ceres-parameter-tolerance</b><em>[float]</em> to control the epsilon of the parameters</li>
+ *  </ul>
+ *  For more information about these options, consult the Ceres <a href="http://ceres-solver.org/nnls_solving.html"> documentation</a>.
  */
 class nonlinear_fitter_ceres: public fitter
 {
