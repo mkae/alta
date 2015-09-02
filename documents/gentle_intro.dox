@@ -1,0 +1,58 @@
+/*!
+  \page gentle-intro A gentle introduction to ALTA
+
+ALTA organizes BRDF analysis and modeling into atomic \ref commands "programs" (coordinate transforms, sub-space integration, parameters estimation, `etc`) that are combined with plugins. Programs work on three types of plugins: \ref functions "BRDFs", \ref datas "datas", and \ref fitters "fitters". Plugins can input or output files. BRDFs, data and fitters can be provided by users through dynamic libraries. This makes ALTA easily extensible. Programs are executed using command line instructions and can be chained to generate scripts. We pro vide a higher level interface to build scripts using XML and \ref python.
+
+In every example, we denotes command line execution using:
+
+    $ do-something 
+
+And Python scripts using:
+
+    >>> import alta
+
+
+<br/>
+<br/>
+
+
+<!-- RP:  I think this is redundant with the FIrst Tutorial  -->
+<!-- RP: I will  merge it with the first tutorial -->
+<!-- ## A Simple 1D Fitting Example using Rational Function
+
+In this example we will fit a one-dimensional rational function and visualize the
+fitting results with gnuplot. This simple example will illustrate 
+several ALTA softwares such as data2brdf brdf2gnuplot and brdf2brdf.
+This simple example uses a dataset named Kirby2.dat, which is not a BRDF, available in 
+sources/tests/.
+
+
+Assume that you are at the root directory of ALTA, launch data2brdf with the following command:
+
+    $ ./sources/build/data2brdf --input ./sources/tests/Kirby2.dat --output Kirby.func --fitter ./sources/build/librational_fitter_eigen
+
+
+This command launches a fitting of the data defined in Kirby2.dat and save the results in the file Kirby.brdf.
+The --fitter option specifies the type of approximation made (here, Rational Function fitting with Eigen implementation).
+
+
+If everything goes well you should get the following output
+\todo
+
+
+To assess the quality of the result we can evaluate the results and display it using for example Gnuplot.
+In order to do so, we will use the software brdf2gnuplot
+
+\todo
+
+\todo Illustrate brdf2brdf to export the .func file to  C++ ou Matlab code
+-->
+
+
+
+
+
+
+\todo Detail the non-linear and rational fitting procedures.
+
+ */
