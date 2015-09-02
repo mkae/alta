@@ -14,19 +14,6 @@
 
 
 
-\page gentle-intro A gentle introduction to ALTA
-
-ALTA organizes BRDF analysis and modeling into atomic \ref commands "programs" (coordinate transforms, sub-space integration, parameters estimation, `etc`) that are combined with plugins. Programs work on three types of plugins: \ref functions "BRDFs", \ref datas "datas", and \ref fitters "fitters". Plugins can input or output files. BRDFs, data and fitters can be provided by users through dynamic libraries. This makes ALTA easily extensible. Programs are executed using command line instructions and can be chained to generate scripts. We pro vide a higher level interface to build scripts using XML and \ref python.
-
-In every example, we denotes command line execution using:
-
-    $ do-something 
-
-And Python scripts using:
-
-    >>> import alta
-
-\todo Detail the non-linear and rational fitting procedures.
 
 
 
