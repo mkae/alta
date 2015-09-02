@@ -41,19 +41,27 @@ Optional dependencies that will allow more plugins to be built include:
   + the [CERES][ceres] solver library, for \ref nonlinear_fitter_ceres;
 
   + the [OpenEXR][openexr] high-dynamic range file format library
-    (<tt>libopenexr-dev</tt> on Debian and derivatives);
+  (<tt>libopenexr-dev</tt> on Debian and derivatives, <tt>openexr</tt> for <a href="http://www.macports.org/">MacPorts</a> and <a href="http://brew.sh/">Homebrew</a>);
 
   + [CGAL][cgal], for some plugins (<tt>libcgal-dev</tt> on Debian and
     derivatives);
 
   + [libFLANN][flann], for the \ref data_interpolant plugin
-    (<tt>libflann-dev</tt> on Debian and derivatives);
+    (<tt>libflann-dev</tt> on Debian and derivatives, <tt>flann</tt> for <a href="http://www.macports.org/">MacPorts</a> and <a href="http://brew.sh/">Homebrew</a>);
 
   + [MATLAB][matlab] with the Engine library, for some plugins.
 
 For your convenience, some of these dependencies are shipped with ALTA,
 as noted above.  Others are automatically downloaded unless
 <tt>--no-externals</tt> is passed to <tt>scons</tt> (see below.)
+
+#### Note for Ceres installation for Debian/Ubuntu distribution
+To improve the numerical stability of the different solvers, it is highly recommended to install the following packages:
+ + <tt>libatlas-base-dev</tt>
+ + <tt>libsuitesparse-dev</tt>
+
+
+
 
 
 ## Portability
