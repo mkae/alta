@@ -3,12 +3,14 @@
 
 <center style="color:red">
 ALTA is currently in an alpha stage but the current master branch
-can be freely cloned at : 
+can be freely cloned with : 
 </center>
 <!-- We provide an archive that is not  feature complete (see below). You can <a href="contacts.html">contact us</a> to get more information  about its features, roadmap, and missing documentation. -->
 
 <center >
-https://scm.gforge.inria.fr/anonscm/git/alta/alta.git
+
+git clone https://scm.gforge.inria.fr/anonscm/git/alta/alta.git
+
 </center>
 
 ### Description
@@ -20,7 +22,10 @@ ALTA is a multi-platform software library to analyze, fit and understand BRDFs. 
 
 ### Target audience
 
-You are working on BRDFs and you want to **benchmark new BRDF models** and compare them with state-of-the-art BRDF models and data easily. You have working on optical measurements and you want **experiment different fitting procedures and models**, or just perform **statistical analysis** on your data.
+You are working on BRDFs and you want to **benchmark new BRDF models** and would like
+to compare them with state-of-the-art BRDF models and data easily. 
+You are working on optical measurements and you want to **experiment different fitting procedures and models**, 
+or just perform **statistical analysis** on your data.
 
 
 ### Main Features
@@ -72,6 +77,7 @@ Those images have been produced using [Mitsuba renderer](http://www.mitsuba-rend
 <br /><br />
 
 
+<!-- 
 How to use it
 -------------
 
@@ -101,6 +107,7 @@ To convert this brdf file (in ALTA \ref format), you will need another command:
 You can find more examples of how to use ALTA on the \ref tutorials page.
 <br /><br />
 
+-->
 
 Contributing
 ----------
