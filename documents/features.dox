@@ -5,14 +5,12 @@ Data formats
 ------------
 
 ALTA can open common BRDF data formats such as:
- + <a href="http://www.merl.com/brdf/">MERL</a> binary files 
- + ASTM format (used in the Cornell BRDF database). 
+ + <a href="http://www.merl.com/brdf/">MERL</a> binary files
+ + ASTM format (used in the Cornell BRDF database)
  + <a href="http://btf.utia.cas.cz/?brdf_dat_dwn">UTIA Anisotropic BRDF Database</a>
 
 We also provide our text-based data format (cf. \ref format) that is compatible with 
 <a href="http://www.gnuplot.info"> Gnuplot</a>.
-
-
 
 Vertical Segment interpolation with Rational Functions
 ----------------------
