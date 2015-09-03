@@ -148,8 +148,8 @@ void rational_function_1d::update(const vec& in_a,
                                   const vec& in_b)
 {
 	// Get the size of the input vector
-	const unsigned int np = in_a.size();
-	const unsigned int nq = in_b.size();
+  const unsigned int np = in_a.size();
+  const unsigned int nq = in_b.size();
 
 	// Resize the coefficient vector if they do not match
 	if(np != _p_coeffs.size()) {
@@ -167,12 +167,12 @@ void rational_function_1d::update(const vec& in_a,
     const double b0 = 1.0;
 #endif
 
-	for(unsigned int k=0; k<np; ++k)
+  for(unsigned int k=0; k<np; ++k)
 	{
 		_p_coeffs[k].a = in_a[k] / b0;
 	}
 
-	for(unsigned int k=0; k<nq; ++k)
+  for(unsigned int k=0; k<nq; ++k)
 	{
 		_q_coeffs[k].a = in_b[k] / b0;
 	}
