@@ -74,6 +74,8 @@ bool rational_function_1d::load(std::istream& in)
 	std::cout << "q_" << i << " = " << b << std::endl;
 #endif
 	// Update the 1D function 
+	//RP: WITHOUT RESIZE BEFORE THE .deg vector is never initialize correctly
+	this->resize(_np,_nq);
 	this->update(a, b);
 	return true;
 }
