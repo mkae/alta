@@ -11,9 +11,31 @@ env.AppendUnique(CPPPATH = ['#sources/tests'])
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
 
+# Portability.
+def library_search_path_variable():
+  """
+  Return the name of the search path environment variable for shared
+  libraries.
+
+  """
+  if sys.platform.startswith('win'):
+    return 'PATH'
+  elif sys.platform.startswith('darwin'):
+    return 'DYLD_LIBRARY_PATH'
+  else:
+    return 'LD_LIBRARY_PATH'
+
 # Data files used by the tests.
 test_file = File('Kirby2.dat').srcnode().abspath
 test_data_directory = os.path.dirname(test_file)
+
+# Directory for the files produced by the tests.
+test_output_directory = Dir('#sources/tests/build').srcnode().abspath
+
+def test_byproduct(file):
+  """Return the absolute file name of FILE, a file produced by a test."""
+  return test_output_directory + os.sep + file
+
 
 def executable(file):
    '''Append '.exe' to FILE if needed.'''
@@ -41,6 +63,34 @@ def run_unit_test(env, target, source):
       else:
          open(str(target[0]),'w').write("FAIL\n")
          return 1
+
+def run_command(arguments):
+  """Return a function that runs SOURCE with ARGUMENTS."""
+  def do_run_command(env, target, source):
+    program = str(source[0].abspath)
+    envvars = os.environ
+    libdir = Dir('#sources/build').srcnode().abspath
+    lib_path_var = library_search_path_variable()
+    lib_path = ""
+    if lib_path_var in envvars and envvars[lib_path_var] != '':
+      lib_path = libdir + os.pathsep + lib_path
+    else:
+      lib_path = libdir
+
+    envvars['ALTA_LIB'] = Dir('#sources/build').srcnode().abspath;
+    envvars[lib_path_var] = lib_path
+
+    status = os.spawnve(os.P_WAIT, program, [program] + arguments, envvars)
+    command = ' '.join([program] + arguments)
+    with open(str(target[0]), 'w') as log:
+      log.write(str(envvars) + '\n');
+      if status == 0:
+        log.write("PASS: '" + command + "' succeeded\n")
+      else:
+        log.write("FAIL: '" + command + "' returned " + str(status) + '\n')
+        return 1
+
+  return do_run_command
 
 def run_dash_dash_help(env, target, source):
 	"""Run SOURCE with '--help'."""
@@ -85,6 +135,12 @@ def make_help_test_alias(program):
 	AlwaysBuild(command)
 	env.Alias('tests', command)
 
+def make_command_test(program, arguments, identifier):
+  """Add a test that invokes PROGRAM with ARGUMENTS."""
+  return env.Command(basename(program) + '.' + identifier + '.log',
+                     executable("#sources/build/" + program),
+                     run_command(arguments))
+
 def make_test_python(script):
    command = env.Command(basename(splitext(script)[0])+ '.log',
                          script, run_unit_test)
@@ -112,4 +168,25 @@ if 'python' in COMMAND_LINE_TARGETS:
    for test in PYTHON_TESTS:
       make_test_python(test)
 
+# Make sure commands from the tutorials actually work.
+
+cmd1 = make_command_test('data2brdf', [ '--input', test_file, '--output',
+                                        test_byproduct('Kirby.brdf'),
+                                        '--fitter', 'rational_fitter_eigen' ],
+                         'rational-fitter-eigen')
+AlwaysBuild(cmd1)
+env.Alias('tests', cmd1)
+
+cmd2 = make_command_test('brdf2data', [ '--input',
+                                        test_byproduct('Kirby.brdf'),
+                                        '--output',
+                                        test_byproduct('Kirby.dat'),
+                                        '--data-file', test_file ],
+                         'data-file')
+env.Depends(cmd2, cmd1)         # 'Kirby.brdf' is created by CMD1
+AlwaysBuild(cmd2)
+env.Alias('tests', cmd2)
+
+
+# Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
