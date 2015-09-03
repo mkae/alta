@@ -30,14 +30,12 @@ def run_unit_test(env, target, source):
    envvars['PYTHONPATH'] = 'sources/build'
 
    if splitext(program)[1] == '.py':
-      print '<<TEST>> Launching a Python script'
       if call(['python2.7', program], env=envvars) == 0:
          open(str(target[0]),'w').write("PASS\n")
       else:
          open(str(target[0]),'w').write("FAIL\n")
          return 1
    else:
-      print '<<TEST>> Launching a C++ program'
       if os.spawnle(os.P_WAIT, program, program, envvars) == 0:
          open(str(target[0]),'w').write("PASS\n")
       else:
