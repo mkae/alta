@@ -153,6 +153,7 @@ UTILITIES = [ 'data2data', 'data2brdf', 'brdf2data', 'fit2stat',
 CXX_TESTS = [ 'params/half-test-1.cpp',
 							'params/half-test-2.cpp',
 							'params/half-test-3.cpp',
+              'params/half-test-4.cpp',
 							'params/params-test-1.cpp',
 							'data-io.cpp' ]
 
