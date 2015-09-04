@@ -32,6 +32,15 @@ int main(int argc, char** argv) {
   // when ωi = ωo = h⃗.
   for (auto&& theta_i : angle_range<double>(0, 90, step)) {
   for (auto&& phi_i : angle_range<double>(-180, 180, step)) {
+      auto fail = [&](const vec& erroneous_result)
+      {
+          std::cerr << "FAIL: conversion to Rusin. "
+                    << erroneous_result.size() << "D: "
+                    << "θ = " << theta_i
+                    << " φ = " << phi_i
+                    << " → " << erroneous_result << std::endl;
+          n++;
+      };
 
       if (theta_i == 0. && phi_i != 0.)
           // It doesn't make sense for φi to be different from zero here.
@@ -71,28 +80,45 @@ int main(int argc, char** argv) {
           || !close_to(phi_h, phi_i)
           || !close_to(theta_d, 0.)
           || !close_to(phi_d, 0.))
-      {
-          std::cerr << "FAIL: conversion to Rusin. 4D: "
-                    << "θ = " << theta_i
-                    << " φ = " << phi_i
-                    << " → " << x << std::endl;
-          n++;
-      }
+          fail(x);
 
       vec y(4);
 
+      // Likewise for the 3D parametrization.
       params::convert(&cart[0], params::CARTESIAN,
                       params::RUSIN_TH_TD_PD, &y[0]);
       if (!close_to(y[0], theta_h)
           || !close_to(y[1], theta_d)
           || !close_to(y[2], phi_d))
-      {
-          std::cerr << "FAIL: conversion to Rusin. 3D: "
-                    << "θ = " << theta_i
-                    << " φ = " << phi_i
-                    << " → " << x << std::endl;
-      }
+          fail(y);
 
+      // And 2D.
+      params::convert(&cart[0], params::CARTESIAN,
+                      params::RUSIN_TH_TD, &y[0]);
+      if (!close_to(y[0], theta_i)
+          || !close_to(y[1], 0.))
+          fail(y);
+
+#if 0                                       // XXX: currently not implemented
+      vec z(6);
+      params::convert(&cart[0], params::CARTESIAN,
+                      params::RUSIN_VH_VD, &z[0]);
+      if (!close_to(z[0], cart[0])                // h⃗
+          || !close_to(z[1], cart[1])
+          || !close_to(z[2], cart[2])
+          || !close_to(z[3], 0.)                  // D⃗
+          || !close_to(z[4], 0.)
+          || !close_to(z[5], 0.))
+          fail(z);
+#endif
+
+      // Lastly, 1D.
+      params::convert(&cart[0], params::CARTESIAN,
+                      params::RUSIN_VH, &y[0]);
+      if (!close_to(y[0], cart[0])                // h⃗
+          || !close_to(y[1], cart[1])
+          || !close_to(y[2], cart[2]))
+          fail(y);
   }}
 
   if (n > 0)
