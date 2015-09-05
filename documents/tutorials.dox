@@ -34,11 +34,11 @@ The \ref data2brdf allows to perform a fitting procedure by converting a \ref da
 
 First, we need to download the Kirby2 dataset in ALTA format: <a href="http://alta.gforge.inria.fr/data/Kirby2.dat">Kirby2.dat</a>. Save this file in <tt>$ALTA/data/1d/NIST/Kirby2</tt>.
 
-    $ ./build/data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter rational_fitter_eigen
+    $ data2brdf --input ../data/1d/NIST/Kirby2/Kirby2.dat --output Kirby.brdf --fitter rational_fitter_eigen
 
 The result can be exported using the \a brdf2data commands.
 
-    $ ./build/brdf2data --input Kirby.brdf --output Kirby.dat --data-file ../data/1d/NIST/Kirby2/Kirby2.dat
+    $ brdf2data --input Kirby.brdf --output Kirby.dat --data-file ../data/1d/NIST/Kirby2/Kirby2.dat
 
 The \ref brdf2data allows you to export a function into a data file. If no data plugin is specified, the ALTA format is used which is gnuplot compliant. The position of evaluation for the function are taken from a specified data file (here the original Kirby2 file).
 
@@ -52,7 +52,7 @@ Using gnuplot for example it is possible to visualize the resulting function app
 
 To convert this brdf file to be used in another software (here matlab), you will need the following command:
 
-    $ ./build/brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
+    $ brdf2brdf --input Kirby.brdf --output Kirby.m --export matlab
 
 \ref brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann distribution).
 
@@ -65,7 +65,7 @@ In this example, we will show how to perform data conversion and vertical segmen
 
 The first command we will execute will convert the three dimensional data in a 2D slice in the halfway vector parametrization:
 
-    $ ./build/data2data --input ../data/3d/merl/gold-metallic-paint.binary --in-data data_merl --output ../data/2d/merl/gold-met.exr --out-data data_brdf_slice
+    $ data2data --input ../data/3d/merl/gold-metallic-paint.binary --in-data data_merl --output ../data/2d/merl/gold-met.exr --out-data data_brdf_slice
 
 The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image files (.exr format), while the \a data_merl plugin opens MERL's binary format. This is the format used by Pacanowski et al. [[2012]](http://hal.inria.fr/hal-00678885/en) to perform fitting. The output of this command should look like:
 
@@ -77,11 +77,11 @@ The \a data_brdf_slice plugin permits to represent BRDF slices using HDR image f
 
 Then, we search for a fit of this 2D BRDF slice using the \a rational_fitter_parallel and a Chebychev basis for 60 to 100 coefficients in total:
 
-    $ ./build/data2brdf --input ../data/2d/merl/gold-met.exr --data data_brdf_slice --output gold-met.brdf --fitter rational_fitter_parallel --func rational_function_chebychev --min-np 60 -- np 100
+    $ data2brdf --input ../data/2d/merl/gold-met.exr --data data_brdf_slice --output gold-met.brdf --fitter rational_fitter_parallel --func rational_function_chebychev --min-np 60 -- np 100
 
 This outputs a BRDF file which cannot be displayed directly. To see the result of our fitting, we can export this BRDF into the BRDF image slice format:
 
-    $ ./build/brdf2data --input gold-met.brdf --output gold-met-rat.exr --data data_brdf_slice
+    $ brdf2data --input gold-met.brdf --output gold-met-rat.exr --data data_brdf_slice
 
 It is now possible to perform side by side comparison of the original data, and the interpolated rational function (click on the image to move the slider):
 
@@ -106,21 +106,21 @@ compareRational.update();
 @endhtmlonly
 
 
-#### Non-linear fitting
+\page simple-tutorial3 Non-linear fitting of BRDFs
 
 In this example, we use Google's <a href="http://code.google.com/p/ceres-solver/">CERES</a> nonlinear fitter to approximate the blue metallic paint from the <a href="http://www.merl.com/brdf/">MERL database</a> using a Lafortune lobe (Note that we do not provide the data in ALTA package, you will have to download it). The resulting BRDF is exported in a shader format compatible with BRDF Explorer.
 
-     $ ./build/data2brdf --data data_merl --input ../data/3d/merl/blue-metallic-paint.binary --output blue-met.brdf --fitter nonlinear_fitter_ceres --func nonlinear_function_lafortune  --export explorer
+     $ data2brdf --data data_merl --input ../data/3d/merl/blue-metallic-paint.binary --output blue-met.brdf --fitter nonlinear_fitter_ceres --func nonlinear_function_lafortune  --export explorer
 
 This command line is rather long. To help you design complex command line in a more intuitive way, ALTA comes with a python script that creates command lines from XML files (see \ref format for an example).
 
 
 
-### Moment analysis using the command line
+\page simple-tutorial4 Moment analysis using the command line
 
 The \a data2moment allows to perform a moment analysis on a \ref data object. It can be useful to determine whether a given data correspond to a separable function along its different axis.
 
-    $ ./build/data2moments --input ../data/1d/NIST/Kirby2/Kirby2.dat --data ./build/libdata_interpolant.so
+    $ data2moments --input ../data/1d/NIST/Kirby2/Kirby2.dat --data data_interpolant
 
 
 
