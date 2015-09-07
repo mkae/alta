@@ -1,14 +1,24 @@
+s
 /*!
 \page contacts Contacts
 
 Please do not hesitate to share your experience of using this library, bug reports,
 or feature requests.<br />
+
+The primary contact point for development discussions is the <a
+href="https://lists.gforge.inria.fr/mailman/listinfo/alta-devel"><tt>alta-devel</tt>
+public mailing list</a>. <br />
+
+The following people have been involved in ALTA development:
+
 <ul>
 	<li><a href="mailto:laurent.belcour@umontreal.ca">Laurent Belcour</a>, Université de Montréal</li>
 	<li><a href="mailto:ludovic.courtes@inria.fr">Ludovic Courtès</a>, Inria</li>
 	<li><a href="mailto:romain.pacanowski@institutoptique.fr">Romain Pacanowski</a> LP2N - CNRS</li>
 </ul>
 
-More information on the project such as diffusion list and bug tracking are available on the gforge project webpage: https://gforge.inria.fr/projects/alta/
+More information on the project, such as pointers to mailing lists, bug
+tracking and task tracking systems, are available on the <a
+href="https://gforge.inria.fr/projects/alta/">project's GForge page</a>.
 
 */
