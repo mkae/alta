@@ -47,6 +47,11 @@ version 2.0](http://mozilla.org/MPL/2.0/), from our Git repository:
 
 See \ref install "the installation instruction" for more information.
 
+### Getting Started
+
+New users should start by reading the tutorials (cf. \ref tutorials)
+
+
 ### Sample results
 
 Here are presented some of the result one can obtain using ALTA for *nonlinear fitting*, *rational fitting* and *data conversion* of BRDF data (please click on the picture to change the horizontal position of the vertical cut). To see how those results where generated, follow the link above the picture.
