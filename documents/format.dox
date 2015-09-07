@@ -74,7 +74,10 @@ x_{i,1} ... x_{i,N}  y_{i,1} ... y_{i,P}
 x_{n,1} ... x_{n,N}  y_{n,1} ... y_{n,P}
 \endverbatim
 
-Vertical segments are not defined if VS is 0. For a VS of 1, each sample as a radius associated for the associated dimension. If VS is 2, each sample has a min and max segment value for the associated dimension.
+Vertical segments are not defined if VS is 0.  For a VS of 1, each
+sample has a radius associated for the associated dimension.  If VS is
+2, each sample has a min and max segment value for the associated
+dimension.
 
  
 
