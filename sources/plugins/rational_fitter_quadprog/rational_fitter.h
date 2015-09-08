@@ -25,6 +25,8 @@
 /*! \brief A vertical segment fitter for rational function using the library QuadProg++
  *  You can find the library here: http://quadprog.sourceforge.net/
  *  \ingroup plugins
+ *  \ingroup fitters
+ *  \todo : WRITE MORE DOCUMENTATION
  */
 class rational_fitter_quadprog : public fitter
 {

@@ -26,6 +26,7 @@
  *  for a fixed number of coefficient. This plugin can run in parallel with OpenMP and
  *  is using QuadProg++ quadratic solver.
  *  \ingroup plugins
+ *  \ingroup fitters
  *
  *  \details
  *  You can find QuadProg++ <a href="http://quadprog.sourceforge.net/">here</a>.

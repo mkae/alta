@@ -26,6 +26,10 @@
 //#define USE_MATLAB
 #define DEBUG
 
+/*! \brief  A plugin to fit rational function using the  Matlab Engine
+ *  \ingroup plugins
+ *  \ingroup fitters
+ */
 class rational_fitter_matlab : public fitter
 {
 	public: // methods

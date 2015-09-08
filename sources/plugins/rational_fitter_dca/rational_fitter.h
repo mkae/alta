@@ -24,7 +24,8 @@
 #include <core/vertical_segment.h>
 
 /*! \brief A rational function optimizer following the DCA algorithm.
- *
+ * \ingroup plugins
+ * \ingroup fitters
  * \todo Implement Papamarkos fitter?
  * \todo I should be able to test when load a BRDF text file to ensure the
  * loaded object is correct.

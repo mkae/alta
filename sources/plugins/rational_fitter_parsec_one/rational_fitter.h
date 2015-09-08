@@ -14,7 +14,10 @@
 
 /*! \brief A vertical segment fitter for rational function using the library QuadProg++
  *  You can find the library here: http://quadprog.sourceforge.net/
+ *  and the [Parsec library](http://icl.cs.utk.edu/parsec/index.html)
  *  \ingroup plugins
+ *  \ingroup fitters
+ *  \todo:  WRITE MORE.
  */
 class rational_fitter_parsec_one : public fitter
 {

@@ -24,6 +24,8 @@
 
 /*! \brief A least square fitter for rational function using the library Eigen
  *  \ingroup plugins
+ *  \ingroup fitters
+ *  \todo :  WRITE MORE
  */
 class rational_fitter_eigen : public fitter
 {
