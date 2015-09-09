@@ -11,10 +11,10 @@ obtain.obtain('Eigen v3.2.1', directory,
 
 rep = 'build' + os.sep + 'include' + os.sep + 'Eigen'
 if not os.path.exists(rep):
-	shutil.copytree(directory + os.sep + 'Eigen', rep)
+   shutil.copytree(directory + os.sep + 'Eigen', rep)
 #end
 
 unsup_rep = 'build' + os.sep + 'include' + os.sep + 'unsupported'
 if not os.path.exists(unsup_rep):
-	shutil.copytree(directory + os.sep + 'unsupported', unsup_rep)
+   shutil.copytree(directory + os.sep + 'unsupported', unsup_rep)
 #end
