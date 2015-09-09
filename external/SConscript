@@ -44,7 +44,10 @@ else:
 	# if not conf.CheckCXXHeader('Eigen/Core'):
 	# 	execfile('obtain_eigen.py')
 	# env = conf.Finish()
-	execfile('obtain_eigen.py')
+	conf = Configure(env)
+	if not conf.CheckCXXHeader('Eigen/Core'):
+		execfile('obtain_eigen.py')
+	env = conf.Finish()
 
 	##
 	# The env variable is cloned for IpOpt, NlOpt and CERES to avoid

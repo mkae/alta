@@ -7,12 +7,18 @@ import SCons.Warnings as W
 import SCons.SConf as C
 
 # Download IpOpt.
-if not os.path.exists('.' + os.sep + 'Ipopt-3.11.8.tgz'):
-   obtain.obtain('IpOpt v3.11.8', 'Ipopt-3.11.8',
-          'http://www.coin-or.org/download/source/Ipopt/Ipopt-3.11.8.tgz', 'Ipopt-3.11.8.tgz',
-          '9f9b76075fbd9315286ea4d7c159c94cab4a4fb16122fb172b24910af5b5b75b')
+version   = '3.8.11'
+base      = 'IpOpt'
+name      = 'IpOpt v' + version
+directory = base + '-' + version
+url       = 'http://www.coin-or.org/download/source/Ipopt/Ipopt-' + version + '.tgz'
+filename  = 'IpOpt-' + version + '.tgz'
+sha256    = '9f9b76075fbd9315286ea4d7c159c94cab4a4fb16122fb172b24910af5b5b75b'
+obtained  = obtain.obtain(name, directory, url, filename, sha256)
 
-if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'coin/IpIpoptNLP.hpp'):
+compiled  = os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'coin/IpIpoptNLP.hpp')
+
+if obtained and not compiled:
    if os.name == 'nt':
       W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of IpOpt')
    else:

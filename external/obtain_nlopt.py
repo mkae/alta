@@ -3,14 +3,19 @@ import os
 import sys
 import shutil
 
+# Download NlOpt.
+version   = '2.4.1'
+base      = 'NlOpt'
+name      = 'NlOpt v' + version
+directory = base + '-' + version
+url       = 'http://ab-initio.mit.edu/nlopt/nlopt-' + version + '.tar.gz'
+filename  = 'nlopt-' + version + '.tar.gz'
+sha256    = 'fe9ade54ed79c87f682540c34ad4e610ff32c9a43c52c6ea78cef6adcd5c1319'
+obtained  = obtain.obtain(name, directory, url, filename, sha256)
 
-# Download NlOpt
-if not os.path.exists('.' + os.sep + 'nlopt-2.4.1.tar.gz'):
-   obtain.obtain('NlOpt', 'nlopt-2.4.1',
-              'http://ab-initio.mit.edu/nlopt/nlopt-2.4.1.tar.gz', 'nlopt-2.4.1.tar.gz',
-              'fe9ade54ed79c87f682540c34ad4e610ff32c9a43c52c6ea78cef6adcd5c1319')
-
-if not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'nlopt.hpp'):
+compiled  = os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'nlopt.hpp')
+ 
+if obtained and not compiled:
    if os.name == 'nt':
       print '<<WARNING>> no automatic installation for this package'
    else:

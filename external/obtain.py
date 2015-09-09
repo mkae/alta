@@ -7,6 +7,7 @@ import hashlib
 import SCons.Errors
 import SCons.Warnings as W
 import SCons.SConf as C
+from subprocess import Popen, PIPE
 
 # Warning class to report stuff about our dependencies.
 class AltaDependencyWarning(W.WarningOnByDefault):
@@ -40,8 +41,14 @@ def check_integrity(filename, sha256):
                                         1, 1, filename)
 
 # Download from URL to FILENAME.
+# Return True if the package was successfully downloaded, else return False.
 def download(url, filename):
-   urllib.urlretrieve(url, filename)
+   try:
+      urllib.urlretrieve(url, filename)
+      return True
+   except IOError:
+      C.progress_display('Unable to download package, check your connection')
+      return False
 
 # Uncompress the archive
 def uncompress(filename):
@@ -56,23 +63,31 @@ def patch(filename, patch):
 def obtain(name, rep, url, filename, sha256):
    if not os.path.exists(rep):
       C.progress_display('obtaining ' + name)
-      if not os.path.exists(filename):
-         download(url, filename)
+
+      # Try to download the file if it exist. If an error happens, return
+      # False.
+      if not os.path.exists(filename) and not download(url, filename):
+         return False
+
       check_integrity(filename, sha256)
       uncompress(filename)
+      return True
+
    else:
       C.progress_display(name + ' source code is already available')
+      return True
 
 def configure_build(rep, options = ''):
    os.chdir(rep)
    ret = os.system('./configure -q --prefix=' + os.getcwd() + os.sep + os.pardir + os.sep + 'build ' + options)
    if ret != 0:
       print '<<ERROR>> unable to configure package'
-      exit
+      return False
 
    ret = os.system('make -s && make -s install')
    if ret != 0:
       print '<<ERROR>> unable to build & install package'
-      exit
+      return False
    
    os.chdir(os.pardir)
+   return True
