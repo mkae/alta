@@ -77,16 +77,27 @@ def obtain(name, rep, url, filename, sha256):
       C.progress_display(name + ' source code is already available')
       return True
 
+# Launch './configure' and 'make install' for UNIX like archives.
+# The command is runned silent. TODO: Add the output of the command
+# to the configuration file.
 def configure_build(rep, options = ''):
    os.chdir(rep)
-   ret = os.system('./configure -q --prefix=' + os.getcwd() + os.sep + os.pardir + os.sep + 'build ' + options)
+
+   args = ['./configure', '-q', '--prefix=' + os.getcwd() + os.sep + os.pardir + os.sep + 'build']
+   #call = Popen(args + options.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
+   call = Popen(args + options.split())
+   ret  = call.wait()
    if ret != 0:
       print '<<ERROR>> unable to configure package'
+      os.chdir(os.pardir)
       return False
 
-   ret = os.system('make -s && make -s install')
+   #call = Popen(['make', 'install'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+   call = Popen(['make', 'install'])
+   ret  = call.wait()
    if ret != 0:
       print '<<ERROR>> unable to build & install package'
+      os.chdir(os.pardir)
       return False
    
    os.chdir(os.pardir)
