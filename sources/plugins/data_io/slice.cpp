@@ -176,9 +176,9 @@ class BrdfSlice : public data {
 		{
 			assert(x.size() == 3);
 
-			_data[3*id + 0] = x[0];
-			_data[3*id + 1] = x[1];
-			_data[3*id + 2] = x[2];
+			_data[3*id + 0] = x[dimX()+0];
+			_data[3*id + 1] = x[dimX()+1];
+			_data[3*id + 2] = x[dimX()+2];
 		}
 
 		vec value(const vec& x) const

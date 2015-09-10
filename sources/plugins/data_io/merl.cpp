@@ -192,9 +192,9 @@ public: // methods
 		int iR = i;
 		int iG = iR + _nSlice;
 		int iB = iG + _nSlice;
-		brdf[iR] = x[0] / RED_SCALE;
-		brdf[iG] = x[1] / GREEN_SCALE;
-		brdf[iB] = x[2] / BLUE_SCALE;
+		brdf[iR] = x[dimX()+0] / RED_SCALE;
+		brdf[iG] = x[dimX()+1] / GREEN_SCALE;
+		brdf[iB] = x[dimX()+2] / BLUE_SCALE;
 	}
 
 	vec value(const vec& in) const {

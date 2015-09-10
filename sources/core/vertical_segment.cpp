@@ -158,11 +158,11 @@ void vertical_segment::set(int i, const vec& x)
 {
    // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),
    // if it only has the size of a single value, then create the segment.
-   if(x.size() == 3*dimY()) {
-      _data[i].tail(3*dimY()) = x;
+   if(x.size() == dimX() + 3*dimY()) {
+      _data[i] = x;
 
-   } else if(x.size() == dimY()) {
-      _data[i].tail(3*dimY()) = vs(x);
+   } else if(x.size() == dimX() + dimY()) {
+      _data[i] = vs(x);
 
    } else {
       std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;

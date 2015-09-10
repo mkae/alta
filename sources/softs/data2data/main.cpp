@@ -222,7 +222,7 @@ int main(int argc, char** argv)
                          d_out->output_parametrization(), d_out->dimY(), 
                          &x[d_out->dimX()]);
 			
-			d_out->set(i, x.tail(d_out->dimX()));
+			d_out->set(i, x);
 		}	
 
       if(stats_incorrect > 0) {
