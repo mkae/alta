@@ -69,9 +69,14 @@ def obtain(name, rep, url, filename, sha256):
       if not os.path.exists(filename) and not download(url, filename):
          return False
 
-      check_integrity(filename, sha256)
-      uncompress(filename)
-      return True
+      # Check the archive and whether it can be uncompressed. If not return
+      # False and alert the user about why the code is not available.
+      try:
+         check_integrity(filename, sha256)
+         uncompress(filename)
+         return True
+      except SCons.Errors.BuildError:
+         return False
 
    else:
       C.progress_display(name + ' source code is already available')
