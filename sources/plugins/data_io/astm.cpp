@@ -134,15 +134,21 @@ public: //methods
       auto vars = header.get_vec<std::string>("VARS");
       update_params(vars);
 
+      // Check data size from header
+      assert(header.is_defined("NUM_POINTS"));
+      int size = header.get_int("NUM_POINTS", 0);
+      initializeToZero(size);
+
       // Size of the data
       const int n = dimX() + dimY(); 
+      int i = 0;
 
 		while(file.good())
 		{
 			std::getline(file, line);
-
-         if(line.size() == 0)
-            break;
+         
+         if(line.size() == 0 || line.rfind(',') == std::string::npos)
+            continue;
 
          std::replace(line.begin(), line.end(), ',', ' ');
 
@@ -154,7 +160,7 @@ public: //methods
 				stream >> x[i];
 			}
 
-			set(x);
+			set(i++, x);
 		}
 
       if(header.is_defined("NUM_POINTS")) {
