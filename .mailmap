@@ -1,0 +1,9 @@
+# This list is used to avoid multiple name/email instances of the same
+# contributors reported by "git log" and "git shortlog" commands.
+
+Laurent Belcour <laurent.belcour@umontreal.ca> <laurent.belcour@inrialpes.fr>
+Laurent Belcour <laurent.belcour@umontreal.ca> <laurent.belcour@gmail.com>
+Laurent Belcour <laurent.belcour@umontreal.ca> <laurent.belcour@inria.fr>
+Ludovic Courtès <ludovic.courtes@inria.fr> <ludo@gnu.org>
+Gael Guennebaud <gael.guennebaud@inria.fr> <g.gael@free.fr>
+Romain Pacanowski <romain.pacanowski@institutoptique.fr> <romain.pacanowski@inria.fr>
