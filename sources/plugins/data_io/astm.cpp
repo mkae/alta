@@ -145,7 +145,6 @@ public: //methods
             break;
 
          std::replace(line.begin(), line.end(), ',', ' ');
-         std::cout << line << std::endl;
 
          // Create a stream from the line data and extract it as
          // a vec of dim dimX() + dimY().
