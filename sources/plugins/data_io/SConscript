@@ -5,9 +5,8 @@ env = env.Clone()
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
 env.SharedLibrary('../../build/data_merl', ['merl.cpp'])
+env.SharedLibrary('../../build/data_astm', ['astm.cpp'])
 
 if openexr_available(env):
 	env.SharedLibrary('../../build/data_utia', ['utia.cpp'])
 	env.SharedLibrary('../../build/data_brdf_slice', ['slice.cpp'])
-
-#env.SharedLibrary('../../build/data_astm', ['astm.cpp'])
