@@ -187,6 +187,16 @@ env.Depends(cmd2, cmd1)         # 'Kirby.brdf' is created by CMD1
 AlwaysBuild(cmd2)
 env.Alias('tests', cmd2)
 
+cmd3 = make_command_test('brdf2gnuplot', [ '--data-file', test_file,
+                                           '--input',
+                                           test_byproduct('Kirby.brdf'),
+                                           '--output',
+                                           test_byproduct('Kirby.dat') ],
+                         'data-file')
+
+env.Depends(cmd3, cmd1)         # 'Kirby.brdf' is created by CMD1
+AlwaysBuild(cmd3)
+env.Alias('tests', cmd3)
 
 # Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
