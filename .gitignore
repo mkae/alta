@@ -33,3 +33,4 @@ external/nlopt-*
 /sources/build/brdf2moments
 /sources/build/data2brdf
 /sources/build/data2data
+/tests/*.log
