@@ -292,6 +292,13 @@ template<typename T> T clamp(T x, T a, T b)
 	return std::max<T>(std::min<T>(x, b), a);
 }
 
+template<typename T>
+static bool close_to(const T a, const T b, const T epsilon = 1E-7)
+{
+    return std::abs(a - b) < epsilon;
+}
+
+
 #ifdef _MSC_VER
 #define NOT_IMPLEMENTED() \
 std::cerr << "<<ERROR>> not implemented " << __FUNCDNAME__ << " in file " << __FILE__ \

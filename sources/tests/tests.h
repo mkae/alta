@@ -37,13 +37,6 @@ namespace alta { namespace tests
     }																															\
     while(0)
 
-
-    template<typename T>
-    static bool close_to(const T a, const T b, const T epsilon = 1E-7)
-    {
-        return std::abs(a - b) < epsilon;
-    }
-
     template<typename T>
     static bool in_range(const T x, const T a, const T b)
     {

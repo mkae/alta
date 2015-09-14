@@ -426,7 +426,7 @@ static void half_vector(double const *invec, vec &half)
 // 'atan2'.
 static bool is_zero(double x)
 {
-    return std::abs(x) < 1e-14;
+    return close_to(x, 0., 1e-14);
 }
 
 void params::from_cartesian(const double* invec, params::input outtype,
