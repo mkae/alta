@@ -13,6 +13,9 @@
 
 #pragma once
 
+// Make sure 'assert' does its job in tests.
+#undef NDEBUG
+
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
