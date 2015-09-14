@@ -669,13 +669,17 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			diff[2] = invec[2];
       rotate(diff, -outvec[1], -outvec[0]);
 
-			outvec[2] = acos(diff[2]);
-
-      // By convention, when DIFF is alongside z⃗, return φd = 0.
+      // By convention, when DIFF is alongside z⃗, return φd = θd = 0.
       if (is_zero(diff[0]) && is_zero(diff[1]))
-          outvec[3] = 0;
+      {
+          outvec[2] = 0.;
+          outvec[3] = 0.;
+      }
       else
+      {
+          outvec[2] = acos(diff[2]);
           outvec[3] = atan2(diff[1], diff[0]);
+      }
 			break;
 
 		case params::SPHERICAL_TL_PL_TV_PV:
