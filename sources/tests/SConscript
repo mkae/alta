@@ -11,6 +11,10 @@ env.AppendUnique(CPPPATH = ['#sources/tests'])
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
 
+conf = Configure(env)
+have_cppquickcheck = conf.CheckLibWithHeader('cppqc', 'cppqc.h', 'C++')
+conf.Finish()
+
 # Portability.
 def library_search_path_variable():
   """
@@ -156,6 +160,12 @@ CXX_TESTS = [ 'core/half-test-1.cpp',
               'core/half-test-4.cpp',
               'core/params-test-1.cpp',
               'core/data-io.cpp' ]
+
+# Optionally, built the CppQuickCheck tests.
+if have_cppquickcheck:
+  CXX_TESTS += [ 'core/params-qc-1.cpp' ]
+  env.AppendUnique(LIBS = ['cppqc'])
+
 
 PYTHON_TESTS = [ 'python/test-python-function.py' ]
 
