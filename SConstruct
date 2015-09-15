@@ -178,6 +178,9 @@ def library_available(env, pkgspec='', lib='', header='',
 		env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
 		result = True
 
+	else:
+		result = conf.CheckLibWithHeader(pkgspec, header, language)
+
 	conf.Finish()
 	return result
 
