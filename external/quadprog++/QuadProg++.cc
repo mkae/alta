@@ -58,9 +58,9 @@ void init_qp(Ref<MatrixXd> G)
 
 // The Solving function, implementing the Goldfarb-Idnani method
 double solve_quadprog(Ref<MatrixXd> G, Ref<const VectorXd> g0,
-                    Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,
-                    Ref<const MatrixXd> CI, Ref<const VectorXd> ci0,
-                    Ref<VectorXd> x)
+                      Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,
+                      Ref<const MatrixXd> CI, Ref<const VectorXd> ci0,
+                      Ref<VectorXd> x)
 {
   std::ostringstream msg;
   {

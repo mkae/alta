@@ -1,51 +1,51 @@
 /*
 
- The quadprog_solve() function implements the algorithm of Goldfarb and Idnani
- for the solution of a (convex) Quadratic Programming problem
- by means of an active-set dual method.
-	
+The quadprog_solve() function implements the algorithm of Goldfarb and Idnani
+for the solution of a (convex) Quadratic Programming problem
+by means of an active-set dual method.
+  
 The problem is in the form:
 
 min 0.5 * x G x + g0 x
 s.t.
     CE^T x + ce0 = 0
     CI^T x + ci0 >= 0
-	
- The matrix and vectors dimensions are as follows:
-     G: n * n
-		g0: n
-				
-		CE: n * p
-	 ce0: p
-				
-	  CI: n * m
-   ci0: m
+  
+The matrix and vectors dimensions are as follows:
+    G: n * n
+    g0: n
+        
+    CE: n * p
+  ce0: p
+        
+    CI: n * m
+  ci0: m
 
-     x: n
+    x: n
 
- The function will return the cost of the solution written in the x vector or
- std::numeric_limits::infinity() if the problem is infeasible. In the latter case
- the value of the x vector is not correct.
+The function will return the cost of the solution written in the x vector or
+std::numeric_limits::infinity() if the problem is infeasible. In the latter case
+the value of the x vector is not correct.
 
- References: D. Goldfarb, A. Idnani. A numerically stable dual method for solving
-             strictly convex quadratic programs. Mathematical Programming 27 (1983) pp. 1-33.
+References: D. Goldfarb, A. Idnani. A numerically stable dual method for solving
+            strictly convex quadratic programs. Mathematical Programming 27 (1983) pp. 1-33.
 
- Notes:
+Notes:
   1. pay attention in setting up the vectors ce0 and ci0.
-	   If the constraints of your problem are specified in the form
-	   A^T x = b and C^T x >= d, then you should set ce0 = -b and ci0 = -d.
+    If the constraints of your problem are specified in the form
+    A^T x = b and C^T x >= d, then you should set ce0 = -b and ci0 = -d.
   2. The matrix G is modified within the function since it is used to compute
-     the G = L^T L cholesky factorization for further computations inside the function.
-     If you need the original matrix G you should make a copy of it and pass the copy
-     to the function.
+    the G = L^T L cholesky factorization for further computations inside the function.
+    If you need the original matrix G you should make a copy of it and pass the copy
+    to the function.
 
- Author: Luca Di Gaspero
-  			 DIEGM - University of Udine, Italy
-				 l.digaspero@uniud.it 
-				 http://www.diegm.uniud.it/digaspero/
+Author: Luca Di Gaspero
+        DIEGM - University of Udine, Italy
+        l.digaspero@uniud.it 
+        http://www.diegm.uniud.it/digaspero/
 
- The author will be grateful if the researchers using this software will
- acknowledge the contribution of this function in their research papers.
+The author will be grateful if the researchers using this software will
+acknowledge the contribution of this function in their research papers.
 
 LICENSE
 
@@ -131,18 +131,18 @@ namespace QuadProgPP{
                         Ref<VectorXd> x);
 
   /**
-   * \param L Cholesky factor of the quadratic objective as computed by init_qp
-   * \param g0 linear part of the quadratic objective
-   * \param x on input: initial solution, on output the optimal solution (if any)
-   * \param scheduling strategy used to prioritize inequalities
-   * \param active_set if not null, treats the indexed inequality first, and on output active_set is filled with the remaining active-set
-   */
+  * \param L Cholesky factor of the quadratic objective as computed by init_qp
+  * \param g0 linear part of the quadratic objective
+  * \param x on input: initial solution, on output the optimal solution (if any)
+  * \param scheduling strategy used to prioritize inequalities
+  * \param active_set if not null, treats the indexed inequality first, and on output active_set is filled with the remaining active-set
+  */
   double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
-                        Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,
-                        Ref<const MatrixXd> CI, Ref<const VectorXd> ci0,
-                        Ref<VectorXd> x,
-                        Scheduling scheduling = Scheduling(),
-                        VectorXi *active_set = 0);
+                                   Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,
+                                   Ref<const MatrixXd> CI, Ref<const VectorXd> ci0,
+                                   Ref<VectorXd> x,
+                                   Scheduling scheduling = Scheduling(),
+                                   VectorXi *active_set = 0);
 }
 
 #endif // #define _QUADPROGPP
