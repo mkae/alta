@@ -37,13 +37,30 @@
 
 typedef Eigen::VectorXd vec;
 
-double norm(const vec& a);
+// Convenience functions.
+static inline double norm(const vec& v)
+{
+    return v.norm();
+}
 
-vec normalize(const vec& a);
+static inline vec normalize(const vec& v)
+{
+    vec result = v;
+    result.normalize();
+    return result;
+}
 
-double dot(const vec& a, const vec& b);
+static inline double dot(const vec& a, const vec &b)
+{
+    return a.dot(b);
+}
 
-vec product(const vec& a, const vec& b);
+//! \brief If A and B have equal sizes, return a vector of the same size
+//! whose elements result from pairwise multiplications of the elements of A
+//! and B.  Otherwise, if A or B is a one-element vector, return the scalar
+//! product of the other vector with that element.  It is an error to supply
+//! vectors of different sizes.
+extern vec product(const vec& a, const vec& b);
 
 std::ostream& operator<<(std::ostream& out, const vec& v);
 

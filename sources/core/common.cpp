@@ -23,81 +23,16 @@
 #endif
 
 #include <iostream>
-
-
-double norm(const vec& a)
-{
-	double norm = 0.0 ;
-	for(int i=0; i<a.size(); ++i)
-	{
-		norm += a[i]*a[i];
-	}
-	return sqrt(norm);
-}
-
-vec normalize(const vec& a)
-{
-	vec b(a.size());
-	double norm = 0.0 ;
-	for(int i=0; i<a.size(); ++i)
-	{
-		norm += a[i]*a[i];
-	}
-	norm = sqrt(norm);
-
-	for(int i=0; i<a.size(); ++i)
-	{
-		b[i] = a[i]/norm;
-	}
-	return b;
-}
-
-double dot(const vec& a, const vec& b)
-{
-#ifdef DEBUG
-	assert(a.size() == b.size());
-#endif
-	double res = 0.0;
-	for(int i=0; i<a.size(); ++i)
-	{
-		res += a[i]*b[i];
-	}
-
-	return res;
-}
+#include <cassert>
 
 vec product(const vec& a, const vec& b)
 {
-    if(a.size() == 1 && b.size() >= 1)
-    {
-        vec res(b.size());
-        for(int i=0; i<b.size(); ++i)
-        {
-            res[i] = a[0]*b[i];
-        }
-        return res;
-    }
-    else if(b.size() == 1 && a.size() >= 1)
-    {
-        vec res(a.size());
-        for(int i=0; i<a.size(); ++i)
-        {
-            res[i] = a[i]*b[0];
-        }
-        return res;
-    }
+    if (a.size() == 1)
+        return b * a[0];
+    else if (b.size() == 1)
+        return a * b[0];
     else
-    {
-#ifndef DEBUG
-        assert(a.size() == b.size());
-#endif
-        vec res(b.size());
-        for(int i=0; i<b.size(); ++i)
-        {
-            res[i] = a[i]*b[i];
-        }
-        return res;
-    }
+        return a.cwiseProduct(b);
 }
 
 std::ostream& operator<<(std::ostream& out, const vec& v)
@@ -111,13 +46,6 @@ std::ostream& operator<<(std::ostream& out, const vec& v)
     out << "]";
     return out;
 }
-
-
-
-
-
-
-
 
 /* ---- Timer implementation ---- */
 
