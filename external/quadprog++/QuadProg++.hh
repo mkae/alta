@@ -3,21 +3,21 @@
 The quadprog_solve() function implements the algorithm of Goldfarb and Idnani
 for the solution of a (convex) Quadratic Programming problem
 by means of an active-set dual method.
-  
+
 The problem is in the form:
 
 min 0.5 * x G x + g0 x
 s.t.
     CE^T x + ce0 = 0
     CI^T x + ci0 >= 0
-  
+
 The matrix and vectors dimensions are as follows:
     G: n * n
     g0: n
-        
+
     CE: n * p
   ce0: p
-        
+
     CI: n * m
   ci0: m
 
@@ -41,7 +41,7 @@ Notes:
 
 Author: Luca Di Gaspero
         DIEGM - University of Udine, Italy
-        l.digaspero@uniud.it 
+        l.digaspero@uniud.it
         http://www.diegm.uniud.it/digaspero/
 
 The author will be grateful if the researchers using this software will

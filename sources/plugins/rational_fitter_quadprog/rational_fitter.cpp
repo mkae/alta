@@ -65,7 +65,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit
   {
     timer time ;
     time.start() ;
-    
+
     r->setSize(temp_np, temp_nq);
     if(fit_data(d, temp_np, temp_nq, r))
     {
@@ -76,7 +76,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit
       return true ;
     }
 
-    
+
     std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed" << std::endl  ;
       time.stop() ;
       std::cout << "<<INFO>> it took " << time << std::endl ;
@@ -119,7 +119,7 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
   _delta = args.get_float("delta", 1) ;
   _add_ls_energy = args.is_defined("add-ls-energy");
 }
-    
+
 
 bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& r)
 {
