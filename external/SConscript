@@ -30,7 +30,6 @@ if env.GetOption('clean'):
    #shutil.rmtree('glog-0.3.3', True)
    #shutil.rmtree('Ipopt-3.11.8', True)
    #shutil.rmtree('nlopt-2.4.1', True)
-   
 else:
    ##
    #   Eigen dependency
@@ -88,7 +87,7 @@ else:
    qp_dir     = 'quadprog++'
    qp_target  = 'build' + os.sep + 'lib' + os.sep + qp_dir
    qp_base    = qp_dir + os.sep
-   qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
+   qp_sources = [qp_base + 'QuadProg++.cc']
    qp_env     = env.Clone()
    qp_env.Append(CPPPATH = ['build' + os.sep + 'include'])
 
