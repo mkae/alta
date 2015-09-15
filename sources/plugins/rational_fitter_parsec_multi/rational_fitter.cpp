@@ -1,5 +1,4 @@
-#include <Eigen/SVD>
-#include <Array.hh>
+#include <Eigen/Dense>
 #include <QuadProg++.hh>
 #include <core/plugins_manager.h>
 
@@ -384,14 +383,15 @@ int rational_fitter_parsec_multi::solve_wrapper( const gesvdm2_args_t *args, sub
     const int N  = np + nq;
 
     // Compute the solution
-    QuadProgPP::Matrix<double> CE(0.0, N, 0);
-    QuadProgPP::Vector<double> ce(0.0, 0);
-    QuadProgPP::Matrix<double> G (0.0, N, N);
-    QuadProgPP::Vector<double> g (0.0, N);
-    QuadProgPP::Vector<double> x (0.0, N);
+    Eigen::MatrixXd CE(N, 0);
+    Eigen::MatrixXd ce(0);
+    Eigen::MatrixXd G (N, N);  G.setZero();
+    Eigen::MatrixXd g (N);     g.setZero();
+    Eigen::MatrixXd x (N);     x.setZero();
 
-    QuadProgPP::Matrix<double> CI(CIptr, N, M);
-    QuadProgPP::Vector<double> ci(ciptr, M);
+    // FIXME: check that CIptr is really row-major, and perhaps modify its storage to avoid this copy 
+    Eigen::MatrixXd CI = Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>::Map(CIptr, N, M);
+    Eigen::Map<Eigen::VectorXd> ci(ciptr, M);
 
     // Select the size of the result vector to
     // be equal to the dimension of p + q

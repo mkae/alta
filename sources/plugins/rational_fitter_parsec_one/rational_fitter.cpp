@@ -1,5 +1,4 @@
 #include <Eigen/SVD>
-#include <Array.hh>
 #include <QuadProg++.hh>
 #include <core/plugins_manager.h>
 
@@ -403,21 +402,17 @@ int rational_fitter_parsec_multi::solve_wrapper( const gesvdm2_args_t *args, sub
     const int N  = np + nq;
 
     // Compute the solution
-    QuadProgPP::Matrix<double> CE(0.0, N, 0);
-    QuadProgPP::Vector<double> ce(0.0, 0);
-    QuadProgPP::Matrix<double> G (0.0, N, N);
-    QuadProgPP::Vector<double> g (0.0, N);
-    QuadProgPP::Vector<double> x (0.0, N);
+    Eigen::MatrixXd CE(N, 0);
+    Eigen::VectorXd ce(0);
+    Eigen::MatrixXd G (N, N); G.setIdentity();
+    Eigen::VectorXd g (N); g.setZero();
+    Eigen::VectorXd x (0.0, N);
 
-    QuadProgPP::Matrix<double> CI(CIptr, N, M);
-    QuadProgPP::Vector<double> ci(ciptr, M);
+    Eigen::MatrixXd CI = Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>::Map(CIptr, N, M);
+    Eigen::Map<Eigen::VectorXd> ci(ciptr, M);
 
     // Select the size of the result vector to
     // be equal to the dimension of p + q
-    for(int i=0; i<N; ++i) {
-	G[i][i] = 1.0;
-    }
-
     double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
     bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
 
