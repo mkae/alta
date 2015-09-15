@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <Eigen/SVD>
-#include <Array.hh>
+#include <Eigen/Dense>
 #include <QuadProg++.hh>
 
 #include <core/rational_function.h>
@@ -22,7 +21,7 @@ class quadratic_program
 	public:
 		//! \brief Constructor need to specify the number of coefficients
         quadratic_program(int np, int nq, bool compute_delta = false) :
-        _np(np), _nq(nq), _compute_delta(compute_delta), CI(0.0, _np+_nq, 0)
+        _np(np), _nq(nq), _compute_delta(compute_delta), CI(_np+_nq, 0)
         { }
 
 		//! \brief Remove the already defined constraints
@@ -34,55 +33,25 @@ class quadratic_program
 		//! \brief Add a constraint by specifying the vector
 		void add_constraints(const vec& c)
 		{
-			const int m = CI.nrows();
-			const int n = CI.ncols();
+			const int m = CI.rows();
+			const int n = CI.cols();
 
 			if(n > 0)
 			{
-				// Construct temp buffer
-				double* temp = new double[n*m];
-				for(int u=0; u<n; ++u)
-				{
-					for(int v=0; v<m; ++v)
-					{
-						temp[u*m + v] = CI[v][u];
-					}
-				}
-
 				// Resize matrix CI
-				CI.resize(m, n+1);
-
-				// Recopy data
-				for(int u=0; u<n+1; ++u)
-				{
-					if(u==n)
-					{
-						for(int v=0; v<m; ++v)
-							CI[v][u] = c[v];
-					}
-					else
-					{
-						for(int v=0; v<m; ++v)
-							CI[v][u] = temp[u*m + v];
-					}
-				}
-				delete[] temp;
+				CI.conservativeResize(m, n+1);
+        CI.col(n) = c;
 			}
 			else
 			{
-				// Resize matrix CI
-				CI.resize(m, 1);
-
-				// Recopy data
-				for(int u=0; u<m; ++u)
-					CI[n][u] = c[u];
+        CI = c;
 			}
 		}
 
 		//! \brief Provide the number of constraints
 		int nb_constraints() const
 		{
-			return CI.ncols();
+			return CI.cols();
 		}
 
         //! Set the indices of the remaining data
@@ -93,7 +62,7 @@ class quadratic_program
 
 		//! \brief Solves the quadratic program and update the p and 
 		//! q vector if necessary.
-		inline bool solve_program(QuadProgPP::Vector<double>& x, double& delta, vec& p, vec& q)
+		inline bool solve_program(Eigen::VectorXd& x, double& delta, vec& p, vec& q)
 		{
 			bool solves_qp = solve_program(x, delta) ;
 
@@ -122,22 +91,22 @@ class quadratic_program
 		}
 
 		//! \brief Solves the quadratic program
-		inline bool solve_program(QuadProgPP::Vector<double>& v, double& delta)
+		inline bool solve_program(Eigen::VectorXd& v, double& delta)
 		{        
-			const int m = CI.nrows();
-			const int n = CI.ncols();
+			const int m = CI.rows();
+			const int n = CI.cols();
 
-			QuadProgPP::Matrix<double> G (0.0, m, m) ;
-			QuadProgPP::Vector<double> g (0.0, m) ;
-			QuadProgPP::Vector<double> ci(0.0, n) ;
-			QuadProgPP::Matrix<double> CE(0.0, m, 0) ;
-			QuadProgPP::Vector<double> ce(0.0, 0) ;
+			Eigen::MatrixXd G (m, m) ;
+			Eigen::VectorXd g (m) ;
+			Eigen::VectorXd ci(n) ;
+			Eigen::MatrixXd CE(m, 0) ;
+			Eigen::VectorXd ce(long(0)) ;
 
 			if(_compute_delta)
 			{
 				// Update the ci column with the delta parameter
 				// (See Celis et al. 2007 p.12)
-				Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(Eigen::MatrixXd::Map(&CI[0][0], m, n));
+				Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(CI.transpose());
 				const double sigma_m = svd.singularValues()(std::min(m, n)-1) ;
 				const double sigma_M = svd.singularValues()(0) ;
 				delta = sigma_M / sigma_m ;
@@ -145,10 +114,7 @@ class quadratic_program
 
 			// Select the size of the result vector to
 			// be equal to the dimension of p + q
-			for(int i=0; i<m; ++i)
-			{
-				G[i][i] = 1.0 ;
-			}
+			G.setIdentity();
 
 			// Each constraint (fitting interval or point
 			// add another dimension to the constraint
@@ -160,7 +126,7 @@ class quadratic_program
 
 				for(int j=0; j<m; ++j)
 				{
-					norm += CI[j][i]*CI[j][i] ; ;
+					norm += CI(j,i)*CI(j,i);
 				}
 
 				// Set the c vector, will later be updated using the
@@ -267,7 +233,7 @@ class quadratic_program
 	protected:
 		int _np, _nq;
 		bool _compute_delta;
-		QuadProgPP::Matrix<double> CI;
+		Eigen::MatrixXd CI;
 
         //! Contains the indices of the vertical segment unused during the
         //! rational interpolation.

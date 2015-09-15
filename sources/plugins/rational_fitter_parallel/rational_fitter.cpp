@@ -14,7 +14,6 @@
 #include <core/plugins_manager.h>
 
 #include <Eigen/SVD>
-#include <Array.hh>
 #include <QuadProg++.hh>
 
 #include <string>
@@ -278,7 +277,7 @@ bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, 
         std::cout << "<<DEBUG>> thread " << omp_get_thread_num() << ", number of intervals tested = " << qp.nb_constraints()/2 << std::endl ;
 #endif
 #endif
-		QuadProgPP::Vector<double> x(n);
+		Eigen::VectorXd x(n);
 		bool solves_qp = qp.solve_program(x, delta, p, q);
 		r->update(p, q);
 

@@ -9,7 +9,7 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #pragma once
-
+#include <Eigen/Dense>
 // Include STL
 #include <vector>
 #include <string>

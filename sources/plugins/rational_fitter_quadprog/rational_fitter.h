@@ -57,5 +57,12 @@ class rational_fitter_quadprog : public fitter
 		// Add constraints to the boundary of the domain. You can shrink it of
 		// the parameter --boundary-constraint *double*
 		double _boundary;
+    
+    std::string _scheduling_mode;
+    int _scheduling_chunk_size;
+    double _scheduling_grow_factor;
+    bool _export_qp;
+    double _delta;
+    bool _add_ls_energy;
 } ;
 

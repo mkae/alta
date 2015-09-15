@@ -8,10 +8,10 @@
    License, v. 2.0.  If a copy of the MPL was not distributed with this
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
-#include "rational_fitter.h"
-
 #include <Eigen/SVD>
-#include <Array.hh>
+#include </Users/guenneba/Eigen/eigen/bench/BenchTimer.h>
+#include <Eigen/Dense>
+#include "rational_fitter.h"
 #include <QuadProg++.hh>
 
 #include <string>
@@ -20,6 +20,8 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
+#include <set>
 
 #ifdef WIN32
 #define isnan(X) ((X != X))
@@ -109,6 +111,14 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 	_max_nq = std::max<int>(_max_nq, _min_nq);
 
 	_boundary = args.get_float("boundary-constraint", 1.0f);
+  
+  _scheduling_mode = args.get_string("scheduling-mode","SlidingWindows");
+  _scheduling_chunk_size = args.get_int("scheduling-chunk-size",-1);
+  _scheduling_grow_factor = args.get_float("scheduling-grow-factor",-1);
+  
+  _export_qp = args.is_defined("export-qp");
+  _delta = args.get_float("delta", 1) ;
+  _add_ls_energy = args.is_defined("add-ls-energy");
 }
 		
 
@@ -136,148 +146,211 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 // the function return a ration BRDF function and a boolean
 bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny, rational_function_1d* r) 
 {
+  using namespace Eigen;
 	// Size of the problem
 	const int N = np+nq ;
 	const int M = d->size() ;
 
 	// Matrices of the problem
-	QuadProgPP::Matrix<double> G (0.0, N, N) ;
-	QuadProgPP::Vector<double> g (0.0, N) ;
-	QuadProgPP::Matrix<double> CI(0.0, N, 2*M) ;
-	QuadProgPP::Vector<double> ci(0.0, 2*M) ;
-	QuadProgPP::Matrix<double> CE(0.0, N, 0) ;
-	QuadProgPP::Vector<double> ce(0.0, 0) ;
-
-	Eigen::MatrixXd eCI(2*M, N) ;
+	MatrixXd G(N, N) ;    G.setZero();
+	VectorXd g(N) ;       g.setZero();
+	MatrixXd CI(N, 2*M) ; CI.setZero();
+	VectorXd ci(2*M) ;    ci.setZero();
+	MatrixXd CE(N, 0) ;   CE.setZero();
+	VectorXd ce(long(0)) ;ce.setZero();
 
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
-	for(int i=0; i<N; ++i)
-	{
-		G[i][i] = 1.0 ; 
-	}
-	
-	// Each constraint (fitting interval or point
-	// add another dimension to the constraint
-	// matrix
-	for(int i=0; i<M; ++i)	
-	{		
-		// Norm of the row vector
-		double a0_norm = 0.0 ;
-		double a1_norm = 0.0 ;
+  
+  MatrixXd Cls(N,M);
+  VectorXd x(N);
+  // initial guess:
+  x.setZero();
+  double cost = 0;
+  G.setIdentity();
+  vec yl, yu, xi;
+  // Each constraint (fitting interval or point
+  // add another dimension to the constraint
+  // matrix
+  for(int i=0, k0=0, k1=1; i<M; ++i)
+  {
+    // Norm of the row vector
+    double a0_norm = 0.0 ;
+    double a1_norm = 0.0 ;
 
-        vec xi = d->get(i) ;
+    xi = d->get(i) ;
+    
+    int i0 = i;
+    int i1 = i+M;
+    
+    // shuffle the constraints to help the solver when working of sub-sets of sequential constraints
+    i0 = 2*k0+0;
+    i1 = 2*k0+1;
+    
+    k0+=32;
+    if(k0>=M)
+    {
+      k0 = k1;
+      k1++;
+    }
 
-		// A row of the constraint matrix has this 
-		// form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
-		// For the lower constraint and negated for 
-		// the upper constraint
-		for(int j=0; j<N; ++j)
-		{
-			// Filling the p part
-			if(j<np)
-			{
-				const double pi = r->p(xi, j);
+    // A row of the constraint matrix has this 
+    // form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
+    // For the lower constraint and negated for 
+    
+    // the upper constraint
+    for(int j=0; j<N; ++j)
+    {
+      // Filling the p part
+      if(j<np)
+      {
+        const double pi = r->p(xi, j);
 
-				CI[j][2*i+0] =  pi;
-				CI[j][2*i+1] = -pi;
+        CI(j,i0) =  pi;
+        CI(j,i1) = -pi;
+        
+        Cls(j,i) = pi;
+      }
+      // Filling the q part
+      else
+      {
+        d->get(i, yl, yu);
 
-				// Updating Eigen matrix
-				eCI(2*i+0, j) = CI[j][2*i+0];
-				eCI(2*i+1, j) = CI[j][2*i+1];
-			}
-			// Filling the q part
-			else
-			{
-				vec yl, yu ; 
-				d->get(i, yl, yu) ;
+        const double qi = r->q(xi, j-np);
 
-				const double qi = r->q(xi, j-np);
+        CI(j,i0) = -yu[ny] * qi;
+        CI(j,i1) =  yl[ny] * qi;
+        
+        Cls(j,i) = -qi*(yu[ny]+yl[ny])/2.0;
+      }
 
-				CI[j][2*i+0] = -yu[ny] * qi;
-				CI[j][2*i+1] =  yl[ny] * qi;
-				
-				// Updating Eigen matrix
-				eCI(2*i+0, j) = CI[j][2*i+0];
-				eCI(2*i+1, j) = CI[j][2*i+1];
-			}
-
-			// Update the norm of the row
-			a0_norm += CI[j][2*i+0]*CI[j][2*i+0];
-			a1_norm += CI[j][2*i+1]*CI[j][2*i+1];
-		}
-	
-		// Set the c vector, will later be updated using the
-		// delta parameter.
-		ci[2*i+0] = -sqrt(a0_norm) ;
-		ci[2*i+1] = -sqrt(a1_norm) ;
-	}
+      // Update the norm of the row
+      a0_norm += CI(j,i0)*CI(j,i0);
+      a1_norm += CI(j,i1)*CI(j,i1);
+    }
+  
+    // Set the c vector, will later be updated using the
+    // delta parameter.
+    ci[i0] = -sqrt(a0_norm);
+    ci[i1] = -sqrt(a1_norm);
+  }
+  
+  // Add least-square linearized quadratic energy
+  if(_add_ls_energy)
+    G.noalias() += 1e2 * Cls * Cls.transpose();
+  
 #ifdef DEBUG
-	std::cout << "CI = [" ;
-	for(int j=0; j<2*M; ++j)
-	{
-		for(int i=0; i<N; ++i)
-		{
-			std::cout << CI[i][j] ;
-			if(i != N-1) std::cout << ", ";
-		}
-		if(j != 2*M-1)
-			std::cout << ";" << std::endl; 
-		else
-			std::cout << "]" << std::endl ;
-	}
+  std::cout << "CI = [" ;
+  for(int j=0; j<2*M; ++j)
+  {
+    for(int i=0; i<N; ++i)
+    {
+      std::cout << CI(i,j);
+      if(i != N-1) std::cout << ", ";
+    }
+    if(j != 2*M-1)
+      std::cout << ";" << std::endl; 
+    else
+      std::cout << "]" << std::endl ;
+  }
 #endif
 
-/*
-	// Update the ci column with the delta parameter
-	// (See Celis et al. 2007 p.12)
-	Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(eCI);
-	const double sigma_m = svd.singularValues()(std::min(2*M, N)-1) ;
-	const double sigma_M = svd.singularValues()(0) ;
+  double delta = _delta;
+#if 0
+  // Update the ci column with the delta parameter
+  // (See Celis et al. 2007 p.12)
+  Eigen::JacobiSVD<Eigen::MatrixXd, Eigen::HouseholderQRPreconditioner> svd(CI.transpose());
+  const double sigma_m = svd.singularValues()(std::min(2*M, N)-1) ;
+  const double sigma_M = svd.singularValues()(0) ;
 
 #ifdef DEBUG
-	std::cout << "<<DEBUG>> SVD = [ " ;
-	for(int i=0; i<std::min(2*M, N); ++i)
-	{
-		std::cout << svd.singularValues()(i) << ", " ;
-	}
-	std::cout << " ]" << std::endl ;
+  std::cout << "<<DEBUG>> SVD = [ " ;
+  for(int i=0; i<std::min(2*M, N); ++i)
+  {
+    std::cout << svd.singularValues()(i) << ", " ;
+  }
+  std::cout << " ]" << std::endl ;
 #endif
-	
-	double delta = sigma_m / sigma_M ;
+  
+  delta = sigma_m / sigma_M ;
 
 #ifndef DEBUG
-	std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
+  std::cout << "<<DEBUG>> delta factor: " << sigma_m << " / " << sigma_M << " = " << delta << std::endl ;
 #endif
 
-	if(isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
-	{
-		std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
-		return false ;
-	}
-   else if(delta <= 0.0)
-	{
-		delta = 1.0 ;
-	}
-/*/
-	const double delta = 1.0;
-//*/
-	for(int i=0; i<2*M; ++i)	
-	{		
-		ci[i] = ci[i] * delta ; 
-#ifdef DEBUG
-        std::cout << i << "\t" << -ci[i] << std::endl ;
+  if(isnan(delta) || (std::abs(delta) == std::numeric_limits<double>::infinity()))
+  {
+    std::cerr << "<<ERROR>> delta factor is NaN of Inf" << std::endl ;
+    return false ;
+  }
+  else if(delta <= 0.0)
+  {
+    delta = 1.0 ;
+  }
+  std::cout << "delta = " << delta << "\n";
 #endif
-	}
-#ifdef DEBUG
-	std::cout << std::endl << std::endl ;
-
-	std::cout << eCI << std::endl << std::endl ;
-#endif
-	// Compute the solution
-	QuadProgPP::Vector<double> x;
-	double cost = QuadProgPP::solve_quadprog(G, g, CE, ce, CI, ci, x);
-
+  ci *= delta;
+    
+  // Compute the solution
+  QuadProgPP::Scheduling scheduling;
+  
+  if(_scheduling_mode=="SlidingWindows")
+  {
+    scheduling.initSlidingWindows(N,2*M);
+    if(_scheduling_grow_factor>=1)
+      scheduling.grow_factor = _scheduling_grow_factor;
+  }
+  else if(_scheduling_mode=="WorstSetFirst")
+  {
+    scheduling.initWorstSetFirst(N,2*M);
+  }
+  if(_scheduling_chunk_size>0)
+    scheduling.initial_chunk_size = _scheduling_chunk_size;
+  
+  if(_export_qp)
+  {
+    // export quadratic objective and all constraints
+    std::ofstream Gf("G.txt");
+    Gf << std::setprecision(16) << G;
+    std::ofstream CIf("CI0.txt");
+    CIf << std::setprecision(16) << CI;
+    std::ofstream cif("ci1.txt");
+    for(int k=0; k<ci.size(); ++k)
+      cif << std::setprecision(16) << ci[k] << "\n";
+  }
+  
+  VectorXi active_set;
+//   BenchTimer t;
+//   t.reset(); t.start();
+  QuadProgPP::init_qp(G);
+//   t.stop(); std::cout << "init_qp: " << t.value() << "s\n";
+//   t.reset(); t.start();
+  cost = QuadProgPP::solve_quadprog_with_guess(G, g, CE, ce, CI, ci, x, scheduling, &active_set);
+//   t.stop(); std::cout << "solve: " << t.value() << "s\n";
+//   std::cout << "active_set.size(): " << active_set.size() << "\n";
+  
+  if(_export_qp)
+  {
+    // export active constraints
+    MatrixXd CI_as(N, active_set.size());
+    VectorXd ci_as(active_set.size());
+    for(int i=0; i<active_set.size();++i)
+    {
+      CI_as.col(i) = CI.col(active_set[i]);
+      ci_as(i) = ci(active_set[i]);
+    }
+    
+    std::ofstream CIf_as("CI0_as.txt");
+    CIf_as << std::setprecision(16) << CI_as;
+    std::ofstream cif_as("ci1_as.txt");
+    for(int k=0; k<ci_as.size(); ++k)
+      cif_as << std::setprecision(16) << ci_as[k] << "\n";
+    
+    // export solution
+    std::ofstream Xf("X.txt");
+    for(int k=0; k<x.size(); ++k)
+      Xf << std::setprecision(16) << x[k] << "\n";
+  }
 
 	bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
 	for(int i=0; i<np+nq; ++i)
