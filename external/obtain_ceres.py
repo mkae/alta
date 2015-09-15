@@ -55,30 +55,19 @@ with open(os.devnull, 'w') as fnull:
 
 
 if obtained and compile_test:
-   C.progress_display('configuring and building CERES')
-   os.chdir('.' + os.sep + 'ceres-solver-' + version)
+   C.progress_display('configuring and building ' + name)
+
+   # Build cmake script
    build_dir = os.pardir + os.sep + 'build' + os.sep
-
-   glog_config = ''
+   options   = ''
    if glog_compiled:
-      glog_config = '-DGLOG_LIBRARY=' + build_dir + 'lib' + os.sep + 'libglog.a' + ' -DGLOG_INCLUDE_DIR=' + build_dir + 'include' + ' -DMINIGLOG=OFF'
+      options = '-DGLOG_LIBRARY=' + build_dir + 'lib' + os.sep + 'libglog.a' + ' -DGLOG_INCLUDE_DIR=' + build_dir + 'include' + ' -DMINIGLOG=OFF'
    else:
-      glog_config = '-DMINIGLOG=ON'
+      options = '-DMINIGLOG=ON'
+   options = options + ' include -DGFLAGS=OFF -DEIGEN_INCLUDE_DIR=' + build_dir + os.sep + 'include' + ' -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
 
-   cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=OFF ' + glog_config + ' include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE_DIR=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release'
-   #cmake_cmd = 'cmake -DBUILD_SHARED_LIBS=ON ' + glog_config + ' include -DGFLAGS=OFF ' + '-DEIGEN_INCLUDE_DIR=' + build_dir + 'include -DCMAKE_INSTALL_PREFIX=' + build_dir + ' .' + ' -DBUILD_EXAMPLES=OFF ' + '-DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release'
+   obtain.cmake_build(directory, options)
 
-   if os.name == 'nt':
-      ret = os.system(cmake_cmd + ' -G \"NMake Makefiles\"')
-      ret = os.system('nmake install')
-   else:
-      cmake_cmd += ' -DCMAKE_CXX_FLAGS=\"-fPIC\"'
-      cmake_cmd += ' -DCMAKE_C_FLAGS=\"-fPIC\"'
-      ret = os.system(cmake_cmd)
-      ret = os.system('make install')
-   #end
-   
-   os.chdir(os.pardir)
 else:
    W.warn(obtain.AltaDependencyWarning,
              'CERES already installed or cannot be installed automatically')

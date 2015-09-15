@@ -22,7 +22,7 @@ if obtained and not compiled:
    if os.name == 'nt':
       W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of IpOpt')
    else:
-      C.progress_display('configuring and building Ipopt and its dependencies')
+      C.progress_display('configuring and building ' + name + ' and its dependencies')
 
       path  = os.getcwd()
       third = path + os.sep + 'Ipopt-3.11.8' + os.sep + 'ThirdParty' + os.sep
@@ -37,10 +37,8 @@ if obtained and not compiled:
 
       os.chdir(path)
       obtain.configure_build('Ipopt-3.11.8', '--enable-static --enable-dependency-linking')
-      #obtain.configure_build('Ipopt-3.11.8', '--enable-shared --enable-dependency-linking')
-   #end
+
 else:
    C.progress_display('IpOpt is already installed')
-   C.progress_display('if the plugins using IpOpt fail to build, \
-check its installation')
-#end
+   C.progress_display('if the plugins using IpOpt fail to build, check its installation')
+
