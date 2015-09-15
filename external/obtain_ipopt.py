@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import SCons.Warnings as W
 import SCons.SConf as C
+from subprocess import Popen, PIPE
 
 def getThirdParty(name) :
    path  = os.getcwd()
@@ -38,7 +39,6 @@ if obtained and not compiled:
       getThirdParty('ASL')
       getThirdParty('Mumps')
 
-      os.chdir(path)
       obtain.configure_build(directory, '--enable-static --enable-dependency-linking')
 else:
    C.progress_display('IpOpt is already installed')
