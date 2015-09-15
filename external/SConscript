@@ -19,90 +19,84 @@ Import('env', 'CheckPKG', 'library_available')
 on_windows = os.name == 'nt'
 
 if env.GetOption('clean'):
-	print "Removing all the third party packages"
+   print "Removing all the third party packages"
 
-	# Removing the output build directory
-	#shutil.rmtree('build', True)
+   # Removing the output build directory
+   #shutil.rmtree('build', True)
 
-	# Removing the TP directories
-	#shutil.rmtree('ceres-solver-1.7.0', True)
-	#shutil.rmtree('eigen-eigen-ffa86ffb5570', True)
-	#shutil.rmtree('glog-0.3.3', True)
-	#shutil.rmtree('Ipopt-3.11.8', True)
-	#shutil.rmtree('nlopt-2.4.1', True)
-	
+   # Removing the TP directories
+   #shutil.rmtree('ceres-solver-1.7.0', True)
+   #shutil.rmtree('eigen-eigen-ffa86ffb5570', True)
+   #shutil.rmtree('glog-0.3.3', True)
+   #shutil.rmtree('Ipopt-3.11.8', True)
+   #shutil.rmtree('nlopt-2.4.1', True)
+   
 else:
-	##
-	#   Eigen dependency
-	#   TODO: Add automatic DL of Eigen only if it is not present. However it
-	#         requires to ensure that the correct PATH to Eigen is provided
-	#         CERES cmake call.
-	##
-	# conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
-	# if conf.CheckPKG('eigen3 >= 3.2.0'):
-	# 	env.ParseConfig('pkg-config --cflags --libs eigen3')
-	# if not conf.CheckCXXHeader('Eigen/Core'):
-	# 	execfile('obtain_eigen.py')
-	# env = conf.Finish()
-	execfile('obtain_eigen.py')
+   ##
+   #   Eigen dependency
+   ##
+   conf = Configure(env)
+   if not conf.CheckCXXHeader('Eigen/Core'):
+      execfile('obtain_eigen.py')
+   env = conf.Finish()
 
-	##
-	# The env variable is cloned for IpOpt, NlOpt and CERES to avoid
-	# propagating the link flags for them in the main build script.
-	##
+   ##
+   # The env variable is cloned for IpOpt, NlOpt and CERES to avoid
+   # propagating the link flags for them in the main build script.
+   ##
 
-    ##
-    # Check for optional dependencies, downloading them if they
-    # are not already available in the user's environment.
-    #
-    # At this point CCFLAGS and LINKFLAGS already contain the
-    # right flags if those dependencies if they found via
-    # 'pkg-config'.  Check whether they are usable, and download
-    # them if not.
-    #
-    ##
+   ##
+   # Check for optional dependencies, downloading them if they
+   # are not already available in the user's environment.
+   #
+   # At this point CCFLAGS and LINKFLAGS already contain the
+   # right flags if those dependencies if they found via
+   # 'pkg-config'.  Check whether they are usable, and download
+   # them if not.
+   #
+   ##
 
-	##
-	#   IpOpt dependencies
-	##
-	env2 = env.Clone()
-	if not on_windows and not library_available(env2, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp') and env['DL_EXTERNALS']:
-		execfile('obtain_ipopt.py')
+   ##
+   #   IpOpt dependencies
+   ##
+   env2 = env.Clone()
+   if not on_windows and not library_available(env2, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp') and env['DL_EXTERNALS']:
+      execfile('obtain_ipopt.py')
 
-	##
-	#   NlOpt dependencies
-	##
-	env2 = env.Clone()
-	if not on_windows and not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h') and env['DL_EXTERNALS']:
-	        execfile('obtain_nlopt.py')
+   ##
+   #   NlOpt dependencies
+   ##
+   env2 = env.Clone()
+   if not on_windows and not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h') and env['DL_EXTERNALS']:
+           execfile('obtain_nlopt.py')
 
-	##
-	#   CERES dependencies
-	##
-	env2 = env.Clone()
-	if not library_available(env2, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h') and env['DL_EXTERNALS']:
-		execfile('obtain_ceres.py')
+   ##
+   #   CERES dependencies
+   ##
+   env2 = env.Clone()
+   if not library_available(env2, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h') and env['DL_EXTERNALS']:
+      execfile('obtain_ceres.py')
 
-	C.progress_display("external libraries are built as shared libraries")
-	C.progress_display("please adjust the shared library search path \
-	before running ALTA")
+   C.progress_display("external libraries are built as shared libraries")
+   C.progress_display("please adjust the shared library search path \
+   before running ALTA")
 
-	##
-	#   QuadProg++
-	#   TODO: Change to the QuadProg v2 code
-	##
-	qp_dir     = 'quadprog++'
-	qp_target  = 'build' + os.sep + 'lib' + os.sep + qp_dir
-	qp_base    = qp_dir + os.sep
-	qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
-	qp_env     = env.Clone()
-	qp_env.Append(CPPPATH = ['build' + os.sep + 'include'])
+   ##
+   #   QuadProg++
+   #   TODO: Change to the QuadProg v2 code
+   ##
+   qp_dir     = 'quadprog++'
+   qp_target  = 'build' + os.sep + 'lib' + os.sep + qp_dir
+   qp_base    = qp_dir + os.sep
+   qp_sources = [qp_base + 'Array.cc', qp_base + 'QuadProg++.cc']
+   qp_env     = env.Clone()
+   qp_env.Append(CPPPATH = ['build' + os.sep + 'include'])
 
-	if qp_env['CC'] != 'cl':
-	    # We're not building a real static library, but rather what
-	    # Libtool calls a "convenience library": an archive that
-	    # contains PIC code.  Thus, force '-fPIC'.
-	    qp_env.AppendUnique(CCFLAGS = ['-fPIC'])
+   if qp_env['CC'] != 'cl':
+      # We're not building a real static library, but rather what
+      # Libtool calls a "convenience library": an archive that
+      # contains PIC code.  Thus, force '-fPIC'.
+      qp_env.AppendUnique(CCFLAGS = ['-fPIC'])
 
-	qp_env.StaticLibrary(target = qp_target, source = qp_sources)
+   qp_env.StaticLibrary(target = qp_target, source = qp_sources)
 
