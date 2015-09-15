@@ -7,6 +7,7 @@ import hashlib
 import SCons.Errors
 import SCons.Warnings as W
 import SCons.SConf as C
+import mimetypes
 from subprocess import Popen, PIPE
 
 # Warning class to report stuff about our dependencies.
@@ -44,6 +45,10 @@ def check_integrity(filename, sha256):
 # Download from URL to FILENAME.
 # Return True if the package was successfully downloaded, else return False.
 def download(url, filename):
+   if os.path.exists(filename):
+      C.progress_display('Package already downloaded')
+      return False
+
    try:
       urllib.urlretrieve(url, filename)
       return True
@@ -56,8 +61,9 @@ def download(url, filename):
 
 # Uncompress the archive
 def uncompress(filename):
-   tfile = tarfile.open(filename, 'r:gz')
-   tfile.extractall()
+   if mimetypes.guess_type(filename)[1] == 'gzip':
+      tfile = tarfile.open(filename, 'r:gz')
+      tfile.extractall()
 
 # Apply a patch to some file
 def patch(filename, patch):
@@ -70,7 +76,7 @@ def obtain(name, rep, url, filename, sha256):
 
       # Try to download the file if it exist. If an error happens, return
       # False.
-      if not os.path.exists(filename) and not download(url, filename):
+      if not download(url, filename):
          return False
 
       check_integrity(filename, sha256)
@@ -104,5 +110,41 @@ def configure_build(rep, options = ''):
       os.chdir(os.pardir)
       return False
    
+   os.chdir(os.pardir)
+   return True
+
+# Launch 'cmake' and 'make && make install' (or equivalent) for
+# package 'rep'. Default options are to build static libs and to
+# install then in the #external/build/ directory.
+def cmake_build(rep, options = ''):
+   os.chdir(rep)
+
+   # Construct the CMake command
+   build_dir = os.pardir + os.sep + 'build' + os.sep
+   cmake_cmd = ['cmake', '-DBUILD_SHARED_LIBS=OFF', 
+                '-DCMAKE_INSTALL_PREFIX=' + build_dir, 
+                '-DCMAKE_BUILD_TYPE=Release']
+   if os.name == 'nt' :
+      cmake_cmd = cmake_cmd + ['-G \"NMake Makefiles\"']
+
+   ret = Popen(cmake_cmd + options.split() + ['.']).wait()
+   if ret != 0:
+      print '<<ERROR>> unable to configure package' + rep
+      os.chdir(os.pardir)
+      return False
+
+   # Construct the build command and run it
+   build_cmd = []
+   if os.name == 'nt':
+      build_cmd = build_cmd + ['nmake']
+   else:
+      build_cmd = build_cmd + ['make']
+
+   ret = Popen(build_cmd + ['install']).wait()
+   if ret != 0:
+      print '<<ERROR>> unable to build & install package ' + rep
+      os.chdir(os.pardir)
+      return False
+
    os.chdir(os.pardir)
    return True
