@@ -159,7 +159,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
                     ++nb_sol_found ;
                     mean_delta += delta ;
 
-                    std::cout << "<<INFO>> found a solution with np=" << temp_np 
+                    std::cout << "<<INFO>> found a solution with np=" << temp_np
 							         << ", nq = " << temp_nq << std::endl;
                     std::cout << "<<INFO>> Linf error = " << linf_dist << std::endl;
                     std::cout << "<<INFO>> L2   error = " << l2_dist << std::endl;

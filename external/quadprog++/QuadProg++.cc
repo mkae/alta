@@ -4,7 +4,7 @@
   This file is part of QuadProg++: a C++ library implementing
   the algorithm of Goldfarb and Idnani for the solution of a (convex)
   Quadratic Programming problem by means of an active-set dual method.
-  
+
   Copyright (C) 2007-2009 Luca Di Gaspero <l.digaspero@uniud.it>
   Copyright (C) 2009 Eric Moyer.
   Copyright (C) 2014-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -52,14 +52,14 @@ double hypot(double a, double b);
 void init_qp(Ref<MatrixXd> G)
 {
   assert(G.rows()==G.cols());
-  
+
   internal::llt_inplace<double, Lower>::blocked(G);
 }
 
 // The Solving function, implementing the Goldfarb-Idnani method
-double solve_quadprog(Ref<MatrixXd> G, Ref<const VectorXd> g0, 
-                    Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,  
-                    Ref<const MatrixXd> CI, Ref<const VectorXd> ci0, 
+double solve_quadprog(Ref<MatrixXd> G, Ref<const VectorXd> g0,
+                    Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,
+                    Ref<const MatrixXd> CI, Ref<const VectorXd> ci0,
                     Ref<VectorXd> x)
 {
   std::ostringstream msg;
@@ -108,14 +108,14 @@ double solve_quadprog(Ref<MatrixXd> G, Ref<const VectorXd> g0,
 
   // decompose the matrix G in the form L^T L
   init_qp(G);
-  
+
   // Find the unconstrained minimizer of the quadratic form 0.5 * x G x + g0 x
   // this is a feasible point in the dual space
   // x = G^-1 * g0
   x = G.triangularView<Lower>().solve(g0);
   x = G.triangularView<Lower>().adjoint().solve(x);
   x = -x;
-  
+
   return solve_quadprog_with_guess(G, g0, CE, ce0, CI, ci0, x);
 }
 
@@ -128,15 +128,15 @@ void partial_sort(ValuesType &values, MatrixType &M, VectorType &m, int start, i
   Index mid;
   Index n = values.size()-start;
   Index first, last ;
-  
+
   ncut--; // to fit the zero-based indices
-  first = start; 
-  last = n-1; 
+  first = start;
+  last = n-1;
   if (ncut < first || ncut > last ) return;
-  
+
   do {
-    mid = first; 
-    RealScalar abskey = values(mid); 
+    mid = first;
+    RealScalar abskey = values(mid);
     for (Index j = first + 1; j <= last; j++) {
       if ( values(j) < abskey) {
         ++mid;
@@ -149,17 +149,17 @@ void partial_sort(ValuesType &values, MatrixType &M, VectorType &m, int start, i
     swap(values(mid), values(first));
     swap(m(mid), m(first));
     M.col(mid).swap(M.col(first));
-    
+
     if (mid > ncut) last = mid - 1;
-    else if (mid < ncut ) first = mid + 1; 
+    else if (mid < ncut ) first = mid + 1;
   } while (mid != ncut );
 }
 
 VectorXd g_u;
 
-double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0, 
-                                 Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,  
-                                 Ref<const MatrixXd> CI_, Ref<const VectorXd> ci0_, 
+double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
+                                 Ref<const MatrixXd> CE, Ref<const VectorXd> ce0,
+                                 Ref<const MatrixXd> CI_, Ref<const VectorXd> ci0_,
                                  Ref<VectorXd> x,
                                  Scheduling scheduling,
                                  VectorXi *active_set)
@@ -167,7 +167,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
   MatrixXd CI(CI_);
   VectorXd ci0(ci0_);
   int n = L.cols(), p = CE.cols(), m = CI.cols();
-  
+
   int ip; // this is the index of the constraint to be added to the active set
   MatrixXd R(n, n), J(n, n);
   VectorXd s(m + p), z(n), r(m + p), d(n), np(n), u(m + p);
@@ -181,20 +181,20 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
                     // and the full step length t2
   VectorXi A(m + p), iai(m + p);
   int q, iq;
-  
+
 #ifdef QP_SKIP_DEGENERATE
   std::vector<bool> iaexcl(m + p, true);
   VectorXd x_old(n), u_old(m + p);
   VectorXi A_old(m + p);
 #endif
 
-  // p is the number of equality constraints 
-  // m is the number of inequality constraints 
+  // p is the number of equality constraints
+  // m is the number of inequality constraints
   q = 0;  // size of the active set A (containing the indices of the active constraints)
 
   // Preprocessing phase
   c1 = L.diagonal().squaredNorm(); // == trace(LL^T) == trace(G)
-  
+
   // initialize the matrix R
   d.setZero();
   R.setZero();
@@ -213,7 +213,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
 
   // and compute the current solution value
   f_value = 0.5 * g0.dot(x);
-  
+
   TRACE_SOLVER( std::cout << "Unconstrained solution: " << f_value << std::endl );
   TRACE_SOLVER( print_vector("x", x) );
 
@@ -250,11 +250,11 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
 
   // set iai = K \ A
   for (int i = 0; i < m; i++) iai[i] = i;
-    
+
   int chunk_start=0, chunk_size = scheduling.initial_chunk_size;
   if(scheduling.mode==Scheduling::WorstFirst)
     chunk_size = m;
-  
+
 //   if(active_set)
 //   {
 //     // restore active set (assume initial guess satisfies given active set)
@@ -281,7 +281,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
   {
     TRACE_SOLVER( print_vector("x", x) );
     // step 1: choose a violated constraint
-    
+
     // FIXME: should be removed:
     for (int i = p; i < iq; i++) {
       if(iai[A[i]]!=-1) { std::cerr << "A <-> iai missmatch\n"; abort();}
@@ -332,7 +332,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
       {
         // If we haven't considered all inequalities, then enlarge the current windows, and restart over
         TRACE_SOLVER( std::cout << "increase windows size after " << iter << " iterations to " << chunk_size*2 );
-        
+
         if(scheduling.grow_factor>1)
         {
           // in this case, let's enlarge the current window size, and re-start sliding from the head,
@@ -379,15 +379,15 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
         s.tail(m-iq)            = ci0.tail(m-iq);
         s.tail(m-iq).noalias() += CI.rightCols(m-iq).transpose() * x;
         flops1 += (m-iq) * n;
-        
+
         // Pack worst inequalities right after the active set
         chunk_size = std::min(m,std::max(chunk_size,iq*2));
         partial_sort(s,CI,ci0,iq,chunk_size-iq);
-        
+
         done_with_current_subset = true;
         continue;
       }
-          
+
       q = iq;
       break;
     }
@@ -401,10 +401,10 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
     A_old.head(iq) = A.head(iq);
     x_old = x;
 #endif
-    
+
 //  l2:
-    // Step 2: check for feasibility and determine a new S-pair 
-    
+    // Step 2: check for feasibility and determine a new S-pair
+
     // Find largest violated inequality -> (ip,ss)
     if(done_with_active_set)
     {
@@ -447,7 +447,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
 
     np = CI.col(ip);    // set np = n[ip]
     u[iq] = 0.0;        // set u = [u 0]^T
-    A[iq] = ip;         // add ip to the active set A 
+    A[iq] = ip;         // add ip to the active set A
 
     TRACE_SOLVER( std::cout << "Trying with constraint " << ip << std::endl );
     TRACE_SOLVER( print_vector("np", np) );
@@ -458,7 +458,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
     {
       count++;
       // Step 2a: determine step direction
-      
+
       // Compute z = H n+ (step direction in the primal space), and if q>0, r = N* n+ (the negative of the step direction in the dual space)
       compute_step_direction(z, r, np, J, R, iq, d);
 
@@ -478,7 +478,7 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
           l = A[k];
         }
       }
-      
+
       // Compute t2: full step length (minimum step in primal space such that the constraint ip becomes feasible)
       if (z.squaredNorm() > std::numeric_limits<double>::epsilon()) // i.e. z != 0
         t2 = -s[ip] / z.dot(np);
@@ -512,9 +512,9 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
       {
         x += t * z;                                       // update solution
         f_value += t * z.dot(np) * (0.5 * t + u[iq]);     // update the solution value
-        u.head(iq) -= t * r.head(iq);                     // u = u + t * [-r 1] 
+        u.head(iq) -= t * r.head(iq);                     // u = u + t * [-r 1]
         u[iq] += t;
-        
+
         TRACE_SOLVER( std::cout << " step in both spaces, f_value=" << f_value );
 
         if (std::abs(t - t2) >= std::numeric_limits<double>::epsilon())
@@ -560,32 +560,32 @@ double solve_quadprog_with_guess(Ref<const MatrixXd> L, Ref<const VectorXd> g0,
             return inf;
           }
       #endif
-              
+
           iai[ip] = -1;
-          
+
           if(scheduling.mode==Scheduling::SlidingWindows && done_with_active_set)
             Scheduling::shift_window(chunk_start, chunk_size, m);
-          
+
           // we are done with current constraint
           break;
         }
       }
     } // end projection loop
   } // end main iteration loop
-  
+
   if(iter>10*m)
   {
     std::cout << "too many iterations...\n";
     return std::numeric_limits<double>::max();
   }
-  
+
   g_u = u;
-  
+
   if(active_set)
     *active_set = A.head(iq);
-  
+
   TRACE_SOLVER_(std::cout << "#iterations = " << iter << " ; inequality update costs: " << 1e-9*flops0 << " + " << 1e-9*flops1 << " = " << 1e-9*(flops0+flops1) << " GFlops");
-  
+
   return f_value;
 }
 
@@ -625,7 +625,7 @@ bool add_constraint(Ref<MatrixXd> R, Ref<MatrixXd> J, Ref<VectorXd> d, int& iq, 
     ss = ss / h;
     cc = cc / h;
     d[j-1] = h;
-    
+
     Ref<VectorXd> J0 = J.col(j-1);
     Ref<VectorXd> J1 = J.col(j);
     internal::apply_rotation_in_the_plane(J0, J1, JacobiRotation<double>(cc,ss));
@@ -664,7 +664,7 @@ void delete_constraint(Ref<MatrixXd> R, Ref<MatrixXd> J, VectorXi& A, Ref<Vector
       break;
     }
   assert(qq>=0);
-  
+
   // remove the constraint from the active set and the duals
   for (int i = qq; i < iq - 1; i++)
   {
@@ -692,7 +692,7 @@ void delete_constraint(Ref<MatrixXd> R, Ref<MatrixXd> J, VectorXi& A, Ref<Vector
     double h = hypot(cc, ss);
     if (h < std::numeric_limits<double>::epsilon()) // h == 0
       continue;
-    
+
     if (cc < 0.0) h = -h;
     cc = cc / h;
     ss = ss / h;
@@ -702,7 +702,7 @@ void delete_constraint(Ref<MatrixXd> R, Ref<MatrixXd> J, VectorXi& A, Ref<Vector
     Ref<VectorXd,0,InnerStride<> > R0 = R.row(j).segment(j+1,iq-j-1);
     Ref<VectorXd,0,InnerStride<> > R1 = R.row(j+1).segment(j+1,iq-j-1);;
     internal::apply_rotation_in_the_plane(R0, R1, JacobiRotation<double>(cc,ss));
-  
+
     Ref<VectorXd> J0 = J.col(j);
     Ref<VectorXd> J1 = J.col(j+1);
     internal::apply_rotation_in_the_plane(J0, J1, JacobiRotation<double>(cc,ss));

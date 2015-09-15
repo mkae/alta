@@ -45,7 +45,7 @@ class rational_fitter_quadprog : public fitter
 
 	protected: // data
 
-		// Fitting a data object using np elements in the numerator and nq 
+		// Fitting a data object using np elements in the numerator and nq
 		// elements in the denominator
 		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& fit) ;
 		virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq, int ny, rational_function_1d* fit) ;
@@ -57,7 +57,7 @@ class rational_fitter_quadprog : public fitter
 		// Add constraints to the boundary of the domain. You can shrink it of
 		// the parameter --boundary-constraint *double*
 		double _boundary;
-    
+
     std::string _scheduling_mode;
     int _scheduling_chunk_size;
     double _scheduling_grow_factor;

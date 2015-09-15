@@ -37,7 +37,7 @@
  *  <ul>
  *		<li><b>--np</b> <em>[int]</em> controls the maximum number of total coefficients
  *		an interpolation should have. By default, this number is 10.</li>
- *		<li><b>--min-np</b> <em>[int]<em></li> controls the starting value for the 
+ *		<li><b>--min-np</b> <em>[int]<em></li> controls the starting value for the
  *		number of coefficients for the rational function. by default, this number
  *		is 10.</li>
  *		<li><b>--np-step</b> <em>[int]</em> stepping for the number of coefficients
@@ -66,23 +66,23 @@ class rational_fitter_parallel : public fitter
 
 	protected: // methods
 
-		// Fitting a data object using np elements in the numerator and nq 
+		// Fitting a data object using np elements in the numerator and nq
 		// elements in the denominator
-		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq, 
-		                      const ptr<rational_function>& fit, const arguments &args, 
+		virtual bool fit_data(const ptr<vertical_segment>& d, int np, int nq,
+		                      const ptr<rational_function>& fit, const arguments &args,
                               double& delta, double& linf_dist,double& l2_dist) ;
-		virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq, 
-		                      int ny, rational_function_1d* fit, const arguments& args, 
+		virtual bool fit_data(const ptr<vertical_segment>& dat, int np, int nq,
+		                      int ny, rational_function_1d* fit, const arguments& args,
 									 vec& p, vec& q, double& delta) ;
 
 		//! \brief Create a constraint vector given its index i in the data
 		//! object and the rational function object to fit. This function
-		//! returns two rows of the constraints matrix A, cu and cl, 
+		//! returns two rows of the constraints matrix A, cu and cl,
 		//! corresponding to the lower constraint and the upper constraint
 		//! of the vertical segment.
-		virtual void get_constraint(int i, int np, int nq, int ny, 
-		                            const ptr<vertical_segment>& data, 
-											 const rational_function_1d* func, 
+		virtual void get_constraint(int i, int np, int nq, int ny,
+		                            const ptr<vertical_segment>& data,
+											 const rational_function_1d* func,
 											 vec& cu, vec& cl);
 
 	protected: // data

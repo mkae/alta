@@ -60,7 +60,7 @@ class quadratic_program
             this->training_set = ts;
         }
 
-		//! \brief Solves the quadratic program and update the p and 
+		//! \brief Solves the quadratic program and update the p and
 		//! q vector if necessary.
 		inline bool solve_program(Eigen::VectorXd& x, double& delta, vec& p, vec& q)
 		{
@@ -92,7 +92,7 @@ class quadratic_program
 
 		//! \brief Solves the quadratic program
 		inline bool solve_program(Eigen::VectorXd& v, double& delta)
-		{        
+		{
 			const int m = CI.rows();
 			const int n = CI.cols();
 
@@ -241,7 +241,7 @@ class quadratic_program
 };
 		
 
-inline void quadratic_program::get_constraint(const vec& xi, const vec& yl, const vec& yu, 
+inline void quadratic_program::get_constraint(const vec& xi, const vec& yl, const vec& yu,
                                               int ny, const rational_function_1d* func,
 															 vec& cu, vec& cl)
 {

@@ -8,9 +8,8 @@
    License, v. 2.0.  If a copy of the MPL was not distributed with this
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
-#include <Eigen/SVD>
-#include </Users/guenneba/Eigen/eigen/bench/BenchTimer.h>
 #include <Eigen/Dense>
+//#include <bench/BenchTimer.h>
 #include "rational_fitter.h"
 #include <QuadProg++.hh>
 
@@ -37,7 +36,7 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 rational_fitter_quadprog::rational_fitter_quadprog() : _boundary(1.0)
 {
 }
-rational_fitter_quadprog::~rational_fitter_quadprog() 
+rational_fitter_quadprog::~rational_fitter_quadprog()
 {
 }
 
@@ -58,7 +57,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit
 	r->setMin(d->min()) ;
 	r->setMax(d->max()) ;
 
-	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np 
+	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np
 	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
 	int temp_np = _min_np, temp_nq = _min_nq ;
@@ -111,11 +110,11 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
 	_max_nq = std::max<int>(_max_nq, _min_nq);
 
 	_boundary = args.get_float("boundary-constraint", 1.0f);
-  
+
   _scheduling_mode = args.get_string("scheduling-mode","SlidingWindows");
   _scheduling_chunk_size = args.get_int("scheduling-chunk-size",-1);
   _scheduling_grow_factor = args.get_float("scheduling-grow-factor",-1);
-  
+
   _export_qp = args.is_defined("export-qp");
   _delta = args.get_float("delta", 1) ;
   _add_ls_energy = args.is_defined("add-ls-energy");
@@ -144,7 +143,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 // np and nq are the degree of the RP to fit to the data
 // y is the dimension to fit on the y-data (e.g. R, G or B for RGB signals)
 // the function return a ration BRDF function and a boolean
-bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny, rational_function_1d* r) 
+bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny, rational_function_1d* r)
 {
   using namespace Eigen;
 	// Size of the problem
@@ -161,7 +160,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 
 	// Select the size of the result vector to
 	// be equal to the dimension of p + q
-  
+
   MatrixXd Cls(N,M);
   VectorXd x(N);
   // initial guess:
@@ -179,14 +178,14 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
     double a1_norm = 0.0 ;
 
     xi = d->get(i) ;
-    
+
     int i0 = i;
     int i1 = i+M;
-    
+
     // shuffle the constraints to help the solver when working of sub-sets of sequential constraints
     i0 = 2*k0+0;
     i1 = 2*k0+1;
-    
+
     k0+=32;
     if(k0>=M)
     {
@@ -194,11 +193,11 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
       k1++;
     }
 
-    // A row of the constraint matrix has this 
+    // A row of the constraint matrix has this
     // form: [p_{0}(x_i), .., p_{np}(x_i), -f(x_i) q_{0}(x_i), .., -f(x_i) q_{nq}(x_i)]
-    // For the lower constraint and negated for 
-    
-    // the upper constraint
+    // For the lower constraint and negated for
+
+    // the upper constrain
     for(int j=0; j<N; ++j)
     {
       // Filling the p part
@@ -208,7 +207,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 
         CI(j,i0) =  pi;
         CI(j,i1) = -pi;
-        
+
         Cls(j,i) = pi;
       }
       // Filling the q part
@@ -220,7 +219,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 
         CI(j,i0) = -yu[ny] * qi;
         CI(j,i1) =  yl[ny] * qi;
-        
+
         Cls(j,i) = -qi*(yu[ny]+yl[ny])/2.0;
       }
 
@@ -228,17 +227,17 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
       a0_norm += CI(j,i0)*CI(j,i0);
       a1_norm += CI(j,i1)*CI(j,i1);
     }
-  
+
     // Set the c vector, will later be updated using the
     // delta parameter.
     ci[i0] = -sqrt(a0_norm);
     ci[i1] = -sqrt(a1_norm);
   }
-  
+
   // Add least-square linearized quadratic energy
   if(_add_ls_energy)
     G.noalias() += 1e2 * Cls * Cls.transpose();
-  
+
 #ifdef DEBUG
   std::cout << "CI = [" ;
   for(int j=0; j<2*M; ++j)
@@ -249,7 +248,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
       if(i != N-1) std::cout << ", ";
     }
     if(j != 2*M-1)
-      std::cout << ";" << std::endl; 
+      std::cout << ";" << std::endl;
     else
       std::cout << "]" << std::endl ;
   }
@@ -271,7 +270,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
   }
   std::cout << " ]" << std::endl ;
 #endif
-  
+
   delta = sigma_m / sigma_M ;
 
 #ifndef DEBUG
@@ -290,10 +289,10 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
   std::cout << "delta = " << delta << "\n";
 #endif
   ci *= delta;
-    
+
   // Compute the solution
   QuadProgPP::Scheduling scheduling;
-  
+
   if(_scheduling_mode=="SlidingWindows")
   {
     scheduling.initSlidingWindows(N,2*M);
@@ -306,7 +305,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
   }
   if(_scheduling_chunk_size>0)
     scheduling.initial_chunk_size = _scheduling_chunk_size;
-  
+
   if(_export_qp)
   {
     // export quadratic objective and all constraints
@@ -318,7 +317,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
     for(int k=0; k<ci.size(); ++k)
       cif << std::setprecision(16) << ci[k] << "\n";
   }
-  
+
   VectorXi active_set;
 //   BenchTimer t;
 //   t.reset(); t.start();
@@ -328,7 +327,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
   cost = QuadProgPP::solve_quadprog_with_guess(G, g, CE, ce, CI, ci, x, scheduling, &active_set);
 //   t.stop(); std::cout << "solve: " << t.value() << "s\n";
 //   std::cout << "active_set.size(): " << active_set.size() << "\n";
-  
+
   if(_export_qp)
   {
     // export active constraints
@@ -339,13 +338,13 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
       CI_as.col(i) = CI.col(active_set[i]);
       ci_as(i) = ci(active_set[i]);
     }
-    
+
     std::ofstream CIf_as("CI0_as.txt");
     CIf_as << std::setprecision(16) << CI_as;
     std::ofstream cif_as("ci1_as.txt");
     for(int k=0; k<ci_as.size(); ++k)
       cif_as << std::setprecision(16) << ci_as[k] << "\n";
-    
+
     // export solution
     std::ofstream Xf("X.txt");
     for(int k=0; k<x.size(); ++k)
@@ -387,6 +386,6 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 	else
 
 	{
-		return false; 
+		return false;
 	}
 }

@@ -41,10 +41,10 @@ void rational_fitter_parsec_multi::set_parameters(const arguments& args)
     _max_nq = args.get_float("nq", _max_np);
     _min_np = args.get_float("min-np", _max_np);
     _min_nq = args.get_float("min-nq", _min_np);
- 
+
     _max_np = std::max<int>(_max_np, _min_np);
     _max_nq = std::max<int>(_max_nq, _min_nq);
-    
+
     _boundary = args.get_float("boundary-constraint", 1.0f);
     _nbcores = args.get_int( "nbcores", 2 );
     _args = &args;
@@ -224,13 +224,13 @@ bool rational_fitter_parsec_multi::fit_data(vertical_segment *d, int N, rational
 		    rc = true;
 		    nb_sol_found ++;
 		    mean_delta += spb->delta[0];
-		    
+		
 		    std::cout << "<<INFO>> found a solution with np=" << (i+1)
 			      << ", nq= " << (N-i)
 			      << ", delta= " << spb->delta[0]
 			      << ", l2_dist= " << spb->l2_dist
 			      << std::endl;
-		    
+		
 		    if(spb->delta[0] < min_delta)
 			{
 			    min_delta   = spb->delta[0] ;
@@ -389,7 +389,7 @@ int rational_fitter_parsec_multi::solve_wrapper( const gesvdm2_args_t *args, sub
     Eigen::MatrixXd g (N);     g.setZero();
     Eigen::MatrixXd x (N);     x.setZero();
 
-    // FIXME: check that CIptr is really row-major, and perhaps modify its storage to avoid this copy 
+    // FIXME: check that CIptr is really row-major, and perhaps modify its storage to avoid this copy
     Eigen::MatrixXd CI = Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>::Map(CIptr, N, M);
     Eigen::Map<Eigen::VectorXd> ci(ciptr, M);
 
@@ -445,7 +445,7 @@ int rational_fitter_parsec_multi::solve_finalize( const gesvdm2_args_t *args, su
     rational_function      *rf = (rational_function*)(pb->rfptr);
 
     static ptr<data> dat((data *)d);
-    
+
     std::cout << "d=" << d << std::endl;
     std::cout << "<<INFO>> got solution to final step for pb with np=" << pb->np << ", nq=" << pb->nq << std::endl;
     pb->linf_dist = rf->Linf_distance(dat);
