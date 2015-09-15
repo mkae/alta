@@ -322,64 +322,6 @@ bool nonlinear_fitter_eigen::fit_data(const ptr<data>& d, ptr<function>& fit, co
     vec nf_x = nf->parameters();
 
     int info;
-#ifdef OLD
-	 if(args.is_defined("fit-compound"))
-	 {
-		 ptr<compound_function> compound = dynamic_pointer_cast<compound_function>(nf);
-		 if(!compound_function)
-		 {
-			 std::cerr << "<<ERROR>> you should use --fit-compound with a compound function" << std::endl;
-			 return false;
-		 }
-
-		 // Register how many parameter are already fitted
-		 int already_fit = 0;
-
-		 // Get the i-th function of the compound
-		 for(int index=0; index<compound->size(); ++index)
-		 {
-			 nonlinear_function* f = (*compound)[index];
-			 if(f->nbParameters() == 0)
-				 continue;
-
-			 Eigen::VectorXd x(f->nbParameters());
-			 for(int i=0; i<f->nbParameters(); ++i)
-			 {
-				 x[i] = nf_x[i+already_fit];
-			 }
-
-			 CompoundFunctor functor(compound, index, d, args.is_defined("fit-with-cosine"));
-			 Eigen::LevenbergMarquardt<CompoundFunctor> lm(functor);
-
-			 info = lm.minimize(x);
-
-			 if(info == Eigen::LevenbergMarquardtSpace::ImproperInputParameters)
-			 {
-				 std::cerr << "<<ERROR>> incorrect parameters" << std::endl;
-				 return false;
-			 }
-			else if(info == Eigen::LevenbergMarquardtSpace::UserAsked)
-			 {
-				 std::cerr << "<<ERROR>> the search is using improper parameters: stopping" << std::endl;
-				 return false;
-			 }
-
-			 // Update the vector of parameters
-			 for(int i=0; i<f->nbParameters(); ++i)
-			 {
-				 nf_x[i+already_fit] = x[i];
-			 }
-
-			 // Update the number of already fitted parameters
-			 already_fit += f->nbParameters();
-
-#ifndef DEBUG
-    std::cout << "<<DEBUG>> function " << index+1 << " using " << lm.iterations() << " iterations" << std::endl;
-#endif
-		 }
-	 }
-	 else
-#endif
 	 {
 		 Eigen::VectorXd x(nf->nbParameters());
 		 for(int i=0; i<nf->nbParameters(); ++i)
