@@ -46,8 +46,11 @@ def download(url, filename):
    try:
       urllib.urlretrieve(url, filename)
       return True
-   except IOError:
-      C.progress_display('Unable to download package, check your connection')
+   except IOError as e:
+      # In Python 2.x, 'urlretrieve' raises IOError upon HTTP errors,
+      # except for some errors such as 404.  Oh well.
+      W.warn(AltaDependencyWarning,
+             "{0}: download failed: {1}".format(url, e.strerror))
       return False
 
 # Uncompress the archive
