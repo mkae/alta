@@ -1,12 +1,12 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+  Copyright (C) 2013, 2014 Inria
 
-   This file is part of ALTA.
+  This file is part of ALTA.
 
-   This Source Code Form is subject to the terms of the Mozilla Public
-   License, v. 2.0.  If a copy of the MPL was not distributed with this
-   file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0.  If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #include <Eigen/Dense>
 //#include <bench/BenchTimer.h>
@@ -30,7 +30,7 @@
 
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
-	return new rational_fitter_quadprog();
+  return new rational_fitter_quadprog();
 }
 
 rational_fitter_quadprog::rational_fitter_quadprog() : _boundary(1.0)
@@ -42,74 +42,74 @@ rational_fitter_quadprog::~rational_fitter_quadprog()
 
 bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit, const arguments &args)
 {
-	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
-	const ptr<vertical_segment>& d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(!r || !d)
-	{
-		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
-		return false ;
-	}
+  ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
+  const ptr<vertical_segment>& d = dynamic_pointer_cast<vertical_segment>(dat) ;
+  if(!r || !d)
+  {
+    std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
+    return false ;
+  }
 
-	// I need to set the dimension of the resulting function to be equal
-	// to the dimension of my fitting problem
-	r->setDimX(d->dimX()) ;
-	r->setDimY(d->dimY()) ;
-	r->setMin(d->min()) ;
-	r->setMax(d->max()) ;
+  // I need to set the dimension of the resulting function to be equal
+  // to the dimension of my fitting problem
+  r->setDimX(d->dimX()) ;
+  r->setDimY(d->dimY()) ;
+  r->setMin(d->min()) ;
+  r->setMax(d->max()) ;
 
-	std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np
-	          << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
+  std::cout << "<<INFO>> np in  [" << _min_np << ", " << _max_np
+            << "] & nq in [" << _min_nq << ", " << _max_nq << "]" << std::endl ;
 
-	int temp_np = _min_np, temp_nq = _min_nq ;
-	while(temp_np <= _max_np || temp_nq <= _max_nq)
-	{
-      timer time ;
-		time.start() ;
-		
-		r->setSize(temp_np, temp_nq);
-		if(fit_data(d, temp_np, temp_nq, r))
-		{
+  int temp_np = _min_np, temp_nq = _min_nq ;
+  while(temp_np <= _max_np || temp_nq <= _max_nq)
+  {
+    timer time ;
+    time.start() ;
+    
+    r->setSize(temp_np, temp_nq);
+    if(fit_data(d, temp_np, temp_nq, r))
+    {
             time.stop() ;
             std::cout << "<<INFO>> got a fit using np = " << temp_np << " & nq =  " << temp_nq << "      " << std::endl ;
             std::cout << "<<INFO>> it took " << time << std::endl ;
 
-			return true ;
-		}
+      return true ;
+    }
 
-		
-		std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed" << std::endl  ;
+    
+    std::cout << "<<INFO>> fit using np = " << temp_np << " & nq =  " << temp_nq << " failed" << std::endl  ;
       time.stop() ;
       std::cout << "<<INFO>> it took " << time << std::endl ;
-		std::cout.flush() ;
+    std::cout.flush() ;
 
-		if(temp_np == _max_np && temp_nq == _max_nq)
-		{
-			return false;
-		}
+    if(temp_np == _max_np && temp_nq == _max_nq)
+    {
+      return false;
+    }
 
-      if(temp_np < _max_np)
-		{
-			++temp_np ;
-		}
-      if(temp_nq < _max_nq)
-		{
-			++temp_nq ;
-		}
-	}
-	return false ;
+    if(temp_np < _max_np)
+    {
+      ++temp_np ;
+    }
+    if(temp_nq < _max_nq)
+    {
+      ++temp_nq ;
+    }
+  }
+  return false ;
 }
 
 void rational_fitter_quadprog::set_parameters(const arguments& args)
 {
-	_max_np = args.get_float("np", 10) ;
-	_max_nq = args.get_float("nq", 10) ;
-	_min_np = args.get_float("min-np", _max_np) ;
-	_min_nq = args.get_float("min-nq", _max_nq) ;
+  _max_np = args.get_float("np", 10) ;
+  _max_nq = args.get_float("nq", 10) ;
+  _min_np = args.get_float("min-np", _max_np) ;
+  _min_nq = args.get_float("min-nq", _max_nq) ;
 
-	_max_np = std::max<int>(_max_np, _min_np);
-	_max_nq = std::max<int>(_max_nq, _min_nq);
+  _max_np = std::max<int>(_max_np, _min_np);
+  _max_nq = std::max<int>(_max_nq, _min_nq);
 
-	_boundary = args.get_float("boundary-constraint", 1.0f);
+  _boundary = args.get_float("boundary-constraint", 1.0f);
 
   _scheduling_mode = args.get_string("scheduling-mode","SlidingWindows");
   _scheduling_chunk_size = args.get_int("scheduling-chunk-size",-1);
@@ -119,24 +119,23 @@ void rational_fitter_quadprog::set_parameters(const arguments& args)
   _delta = args.get_float("delta", 1) ;
   _add_ls_energy = args.is_defined("add-ls-energy");
 }
-		
+    
 
 bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, const ptr<rational_function>& r)
 {
-    // For each output dimension (color channel for BRDFs) perform
-    // a separate fit on the y-1D rational function.
-	for(int j=0; j<d->dimY(); ++j)
-	{
-		rational_function_1d* rs = r->get(j);
-		rs->resize(np, nq);
+  // For each output dimension (color channel for BRDFs) perform
+  // a separate fit on the y-1D rational function.
+  for(int j=0; j<d->dimY(); ++j)
+  {
+    rational_function_1d* rs = r->get(j);
+    rs->resize(np, nq);
 
-		if(!fit_data(d, np, nq, j, rs))
-        {
-			return false ;
-        }
+    if(!fit_data(d, np, nq, j, rs))
+    {
+      return false ;
     }
-
-	return true ;
+  }
+  return true ;
 }
 
 // dat is the data object, it contains all the points to fit
@@ -146,20 +145,20 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, int nq, int ny, rational_function_1d* r)
 {
   using namespace Eigen;
-	// Size of the problem
-	const int N = np+nq ;
-	const int M = d->size() ;
+  // Size of the problem
+  const int N = np+nq ;
+  const int M = d->size() ;
 
-	// Matrices of the problem
-	MatrixXd G(N, N) ;    G.setZero();
-	VectorXd g(N) ;       g.setZero();
-	MatrixXd CI(N, 2*M) ; CI.setZero();
-	VectorXd ci(2*M) ;    ci.setZero();
-	MatrixXd CE(N, 0) ;   CE.setZero();
-	VectorXd ce(long(0)) ;ce.setZero();
+  // Matrices of the problem
+  MatrixXd G(N, N) ;    G.setZero();
+  VectorXd g(N) ;       g.setZero();
+  MatrixXd CI(N, 2*M) ; CI.setZero();
+  VectorXd ci(2*M) ;    ci.setZero();
+  MatrixXd CE(N, 0) ;   CE.setZero();
+  VectorXd ce(long(0)) ;ce.setZero();
 
-	// Select the size of the result vector to
-	// be equal to the dimension of p + q
+  // Select the size of the result vector to
+  // be equal to the dimension of p + q
 
   MatrixXd Cls(N,M);
   VectorXd x(N);
@@ -351,41 +350,40 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
       Xf << std::setprecision(16) << x[k] << "\n";
   }
 
-	bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
-	for(int i=0; i<np+nq; ++i)
-	{
-		const double v = x[i];
-		solves_qp = solves_qp && !isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
-	}
+  bool solves_qp = !(cost == std::numeric_limits<double>::infinity());
+  for(int i=0; i<np+nq; ++i)
+  {
+    const double v = x[i];
+    solves_qp = solves_qp && !isnan(v) && (v != std::numeric_limits<double>::infinity()) ;
+  }
 
-	if(solves_qp)
-	{
-		// Recopy the vector d
-		vec p(np), q(nq);
-		double norm = 0.0 ;
-		for(int i=0; i<N; ++i)
-		{
-			const double v = x[i];
-			norm += v*v ;
-			if(i < np)
-			{
-				p[i] = v ;
-			}
-			else
-			{
-				q[i - np] = v ;
-			}
-		}
+  if(solves_qp)
+  {
+    // Recopy the vector d
+    vec p(np), q(nq);
+    double norm = 0.0 ;
+    for(int i=0; i<N; ++i)
+    {
+      const double v = x[i];
+      norm += v*v ;
+      if(i < np)
+      {
+        p[i] = v ;
+      }
+      else
+      {
+        q[i - np] = v ;
+      }
+    }
 
-		r->update(p, q);
+    r->update(p, q);
 #ifdef DEBUG
-		std::cout << "<<INFO>> got solution " << *r << std::endl ;
+    std::cout << "<<INFO>> got solution " << *r << std::endl ;
 #endif
-		return norm > 0.0;
-	}
-	else
-
-	{
-		return false;
-	}
+    return norm > 0.0;
+  }
+  else
+  {
+    return false;
+  }
 }
