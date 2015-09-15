@@ -1,12 +1,12 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-  Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014 Inria
 
-  This file is part of ALTA.
+   This file is part of ALTA.
 
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0.  If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0.  If a copy of the MPL was not distributed with this
+   file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #pragma once
 
@@ -23,9 +23,9 @@
 #include <core/args.h>
 
 /*! \brief A vertical segment fitter for rational function using the library QuadProg++
-*  You can find the library here: http://quadprog.sourceforge.net/
-*  \ingroup plugins
-*/
+ *  You can find the library here: http://quadprog.sourceforge.net/
+ *  \ingroup plugins
+ */
 class rational_fitter_quadprog : public fitter
 {
   public: // methods

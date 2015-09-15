@@ -1,12 +1,12 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-  Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014 Inria
 
-  This file is part of ALTA.
+   This file is part of ALTA.
 
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0.  If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+   This Source Code Form is subject to the terms of the Mozilla Public
+   License, v. 2.0.  If a copy of the MPL was not distributed with this
+   file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #pragma once
 #include <Eigen/Dense>
@@ -23,32 +23,32 @@
 #include <core/args.h>
 
 /*! \brief A vertical segment fitter for rational functions that search for a solution
-*  for a fixed number of coefficient. This plugin can run in parallel with OpenMP and
-*  is using QuadProg++ quadratic solver.
-*  \ingroup plugins
-*
-*  \details
-*  You can find QuadProg++ <a href="http://quadprog.sourceforge.net/">here</a>.
-*  <br />
-*
-*  <h3>Plugin parameters</h3>
-*
-*  We provide the following command line arguments to manipulate this plugin:
-*  <ul>
-* <li><b>--np</b> <em>[int]</em> controls the maximum number of total coefficients
-*   an interpolation should have. By default, this number is 10.</li>
-*   <li><b>--min-np</b> <em>[int]<em></li> controls the starting value for the
-*   number of coefficients for the rational function. by default, this number
-*   is 10.</li>
-*   <li><b>--np-step</b> <em>[int]</em> stepping for the number of coefficients
-*   of the rational function. By default, this number is 1.</li>
-*   <li><b>--nb-cores</b> <em>[int]</em> number of core allocated to perform
-*   the seach. By default, this is equal to the number of processors.</li>
-*   <li><b>--use_delta</b> use the strategy of Pacanowski et al. [2012] to
-*   modify the constraint vector by the condition number of the constraint
-*   matrix. We did not experience any benefit from using it.</li>
-*  </ul>
-*/
+ *  for a fixed number of coefficient. This plugin can run in parallel with OpenMP and
+ *  is using QuadProg++ quadratic solver.
+ *  \ingroup plugins
+ *
+ *  \details
+ *  You can find QuadProg++ <a href="http://quadprog.sourceforge.net/">here</a>.
+ *  <br />
+ *
+ *  <h3>Plugin parameters</h3>
+ *
+ *  We provide the following command line arguments to manipulate this plugin:
+ *  <ul>
+ * <li><b>--np</b> <em>[int]</em> controls the maximum number of total coefficients
+ *   an interpolation should have. By default, this number is 10.</li>
+ *   <li><b>--min-np</b> <em>[int]<em></li> controls the starting value for the
+ *   number of coefficients for the rational function. by default, this number
+ *   is 10.</li>
+ *   <li><b>--np-step</b> <em>[int]</em> stepping for the number of coefficients
+ *   of the rational function. By default, this number is 1.</li>
+ *   <li><b>--nb-cores</b> <em>[int]</em> number of core allocated to perform
+ *   the seach. By default, this is equal to the number of processors.</li>
+ *   <li><b>--use_delta</b> use the strategy of Pacanowski et al. [2012] to
+ *   modify the constraint vector by the condition number of the constraint
+ *   matrix. We did not experience any benefit from using it.</li>
+ *  </ul>
+ */
 class rational_fitter_parallel : public fitter
 {
   public: // methods
