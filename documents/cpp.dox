@@ -1,0 +1,33 @@
+/**
+\page cpp C++ API
+
+ALTA internal code is described in the \ref core "core" section. There you will find how to load plugins using the \ref plugins_manager "plugin manager". Plugins can be of three different types:
+
+ + \ref data plugins allow load/save measurments of BRDFs.
+ + \ref function plugins represent BRDF models.
+ + \ref fitter plugins enable to match a BRDF model to data.
+
+To load a particular plugin, you have to use one of the `get` function. For example to load the data plugin `data_merl` that enables to load the MERL dataset you can write:
+
+    auto plugin = plugins_manager::get_data("data_merl");
+
+The `get_data` function returns a shared pointer to the plugin object. This plugin object can be used as a pointer to the associated type (here \ref data "data").
+
+
+#### Plugin parameters
+
+It is possible to pass parameters to the plugin creation using an \ref arguments object. Argument objects are dictionaries storing specific parameters name and values as strings.
+
+Arguments can be created from the command line arguments of your program. Note that the command line must respect the following syntax `--name [value]`. For example the command line arguments `--hello world --foo bar` will result in the argument:
+
+    args["hello"] == "world"
+    args["foo"] == "bar"
+
+Arguments are passed during the creation of plugins:
+
+    arguments args;
+    args.update("foo", "bar"); // Adding --foo bar
+    auto plugin = plugins_manager::get_data("data_merl", args);
+
+Parameters are plugin specific. Please refer to each plugin documentation using the \ref plugins "plugins list".
+*/

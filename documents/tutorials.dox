@@ -1,15 +1,39 @@
 /*!
 \page tutorials Tutorials
+  
+### Forewords
 
- + <a href="gentle-intro.html">A gentle introduction to ALTA</a>
- + Using the command line
-    + <a href="simple-tutorial1.html">A simple 1D rational fitting</a>
-    + <a href="tutorial3.html">BRDF Data conversion</a>
-    + <a href="tutorial2.html">BRDF Rational fitting</a>
-    + <a href="tutorial1.html">BRDF non-linear fitting</a>
- + <a href="xml-tutorial1.html">Using XML scripts</a>
- + <a href="python.html">Using the Python interface</a>
- + <a href="cpp-tutorial1.html">Using the C++ interface</a>
+ALTA organizes BRDF analysis and modeling into atomic \ref commands "programs" (coordinate transforms, sub-space integration, parameters estimation, `etc`) that are combined with plugins. Programs work on three types of plugins: \ref functions "BRDFs", \ref datas "datas", and \ref fitters "fitters". Plugins can input or output files. BRDFs, data and fitters can be provided by users through dynamic libraries. This makes ALTA easily extensible. Programs are executed using command line instructions and can be chained to generate scripts. We pro vide a higher level interface to build scripts using XML and \ref python.
+
+In every example, we denotes command line execution using:
+
+    $ do-something 
+
+And Python scripts using:
+
+    >>> import alta
+
+<br />
+### Tutorials 
+
+#### Tutorials using the command line
+
+ + <a href="simple-tutorial1.html">A simple 1D rational fitting</a>
+ + <a href="tutorial3.html">BRDF Data conversion</a>
+ + <a href="tutorial2.html">BRDF Rational fitting</a>
+ + <a href="tutorial1.html">BRDF non-linear fitting</a>
+
+### Tutorial using the XML interface
+
+ + <a href="xml-tutorial1.html">Introduction to XML scripts</a>
+
+### Tutorial using the Python interface
+
+ + <a href="python.html"> Introduction to the Python interface</a>
+
+### Tutorial using the C++ interface
+
+ + <a href="cpp-tutorial1.html">Creating your own program</a>
 
 
 

@@ -5,37 +5,36 @@
 <!-- This page lists all documentation related to the ALTA library. -->
 
 
-### Getting Started with ALTA [NEW Users should start here]
-+ \ref gentle-intro 
-+ \ref tutorials 
+#### APIs 
+
+ALTA provides two programming APIs. At the lowest level, it is possible to author new \ref plugins "plugins" and \ref commands "commands" using the C++ API. At the highest level, it is possible to build Python scripts by directly manipulating plugins in this language.
+
++ \ref cpp "C++  API"
++ \ref python "Python Bindings"
 
 
+#### File format specifications
 
-### More specific documents 
+ALTA permits to manipulate various type of files. Here, we detail: our internal data file format which can be either ASCII or binary; our function file format to store function parameters; and our XML file format to store high-level scripts.
 
-#### Format  Specifications
+\todo Separate the different file format
 
-+ ALTA Data File \ref format
-+ ALTA Function File format
-+ ALTA XML Scripting Format
++ \ref format "Data file format"
++ \ref format "Function file format"
++ \ref format "XML scripting format"
+
 
 #### BRDF Related Documents
 
 + <a href="classparams.html" >Parametrisations </a> supported in ALTA
 
-##### Sofware Engineering 
 
-+ Compilation System   
-+ ALTA Plugin System 
+#### Reference
 
-
-### Reference
 + List of plugin to convert data (cf. \ref datas)
 + List of plugins to fit data (cf. \ref fitters)
 + List of BRDF Models (cf. \ref functions)
 + List of provided ALTA sofwares (cf. \ref commands)
-+ C++  API
-+ Python Bindings API
 
 
 */
