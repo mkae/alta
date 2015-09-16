@@ -1,17 +1,27 @@
 /*!
 \page tools Tools
 
-The following tools can be used with ALTA
-to visualize the quality of your fitting results as plots or as rendered images:
+ALTA is compatible with many tools to either visualize results, perform rendering or plot data. We provde an interface for the following tools:
 
- - [Disney BRDFExplorer] (http://www.disneyanimation.com/technology/brdf.html)
-    - Use <tt>brdf2brdf</tt> to generate compatible BRDFExplorer shaders
-    - Use <tt>brdf2data</tt> to generate MERL binary files that can be opened by  BRDFExplorer
+<p>
+ + [Disney BRDFExplorer] (http://www.disneyanimation.com/technology/brdf.html) - It is possible visualize BRDFs by exporting BRDFExplorer shaders and data files. There is two way to generate BRDF data readable by BRDF explorer from an ALTA function file (here `mybrdf.func`):
 
- - [Gnuplot] (http://www.gnuplot.info/)
+    - Use \ref brdf2brdf to generate a BRDFExplorer compatible shader.
+
+            brdf2brdf --input mybrdf.func --output mybrdf.shader --export explorer
+
+    - Use \ref brdf2data to a generate a MERL binary file that can be opened by BRDFExplorer. Note that this method is restricted to isotropic functions.
+
+            brdf2data --input mybrdf.func --output mybrdf.binary --data data_merl
+</p>
+
+<p>
+ + [Gnuplot] (http://www.gnuplot.info/)
     - Use <tt>brdf2gnuplot</tt> to generate a file compatible with gnuplot
+</p>
 
- - Mitsuba Plugin [GitHub page](https://github.com/belcour/AltaBRDF) that permits to use ALTA BRDF inside Mitsuba
-
+<p>
+ + [Mitsuba](http://mitsuba-renderer.org/) - All renders on this webpage were done using a Mitsuba plugin that permits to use ALTA's BRDF models and data inside Mitsuba. Check the [GitHub page](https://github.com/belcour/AltaBRDF) for more details.
+</p>
 <!-- TODO:  Manao BRDF Explorer. Benjamin Python Scripts and Shell commands scripts ? -->
 */
