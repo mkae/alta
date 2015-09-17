@@ -22,7 +22,7 @@ base      = 'IpOpt'
 name      = 'IpOpt v' + version
 directory = base + '-' + version
 url       = 'http://www.coin-or.org/download/source/Ipopt/Ipopt-' + version + '.tgz'
-filename  = 'IpOpt-' + version + '.tgz'
+filename  = 'Ipopt-' + version + '.tgz'
 sha256    = '292afd952c25ec9fe6225041683dcbd3cb76e15a128764671927dbaf881c2e89'
 obtained  = obtain.obtain(name, directory, url, filename, sha256)
 
