@@ -125,7 +125,7 @@ def cmake_build(rep, options = ''):
                 '-DCMAKE_INSTALL_PREFIX=' + build_dir, 
                 '-DCMAKE_BUILD_TYPE=Release']
    if os.name == 'nt' :
-      cmake_cmd = cmake_cmd + ['-G \"NMake Makefiles\"']
+      cmake_cmd = cmake_cmd + ['-G', 'NMake Makefiles']
 
    ret = Popen(cmake_cmd + options.split() + ['.']).wait()
    if ret != 0:
