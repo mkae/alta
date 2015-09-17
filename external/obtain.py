@@ -98,7 +98,7 @@ def configure_build(rep, options = ''):
    call = Popen(args + options.split())
    ret  = call.wait()
    if ret != 0:
-      print '<<ERROR>> unable to configure package'
+      C.progress_display('Warning: unable to configure package' + rep)
       os.chdir(os.pardir)
       return False
 
@@ -106,7 +106,7 @@ def configure_build(rep, options = ''):
    call = Popen(['make', 'install'])
    ret  = call.wait()
    if ret != 0:
-      print '<<ERROR>> unable to build & install package'
+      C.progress_display('Warning: unable to build & install package' + rep)
       os.chdir(os.pardir)
       return False
    
@@ -129,7 +129,7 @@ def cmake_build(rep, options = ''):
 
    ret = Popen(cmake_cmd + options.split() + ['.']).wait()
    if ret != 0:
-      print '<<ERROR>> unable to configure package' + rep
+      C.progress_display('Warning: unable to configure package' + rep)
       os.chdir(os.pardir)
       return False
 
@@ -142,7 +142,7 @@ def cmake_build(rep, options = ''):
 
    ret = Popen(build_cmd + ['install']).wait()
    if ret != 0:
-      print '<<ERROR>> unable to build & install package ' + rep
+      C.progress_display('Warning: unable to build & install package ' + rep)
       os.chdir(os.pardir)
       return False
 
