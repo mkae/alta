@@ -18,15 +18,15 @@ glog_obtained = obtain.obtain(name, directory, url, filename, sha256)
 glog_compiled = os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'glog')
 
 if glog_obtained and not glog_compiled:
-   # if os.name == 'nt':
-   #    W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of GLOG')
-   # else:
+   if os.name == 'nt':
+      W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of GLOG')
+   else:
    #    exists_archive = os.path.exists('.' + os.sep + directory)
-   if sys.platform == 'darwin':
-      obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
+      if sys.platform == 'darwin':
+         obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
       
-   C.progress_display('configuring and building GLOG')
-   glog_compiled = obtain.configure_build(directory, '--disable-shared --enable-static --with-pic')
+      C.progress_display('configuring and building GLOG')
+      glog_compiled = obtain.configure_build(directory, '--disable-shared --enable-static --with-pic')
 else:
    C.progress_display('GLOG is already installed')
 
