@@ -24,5 +24,7 @@ if obtained:
       shutil.copytree(directory + os.sep + 'unsupported', unsup_rep)
 
 else:
-   msg = "Unable to obtain " + name
-   raise Errors.BuildError(msg, 1, 1, filename)
+   msg = "download from '" + url + "' failed"
+   raise Errors.BuildError(errstr = msg,
+                           filename = filename,
+                           exitstatus = 1)

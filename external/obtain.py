@@ -37,8 +37,9 @@ def check_integrity(filename, sha256):
                   filename + "' is inauthentic"
           print >> sys.stderr, \
                   "error: got sha256 hash {0} but expected {1}".format(obtained, sha256)
-          raise SCons.Errors.BuildError("downloaded file is inauthentic",
-                                        1, 1, filename)
+          raise SCons.Errors.BuildError(errstr = "downloaded file is inauthentic",
+                                        filename = filename,
+                                        exitstatus = 1)
 
 # Download from URL to FILENAME.
 # Return True if the package was successfully downloaded, else return False.
