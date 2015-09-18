@@ -14,21 +14,20 @@ directory = base + '-' + version
 url       = 'http://google-glog.googlecode.com/files/glog-' + version + '.tar.gz'
 filename  = 'glog-' + version + '.tar.gz'
 sha256    = 'fbf90c2285ba0561db7a40f8a4eefb9aa963e7d399bd450363e959929fe849d0'
-glog_obtained = obtain.obtain(name, directory, url, filename, sha256)
-glog_compiled = os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'glog')
+
+glog_obtained = False
+glog_compiled = False
+if os.name != 'nt':
+   glog_obtained = obtain.obtain(name, directory, url, filename, sha256)
+   glog_compiled = os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'glog')
 
 if glog_obtained and not glog_compiled:
-   if os.name == 'nt':
-      W.warn(obtain.AltaDependencyWarning, 'sorry, no automatic installation of GLOG')
-   else:
-   #    exists_archive = os.path.exists('.' + os.sep + directory)
-      if sys.platform == 'darwin':
-         obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
-      
-      C.progress_display('configuring and building GLOG')
-      glog_compiled = obtain.configure_build(directory, '--disable-shared --enable-static --with-pic')
-else:
-   C.progress_display('GLOG is already installed')
+
+   if sys.platform == 'darwin':
+      obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
+
+   C.progress_display('configuring and building GLOG for CERES')
+   glog_compiled = obtain.configure_build(directory, '--disable-shared --enable-static --with-pic')
 
 
 # Download CERES.  Assume Eigen is already available.
