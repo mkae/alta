@@ -2,8 +2,8 @@
 \page contribute Contribute
 
 You can contribute and expand ALTA by providing new plugins. The three kind
-of plugins (\ref function, \ref data and \ref fitter) can be provided. 
-Examples of such plugins can be found in the $ALTA/sources/plugins 
+of plugins (\ref function, \ref data and \ref fitter) can be provided.
+Examples of such plugins can be found in the `$ALTA/sources/plugins`
 directory.
 
 

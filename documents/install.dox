@@ -111,6 +111,19 @@ Examples of configuration files are provided under
 <tt>configs/scons</tt>.
 
 
+## Configuration of the environment
+
+To have a direct access to ALTA's commands and plugins from the command line and from python, we recommend to use our environment setters scripts. On Linux/OSX, please source setpath.sh from the terminal:
+
+    $ source setpath.sh
+
+On MS Windows, please excecute the script setpath.bat from the command line:
+
+    $ ./setpath.bat
+
+Programs and plugins will be accessible from the command line without requiring to specify the absolute or relative path to your current position.
+
+
 ## Testing
 
 ALTA comes with a test suite that can be run with:

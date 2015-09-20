@@ -5,7 +5,7 @@
 <!-- This page lists all documentation related to the ALTA library. -->
 
 
-#### APIs 
+#### APIs
 
 ALTA provides two programming APIs. At the lowest level, it is possible to author new \ref plugins "plugins" and \ref commands "commands" using the C++ API. At the highest level, it is possible to build Python scripts by directly manipulating plugins in this language.
 
@@ -17,8 +17,6 @@ ALTA provides two programming APIs. At the lowest level, it is possible to autho
 
 ALTA permits to manipulate various type of files. Here, we detail: our internal data file format which can be either ASCII or binary; our function file format to store function parameters; and our XML file format to store high-level scripts.
 
-\todo Separate the different file format
-
 + \ref format "Data file format"
 + \ref format "Function file format"
 + \ref format "XML scripting format"
@@ -26,10 +24,12 @@ ALTA permits to manipulate various type of files. Here, we detail: our internal 
 
 #### BRDF Related Documents
 
-+ <a href="classparams.html" >Parametrisations </a> supported in ALTA
+ALTA can manipulate BRDF data in different parametrization of the input space of those functions. A BRDF is defined as \f$y = \rho(\omega_i, \omega_o)\f$, where \f$\omega_i, \omega_o \in \Omega\f$ the hemisphere of directions. Multiple way to parametrize this space exist, and we implement most of them. See <a href="classparams.html" >Parametrisations supported in ALTA</a> for more details.
 
 
-#### Reference
+#### References
+
+Below are referenced all the different plugins and softwares provided with ALTA. Documentation on how to use them is provided on the different pages.
 
 + List of plugin to convert data (cf. \ref datas)
 + List of plugins to fit data (cf. \ref fitters)
