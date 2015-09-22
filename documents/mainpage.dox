@@ -1,9 +1,9 @@
 /**
-\mainpage A BRDF analysis library 
+\mainpage A BRDF analysis library
 
 <center style="color:red">
 ALTA is currently in an alpha stage but the current master branch
-can be freely cloned with : 
+can be freely cloned with:
 </center>
 <!-- We provide an archive that is not  feature complete (see below). You can <a href="contacts.html">contact us</a> to get more information  about its features, roadmap, and missing documentation. -->
 
@@ -23,8 +23,8 @@ ALTA is a multi-platform software library to analyze, fit and understand BRDFs. 
 ### Target audience
 
 You are working on BRDFs and you want to **benchmark new BRDF models** and would like
-to compare them with state-of-the-art BRDF models and data easily. 
-You are working on optical measurements and you want to **experiment different fitting procedures and models**, 
+to compare them with state-of-the-art BRDF models and data easily.
+You are working on optical measurements and you want to **experiment different fitting procedures and models**,
 or just perform **statistical analysis** on your data.
 
 
@@ -33,9 +33,9 @@ or just perform **statistical analysis** on your data.
  + Load and Save common BRDF data formats (see the \ref datas "data plugins list")
  + Rational \& Non-linear fitting of BRDF (see the  \ref fitters "fitter plugins list")
  + Analytic BRDF models (see the \ref functions "function plugins list")
- + Scripting (based on XML or Python language) mechanism to automatize processing 
+ + Scripting (based on XML or Python language) mechanism to automatize processing
 
-  The full list of features is available in the \ref features page.
+The full list of features is available in the \ref features page.
 
 
 ### Download
@@ -43,18 +43,18 @@ or just perform **statistical analysis** on your data.
 ALTA is free software available under the [Mozilla Public License,
 version 2.0](http://mozilla.org/MPL/2.0/), from our Git repository:
 
-    git clone https://gforge.inria.fr/git/alta/alta.git
+    $ git clone https://gforge.inria.fr/git/alta/alta.git
 
 See \ref install "the installation instruction" for more information.
 
 ### Getting Started
 
-New users should start by reading the tutorials (cf. \ref tutorials)
+Examples of use can be found in the \ref tutorials "tutorials" section. Also, for a more advance usage of ALTA, please refer to the \ref documentation "APIs and references" page.
 
 
 ### Sample results
 
-Here are presented some of the result one can obtain using ALTA for *nonlinear fitting*, *rational fitting* and *data conversion* of BRDF data (please click on the picture to change the horizontal position of the vertical cut). To see how those results where generated, follow the link above the picture.
+Here are results one can obtain using ALTA for *nonlinear fitting*, *rational fitting* and *data conversion* of BRDF data (please click on the picture to change the position of the vertical cut). To see how those results where generated, follow the link above the picture.
 
 @htmlonly
 <center >
@@ -82,7 +82,7 @@ Those images have been produced using [Mitsuba renderer](http://www.mitsuba-rend
 <br /><br />
 
 
-<!-- 
+<!--
 How to use it
 -------------
 
@@ -96,7 +96,7 @@ Tada! You have produced your first fit. The produced output is a 1D rational fun
 
 @htmlonly
 <center>
-   <img src="Kirby2.png" width="60% alt="Fitting the Kirby2 dataset with a rational polynomial" /> 
+   <img src="Kirby2.png" width="60% alt="Fitting the Kirby2 dataset with a rational polynomial" />
 </center>
 @endhtmlonly
 
@@ -114,18 +114,19 @@ You can find more examples of how to use ALTA on the \ref tutorials page.
 
 -->
 
+<!--
 Contributing
 ----------
 
 There are many ways in which you can extend ALTA. Please refer to \ref
-contribute for more information.
+contribute "contribute" for more information.
 <br /><br />
-
+-->
 
 Citing ALTA
 -------
 
-If you are a happy user of ALTA and use it in one of your publication, you are more than welcomed to cite us! 
+If you are a happy user of ALTA and use it in one of your publication, you are more than welcomed to cite us!
 You can safely use our [EGSR MAM presentation][egsr-mam] reference or the following software citation:
 
     @misc{alta-lib,
