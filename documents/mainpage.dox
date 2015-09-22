@@ -30,12 +30,12 @@ or just perform **statistical analysis** on your data.
 
 ### Main Features
 
- + Load and Save common BRDF data formats (see the \ref datas "data plugins list")
- + Rational \& Non-linear fitting of BRDF (see the  \ref fitters "fitter plugins list")
- + Analytic BRDF models (see the \ref functions "function plugins list")
- + Scripting (based on XML or Python language) mechanism to automatize processing
+ + Import/Export common \ref datas "BRDF data formats"
+ + \ref fitters "Rational &amp; Non-linear fitting" of BRDF
+ + Analytic \ref functions "BRDF models"
+ + \ref python "Scripting mechanisms" to automatize processing
 
-The full list of features is available in the \ref features page.
+The full list of features is available in the \ref features "features" page.
 
 
 ### Download
