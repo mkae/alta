@@ -30,6 +30,7 @@ if env.GetOption('clean'):
    #shutil.rmtree('glog-0.3.3', True)
    #shutil.rmtree('Ipopt-3.11.8', True)
    #shutil.rmtree('nlopt-2.4.1', True)
+
 else:
    ##
    #   Eigen dependency
@@ -66,7 +67,7 @@ else:
    #   NlOpt dependencies
    ##
    env2 = env.Clone()
-   if not on_windows and not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h') and env['DL_EXTERNALS']:
+   if not library_available(env2, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_DIR', lib='NLOPT_LIB', header='nlopt.h') and env['DL_EXTERNALS']:
            execfile('obtain_nlopt.py')
 
    ##
