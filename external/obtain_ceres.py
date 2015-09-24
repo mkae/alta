@@ -45,14 +45,6 @@ obtained  = obtain.obtain(name, directory, url, filename, sha256)
 ## presence of cmake.
 compile_test = not os.path.exists('.' + os.sep + 'build' + os.sep + 'include' + os.sep + 'ceres')
 
-with open(os.devnull, 'w') as fnull:
-   res = subprocess.call(['cmake', '--version'], stdout = fnull, stderr = fnull, shell=True)
-   if res != 0:
-      compile_test = False
-      W.warn(obtain.AltaDependencyWarning,
-                'CMake is not installed but is needed to build CERES')
-
-
 if obtained and compile_test:
    C.progress_display('configuring and building ' + name)
 

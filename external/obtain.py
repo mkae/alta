@@ -47,7 +47,7 @@ def check_integrity(filename, sha256):
 def download(url, filename):
    if os.path.exists(filename):
       C.progress_display('Package already downloaded')
-      return False
+      return True
 
    try:
       urllib.urlretrieve(url, filename)
@@ -109,7 +109,7 @@ def configure_build(rep, options = ''):
       C.progress_display('Warning: unable to build & install package' + rep)
       os.chdir(os.pardir)
       return False
-   
+
    os.chdir(os.pardir)
    return True
 
@@ -117,19 +117,25 @@ def configure_build(rep, options = ''):
 # package 'rep'. Default options are to build static libs and to
 # install then in the #external/build/ directory.
 def cmake_build(rep, options = ''):
+
    os.chdir(rep)
 
    # Construct the CMake command
    build_dir = os.pardir + os.sep + 'build' + os.sep
-   cmake_cmd = ['cmake', '-DBUILD_SHARED_LIBS=OFF', 
-                '-DCMAKE_INSTALL_PREFIX=' + build_dir, 
+   cmake_cmd = ['cmake', '-DBUILD_SHARED_LIBS=OFF',
+                '-DCMAKE_INSTALL_PREFIX=' + build_dir,
                 '-DCMAKE_BUILD_TYPE=Release']
    if os.name == 'nt' :
       cmake_cmd = cmake_cmd + ['-G', 'NMake Makefiles']
 
-   ret = Popen(cmake_cmd + options.split() + ['.']).wait()
-   if ret != 0:
-      C.progress_display('Warning: unable to configure package' + rep)
+   try:
+      ret = Popen(cmake_cmd + options.split() + ['.']).wait()
+      if ret != 0:
+         C.progress_display('Warning: unable to configure package' + rep)
+         os.chdir(os.pardir)
+         return False
+   except OSError as e:
+      W.warn(AltaDependencyWarning, "execution of '{0}' failed: {1}".format(cmake_cmd, e.strerror))
       os.chdir(os.pardir)
       return False
 
