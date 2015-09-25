@@ -10,7 +10,7 @@ import os, sys
 ## Compiler and build flags.
 ##
 #CXX            = 'g++'
-CCFLAGS        = ['-O3', '-g', '-Wall', '-std=c++11', '-DNDEBUG']
+CCFLAGS        = ['-O3', '-g', '-Wall', '-std=c++11']
 
 
 ## ALTA internal flags
