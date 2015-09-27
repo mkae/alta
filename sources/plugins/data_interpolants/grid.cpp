@@ -21,36 +21,36 @@
 vec get_min(const params::input& param) {
 
    vec res(params::dimension(param));
-	switch(param)
-	{
-		// 1D Parametrizations
-		case params::COS_TH:
+   switch(param)
+   {
+      // 1D Parametrizations
+      case params::COS_TH:
          res[0] = 0.0;
-			break;
-		case params::COS_TK:
+         break;
+      case params::COS_TK:
          res[0] = 0.0;
-			break;
-		case params::COS_TLV:
+         break;
+      case params::COS_TLV:
          res[0] = -1.0;
-			break;
-		case params::COS_TLR:
+         break;
+      case params::COS_TLR:
          res[0] = -1.0;
-			break;
+         break;
 
-			// 2D Parametrizations
-		case params::COS_TH_TD:
+         // 2D Parametrizations
+      case params::COS_TH_TD:
          res[0] = 0.0;
          res[1] = 0.0;
-			break;
-		case params::RUSIN_TH_TD:
+         break;
+      case params::RUSIN_TH_TD:
          res[0] = 0.0;
          res[1] = 0.0;
-			break;
-		case params::ISOTROPIC_TV_PROJ_DPHI:
+         break;
+      case params::ISOTROPIC_TV_PROJ_DPHI:
          res[0] = -0.5*M_PI;
          res[1] = -0.5*M_PI;
-			break;
-		case params::STARK_2D:
+         break;
+      case params::STARK_2D:
          res[0] = 0.0;
          res[1] = 0.0;
          break;
@@ -67,36 +67,36 @@ vec get_min(const params::input& param) {
 vec get_max(const params::input& param) {
 
    vec res(params::dimension(param));
-	switch(param)
-	{
-		// 1D Parametrizations
-		case params::COS_TH:
+   switch(param)
+   {
+      // 1D Parametrizations
+      case params::COS_TH:
          res[0] = 1.0;
-			break;
-		case params::COS_TK:
+         break;
+      case params::COS_TK:
          res[0] = 1.0;
-			break;
-		case params::COS_TLV:
+         break;
+      case params::COS_TLV:
          res[0] = 1.0;
-			break;
-		case params::COS_TLR:
+         break;
+      case params::COS_TLR:
          res[0] = 1.0;
-			break;
+         break;
 
-			// 2D Parametrizations
-		case params::COS_TH_TD:
+         // 2D Parametrizations
+      case params::COS_TH_TD:
          res[0] = 1.0;
          res[1] = 1.0;
-			break;
-		case params::RUSIN_TH_TD:
+         break;
+      case params::RUSIN_TH_TD:
          res[0] = 0.5*M_PI;
          res[1] = 0.5*M_PI;
-			break;
-		case params::ISOTROPIC_TV_PROJ_DPHI:
+         break;
+      case params::ISOTROPIC_TV_PROJ_DPHI:
          res[0] = 0.5*M_PI;
          res[1] = 0.5*M_PI;
-			break;
-		case params::STARK_2D:
+         break;
+      case params::STARK_2D:
          res[0] = 1.0;
          res[1] = 1.0;
          break;
@@ -116,9 +116,9 @@ vec get_max(const params::input& param) {
  *  \brief Data object storing BRDF values on a grid. Can perform linear
  *  interpolation between grid cells
  *
- *  \details 
+ *  \details
  *
- *  It is possible to select the parametrization using the --param NAME 
+ *  It is possible to select the parametrization using the --param NAME
  *  argument when loading the BRDF. The default parametrization is
  *  \ref params::STARK_2D "STARK_2D"
  *
@@ -126,28 +126,28 @@ vec get_max(const params::input& param) {
  *
  */
 class BrdfGrid : public vertical_segment {
-	public:
+   public:
 
       std::vector<int> _size;
 
-		BrdfGrid(const arguments& args) : vertical_segment()
-		{
-			// Set the input and output parametrization
-			_in_param  = params::STARK_2D;
-			_out_param = params::RGB_COLOR;
-			_nX = 2;
-			_nY = 3;
+      BrdfGrid(const arguments& args) : vertical_segment()
+      {
+         // Set the input and output parametrization
+         _in_param  = params::STARK_2D;
+         _out_param = params::RGB_COLOR;
+         _nX = 2;
+         _nY = 3;
 
          initialize(args);
-		}
+      }
 
       void initialize(const arguments& args, bool preallocate = true) {
-			// Allow to load a different parametrization depending on the 
-			// parameters provided.
-			if(args.is_defined("param")) {
-				_in_param = params::parse_input(args["param"]);
+         // Allow to load a different parametrization depending on the
+         // parameters provided.
+         if(args.is_defined("param")) {
+            _in_param = params::parse_input(args["param"]);
             _nX = params::dimension(_in_param);
-			}
+         }
 
          // Get the grid size, by default use an 10^dimX grid
          int N = 1;
@@ -187,7 +187,7 @@ class BrdfGrid : public vertical_segment {
          const auto k = get_indices(x);
          return get_index(k);
       }
-      
+
       inline int get_index(const std::vector<int>& k) const {
 
          int N = 0;
@@ -196,7 +196,7 @@ class BrdfGrid : public vertical_segment {
          }
          return N;
       }
-      
+
       inline std::vector<int> get_indices(const vec& x) const {
 
          std::vector<int> k(dimX());
@@ -216,17 +216,17 @@ class BrdfGrid : public vertical_segment {
          k[_nX-1] = K % _size[_nX-1];
          for(int i=_nX-2; i>=0; --i) {
             K    = (K-k[i+1]) / _size[i+1];
-            k[i] = K % _size[i]; 
+            k[i] = K % _size[i];
          }
-         
+
          return k;
       }
 
       // Obtain the X dimension of vector x from its index in the grid.
       inline void get_abscissa(int N, vec& x) const {
-            
+
          const auto k = get_indices(N);
-         
+
          // Evaluate the abscissa from the vector indices and
          // the min and max. The grid exactly map [0..1]
          for(int i=0; i<_nX; ++i) {
@@ -234,9 +234,9 @@ class BrdfGrid : public vertical_segment {
          }
       }
 
-		// Load data from a file
-		void load(const std::string& filename, const arguments& args)
-		{
+      // Load data from a file
+      void load(const std::string& filename, const arguments& args)
+      {
          std::ifstream file;
 
          // Raise an exception when 'open' fails.
@@ -248,10 +248,10 @@ class BrdfGrid : public vertical_segment {
          initialize(header, false);
 
          load_data_from_text(file, header, *this, args);
-		}
+      }
 
-		void save(const std::string& filename) const 
-		{
+      void save(const std::string& filename) const
+      {
          std::ofstream file;
 
          file.exceptions(std::ios_base::failbit);
@@ -272,7 +272,7 @@ class BrdfGrid : public vertical_segment {
          }
 
          file.close();
-		}
+      }
 
       void save_header(std::ostream& out) const {
          out << "#ALTA HEADER BEGIN" << std::endl;
@@ -283,27 +283,27 @@ class BrdfGrid : public vertical_segment {
          out << "#ALTA HEADER END" << std::endl;
       }
 
-		// Acces to data
-		vec get(int id) const 
-		{
-			return vertical_segment::get(id) ;
-		}
-		inline vec operator[](int i) const 
-		{
-			return get(i) ;
-		}
+      // Acces to data
+      vec get(int id) const
+      {
+         return vertical_segment::get(id) ;
+      }
+      inline vec operator[](int i) const
+      {
+         return get(i) ;
+      }
 
-		void set(const vec& x)
-		{
+      void set(const vec& x)
+      {
          NOT_IMPLEMENTED();
-		}
-		void set(int id, const vec& x)
-		{
+      }
+      void set(int id, const vec& x)
+      {
          vertical_segment::set(id, x);
-		}
+      }
 
-		vec value(const vec& x) const
-		{
+      vec value(const vec& x) const
+      {
          // Get the base index
          const auto k = get_indices(x);
          const int id = get_index(k);
@@ -340,14 +340,12 @@ class BrdfGrid : public vertical_segment {
 
             y += alpha * get(id+cid_s).segment(_nX, _nY);
          }
-         
+
          return y;
-		}
+      }
 };
 
 ALTA_DLL_EXPORT data* provide_data(const arguments& args)
 {
     return new BrdfGrid(args);
 }
-
-
