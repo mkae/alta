@@ -15,7 +15,7 @@
 
 struct param_info
 {
-	param_info(std::string n, int d, std::string i) : 
+	param_info(std::string n, int d, std::string i) :
         name(n), dimension(d), info(i) { }
 
 	std::string name;
@@ -159,19 +159,19 @@ void params::to_cartesian(const double* invec, params::input intype,
 		{
 			const double Hx = invec[0];
 			const double Hy = 0;
-      const double sum = Hx*Hx + invec[1]*invec[1];
-			const double Hz = sqrt(1.0 - std::min(sum, 1.0));
-                             ;
+         const double sum = Hx*Hx + invec[1]*invec[1];
+			const double Hz = (sum <= 1.0) ? sqrt(1.0 - std::min(sum, 1.0)) : -1.0;
+
 			// Ensuring that <H,B> = 0.
 			const double Bx = 0.0;
 			const double By = invec[1];
 			const double Bz = 0.0;
 
-      assert(Hz >= 0 && Hz <= 1);
+         //assert(Hz >= 0 && Hz <= 1);
 			outvec[0] = Hx-Bx;
 			outvec[1] = Hy-By;
 			outvec[2] = Hz-Bz;
-			outvec[3] = Hx+Bx; 
+			outvec[3] = Hx+Bx;
 			outvec[4] = Hy+By;
 			outvec[5] = Hz+Bz;
 		}
@@ -314,11 +314,11 @@ void params::to_cartesian(const double* invec, params::input intype,
 			const double Bx = invec[1]*sinThe*cosPhi;
 			const double By = invec[1]*sinThe*sinPhi;
 			const double Bz = invec[1]*cosThe;
-			
+
 			outvec[0] = Hx-Bx;
 			outvec[1] = Hy-By;
 			outvec[2] = Hz-Bz;
-			outvec[3] = Hx+Bx; 
+			outvec[3] = Hx+Bx;
 			outvec[4] = Hy+By;
 			outvec[5] = Hz+Bz;
 		}
@@ -333,7 +333,7 @@ void params::to_cartesian(const double* invec, params::input intype,
 			outvec[1] =   sinPhi*invec[1];
 			outvec[3] =   invec[0] - cosPhi*invec[1];
 			outvec[4] = - sinPhi*invec[1];
-	
+
 			// Safeguard, if the vectors are not under unit length return an
 			// invalid configuration
 			if(outvec[0]*outvec[0]+outvec[1]*outvec[1] > 1.0 ||
@@ -436,13 +436,13 @@ void params::from_cartesian(const double* invec, params::input outtype,
 	std::cout << " ENTERING from_cartesian with outtype = " << get_name(outtype) << std::endl;
 	std::cout << " invec = " << invec[0] <<  " " << invec[1] << " " << invec[2] << " " << invec[3]
 						<< "  " << invec[4] << " " << invec[5] << std::endl;
-	#endif 
+	#endif
 
 	// Compute the half vector.
   vec half(3);
   half_vector(invec, half);
 
-	// Difference vector 
+	// Difference vector
 	double diff[3];
 
 	switch(outtype)
@@ -484,7 +484,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
 		}
 			break;
 		// outvec[0] = ||Hp|| Norm of the projected unormalized Half vector
-		//             H = (V+L)/2 
+		//             H = (V+L)/2
 		// outvec[1] = ||B|| Norm of the unormalized Back vector B = (L-V)/2
 		case STARK_2D:
 		{
@@ -551,9 +551,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			outvec[2] = atan2(invec[4], invec[3]) - atan2(invec[1], invec[0]);
 			break;
 		case params::RUSIN_VH:
-			outvec[0] = half[0];  
-			outvec[1] = half[1];  
-			outvec[2] = half[2];  
+			outvec[0] = half[0];
+			outvec[1] = half[1];
+			outvec[2] = half[2];
 			break;
       case params::SCHLICK_VK:
       {
@@ -731,7 +731,7 @@ params::input params::parse_input(const std::string& txt)
 	std::cout << "<<INFO>> the input parametrization is UNKNOWN_INPUT" << std::endl;
 	return params::UNKNOWN_INPUT;
 }
-        
+
 params::output params::parse_output(const std::string& txt)
 {
 	if(txt == std::string("ENERGY"))
