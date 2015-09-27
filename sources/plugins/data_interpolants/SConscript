@@ -4,4 +4,47 @@ env = env.Clone()
 # Special linking flags, defined in the OS dependant configuration file
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
+
+build_rbf_lib = False
+build_mat_lib = False
+
+test_env = env.Clone()
+test_env.AppendUnique(LIBS    = env['FLANN_LIB'])
+test_env.AppendUnique(LIBPATH = env['FLANN_DIR'])
+test_env.AppendUnique(CPPPATH = env['FLANN_INC'])
+test_env.AppendUnique(LIBS    = env['CGAL_LIB'])
+test_env.AppendUnique(LIBPATH = env['CGAL_DIR'])
+test_env.AppendUnique(CPPPATH = env['CGAL_INC'])
+test_env.AppendUnique(LIBS    = env['MATLAB_LIB'])
+test_env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
+test_env.AppendUnique(CPPPATH = env['MATLAB_INC'])
+
+conf = Configure(test_env)
+# Check for the presence of FLANN lib
+if conf.CheckLibWithHeader(env['FLANN_LIB'], 'flann/flann.hpp', 'CXX'):
+   build_rbf_lib = True
+   env.AppendUnique(LIBS    = env['FLANN_LIB'])
+   env.AppendUnique(LIBPATH = env['FLANN_DIR'])
+   env.AppendUnique(CPPPATH = env['FLANN_INC'])
+
+# Check for the presence of CGAL lib
+if conf.CheckLibWithHeader(env['CGAL_LIB'], 'flann/flann.hpp', 'CXX'):
+   build_rbf_lib = True
+   env.AppendUnique(LIBS    = env['CGAL_LIB'])
+   env.AppendUnique(LIBPATH = env['CGAL_DIR'])
+   env.AppendUnique(CPPPATH = env['CGAL_INC'])
+
+# Check for the presence of Matlab lib
+if conf.CheckLibWithHeader(env['MATLAB_LIB'], 'engine.h', 'CXX'):
+   build_mat_lib = True
+   env.AppendUnique(LIBS    = env['MATLAB_LIB'])
+   env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
+   env.AppendUnique(CPPPATH = env['MATLAB_INC'])
+
+test_env = conf.Finish()
+
 env.SharedLibrary('../../build/data_grid', ['grid.cpp'])
+if(build_rbf_lib):
+   env.SharedLibrary('../../build/data_interpolant_rbf', ['rbf.cpp'])
+if(build_mat_lib):
+   env.SharedLibrary('../../build/data_interpolant_matlab', ['matlab.cpp'])
