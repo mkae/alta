@@ -1,0 +1,36 @@
+/*!
+
+\page data Data
+
+In this page, we link to the datasets you can read and manipulate with ALTA:
+<p>
+ + [MERL](http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs): a set of roughly a hundred measured isotropic BRDFs with an imaging system.
+</p>
+<p>
+ + [UTIA](http://btf.utia.cas.cz/?brdf_dat_dwn): a set of anisotropic BRDFs measured with a gonio-reflectometer.
+</p>
+<p>
+ + [Cornell](http://www.graphics.cornell.edu/online/measurements/reflectance): a set of isotropic BRDF measured with a gonio-reflectometer.
+</p>
+<p>
+ + Retro-reflective materials: a set of three retro-reflective materials captured with a special gonio-reflectometer (see [here](http://hal.inria.fr/)). Each data file contains dense measurements for three light incidences. Note that those datasets are too sparse in elevation to be used directly for rendering. We advise to first fit them to a retro-reflective BRDF model.
+@htmlonly
+<center >
+<table id="image-table" style="border-spacing:10px 0px">
+   <tr>
+      <td><img src="retro-3M-jaune.jpg" width="150px"/></td>
+      <td><img src="retro-gray-tape.jpg" width="150px"/></td>
+      <td><img src="retro-orange-tape.jpg" width="150px"/></td>
+   </tr>
+   <tr>
+      <td style="text-align:center"><a href="retro-3M-jaune.dat">3M Jaune</a></td>
+      <td style="text-align:center"><a href="retro-gray-tape.dat">Gray tape</a></td>
+      <td style="text-align:center"><a href="retro-orange-tape.dat">Orange tape</a></td>
+   </tr>
+</table>
+</center>
+@endhtmlonly
+</p>
+\todo Add the different files in the repo. Need to know which one to put!
+
+*/
