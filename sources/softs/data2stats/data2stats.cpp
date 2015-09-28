@@ -193,15 +193,15 @@ class Norm
 };
 
 //Returns true if the conversion was successful
-bool convertDataToFunctionParam(ptr<data> const & data,
-      ptr<function> const & f,
+bool convertDataToFunctionParam(ptr<data> const & d,
+      ptr<data> const & f,
       bool & conversion_necessary,
       vertical_segment* & converted_data )
 {
    conversion_necessary = true;
-   if( data->input_parametrization() == f->input_parametrization() )
+   if( d->input_parametrization() == f->input_parametrization() )
    {
-      if( data->output_parametrization() == f->output_parametrization() )
+      if( d->output_parametrization() == f->output_parametrization() )
       {
          conversion_necessary = false;
          return true;
@@ -209,30 +209,31 @@ bool convertDataToFunctionParam(ptr<data> const & data,
       else // Ouput parametrizations are different.
          // Output parametrization of  the Function prevails
       {
-         converted_data = new vertical_segment( data->input_parametrization(),
-               f->output_parametrization(),
-               data->size() );
-         converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+         converted_data = new vertical_segment(d->input_parametrization(),
+                                               f->output_parametrization(),
+                                               d->size());
+         converted_data->setParametrizations(f->input_parametrization(),
+                                             f->output_parametrization());
 
          //Note that: data_x = dat.head( data->dimX() );
          //           data_y = dat.tail( data->dimY() );
-         vec dat        = vec::Zero( data->dimX() + data->dimY() );
-         vec data_x     = vec::Zero( data->dimX() );
-         vec data_y     = vec::Zero( data->dimY() );
-         vec new_data_y = vec::Zero( f->dimY() );
-         vec new_data   = vec::Zero(data->dimX() + f->dimY() );
+         vec dat        = vec::Zero(d->dimX() + d->dimY());
+         vec data_x     = vec::Zero(d->dimX());
+         vec data_y     = vec::Zero(d->dimY());
+         vec new_data_y = vec::Zero(f->dimY());
+         vec new_data   = vec::Zero(d->dimX() + f->dimY());
 
          for( unsigned int i=0; i < converted_data->size(); i++)
          {
-            dat = data->get(i);
-            data_x = dat.head( data->dimX() );
-            data_y = dat.tail( data->dimY() );
+            dat = d->get(i);
+            data_x = dat.head( d->dimX() );
+            data_y = dat.tail( d->dimY() );
 
-            params::convert( &data_y[0], data->output_parametrization(), data->dimY(),
-                  f->output_parametrization(), f->dimY(),  &new_data_y[0]);
+            params::convert(&data_y[0], d->output_parametrization(), d->dimY(),
+                  f->output_parametrization(), f->dimY(), &new_data_y[0]);
 
-            new_data.head( data->dimX() ) = data_x;
-            new_data.tail( f->dimY() )    = new_data_y;
+            new_data.head(d->dimX()) = data_x;
+            new_data.tail(f->dimY()) = new_data_y;
 
             converted_data->set(i, new_data );
          }
@@ -243,30 +244,30 @@ bool convertDataToFunctionParam(ptr<data> const & data,
    {
       // Output param are the same
       // Converting to the function input parametrization
-      if( data->output_parametrization() == f->output_parametrization() )
+      if( d->output_parametrization() == f->output_parametrization() )
       {
 
-         converted_data = new vertical_segment( f->dimX(), f->dimY(), data->size() );
+         converted_data = new vertical_segment( f->dimX(), f->dimY(), d->size() );
          converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
 
          //Note that: data_x = dat.head( data->dimX() );
          //           data_y = dat.tail( data->dimY() );
-         vec dat        = vec::Zero( data->dimX() + data->dimY() );
-         vec data_x     = vec::Zero( data->dimX() );
-         vec data_y     = vec::Zero( data->dimY() );
+         vec dat        = vec::Zero(d->dimX() + d->dimY());
+         vec data_x     = vec::Zero(d->dimX());
+         vec data_y     = vec::Zero(d->dimY());
 
-         vec new_data = vec::Zero( f->dimX() + f->dimY() );
-         vec new_data_y = vec::Zero( f->dimY() );
-         vec new_data_x = vec::Zero( f->dimX() );
+         vec new_data   = vec::Zero(f->dimX() + f->dimY());
+         vec new_data_y = vec::Zero(f->dimY());
+         vec new_data_x = vec::Zero(f->dimX());
 
          for( unsigned int i=0; i < (unsigned int) converted_data->size(); i++)
          {
 
-            dat = data->get(i);
-            data_x = dat.head( data->dimX() );
-            data_y = dat.tail( data->dimY() );
+            dat    = d->get(i);
+            data_x = dat.head(d->dimX());
+            data_y = dat.tail(d->dimY());
 
-            params::convert( &data_x[0], data->input_parametrization() ,
+            params::convert( &data_x[0], d->input_parametrization() ,
                   f->input_parametrization(), &new_data_x[0] );
 
             new_data.head( f->dimX() ) = new_data_x;
@@ -487,15 +488,15 @@ int main(int argc, char* argv[])
    ptr<data> generic_data = dynamic_pointer_cast<data>( vs_data );
 
    vertical_segment*   conv_vs = NULL;
-   bool conversion_necessary = false;
+   bool conversion_necessary = true;
    std::cout << "<<INFO>> Converting data to function parametrization if needed" << std::endl;
 
 
-   // t.start();
-   // convertDataToFunctionParam( generic_data, ref, conversion_necessary, conv_vs );
-   // t.stop();
-   // std::cout << "<<INFO>> Data converted in " << t << std::endl;
-   // t.reset();
+   t.start();
+   convertDataToFunctionParam( generic_data, ref, conversion_necessary, conv_vs );
+   t.stop();
+   std::cout << "<<INFO>> Data converted in " << t << std::endl;
+   t.reset();
 
    ptr<data> converted_data = NULL;
    if( conversion_necessary )
