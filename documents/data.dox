@@ -13,7 +13,7 @@ In this page, we link to the datasets you can read and manipulate with ALTA:
  + [Cornell](http://www.graphics.cornell.edu/online/measurements/reflectance): a set of isotropic BRDF measured with a gonio-reflectometer.
 </p>
 <p>
- + Retro-reflective materials: a set of three retro-reflective materials captured with a special gonio-reflectometer (see [here](http://hal.inria.fr/)). Each data file contains dense measurements for three light incidences. Note that those datasets are too sparse in elevation to be used directly for rendering. We advise to first fit them to a retro-reflective BRDF model.
+ + Retro-reflective materials: a set of three retro-reflective materials captured with a special gonio-reflectometer (see [here](http://hal.inria.fr/) for details). Each data file contains dense measurements for three light incidences. Note that those datasets are too sparse in elevation to be used directly for rendering. We advise to first fit them to a retro-reflective BRDF model.
 @htmlonly
 <center >
 <table id="image-table" style="border-spacing:10px 0px">
