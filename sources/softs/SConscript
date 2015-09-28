@@ -7,3 +7,4 @@ SConscript('brdf2data/SConscript')
 SConscript('brdf2gnuplot/SConscript')
 
 SConscript('fit2stat/SConscript')
+SConscript('data2stats/SConscript')
