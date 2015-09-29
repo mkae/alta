@@ -18,14 +18,19 @@ In this page, we link to the datasets you can read and manipulate with ALTA:
 <center >
 <table id="image-table" style="border-spacing:10px 0px">
    <tr>
+      <td style="text-align:center"><strong>3M Yellow</strong></td>
+      <td style="text-align:center"><strong>Gray tape</strong></td>
+      <td style="text-align:center"><strong>Orange tape</strong></td>
+   </tr>
+   <tr>
       <td><img src="retro-3M-jaune.jpg" width="150px"/></td>
       <td><img src="retro-gray-tape.jpg" width="150px"/></td>
       <td><img src="retro-orange-tape.jpg" width="150px"/></td>
    </tr>
    <tr>
-      <td style="text-align:center"><a href="retro-3M-jaune.dat">3M Jaune</a></td>
-      <td style="text-align:center"><a href="retro-gray-tape.dat">Gray tape</a></td>
-      <td style="text-align:center"><a href="retro-orange-tape.dat">Orange tape</a></td>
+      <td style="text-align:center"><a href="retro-3M-jaune.dat"   >Original data</a></td>
+      <td style="text-align:center"><a href="retro-gray-tape.dat"  >Original data</a></td>
+      <td style="text-align:center"><a href="retro-orange-tape.dat">Original data</a></td>
    </tr>
 </table>
 </center>
