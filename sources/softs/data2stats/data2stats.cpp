@@ -194,7 +194,7 @@ class Norm
 
 //Returns true if the conversion was successful
 bool convertDataToFunctionParam(ptr<data> const & d,
-      ptr<data> const & f,
+      ptr<parametrized> const & f,
       bool & conversion_necessary,
       vertical_segment* & converted_data )
 {
@@ -493,7 +493,7 @@ int main(int argc, char* argv[])
 
 
    t.start();
-   convertDataToFunctionParam( generic_data, ref, conversion_necessary, conv_vs );
+   convertDataToFunctionParam( generic_data, dynamic_pointer_cast<parametrized>(ref), conversion_necessary, conv_vs );
    t.stop();
    std::cout << "<<INFO>> Data converted in " << t << std::endl;
    t.reset();
