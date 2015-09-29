@@ -32,9 +32,15 @@ In this page, we link to the datasets you can read and manipulate with ALTA:
       <td style="text-align:center"><a href="retro-gray-tape.dat"  >Original data</a></td>
       <td style="text-align:center"><a href="retro-orange-tape.dat">Original data</a></td>
    </tr>
+   <tr>
+      <td style="text-align:center"><a href="retro-3M-jaune-dense.dat"   >Used data</a></td>
+      <td style="text-align:center"><a href="retro-gray-tape-dense.dat"  >Used data</a></td>
+      <td style="text-align:center"><a href="retro-orange-tape-dense.dat">Used data</a></td>
+   </tr>
 </table>
 </center>
 @endhtmlonly
+We prodive the original dataset as well as the densified dataset (using Matlab interpolation) that was used to perform fitting of the different retroreflection models. An example of fitting xml script can be found [here](retro-3M-yellow-abc.xml).
 </p>
 \todo Add the different files in the repo. Need to know which one to put!
 
