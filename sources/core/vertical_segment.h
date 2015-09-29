@@ -30,46 +30,49 @@
  *
  *  This class implement a data representation of vertical segments in the
  *  sens of Pacanowski et al. [2012]. Each data point is in fact composed
- *  of a middle point \f$ x \f$ and an upper \f$ \overline{x} \f$ and lower 
+ *  of a middle point \f$ x \f$ and an upper \f$ \overline{x} \f$ and lower
  *  bound \f$ \underline{x} \f$.
  *
- *  To retreive the complete vertical segment data \f$ [x, \underline{x}, 
- *  \overline{x}] \f$, a special function is provided. The functions 
+ *  To retreive the complete vertical segment data \f$ [x, \underline{x},
+ *  \overline{x}] \f$, a special function is provided. The functions
  *  inherited from \a data will only return the middle point.
  *
  *  It is possible to load regular ALTA file using a vertical segment data
- *  loader. It will automatically generate vertical segments. You can 
+ *  loader. It will automatically generate vertical segments. You can
  *  control the behaviour of the vertical segments using the following
  *  option in the command line:
- *  <ul>
- *		<li><b>\-\-dt</b> specify the size of the vertical segment. If the 
- *		option <b>\-\-dt-relative</b> is not set, this size is absolute: \f$ [x,
- *		x - dt, x + dt] \f$. If the <b>\-\-dt-relative</b> option is set, the 
- *		vertical segment size is relative to the middle point value \f$ x \f$: 
- *		\f$ [x, x (1 - dt), x (1 + dt)] \f$. You can specify the vertical
- *		segment to be equal to the max of the relative and absolute sizes
- *		using the <b>\-\-dt-max</b> option.
- *		<li><b>\-\-data-positive</b> for the vertical segment to stay in the 
+ *
+ *	 + <strong>\-\-dt</strong> specify the size of the vertical segment. If the
+ *		 option <strong>\-\-dt-relative</strong> is not set, this size is absolute: \f$ [x,
+ *		 x - dt, x + dt] \f$. If the <strong>\-\-dt-relative</strong> option is set, the
+ *		 vertical segment size is relative to the middle point value \f$ x \f$:
+ *		 \f$ [x, x (1 - dt), x (1 + dt)] \f$. You can specify the vertical
+ *		 segment to be equal to the max of the relative and absolute sizes
+ *		 using the <strong>\-\-dt-max</strong> option.
+ *
+ *   + <strong>\-\-data-positive</strong> for the vertical segment to stay in the
  *		positive region. The negative values are replaced by zeros.
- *  </ul>
+ *
  *
  *  The data of the vertical segment can be restricted to subpart of the
  *  original data by specifying the bounding box of the input and output
  *  domain:
- *  <ul>
- *		<li><b>\-\-min</b> <it>[vec]</it> specify the minimun input 
- *		coordinate that should be loaded. All data with input coordinate
- *		less than this vector will be discarded.
- *		<li><b>\-\-max</b> <it>[vec]</it> specify the maximum input 
- *		coordinate that should be loaded. All data with input coordinate
- *		greater than this vector will be discarded.
- *		<li><b>\-\-ymin</b> <it>[vec]</it> specify the minimun output 
+ *
+ *	 + <strong>\-\-min</strong> <em>[vec]</em> specify the minimun input
+ *	   coordinate that should be loaded. All data with input coordinate
+ *	   less than this vector will be discarded.
+ *
+ *	 + <strong>\-\-max</strong> <em>[vec]</em> specify the maximum input
+ *	   coordinate that should be loaded. All data with input coordinate
+ *		 greater than this vector will be discarded.
+ *
+ *   + <strong>\-\-ymin</strong> <em>[vec]</em> specify the minimun output
  *		coordinate that should be loaded. All data with associated value
  *		less than this vector will be discarded.
- *		<li><b>\-\-ymax</b> <it>[vec]</it> specify the maximum output 
+ *
+ *   + <strong>\-\-ymax</strong> <em>[vec]</em> specify the maximum output
  *		coordinate that should be loaded. All data with associated value
  *		greater than this vector will be discarded.
- *	 </ul>
  */
 class vertical_segment : public data
 {
@@ -85,7 +88,7 @@ class vertical_segment : public data
 
     //! \brief Construct vertical segment data for a given size and where the size of each element
     //! is also given. All data are initialized to zero
-    vertical_segment( params::input in_param, 
+    vertical_segment( params::input in_param,
                       params::output out_param,
                       unsigned int size );
 
@@ -106,7 +109,7 @@ class vertical_segment : public data
 
 
 		// Acces to data
-		virtual vec get(int i) const ;		
+		virtual vec get(int i) const ;
 		virtual vec operator[](int i) const;
 
       virtual vec value(const vec&) const
@@ -117,14 +120,14 @@ class vertical_segment : public data
 		//! \brief Put the sample inside the data
 		virtual void set(const vec& x);
 		virtual void set(int i, const vec& x);
-		
+
 		//! \brief Specific accessor to a vertical segment, this gives the
 		//! complete vector, plus the ordinate segment
 		virtual void get(int i, vec &x, vec &yl, vec &yu) const ;
 
-		//! \brief Specific accessor to a vertical segment. Provides only the 
+		//! \brief Specific accessor to a vertical segment. Provides only the
 		//! ordinate segment.
-		virtual void get(int i, vec& yl, vec& yu) const ;		
+		virtual void get(int i, vec& yl, vec& yu) const ;
 
 		// Get data size
 		virtual int size() const ;
