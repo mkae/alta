@@ -100,7 +100,7 @@ class quadratic_program
 			Eigen::VectorXd g (m) ;
 			Eigen::VectorXd ci(n) ;
 			Eigen::MatrixXd CE(m, 0) ;
-			Eigen::VectorXd ce(long(0)) ;
+			Eigen::VectorXd ce ;
 
 			if(_compute_delta)
 			{
