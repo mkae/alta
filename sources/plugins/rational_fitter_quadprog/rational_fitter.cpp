@@ -155,7 +155,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
   MatrixXd CI(N, 2*M) ; CI.setZero();
   VectorXd ci(2*M) ;    ci.setZero();
   MatrixXd CE(N, 0) ;   CE.setZero();
-  VectorXd ce(long(0)) ;ce.setZero();
+  VectorXd ce;
 
   // Select the size of the result vector to
   // be equal to the dimension of p + q
