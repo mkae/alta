@@ -1,10 +1,6 @@
 /*!
 \page documentation Documentation
 
-
-<!-- This page lists all documentation related to the ALTA library. -->
-
-
 #### APIs
 
 ALTA provides two programming APIs. At the lowest level, it is possible to author new \ref plugins "plugins" and \ref commands "commands" using the C++ API. At the highest level, it is possible to build Python scripts by directly manipulating plugins in this language.
@@ -35,6 +31,4 @@ Below are referenced all the different plugins and softwares provided with ALTA.
 + List of plugins to fit data (cf. \ref fitters)
 + List of BRDF Models (cf. \ref functions)
 + List of provided ALTA sofwares (cf. \ref commands)
-
-
 */
