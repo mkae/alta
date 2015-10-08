@@ -4,7 +4,7 @@
 
 In this page, we link to the datasets you can read and manipulate with ALTA:
 <p>
- + [MERL](http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs): a set of roughly a hundred measured isotropic BRDFs with an imaging system.
+ + [MERL](http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs): a set of roughly a hundred measured isotropic BRDFs acquired with an imaging system.
 </p>
 <p>
  + [UTIA](http://btf.utia.cas.cz/?brdf_dat_dwn): a set of anisotropic BRDFs measured with a gonio-reflectometer.
@@ -13,7 +13,7 @@ In this page, we link to the datasets you can read and manipulate with ALTA:
  + [Cornell](http://www.graphics.cornell.edu/online/measurements/reflectance): a set of isotropic BRDF measured with a gonio-reflectometer.
 </p>
 <p>
- + Retro-reflective materials: a set of three retro-reflective materials captured with a special gonio-reflectometer (see [here](http://hal.inria.fr/) for details). Each data file contains dense measurements for three light incidences. Note that those datasets are too sparse in elevation to be used directly for rendering. We advise to first fit them to a retro-reflective BRDF model.
+ + Retro-reflective materials: a set of three retro-reflective materials captured with a special gonio-reflectometer built at [CEA-CESTA](http://www-dam.cea.fr/organisation-competences/cesta.html) (see [here](https://hal.inria.fr/hal-01083366/) for details). Each data file contains dense measurements for three light incidences. Note that those datasets are too sparse in elevation to be used directly for rendering. We advise to first fit them to a retro-reflective BRDF model.
 @htmlonly
 <center >
 <table id="image-table" style="border-spacing:10px 0px">
@@ -33,13 +33,13 @@ In this page, we link to the datasets you can read and manipulate with ALTA:
       <td style="text-align:center"><a href="retro-orange-tape.dat">Original data</a></td>
    </tr>
    <tr>
-      <td style="text-align:center"><a href="retro-3M-jaune-dense.dat"   >Used data</a></td>
-      <td style="text-align:center"><a href="retro-gray-tape-dense.dat"  >Used data</a></td>
-      <td style="text-align:center"><a href="retro-orange-tape-dense.dat">Used data</a></td>
+      <td style="text-align:center"><a href="retro-3M-jaune-dense.dat"   >Densified data</a></td>
+      <td style="text-align:center"><a href="retro-gray-tape-dense.dat"  >Densified data</a></td>
+      <td style="text-align:center"><a href="retro-orange-tape-dense.dat">Densified data</a></td>
    </tr>
 </table>
 </center>
 @endhtmlonly
-We prodive the original dataset as well as the densified dataset (using Matlab interpolation) that was used to perform fitting of the different retroreflection models. An example of fitting xml script can be found [here](retro-3M-yellow-abc.xml).
+We provide the original dataset as well as the densified dataset (using Matlab interpolation) that were used to perform fitting of the different retroreflection models. An example of fitting xml script can be found [here](retro-3M-yellow-abc.xml).
 </p>
 */

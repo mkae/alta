@@ -21,7 +21,7 @@ ALTA is compatible with many tools to either visualize results, perform renderin
 </p>
 
 <p>
- + [Mitsuba](http://mitsuba-renderer.org/) - All renders on this webpage were done using a Mitsuba plugin that permits to use ALTA's BRDF models and data inside Mitsuba. Check the [GitHub page](https://github.com/belcour/AltaBRDF) for more details.
+ + [Mitsuba](http://mitsuba-renderer.org/) - All rendered images on this webpage were done using a Mitsuba plugin that permits to use ALTA's BRDF models and data inside Mitsuba. Check the [GitHub page](https://github.com/belcour/AltaBRDF) for more details.
 </p>
 <!-- TODO:  Manao BRDF Explorer. Benjamin Python Scripts and Shell commands scripts ? -->
 */
