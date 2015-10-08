@@ -29,17 +29,17 @@
  *  A vertical segment data class
  *
  *  This class implement a data representation of vertical segments in the
- *  sens of Pacanowski et al. [2012]. Each data point is in fact composed
+ *  sense of Pacanowski et al. [2012]. Each data point is in fact composed
  *  of a middle point \f$ x \f$ and an upper \f$ \overline{x} \f$ and lower
  *  bound \f$ \underline{x} \f$.
  *
- *  To retreive the complete vertical segment data \f$ [x, \underline{x},
+ *  To retrieve the complete vertical segment data \f$ [x, \underline{x},
  *  \overline{x}] \f$, a special function is provided. The functions
  *  inherited from \a data will only return the middle point.
  *
  *  It is possible to load regular ALTA file using a vertical segment data
  *  loader. It will automatically generate vertical segments. You can
- *  control the behaviour of the vertical segments using the following
+ *  control the behavior of the vertical segments using the following
  *  option in the command line:
  *
  *  + <strong>\-\-dt</strong> specify the size of the vertical segment. If the
