@@ -56,6 +56,8 @@ class rational_function_legendre_1d : public rational_function_1d
  *  page). Consequently, they qre less performant compared to Chebychev polynomials
  *  for higher order expansions. The first terms of the basis are hard coded.
  *
+ *  For more details see the addendum on Rational BRDF available at https://hal.inria.fr/hal-00913516
+ *
  *  \author Laurent Belcour \<laurent.belcour@umontreal.ca\>
  *
  */
