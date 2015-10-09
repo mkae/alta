@@ -14,8 +14,6 @@ if library_available(env, pkgspec='python-2.7',
 	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
 	if conf.CheckLib(env['OPENMP_LIB']):
 		env.AppendUnique(LIBS    = env['OPENMP_LIB'])
-	#end
-
 
 	# On GNU/Linux the '-mt' suffix is no longer used, but it is still
 	# used on some other platforms (see
@@ -26,7 +24,7 @@ if library_available(env, pkgspec='python-2.7',
 		build_lib = conf.CheckLibWithHeader('boost_python',
 														            'boost/python.hpp', 'c++')
 
-	conf.Finish()
+	env = conf.Finish()
 
 if build_lib:
 	env.Prepend(LIBS = ['core'])

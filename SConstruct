@@ -216,7 +216,7 @@ if conf.CheckLibWithHeader('rt', 'sched.h', 'c++'):
 
 Export('ALTA_LIBS')
 
-conf.Finish()
+env = conf.Finish()
 
 ## Load the configuration file if it exists. The configuration file
 ## is a python script that updates the env variable with different
@@ -231,7 +231,7 @@ env.AppendUnique(CPPPATH = ['#sources'])
 env.Decider('timestamp-newer')
 
 ## Launch the compilations
-##l
+##
 Export('env')
 
 external = env.SConscript('external/SConscript')

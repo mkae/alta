@@ -17,4 +17,3 @@ if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_D
 	env.AppendUnique(LIBS = libs)
 
 	env.SharedLibrary('../../build/nonlinear_fitter_ceres', 'fitter.cpp')
-#end

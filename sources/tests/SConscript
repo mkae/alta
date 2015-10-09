@@ -17,7 +17,7 @@ env.AppendUnique(LIBS = ALTA_LIBS)
 
 conf = Configure(env)
 have_cppquickcheck = conf.CheckLibWithHeader('cppqc', 'cppqc.h', 'C++')
-conf.Finish()
+env = conf.Finish()
 
 # Portability.
 def library_search_path_variable():

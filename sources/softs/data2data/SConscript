@@ -12,7 +12,7 @@ if env['OPENMP_LIB']:
 	   env.AppendUnique(LIBS = env['OPENMP_LIB'])
    #end
 #end
-conf.Finish()
+env = conf.Finish()
 
 # Soft Sources
 sources = ['main.cpp']

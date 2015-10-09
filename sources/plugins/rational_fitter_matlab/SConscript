@@ -13,14 +13,12 @@ build_lib = False
 conf = Configure(env)
 
 if conf.CheckLib(env['MATLAB_LIB'], language='c++'):
-
 	build_lib = True
 else:
 	W.warn(W.DependencyWarning, "unable to find MATLAB for Rational Fitter")
 
-conf.Finish()
+env = conf.Finish()
 
 if build_lib:
 	sources = ['rational_fitter.cpp']
 	env.SharedLibrary('../../build/rational_fitter_matlab', sources)
-#end
