@@ -1,15 +1,13 @@
 Import('env')
 env = env.Clone()
 
+# We always build Quadprog++ in external/ so no need to check for its
+# availability: this plugin can always be built.
+
 env.AppendUnique(CPPPATH = env['QUADPROG_INC'])
 env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
 env.AppendUnique(LIBS    = env['QUADPROG_LIB'])
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 
-conf = Configure(env)
-build_lib = conf.CheckLib(env['QUADPROG_LIB'], language='c++')
-env = conf.Finish()
-
-if build_lib:
-	sources = ['rational_fitter.cpp']
-	env.SharedLibrary('../../build/rational_fitter_quadprog', sources)
+sources = ['rational_fitter.cpp']
+env.SharedLibrary('../../build/rational_fitter_quadprog', sources)
