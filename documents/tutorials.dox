@@ -1,20 +1,20 @@
 /*!
 \page tutorials Tutorials
-  
+
 ### Forewords
 
 ALTA organizes BRDF analysis and modeling into atomic \ref commands "programs" (coordinate transforms, sub-space integration, parameters estimation, `etc`) that are combined with plugins. Programs work on three types of plugins: \ref functions "BRDFs", \ref datas "datas", and \ref fitters "fitters". Plugins can input or output files. BRDFs, data and fitters can be provided by users through dynamic libraries. This makes ALTA easily extensible. Programs are executed using command line instructions and can be chained to generate scripts. We pro vide a higher level interface to build scripts using XML and \ref python.
 
 In every example, we denotes command line execution using:
 
-    $ do-something 
+    $ do-something
 
 And Python scripts using:
 
     >>> import alta
 
 <br />
-### Tutorials 
+### Tutorials
 
 #### Tutorials using the command line
 
@@ -80,6 +80,13 @@ To convert this brdf file to be used in another software (here matlab), you will
 
 \ref brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann distribution).
 
+@htmlonly
+<br />
+Here we provide the resulting BRDF file:
+<center>
+<a href="Kirby2.brdf"><img src="brdf.png" alt="BRDF file" width="80px" /></a>
+</center>
+@endhtmlonly
 
 
 
@@ -306,7 +313,7 @@ will download the dataset and
 
     $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice
 
-this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice. By default, the \ref data_brdf_slice exports in the  \ref params::STARK_2D "STARK_2D" parametrization. But it is also possible to use other kind of 2D parametrization such as \ref params::RUSIN_TH_TD "RUSIN_TH_TD" using the `--param [string]` option (see \ref params for the complete list): 
+this conversion requires to use the \ref data_merl and \ref data_brdf_slice plugins to load MERL binary files and convert them into and HDR image slice. By default, the \ref data_brdf_slice exports in the  \ref params::STARK_2D "STARK_2D" parametrization. But it is also possible to use other kind of 2D parametrization such as \ref params::RUSIN_TH_TD "RUSIN_TH_TD" using the `--param [string]` option (see \ref params for the complete list):
 
     $ data2data --input red-fabric.binary --in-data data_merl --output red-fabric.exr --out-data data_brdf_slice --param RUSIN_TH_TD
 
