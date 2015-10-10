@@ -81,11 +81,17 @@ To convert this brdf file to be used in another software (here matlab), you will
 \ref brdf2brdf converts an ALTA brdf file into another format such as Matlab m file, C++ code, or BRDF Explorer shader. Note that this tool cannot convert to another ALTA file (e.g., converting a Blinn lobe to a Beckmann distribution).
 
 @htmlonly
-<br />
-Here we provide the resulting BRDF file:
+<p>
+Here we provide the resulting BRDF file and the XML script used to generate it:
 <center>
-<a href="Kirby2.brdf"><img src="brdf.png" alt="BRDF file" width="80px" /></a>
+<table>
+   <tr>
+      <td><a href="Kirby2.brdf"><img src="brdf.png" alt="BRDF file" height="80px" /></a></td>
+      <td><a href="Kirby2.xml"><img src="xml.png" alt="BRDF file" height="80px" /></a></td>
+   </tr>
+</table>
 </center>
+</p>
 @endhtmlonly
 
 

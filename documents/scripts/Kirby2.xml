@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<alta>
+	<action name="data2brdf">
+		<!-- Input and output arguments of the action -->
+		<input name="./sources/tests/Kirby2.dat" />
+		<output name="Kriby2.brdf" />
+
+		<!-- Define the function to use -->
+		<function name="rational_function_legendre" />
+
+		<!-- Define the ftting procedure to use -->
+		<plugin type="fitter" name="rational_fitter_leastsquare" />
+
+	</action>
+
+	<action name="brdf2gnuplot">
+		<!-- Input and output arguments of the action -->
+		<input name="Kriby2.brdf" />
+		<output name="Kirby2.dat" />
+
+		<!-- Take the data file abscissa and apply the function to it -->
+		<parameter name="data-file" value="./sources/tests/Kirby2.dat" />
+	</action>
+</alta>
