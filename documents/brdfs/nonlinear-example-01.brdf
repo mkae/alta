@@ -1,0 +1,20 @@
+#ALTA FUNC HEADER
+#CMD  --L2 0.0140196 --Linf 0.0228819 --fitter nonlinear_fitter_ceres --func [nonlinear_function_diffuse, nonlinear_function_blinn] --input blue-filtered.dat --output blue-metallic-paint.func
+#DIM 6 3
+#PARAM_IN  CARTESIAN
+#ALTA HEADER END
+
+
+
+#FUNC nonlinear_function_diffuse
+kd 0.001372370561
+kd 0.00107240384
+kd 0.002848470952
+
+#FUNC nonlinear_function_blinn
+Ks 0.1285394675
+N  54.33937957
+Ks 0.1307347523
+N  67.17125237
+Ks 0.3648163434
+N  67.28104107
