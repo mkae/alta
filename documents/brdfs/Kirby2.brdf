@@ -1,5 +1,5 @@
 #ALTA FUNC HEADER
-#CMD  --L2 0.0279415 --Linf 0.27124 --fitter rational_fitter_eigen --input ./sources/tests/Kirby2.dat --output Kirby.brdf
+#CMD  --L2 0.0279415 --Linf 0.27124 --fitter rational_fitter_eigen --input Kirby2.dat --output Kirby2.brdf
 #DIM 1 1
 #PARAM_IN  UNKNOWN_INPUT
 #ALTA HEADER END
