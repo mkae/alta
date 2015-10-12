@@ -249,5 +249,6 @@ if 'tests' in COMMAND_LINE_TARGETS:
 	if 'python' in COMMAND_LINE_TARGETS:
 		env.Depends(tests, python)
 
+env.Depends(core, external)
 env.Depends(plugins, core)
 env.Depends(softs, core)
