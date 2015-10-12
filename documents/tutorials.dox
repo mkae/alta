@@ -86,7 +86,7 @@ Here we provide the resulting BRDF file and the XML script used to generate it:
 <center>
 <table style="border-spacing: 20px 0px;">
    <tr>
-      <td><a href="rational-example-012.brdf"><img src="brdf.png" alt="BRDF file" height="80px" /></a></td>
+      <td><a href="Kirby2.brdf"><img src="brdf.png" alt="BRDF file" height="80px" /></a></td>
       <td><a href="rational-example-012.xml"><img src="xml.png" alt="BRDF file" height="80px" /></a></td>
    </tr>
 </table>
