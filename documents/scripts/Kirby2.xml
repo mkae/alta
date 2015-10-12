@@ -2,7 +2,7 @@
 <alta>
    <action name="data2brdf">
       <!-- Input and output arguments of the action -->
-      <input name="./sources/tests/Kirby2.dat" />
+      <input name="Kirby2.dat" />
       <output name="Kriby2.brdf" />
 
       <!-- Define the function to use -->
@@ -16,9 +16,9 @@
    <action name="brdf2gnuplot">
       <!-- Input and output arguments of the action -->
       <input name="Kriby2.brdf" />
-      <output name="Kirby2.dat" />
+      <output name="Kirby2-export.dat" />
 
       <!-- Take the data file abscissa and apply the function to it -->
-      <parameter name="data-file" value="./sources/tests/Kirby2.dat" />
+      <parameter name="data-file" value="Kirby2.dat" />
    </action>
 </alta>
