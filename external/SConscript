@@ -81,22 +81,22 @@ else:
    C.progress_display("please adjust the shared library search path \
    before running ALTA")
 
-   ##
-   #   QuadProg++
-   #   TODO: Change to the QuadProg v2 code
-   ##
-   qp_dir     = 'quadprog++'
-   qp_target  = 'build' + os.sep + 'lib' + os.sep + qp_dir
-   qp_base    = qp_dir + os.sep
-   qp_sources = [qp_base + 'QuadProg++.cc']
-   qp_env     = env.Clone()
-   qp_env.Append(CPPPATH = ['build' + os.sep + 'include'])
+##
+#   QuadProg++
+#   TODO: Change to the QuadProg v2 code
+##
+qp_dir     = 'quadprog++'
+qp_target  = 'build' + os.sep + 'lib' + os.sep + qp_dir
+qp_base    = qp_dir + os.sep
+qp_sources = [qp_base + 'QuadProg++.cc']
+qp_ccflags = []
 
-   if qp_env['CC'] != 'cl':
-      # We're not building a real static library, but rather what
-      # Libtool calls a "convenience library": an archive that
-      # contains PIC code.  Thus, force '-fPIC'.
-      qp_env.AppendUnique(CCFLAGS = ['-fPIC'])
+if env['CC'] != 'cl':
+  # We're not building a real static library, but rather what Libtool
+  # calls a "convenience library": an archive that contains PIC code.
+  # Thus, force '-fPIC'.
+  qp_ccflags = ['-fPIC']
 
-   qp_env.StaticLibrary(target = qp_target, source = qp_sources)
-
+env.StaticLibrary(target = qp_target, source = qp_sources,
+                  CCFLAGS = qp_ccflags,
+                  CPPPATH = ['build' + os.sep + 'include'])
