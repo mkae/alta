@@ -8,16 +8,15 @@ Import('env', 'ALTA_LIBS', 'openexr_available')
 env = env.Clone()
 
 have_openexr = openexr_available(env)
+conf = Configure(env)
+have_cppquickcheck = conf.CheckLibWithHeader('cppqc', 'cppqc.h', 'C++')
+env = conf.Finish()
 
 # Add the directory of <tests.h> to the include path.
 env.AppendUnique(CPPPATH = ['#sources/tests'])
 
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
-
-conf = Configure(env)
-have_cppquickcheck = conf.CheckLibWithHeader('cppqc', 'cppqc.h', 'C++')
-env = conf.Finish()
 
 # Portability.
 def library_search_path_variable():

@@ -3,17 +3,16 @@ import SCons.Warnings as W
 Import('env', 'library_available')
 env = env.Clone()
 
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
-
 if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h'):
-	conf = Configure(env)
-	libs = []
-	for lib in env['CERES_OPT_LIB']:		
-		if conf.CheckLib(lib, language='c++'):
-			libs.append(lib)
-		#else:
-		#	W.warn(W.DependencyWarning, "could not find library " + lib)
-	env = conf.Finish()
-	env.AppendUnique(LIBS = libs)
 
-	env.SharedLibrary('../../build/nonlinear_fitter_ceres', 'fitter.cpp')
+  conf = Configure(env)
+  libs = []
+  for lib in env['CERES_OPT_LIB']:
+    if conf.CheckLib(lib, language='c++'):
+      libs.append(lib)
+  env = conf.Finish()
+
+  env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+  env.AppendUnique(LIBS = libs)
+
+  env.SharedLibrary('../../build/nonlinear_fitter_ceres', 'fitter.cpp')

@@ -1,20 +1,19 @@
 Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
-env.Prepend(LIBS = ['core'])
-env.AppendUnique(LIBS = ALTA_LIBS)
-
-# Check if OpenMP is available
+# Check whether OpenMP is available.  Do that before 'libcore' is
+# added to 'LIBS', otherwise SCons ends up silently building 'libcore'
+# during the configuration phase.
 conf = Configure(env)
 if env['OPENMP_LIB']:
    if conf.CheckLib(env['OPENMP_LIB'], language='c++'):
 	   env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
 	   env.AppendUnique(LIBS = env['OPENMP_LIB'])
-   #end
-#end
 env = conf.Finish()
 
-# Soft Sources
-sources = ['main.cpp']
+env.Prepend(LIBS = ['core'])
+env.AppendUnique(LIBS = ALTA_LIBS)
 
+
+sources = ['main.cpp']
 env.Program('../../build/data2data', sources)

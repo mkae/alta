@@ -1,7 +1,6 @@
 Import('env')
 env = env.Clone()
 
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 env.AppendUnique(CPPPATH = env['EIGEN_INC'])
 
 build_lib = False
@@ -16,5 +15,6 @@ else:
 env = conf.Finish()
 
 if build_lib:
-	sources = ['fitter.cpp']
-	env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources)
+  env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+  sources = ['fitter.cpp']
+  env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources)

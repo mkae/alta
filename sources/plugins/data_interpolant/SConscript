@@ -1,20 +1,15 @@
 Import('env')
 env = env.Clone()
 
-env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
-env.AppendUnique(LIBS    = env['FLANN_LIB'])
-env.AppendUnique(LIBPATH = env['FLANN_DIR'])
-env.AppendUnique(CPPPATH = env['FLANN_INC'])
-
-build_lib = False
-
 conf = Configure(env)
-
-if conf.CheckLibWithHeader(env['FLANN_LIB'], 'flann/flann.hpp', 'CXX'):
-	build_lib = True
-
+build_lib = conf.CheckLibWithHeader(env['FLANN_LIB'], 'flann/flann.hpp', 'CXX')
 env = conf.Finish()
 
 if build_lib:
-	sources = ['data.cpp']
-	env.SharedLibrary('../../build/data_interpolant', sources)
+  env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+  env.AppendUnique(LIBS    = env['FLANN_LIB'])
+  env.AppendUnique(LIBPATH = env['FLANN_DIR'])
+  env.AppendUnique(CPPPATH = env['FLANN_INC'])
+
+  sources = ['data.cpp']
+  env.SharedLibrary('../../build/data_interpolant', sources)
