@@ -1,10 +1,5 @@
 Import('env', 'ALTA_LIBS')
-env = env.Clone()
 
-env.Prepend(LIBS = ['core'])
-env.AppendUnique(LIBS = ALTA_LIBS)
-
-# Soft Sources
 sources = ['fit2stat.cpp']
-
-env.Program('../../build/fit2stat', sources)
+env.Program('../../build/fit2stat', sources,
+            LIBS = ['core'] + ALTA_LIBS)

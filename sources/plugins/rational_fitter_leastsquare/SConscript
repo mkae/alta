@@ -1,8 +1,5 @@
 Import('env')
-env = env.Clone()
-
-env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 
 sources = ['rational_fitter.cpp']
-
-env.SharedLibrary('../../build/rational_fitter_leastsquare', sources)
+env.SharedLibrary('../../build/rational_fitter_leastsquare', sources,
+                  LIBS = env['PLUGIN_LIB'])

@@ -1,15 +1,5 @@
-
 Import('env')
-env = env.Clone()
-
-env.Append(LIBS = env['PLUGIN_LIB'])
-
-#env = Environment()
-#env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-#env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
 
 sources = ['rational_function.cpp']
-#libs = ['core']
-#env.SharedLibrary('../../build/rational_function_chebychev', sources, LIBS=libs)
-
-env.SharedLibrary('../../build/rational_function_chebychev', sources )
+env.SharedLibrary('../../build/rational_function_chebychev', sources,
+                  LIBS = env['PLUGIN_LIB'])

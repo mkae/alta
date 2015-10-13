@@ -1,14 +1,5 @@
 Import('env')
-env = env.Clone()
 
-#env = Environment()
-#env.Append(CPPPATH = ['../../../external/build/include', '../../'])
-#env.Append(LIBPATH = ['../../../external/build/lib', '../../build'])
-
-env.Append(LIBS = env['PLUGIN_LIB'])
 sources = ['function.cpp']
-
-#libs = ['core']
-#env.SharedLibrary('../../build/nonlinear_function_blinn', sources, LIBS=libs)
-
-env.SharedLibrary('../../build/nonlinear_function_blinn', sources )
+env.SharedLibrary('../../build/nonlinear_function_blinn', sources,
+                  LIBS = env['PLUGIN_LIB'])

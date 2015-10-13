@@ -1,9 +1,5 @@
 Import('env')
-env = env.Clone()
 
-
-env.Append(LIBS = env['PLUGIN_LIB'])
 sources = ['function.cpp']
-
-
-env.SharedLibrary('../../build/nonlinear_function_ward', sources )
+env.SharedLibrary('../../build/nonlinear_function_ward', sources,
+                  LIBS = env['PLUGIN_LIB'])

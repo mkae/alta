@@ -1,10 +1,5 @@
 Import('env', 'ALTA_LIBS')
-env = env.Clone()
 
-env.Prepend(LIBS = ['core'])
-env.AppendUnique(LIBS = ALTA_LIBS)
-
-# Soft Sources
 sources = ['main.cpp']
-
-env.Program('../../build/brdf2brdf', sources)
+env.Program('../../build/brdf2brdf', sources,
+            LIBS = ['core'] + ALTA_LIBS)
