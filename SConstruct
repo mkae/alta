@@ -155,38 +155,39 @@ def CheckPKG(context, name):
 		return ret
 
 
-"""
-Return True if the given library is available. First look for the LIB_VAR and
-INC_VAR construction variables, honoring them if they are defined. Then look
-for PKGSPEC using pkg-config. Last, try to build LIB with HEADER. Configure
-ENV accordingly.
-"""
 def library_available(env, pkgspec='', lib='', header='',
-					  language='c++', inc_var='', lib_var=''):
+                      language='c++', inc_var='', lib_var=''):
+  """Return True if the given library is available.
 
-	conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+  First look for the LIB_VAR and INC_VAR construction variables,
+  honoring them if they are defined.  Then look for PKGSPEC using
+  pkg-config.  Last, try to build LIB with HEADER.  Configure ENV
+  accordingly.
 
-	result = False
-	# If a XXX_LIB is specified in the environment, add the various path
-	# and link flags. Check if the library is correctly compiling and
-	# linking with the header.
-	if (lib in env) and (len(env[lib]) > 0):
-		env.AppendUnique(LIBPATH = env[lib_var])
-		env.AppendUnique(CPPPATH = env[inc_var])
-		env.AppendUnique(LIBS = env[lib])
+  """
+  conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
 
-		# Check whether the library is usable.
-		result = conf.CheckLibWithHeader(env[lib], header, language)
+  # If a XXX_LIB is specified in the environment, add the various path
+  # and link flags. Check if the library is correctly compiling and
+  # linking with the header.
+  if (lib in env) and (len(env[lib]) > 0):
+    env.AppendUnique(LIBPATH = env[lib_var])
+    env.AppendUnique(CPPPATH = env[inc_var])
+    env.AppendUnique(LIBS = env[lib])
 
-	elif conf.CheckPKG(pkgspec):
-		env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
-		result = True
-
-	else:
+    # Check whether the library is usable.
+    result = conf.CheckLibWithHeader(env[lib], header, language)
+  elif conf.CheckPKG(pkgspec):
+    env.ParseConfig('pkg-config --cflags --libs "' + pkgspec + '"')
+    # XXX: We can't use 'CheckLibWithHeader' to verify that
+    # everything's alright because we don't know the library name.  So
+    # assume that pkg-config got it right.
+    result = True
+  else:
 		result = conf.CheckLibWithHeader(pkgspec, header, language)
 
-	conf.Finish()
-	return result
+  conf.Finish()
+  return result
 
 def openexr_available(env):
 		"""Return True if OpenEXR is available."""
