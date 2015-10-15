@@ -2,8 +2,12 @@ import os, sys
 from subprocess import call
 from os.path import basename, splitext
 
-Import('env', 'ALTA_LIBS')
+import obtain
+
+Import('env', 'ALTA_LIBS', 'openexr_available')
 env = env.Clone()
+
+have_openexr = openexr_available(env)
 
 # Add the directory of <tests.h> to the include path.
 env.AppendUnique(CPPPATH = ['#sources/tests'])
@@ -218,6 +222,33 @@ cmd4 = make_command_test('brdf2brdf', [ '--input',
 env.Depends(cmd4, cmd1)         # 'Kirby.brdf' is created by CMD1
 AlwaysBuild(cmd4)
 env.Alias('tests', cmd4)
+
+def download_gold_metallic_paint(target, source, env):
+  url = 'http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/gold-metallic-paint.binary'
+  sha256 = '69c493d7f36fa5267d15948a616056f9bc84e352ec6db49b64afe6ff232e27d6'
+  target = str(target[0])
+
+  print "downloading '" + target + "' from '" + url + "'"
+  print "this will take some time..."
+  obtain.download(url, target)
+  return obtain.check_integrity(target, sha256)
+
+download = env.Command(test_output_directory + '/gold-metallic-paint.binary',
+                       None, download_gold_metallic_paint)
+
+if openexr_available:
+  cmd5 = make_command_test('data2data',
+                           ['--input',
+                            test_byproduct('gold-metallic-paint.binary'),
+                            '--in-data', 'data_merl',
+                            '--output',
+                            test_byproduct('gold-metallic-paint.exr'),
+                            '--out-data', 'data_brdf_slice'],
+                           'exr-export')
+  env.Depends(cmd5, cmd1)
+  env.Depends(cmd5, download)
+  AlwaysBuild(cmd5)
+  env.Alias('tests', cmd5)
 
 # Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
