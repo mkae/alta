@@ -75,61 +75,34 @@ into the file:
 \page xml-format XML scripts
 
 You can create XML formated files to run ALTA complex commands. A python
-script <em>xml_cmd.py</em> is available in the directory <em>scripts</em>.
-You can use it with the following command: <em>./scripts/xml_cmd.py
-file.xml</em>
+script `xml_cmd.py` is available in the directory `#/sources/scripts`.
+You can use it with the following command: `#/sources/scripts/xml_cmd.py
+file.xml`
 
 We provide an example XML file that is self describing:
-\verbatim
+~~~{.xml}
 <?xml version="1.0"?>
 <alta>
-	<!-- In the configuration you can setup the relative directories -->
-	<configuration>
-		<parameter name="lib-dir" value="./build" />
-	</configuration>
+  <action name="data2brdf">
+    <!-- Input and output arguments of the action -->
+    <input  name="../data/3d/merl/blue-metallic-paint.binary" />
+    <output name="./results/3d/merl/blue-mettalic-paint.brdf" />
 
-	<!-- Fit the data to a BRDF model -->
-	<!-- You can chain as many action as you want to perform fit. Convert
-        data, output to matlab/gnuplot/BRDFExplorer format -->
-	<action name="data2brdf">
+    <!-- Define the function to use -->
+    <function name="nonlinear_function_diffuse" />
+    <function name="nonlinear_function_beckmann" />
 
-		<!-- Input and output arguments of the action -->
-		<input name="/home/belcour/Projects/alta/data/2d/matusik_merl/blue-metallic-paint-double-mean-romeiro-80deg.dat" />
-		<output name="./results/blue-metallic-paint-2lafortune.brdf" />
+    <!-- Define the ftting procedure to use -->
+    <plugin type="fitter" name="nonlinear_fitter_ceres" />
 
-		<!-- Define the function to use -->
-		<!-- You can chain multiple functions here to create a compound -->
-		<function name="nonlinear_function_diffuse" />
-		<function name="nonlinear_function_isotropic_lafortune" />
+    <!-- Define the data loader to use -->
+    <plugin type="data" name="data_merl" />
 
-		<!-- Define the ftting procedure to use -->
-		<plugin type="fitter" name="nonlinear_fitter_ceres" />
-
-		<!-- Fitting parameters -->
-		<parameter name="max" value="[0.8, 0.8]" />
-	</action>
-
-	<!-- Convert the fit to BRDF explorer format -->
-	<action name="brdf2brdf">
-
-		<!-- Input and output arguments of the action -->
-		<input  name="./results/blue-metallic-paint-2lafortune.brdf" />
-		<output name="./results/blue-metallic-paint-2lafortune_explorer.brdf" />
-
-		<parameter name="export" value="explorer" />
-	</action>
-
-	<!-- Export the fit -->
-	<action name="brdf2gnuplot">
-
-		<!-- Input and output arguments of the action -->
-		<input  name="./results/blue-metallic-paint-2lafortune.brdf" />
-		<output name="./results/blue-metallic-paint-2lafortune.dat" />
-
-		<parameter name="data" value="/home/belcour/Projects/alta/data/2d/matusik_merl/blue-metallic-paint-double-mean-romeiro-80deg.dat" />
-	</action>
+    <!-- Parameter -->
+    <parameter name="export" value="explorer" />
+  </action>
 </alta>
-\endverbatim
+~~~
 
 The `<input>` command can take two different kind of attributes:
  + `name="filename"` when the action is done for a single input file.

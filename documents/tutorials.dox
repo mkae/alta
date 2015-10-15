@@ -345,22 +345,9 @@ You can put multiple `<action>` commands in the xml file. Those commands will be
 
 
 
-
-
-\page python-tutorial1 Using the Python interface
-
-All actions can be done using Python scripts. We provide a python interface that can be loaded with:
-
-    >>> import alta
-
-The complete python interface of ALTA can be found here : \ref python.
-
-
-
-
 \page cpp-tutorial1 Using the C++ interface
 
-It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (`libcore.a` on GNU/Linux). The core library provides all the generic objects for \ref function, \ref data, and \ref fitter. You can load a plugin and create an object using the \ref plugins_manager.
+It is possible to create your own programs and make use of ALTA's plugin possibilities. To do so, you only need to link you program with the core library (`libcore.a` on GNU/Linux). The core library provides all the generic objects for \ref function "BRDF", \ref data "data", and \ref fitter "fitter". You can load a plugin and create an object using the \ref plugins_manager.
 
 The following program produces slices of data files and outputs it on a gnuplot compliant data file. It requires an interpolant data format such as \ref data_merl, \ref data_interpolant (our internal data format is not):
 
