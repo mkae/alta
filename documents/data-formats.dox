@@ -1,0 +1,87 @@
+/*!
+\page dataformats Data File Formats
+
+ALTA usually takes as input material reflectance measurements.  While
+ALTA plug-ins can support arbitrary file formats, ALTA has built-in
+support for two input file formats.  The first one is a simple
+human-readable textual format, and the second one is a compact binary
+format.  This section describes the actual data formats.
+
+Files in either format must start with a header that provides the
+necessary meta-data; lines preceding this header are discarded.  The
+header looks like this:
+
+    #DIM 1 1
+    #PARAM_IN  UNKNOWN
+    #PARAM_OUT UNKNOWN
+
+Lines starting with <tt>#</tt> are considered comments, except for those
+lines that start with <tt>#</tt> immediately followed by a letter: these
+constitute the <em>file header</em>.
+
+The header ends when either a non-comment line is read, or when the
+following line is encountered:
+
+    #ALTA END HEADER
+
+The file header essentially defines key/value associations.  For
+example, ALTA expects <tt>DIM</tt> key to be associated with a pair of
+integers representing the dimensions of the inputs; the value for
+<tt>PARAM_IN</tt> must be a string denoting a valid input
+parametrization, such as <tt>RUSIN_TH_TD_PD</tt>.
+
+
+Textual Data Format
+-------------------
+
+For a text data file with <em>n</em> data entries where the input domain
+has <em>N</em> dimensions and a <em>input_param</em> parametrization and
+the output domain has <em>P</em> dimensions and a <em>output_param</em>
+parametrization, the textual file format is the following:
+
+    #DIM N P
+    #PARAM_IN  %input_param%
+    #PARAM_OUT %output_param%
+    #VS [0|1|2] (P times)
+    x_{1,1} ... x_{1,N}  y_{1,1} ... y_{1,P}
+    ...
+    x_{i,1} ... x_{i,N}  y_{i,1} ... y_{i,P}
+    ...
+    x_{n,1} ... x_{n,N}  y_{n,1} ... y_{n,P}
+
+Vertical segments are not defined if VS is 0.  For a VS of 1, each
+sample as a radius associated for the associated dimension.  If VS is 2,
+each sample has a min and max segment value for the associated
+dimension.
+
+
+Binary Data Format
+------------------
+
+In addition to the default textual format described above, ALTA supports
+a compact binary format for representing raw data.  The binary format
+starts with a similar header:
+
+    #DIM 1 1
+    #PARAM_IN  UNKNOWN_INPUT
+    #PARAM_OUT UNKNOWN_OUTPUT
+    #FORMAT binary
+    #VERSION 0
+    #PRECISION ieee754-double
+    #SAMPLE_COUNT 150
+    #ENDIAN little
+    #BEGIN_STREAM
+
+After <tt>#BEGIN_STREAM</tt> comes a byte sequence representing the
+actual data.  In this example, the byte sequence is an array of 151
+little-endian IEEE-754 double precision numbers.  The byte sequence is
+followed by <tt>#END_STREAM</tt> on a line on its own.
+
+The header represents a matrix of <tt>SAMPLE_COUNT</tt> rows and
+<tt>DIM_X + DIM_Y</tt> columns of double-precision floating point
+numbers.
+
+This simple binary format was designed with two goals in mind: providing
+a compact way to store large input data, and allowing implementations to
+directly map the file in memory, as opposed to having to allocate
+storage and parse large sequences of numbers.

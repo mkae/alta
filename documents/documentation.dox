@@ -17,6 +17,10 @@ ALTA permits to manipulate various type of files. Here, we detail: our internal 
 + \ref format "Function file format"
 + \ref format "XML scripting format"
 
+#### Data formats
+
+The \ref data-formats "Data Formats" section describes the data formats
+ALTA uses to store data.
 
 #### BRDF Related Documents
 
