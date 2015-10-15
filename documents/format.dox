@@ -31,7 +31,7 @@ Parametrization format
 
  - `#PARAM_IN   input_parametrization_name`
  - `#PARAM_OUT  output_parametrization_name`
- 
+
 
 Input Parametrization
 ---------------------
@@ -45,14 +45,14 @@ input parametrizations.
 Output Parametrization
 ----------------------
 
-In the current version of ALTA, we cannot handle different output 
+In the current version of ALTA, we cannot handle different output
 parametrizations (like LAB color space). Fitting will be performed
 independantly of the data and function output space. They only need
 to match in size.
 
 \verbatim
 	INV_STERADIAN, // A BRDF which unit is sr^{-1}
-	INV_STERADIAN_COSINE_FACTOR, // A BRDF multiplied by the cosine factor, unit is still sr^{-1} 
+	INV_STERADIAN_COSINE_FACTOR, // A BRDF multiplied by the cosine factor, unit is still sr^{-1}
 \endverbatim
 
 
@@ -62,7 +62,7 @@ For a text data file with <em>n</em> data entries where the input domain has <em
 
 \verbatim
 #ALTA DATA HEADER
-#DIM N P 
+#DIM N P
 #PARAM_IN  %input_param%
 #PARAM_OUT %output_param%
 #VS [0|1|2] (P times)
@@ -79,17 +79,17 @@ sample has a radius associated for the associated dimension.  If VS is
 2, each sample has a min and max segment value for the associated
 dimension.
 
- 
 
 
 
-<h2>Function file format</h2>
+
+\page func-format Function file format
 
 ALTA library assumes that all functions are exported using the following convention:
 
 <ul>
 	<li>The *.function file is outputed in plain text and not in binary.</li>
-	<li>The *.function file starts with a header. Each line of the header 
+	<li>The *.function file starts with a header. Each line of the header
 	starts with the character '#'.</li>
 	<li>The header contains the command line used to create the function
 	in a <em>#CMD ...</em> line.
@@ -109,10 +109,10 @@ Example of a *.function file for a single Lafortune lobe without any diffuse:
    #FUNC lafortune
    Cx 1.0
    Cz 1.0
-   N  10.0 
+   N  10.0
 \endverbatim
 
-For multiple BRDFs lobes (when you want to add a diffuse for example), you need to 
+For multiple BRDFs lobes (when you want to add a diffuse for example), you need to
 specify it into the command line. The different parameters are outputed sequentially
 into the file:
 \verbatim
@@ -123,7 +123,7 @@ into the file:
    #PARAM_OUT RGB_COLOR
    #ALTA_HEADER_END
 
-   #FUNC diffuse 
+   #FUNC diffuse
    kd 1.0
    kd 0.02
    kd 0.1We advise to output function file into <em>.function</em> file for consistency.
@@ -131,21 +131,21 @@ into the file:
    #FUNC lafortune
    Cx 1.0
    Cz 1.0
-   N  10.0 
+   N  10.0
    Cx 1.0
    Cz 1.0
-   N  10.0 
+   N  10.0
    Cx 1.0
    Cz 1.0
-   N  10.0 
+   N  10.0
 
    #FUNC phong
    ks 1.0
-   N  10.0 
+   N  10.0
    ks 1.0
-   N  10.0 
+   N  10.0
    ks 1.0
-   N  10.0 
+   N  10.0
 
    #FUNC schlick
    R 1.0
@@ -156,11 +156,11 @@ into the file:
 \todo Right now the different color channels have the same length !
 
 
-<h2>XML scripts</h2>
+\page xml-format XML scripts
 
 You can create XML formated files to run ALTA complex commands. A python
 script <em>xml_cmd.py</em> is available in the directory <em>scripts</em>.
-You can use it with the following command: <em>./scripts/xml_cmd.py 
+You can use it with the following command: <em>./scripts/xml_cmd.py
 file.xml</em>
 
 We provide an example XML file that is self describing:
@@ -192,20 +192,20 @@ We provide an example XML file that is self describing:
 		<!-- Fitting parameters -->
 		<parameter name="max" value="[0.8, 0.8]" />
 	</action>
-	
+
 	<!-- Convert the fit to BRDF explorer format -->
 	<action name="brdf2brdf">
-		
+
 		<!-- Input and output arguments of the action -->
 		<input  name="./results/blue-metallic-paint-2lafortune.brdf" />
 		<output name="./results/blue-metallic-paint-2lafortune_explorer.brdf" />
 
 		<parameter name="export" value="explorer" />
 	</action>
-	
+
 	<!-- Export the fit -->
 	<action name="brdf2gnuplot">
-		
+
 		<!-- Input and output arguments of the action -->
 		<input  name="./results/blue-metallic-paint-2lafortune.brdf" />
 		<output name="./results/blue-metallic-paint-2lafortune.dat" />

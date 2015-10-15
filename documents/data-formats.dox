@@ -1,5 +1,5 @@
 /*!
-\page dataformats Data File Formats
+\page data-formats Data File Formats
 
 ALTA usually takes as input material reflectance measurements.  While
 ALTA plug-ins can support arbitrary file formats, ALTA has built-in
@@ -85,3 +85,4 @@ This simple binary format was designed with two goals in mind: providing
 a compact way to store large input data, and allowing implementations to
 directly map the file in memory, as opposed to having to allocate
 storage and parse large sequences of numbers.
+*/

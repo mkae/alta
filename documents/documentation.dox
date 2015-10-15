@@ -13,14 +13,9 @@ ALTA provides two programming APIs. At the lowest level, it is possible to autho
 
 ALTA permits to manipulate various type of files. Here, we detail: our internal data file format which can be either ASCII or binary; our function file format to store function parameters; and our XML file format to store high-level scripts.
 
-+ \ref format "Data file format"
-+ \ref format "Function file format"
-+ \ref format "XML scripting format"
-
-#### Data formats
-
-The \ref data-formats "Data Formats" section describes the data formats
-ALTA uses to store data.
++ \ref data-formats "Data file format"
++ \ref func-format "Function file format"
++ \ref xml-format "XML scripting format"
 
 #### BRDF Related Documents
 
