@@ -14,6 +14,10 @@ import os
 import sys
 import SCons.SConf as C
 
+# Arrange so that the 'obtain' module can always be imported.
+top_srcdir = Dir('.').srcnode().abspath
+sys.path += [ top_srcdir + '/external' ]
+
 ## Build the documentation. This is independant of everything else and
 ## should return afterwards, speeding-up the process of generating doc.
 ##
