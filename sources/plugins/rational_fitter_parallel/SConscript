@@ -21,3 +21,5 @@ env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 
 sources = ['rational_fitter.cpp']
 env.SharedLibrary('../../build/rational_fitter_parallel', sources)
+
+Return('sources')               # always built

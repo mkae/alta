@@ -3,3 +3,4 @@ Import('env')
 sources = ['rational_function.cpp']
 env.SharedLibrary('../../build/rational_function_cosine', sources,
                   LIBS = env['PLUGIN_LIB'])
+Return('sources')               # always built

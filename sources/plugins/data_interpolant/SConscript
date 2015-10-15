@@ -13,3 +13,5 @@ if build_lib:
 
   sources = ['data.cpp']
   env.SharedLibrary('../../build/data_interpolant', sources)
+
+Return('build_lib')

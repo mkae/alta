@@ -16,9 +16,8 @@ if library_available(env, pkgspec='nlopt', inc_var='NLOPT_INC', lib_var='NLOPT_D
 
 	build_lib = True
 
-#end
-
 if build_lib:
 	sources = ['fitter.cpp']
 	env.SharedLibrary('../../build/nonlinear_fitter_nlopt', sources)
-#end
+
+Return('build_lib')

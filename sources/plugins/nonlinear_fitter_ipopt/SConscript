@@ -3,6 +3,11 @@ env = env.Clone()
 
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
-if library_available(env, pkgspec='ipopt', inc_var='IPOPT_INC', lib_var='IPOPT_DIR', lib='IPOPT_LIB', header='coin/IpTNLP.hpp'):
-	env.SharedLibrary('../../build/nonlinear_fitter_ipopt', 'fitter.cpp')
-#end
+build_lib = library_available(env, pkgspec='ipopt',
+                              inc_var='IPOPT_INC', lib_var='IPOPT_DIR',
+                              lib='IPOPT_LIB', header='coin/IpTNLP.hpp')
+
+if build_lib:
+  env.SharedLibrary('../../build/nonlinear_fitter_ipopt', 'fitter.cpp')
+
+Return('build_lib')

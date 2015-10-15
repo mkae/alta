@@ -3,3 +3,4 @@ Import('env')
 sources = ['function.cpp']
 env.SharedLibrary('../../build/nonlinear_function_beckmann', sources,
                   LIBS = env['PLUGIN_LIB'])
+Return('sources')               # always built

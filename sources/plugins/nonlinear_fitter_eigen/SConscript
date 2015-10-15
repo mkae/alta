@@ -8,7 +8,7 @@ build_lib = False
 conf = Configure(env)
 
 if conf.CheckCXXHeader('unsupported/Eigen/LevenbergMarquardt'):
-	build_lib = True
+  build_lib = True
 else:
   print "<<WARNING>> Unsupported Eigen LevenbergMarquardt was not found"
 
@@ -18,3 +18,5 @@ if build_lib:
   env.AppendUnique(LIBS = env['PLUGIN_LIB'])
   sources = ['fitter.cpp']
   env.SharedLibrary('../../build/nonlinear_fitter_eigen', sources)
+
+Return('build_lib')

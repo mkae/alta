@@ -3,8 +3,12 @@ import SCons.Warnings as W
 Import('env', 'library_available')
 env = env.Clone()
 
-if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_DIR', lib='CERES_LIB', header='ceres/ceres.h'):
+build_lib = library_available(env, pkgspec='ceres',
+                              inc_var='CERES_INC', lib_var='CERES_DIR',
+                              lib='CERES_LIB',
+                              header='ceres/ceres.h')
 
+if build_lib:
   conf = Configure(env)
   libs = []
   for lib in env['CERES_OPT_LIB']:
@@ -16,3 +20,5 @@ if library_available(env, pkgspec='ceres', inc_var='CERES_INC', lib_var='CERES_D
   env.AppendUnique(LIBS = libs)
 
   env.SharedLibrary('../../build/nonlinear_fitter_ceres', 'fitter.cpp')
+
+Return('build_lib')

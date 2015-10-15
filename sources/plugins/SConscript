@@ -45,7 +45,35 @@ plugins = [ 'data_interpolant',
             'nonlinear_fresnel_retroschlick' ]
 
 def build_plugin(directory):
-  return SConscript(directory + '/SConscript')
+  return directory, SConscript(directory + '/SConscript')
+
+def display_status(status):
+  name, status = status
+  print "    " + name
+
+def is_built(status):
+  _, status = status
+  return status
+
+def is_not_built(status):
+  _, status = status
+  return not status
 
 # Build them all!
-map(build_plugin, plugins)
+status = map(build_plugin, plugins)
+
+if not GetOption('silent') and not GetOption('clean'):
+  print ""
+  print "***** Summary of the plug-ins being built *****"
+  print ""
+  print "  The following plug-ins are built:"
+  map(display_status, filter(is_built, status))
+  print ""
+
+  omitted=filter(is_not_built, status)
+  if len(omitted) > 0:
+    print "  The following plug-ins are *not* built:"
+    map(display_status, omitted)
+    print ""
+    print "  See 'config.log' for details."
+    print ""

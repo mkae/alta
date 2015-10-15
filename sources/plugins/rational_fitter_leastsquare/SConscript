@@ -3,3 +3,4 @@ Import('env')
 sources = ['rational_fitter.cpp']
 env.SharedLibrary('../../build/rational_fitter_leastsquare', sources,
                   LIBS = env['PLUGIN_LIB'])
+Return('sources')               # always built
