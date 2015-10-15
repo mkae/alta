@@ -19,7 +19,7 @@ This correspond to the argument `--foo bar --hello world`. Similarly, a `vec` ty
 
     >>> v = alta.vec([0.0, 0.0, 0.0])
 
-You can obtain \ref functions, \ref datas and \ref fitters objects using the `get_function`, `get_data` and `get_fitter` functions with the name of the plugin to load as argument:
+You can obtain \ref functions "BRDF", \ref datas "data" and \ref fitters "fitter" objects using the `get_function`, `get_data` and `get_fitter` functions with the name of the plugin to load as argument:
 
     >>> func   = alta.get_function('nonlinear_function_blinn')
     >>> dat    = alta.get_data('data_merl')
@@ -27,7 +27,7 @@ You can obtain \ref functions, \ref datas and \ref fitters objects using the `ge
 
 Note that you can also provide an \ref arguments object to set specific options for the plugin (see below).
 
-\ref functions and \ref datas can load from files and save to files:
+\ref functions "BRDF" and \ref datas "data" objects can load from and save to files:
 
     >>> dat = alta.get_data('data_merl')
     >>> dat.load('blue_metallic_paint.binary')
@@ -39,7 +39,7 @@ In both cases, an \ref arguments object can be passed to control the behaviour o
     >>> func = alta.get_function('nonlinear_function_blinn')
     >>> func.save('my_function.func', args)
 
-Some \ref commands are available as python functions:
+Some \ref commands "commands" are available as python functions:
 
     >>> dat1 = alta.load_data('data_merl', 'blue-metallic-paint.binary')
     >>> dat2 = alta.get_data('data_utia')
@@ -47,11 +47,11 @@ Some \ref commands are available as python functions:
 
 This will perform a data conversion from the `blue-metallic-paint` of the [MERL][MERL] database to the \ref UTIA format.
 
-Available \ref commands are:
+Available \ref commands "commands" are:
 
- + `data2data` to convert a \ref data object into another one. This function will try to evaluate the input data at every location specified by the output data format when the format has a static set of configurations (this is the case for all `data_io` plugins). Function call: `data2data(data_in, data_out)`.
+ + `data2data` to convert a \ref data "data" object into another one. This function will try to evaluate the input data at every location specified by the output data format when the format has a static set of configurations (this is the case for all `data_io` plugins). Function call: `data2data(data_in, data_out)`.
 
- + `brdf2data` to evalute a \ref function at the configurations defined by the data object. This will replace the content of the data object by the values of the function at the specified locations. Function call `brdf2data(func_in, data_out)`.
+ + `brdf2data` to evalute a \ref function "BRDF" at the configurations defined by the \ref data "data" object. This will replace the content of the data object by the values of the function at the specified locations. Function call `brdf2data(func_in, data_out)`.
 
 
   [MERL]: http://www.merl.com/brdf/
