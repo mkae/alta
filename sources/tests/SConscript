@@ -250,5 +250,19 @@ if openexr_available:
   AlwaysBuild(cmd5)
   env.Alias('tests', cmd5)
 
+  cmd6 = make_command_test('data2brdf',
+                           ['--input',
+                            test_byproduct('gold-metallic-paint.exr'),
+                            '--data', 'data_brdf_slice',
+                            '--output',
+                            test_byproduct('gold-metallic-pain.brdf'),
+                            '--fitter', 'rational_fitter_parallel',
+                            '--func', 'rational_function_chebychev',
+                            '--min-np', '35', '--np', '40'],
+                           'exr-input-rational-fit')
+  env.Depends(cmd6, cmd5)
+  AlwaysBuild(cmd6)
+  env.Alias('tests', cmd6)
+
 # Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
