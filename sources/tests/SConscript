@@ -203,7 +203,7 @@ cmd3 = make_command_test('brdf2gnuplot', [ '--data-file', test_file,
                                            test_byproduct('Kirby.brdf'),
                                            '--output',
                                            test_byproduct('Kirby.dat') ],
-                         'data-file')
+                         'gnuplot-export')
 
 env.Depends(cmd3, cmd1)         # 'Kirby.brdf' is created by CMD1
 AlwaysBuild(cmd3)
