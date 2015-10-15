@@ -209,5 +209,15 @@ env.Depends(cmd3, cmd1)         # 'Kirby.brdf' is created by CMD1
 AlwaysBuild(cmd3)
 env.Alias('tests', cmd3)
 
+cmd4 = make_command_test('brdf2brdf', [ '--input',
+                                        test_byproduct('Kirby.brdf'),
+                                        '--output',
+                                        test_byproduct('Kirby.m'),
+                                        '--export', 'matlab' ],
+                         'matlab-export')
+env.Depends(cmd4, cmd1)         # 'Kirby.brdf' is created by CMD1
+AlwaysBuild(cmd4)
+env.Alias('tests', cmd4)
+
 # Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
