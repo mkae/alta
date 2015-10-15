@@ -34,7 +34,7 @@ test_file = File('Kirby2.dat').srcnode().abspath
 test_data_directory = os.path.dirname(test_file)
 
 # Directory for the files produced by the tests.
-test_output_directory = Dir('#sources/tests/build').srcnode().abspath
+test_output_directory = Dir('#sources/tests/build').abspath
 
 def test_byproduct(file):
   """Return the absolute file name of FILE, a file produced by a test."""
