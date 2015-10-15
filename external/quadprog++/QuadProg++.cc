@@ -33,10 +33,15 @@
 #include <Eigen/Jacobi>
 #include "QuadProg++.hh"
 
+#ifdef DEBUG
 #define TRACE_SOLVER_(CODE) std::cout << __LINE__ << ": "; CODE; std::cout << std::endl
 // #define TRACE_SOLVER(CODE) TRACE_SOLVER_(CODE)
 #define TRACE_SOLVER(CODE) do {} while(0)
-
+#else
+#define TRACE_SOLVER_(CODE)
+// #define TRACE_SOLVER(CODE) TRACE_SOLVER_(CODE)
+#define TRACE_SOLVER(CODE)
+#endif
 // #define QP_SKIP_DEGENERATE
 
 namespace QuadProgPP{
