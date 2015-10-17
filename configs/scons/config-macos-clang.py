@@ -31,12 +31,12 @@ PLUGIN_LIB     = ['core', 'stdc++']
 ##
 PYTHON_INC    = ['/opt/local/include', '/usr/include/python2.7']
 PYTHON_DIR    = ['/opt/local/lib']
-PYTHON_LIB    = ['boost_python-mt', 'python2.7']
+PYTHON_LIB    = ['python2.7']
 
 
 ## Eigen library
 ##
-EIGEN_INC     = ['#external/build/include/Eigen']
+EIGEN_INC     = ['#external/build/include']
 
 
 ## OpenMP flags
