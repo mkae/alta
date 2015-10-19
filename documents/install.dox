@@ -49,6 +49,9 @@ Optional dependencies that will allow more plugins to be built include:
   + [libFLANN][flann], for the \ref data_interpolant plugin
     (<tt>libflann-dev</tt> on Debian and derivatives, <tt>flann</tt> for <a href="http://www.macports.org/">MacPorts</a> and <a href="http://brew.sh/">Homebrew</a>);
 
+  + [CppQuickCheck][cppquickcheck], for the optional
+    specification-based unit tests on randomly-generated inputs;
+
   + [MATLAB][matlab] with the Engine library, for some plugins.
 
 For your convenience, some of these dependencies are shipped with ALTA,
@@ -151,4 +154,5 @@ list](https://lists.gforge.inria.fr/mailman/listinfo/alta-devel).
 [cgal]: http://www.cgal.org "CGAL"
 [ceres]: https://code.google.com/p/ceres-solver/ "CERES solver"
 [flann]: http://www.cs.ubc.ca/research/flann/ "FLANN"
+[cppquickcheck]: https://github.com/grogers0/CppQuickCheck "CppQuickCheck"
 */
