@@ -235,7 +235,7 @@ def download_gold_metallic_paint(target, source, env):
 download = env.Command(test_output_directory + '/gold-metallic-paint.binary',
                        None, download_gold_metallic_paint)
 
-if openexr_available:
+if have_openexr:
   cmd5 = make_command_test('data2data',
                            ['--input',
                             test_byproduct('gold-metallic-paint.binary'),
