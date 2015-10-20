@@ -35,9 +35,11 @@ else:
    ##
    #   Eigen dependency
    ##
-   conf = Configure(env)
+   conf = Configure(env, custom_tests = { 'CheckPKG' : CheckPKG })
+   if conf.CheckPKG('eigen3'):
+     env.ParseConfig('pkg-config --cflags --libs eigen3')
    if not conf.CheckCXXHeader('Eigen/Core'):
-      execfile('obtain_eigen.py')
+     execfile('obtain_eigen.py')
    env = conf.Finish()
 
    ##
@@ -99,4 +101,4 @@ if env['CC'] != 'cl':
 
 env.StaticLibrary(target = qp_target, source = qp_sources,
                   CCFLAGS = qp_ccflags,
-                  CPPPATH = ['build' + os.sep + 'include'])
+                  CPPPATH = env['CPPPATH'] + ['build' + os.sep + 'include'])

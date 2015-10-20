@@ -125,7 +125,6 @@ if len(envVars['PKG_CONFIG_PATH']) > 0:
 	envVars['PKG_CONFIG_PATH'] += ':'
 envVars['PKG_CONFIG_PATH'] += os.path.abspath('external' + os.sep + 'build' + os.sep + 'lib' + os.sep + 'pkgconfig')
 env = Environment(variables = vars, ENV = envVars)
-env.AppendUnique(CPPPATH = env['EIGEN_INC'])
 env['DL_EXTERNALS'] = GetOption('obtain_externals')
 
 
