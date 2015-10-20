@@ -50,8 +50,8 @@ Section "ALTA" SecMain
   File "${ALTADIR}\sources\build\rational*.dll"
   File "${ALTADIR}\sources\build\data*.dll"
 
-#  SetOutPath $INSTDIR\python
-#  File "${ALTADIR}\sources\build\alta.dll"
+  SetOutPath $INSTDIR\python
+  File "${ALTADIR}\sources\build\alta.dll"
 
   # Update the ENVIROMNENT
   WriteRegStr HKCU "Environment" "ALTA_DIR"   '$INSTDIR'
