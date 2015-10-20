@@ -4,6 +4,7 @@
 
 
 # Name of the installer
+Name "ALTA"
 Outfile "ALTA.exe"
 
 InstallDir "$DESKTOP\ALTA"
@@ -15,9 +16,20 @@ RequestExecutionLevel user
 
 
 # Pages
-  !insertmacro MUI_PAGE_WELCOME
   !define MUI_WELCOMEPAGE_TITLE "Welcome to ALTA Installer"
 
+  !define MUI_HEADERIMAGE
+  !define MUI_HEADERIMAGE_BITMAP "alta-logo-installer.bmp"
+ 
+  !define MUI_ABORTWARNING
+  !define MUI_ABORTWARNING_CANCEL_DEFAULT
+  
+  !define MUI_ICON "alta-logo-installer.ico"
+  #!define MUI_WELCOMEFINISHPAGE_BITMAP "alta-logo-installer-welcome.bmp"
+  
+  !insertmacro MUI_PAGE_WELCOME
+  
+  
   !insertmacro MUI_PAGE_LICENSE "..\..\LICENSE.txt"
 #	!insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
@@ -30,8 +42,6 @@ RequestExecutionLevel user
   !insertmacro MUI_UNPAGE_INSTFILES
 
 ;Interface Settings
-
-  !define MUI_ABORTWARNING
 
   !insertmacro MUI_LANGUAGE "English"
 
