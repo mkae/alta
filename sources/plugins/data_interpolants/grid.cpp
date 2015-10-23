@@ -55,7 +55,17 @@ vec get_min(const params::input& param) {
          res[1] = 0.0;
          break;
 
-      // TODO 3D Params
+      // 3D Params
+      case params::RUSIN_TH_TD_PD:
+         res[0] = 0.0;
+         res[1] = 0.0;
+         res[2] = 0.0;
+         break;
+      case params::STARK_3D:
+         res[0] = 0.0;
+         res[1] = 0.0;
+         res[2] = 0.0;
+         break;
 
       default:
          return res;
@@ -101,7 +111,17 @@ vec get_max(const params::input& param) {
          res[1] = 1.0;
          break;
 
-      // TODO 3D Params
+      // 3D Params
+      case params::RUSIN_TH_TD_PD:
+         res[0] = 0.5*M_PI;
+         res[1] = 0.5*M_PI;
+         res[2] = 2.0*M_PI;
+         break;
+      case params::STARK_3D:
+         res[0] = 1.0;
+         res[1] = 1.0;
+         res[2] = 2.0*M_PI;
+         break;
 
       default:
          return res;
@@ -142,6 +162,7 @@ class BrdfGrid : public vertical_segment {
       }
 
       void initialize(const arguments& args, bool preallocate = true) {
+
          // Allow to load a different parametrization depending on the
          // parameters provided.
          if(args.is_defined("param")) {
