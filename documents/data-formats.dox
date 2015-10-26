@@ -73,7 +73,7 @@ starts with a similar header:
     #BEGIN_STREAM
 
 After <tt>#BEGIN_STREAM</tt> comes a byte sequence representing the
-actual data.  In this example, the byte sequence is an array of 151
+actual data, store in row order.  In this example, the byte sequence is an array of 151
 little-endian IEEE-754 double precision numbers.  The byte sequence is
 followed by <tt>#END_STREAM</tt> on a line on its own.
 
