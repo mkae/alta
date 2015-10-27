@@ -60,17 +60,21 @@ else:
 # List of C++ compilers we look for by default.
 cxx_compilers = [ 'g++', 'c++', 'clang++', 'cl' ]
 
-def default_cxx_compiler():
-	"Return the absolute file name of a C++ compiler."
-	for cxx in cxx_compilers:
-		cxx_full = WhereIs(cxx)
-		if cxx_full != None:
-			return cxx_full
-	return cxx_compilers[0]
+def program_file_name(choices):
+  """
+  Look for the programs listed in CHOICES.  Return the absolute file
+  name of one that matches, or the first element of CHOICES.
+
+  """
+  for program in choices:
+    full = WhereIs(program)
+    if full != None:
+      return full
+  return choices[0]
 
 vars = Variables(configFile)
 vars.Add('CXX',               'C++ compiler',
-				 default = default_cxx_compiler())
+         default = program_file_name(cxx_compilers))
 vars.Add('CCFLAGS',           'Compiler\'s flags',
 		 default = ['-g', '-O2', '-Wall'])
 vars.Add('LINKFLAGS',         'Linker\'s flags',
