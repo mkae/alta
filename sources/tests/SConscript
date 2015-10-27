@@ -56,7 +56,7 @@ def run_unit_test(env, target, source):
    program = str(source[0].abspath)
    envvars = os.environ
    envvars['TEST_DATA_DIRECTORY'] = test_data_directory
-   envvars['PYTHONPATH'] = Dir('#sources/build').srcnode().abspath
+   envvars['PYTHONPATH'] = Dir('#sources/build').abspath
 
    if splitext(program)[1] == '.py':
       if call([env['PYTHON'], program], env=envvars) == 0:
@@ -76,7 +76,7 @@ def run_command(arguments):
   def do_run_command(env, target, source):
     program = str(source[0].abspath)
     envvars = os.environ
-    libdir = Dir('#sources/build').srcnode().abspath
+    libdir = Dir('#sources/build').abspath
     lib_path_var = library_search_path_variable()
     lib_path = ""
     if lib_path_var in envvars and envvars[lib_path_var] != '':
@@ -84,7 +84,7 @@ def run_command(arguments):
     else:
       lib_path = libdir
 
-    envvars['ALTA_LIB'] = Dir('#sources/build').srcnode().abspath;
+    envvars['ALTA_LIB'] = Dir('#sources/build').abspath;
     envvars[lib_path_var] = lib_path
 
     status = os.spawnve(os.P_WAIT, program, [program] + arguments, envvars)
