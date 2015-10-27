@@ -51,12 +51,31 @@ def executable(file):
    else:
       return file
 
+def build_environment_variables():
+  """
+  Return the environment variables necessary when running tests.
+  """
+  envvars = os.environ.copy()
+  envvars['TEST_DATA_DIRECTORY'] = test_data_directory
+  envvars['PYTHONPATH'] = Dir('#sources/build').abspath
+  envvars['ALTA_LIB'] = Dir('#sources/build').abspath;
+
+  libdir = Dir('#sources/build').abspath
+  lib_path_var = library_search_path_variable()
+  lib_path = ""
+  if lib_path_var in envvars and envvars[lib_path_var] != '':
+    lib_path = libdir + os.pathsep + lib_path
+  else:
+    lib_path = libdir
+
+  envvars[lib_path_var] = lib_path
+
+  return envvars
+
 # Inspired by <http://www.scons.org/wiki/UnitTests>.
 def run_unit_test(env, target, source):
    program = str(source[0].abspath)
-   envvars = os.environ
-   envvars['TEST_DATA_DIRECTORY'] = test_data_directory
-   envvars['PYTHONPATH'] = Dir('#sources/build').abspath
+   envvars = build_environment_variables()
 
    if splitext(program)[1] == '.py':
       if call([env['PYTHON'], program], env=envvars) == 0:
@@ -75,17 +94,7 @@ def run_command(arguments):
   """Return a function that runs SOURCE with ARGUMENTS."""
   def do_run_command(env, target, source):
     program = str(source[0].abspath)
-    envvars = os.environ
-    libdir = Dir('#sources/build').abspath
-    lib_path_var = library_search_path_variable()
-    lib_path = ""
-    if lib_path_var in envvars and envvars[lib_path_var] != '':
-      lib_path = libdir + os.pathsep + lib_path
-    else:
-      lib_path = libdir
-
-    envvars['ALTA_LIB'] = Dir('#sources/build').abspath;
-    envvars[lib_path_var] = lib_path
+    envvars = build_environment_variables()
 
     status = os.spawnve(os.P_WAIT, program, [program] + arguments, envvars)
     command = ' '.join([program] + arguments)
