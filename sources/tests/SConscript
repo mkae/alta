@@ -56,7 +56,7 @@ def run_unit_test(env, target, source):
    program = str(source[0].abspath)
    envvars = os.environ
    envvars['TEST_DATA_DIRECTORY'] = test_data_directory
-   envvars['PYTHONPATH'] = 'sources/build'
+   envvars['PYTHONPATH'] = Dir('#sources/build').srcnode().abspath
 
    if splitext(program)[1] == '.py':
       if call([env['PYTHON'], program], env=envvars) == 0:
