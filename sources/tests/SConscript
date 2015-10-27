@@ -59,7 +59,7 @@ def run_unit_test(env, target, source):
    envvars['PYTHONPATH'] = 'sources/build'
 
    if splitext(program)[1] == '.py':
-      if call(['python2.7', program], env=envvars) == 0:
+      if call([env['PYTHON'], program], env=envvars) == 0:
          open(str(target[0]),'w').write("PASS\n")
       else:
          open(str(target[0]),'w').write("FAIL\n")

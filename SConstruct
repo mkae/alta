@@ -60,6 +60,9 @@ else:
 # List of C++ compilers we look for by default.
 cxx_compilers = [ 'g++', 'c++', 'clang++', 'cl' ]
 
+# List of Python 2.x interpreter names to look for.
+python_programs = [ 'python2.7', 'python2', 'python', sys.executable ]
+
 def program_file_name(choices):
   """
   Look for the programs listed in CHOICES.  Return the absolute file
@@ -110,6 +113,8 @@ vars.Add('IPOPT_OPT_LIB',     'IPOPT optional libraries')
 vars.Add('MATLAB_INC',        'MATLAB include directory')
 vars.Add('MATLAB_DIR',        'MATLAB directory')
 vars.Add('MATLAB_LIB',        'MATLAB libraries')
+vars.Add('PYTHON',            'Python interpreter',
+         default = program_file_name(python_programs))
 
 
 ##
