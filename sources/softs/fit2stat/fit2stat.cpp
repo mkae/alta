@@ -459,7 +459,7 @@ main(int argc, char* argv[])
   }
 
   std::cout << "<<INFO>> Loading data ..." << std::endl;
-  ptr<vertical_segment> vs_data = new vertical_segment();
+  ptr<vertical_segment> vs_data = ptr<vertical_segment>(new vertical_segment());
   //ptr<data> vs_data = plugins_manager::get_data("vertical_segment");
   
   timer  t;
@@ -482,7 +482,7 @@ main(int argc, char* argv[])
 
 
   // Load a function file representing the BRDF
-  ptr<function> brdf = plugins_manager::load_function(args["brdf"]) ;
+  ptr<function> brdf = ptr<function>(plugins_manager::load_function(args["brdf"]));
   if(brdf.get() == NULL)
   {  
     std::cout << "<<ERROR>> Could not load the BRDF. Check your file. ABORTING !!!! "  << std::endl;

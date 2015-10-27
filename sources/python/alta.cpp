@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2014 Inria
+   Copyright (C) 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -24,17 +24,6 @@
 
 #define bp boost::python
 
-
-/* The following code register ALTA's shared pointer as a valid shared ptr
- * to be used by boost::python .
- */
-template <typename T> T* get_pointer(ptr<T>& p) {
-   return const_cast<T*>(p.get());
-}
-
-template <typename T> const T* get_pointer(const ptr<T>& p) {
-   return p.get();
-}
 
 namespace boost {
    namespace python {
@@ -195,10 +184,10 @@ ptr<function> get_function_from_args(const python_arguments& args) {
  * The file is supposed to load the function correctly.
  */
 ptr<function> load_function(const std::string& filename) {
-   return plugins_manager::load_function(filename);
+    return ptr<function>(plugins_manager::load_function(filename));
 }
 ptr<function> load_function_with_args(const std::string& filename, const arguments&) {
-   return plugins_manager::load_function(filename);
+    return ptr<function>(plugins_manager::load_function(filename));
 }
 
 /* Loading a function object from file

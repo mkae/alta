@@ -276,13 +276,14 @@ function* plugins_manager::get_function(const arguments& args)
 
       //Recursive call
       function* f = get_function(temp_args);
-      if(dynamic_cast<nonlinear_function*>(f) == NULL)
+      nonlinear_function *nl_f = dynamic_cast<nonlinear_function*>(f);
+      if(nl_f == NULL)
       {
           std::cerr << "<<ERROR>> only non-linear functions are compatible with a compound" << std::endl;
       }
       else
       {
-          compound->push_back(dynamic_cast<nonlinear_function*>(f), temp_args);
+          compound->push_back(ptr<nonlinear_function>(nl_f), temp_args);
       }
     }
 
@@ -371,7 +372,9 @@ function* plugins_manager::get_function(const arguments& args)
           std::cout << "<<DEBUG>> The lobe is fixed" << std::endl;
         }
 
-        return new product_function(nl_func, func_fres, lobe_is_fixed, fresnel_is_fixed);
+        return new product_function(ptr<nonlinear_function>(nl_func),
+                                    ptr<nonlinear_function>(func_fres),
+                                    lobe_is_fixed, fresnel_is_fixed);
       }
       else
       {
@@ -412,7 +415,7 @@ ptr<function> plugins_manager::get_function(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
 #endif
-        return myFunc();
+        return ptr<function>(myFunc());
     }
     else
     {
@@ -429,7 +432,7 @@ ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no data plugin specified, returning a vertical_segment loader" << std::endl;
 #endif
-        return new vertical_segment();
+        return ptr<data>(new vertical_segment());
     }
 
 	 DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
@@ -438,12 +441,12 @@ ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using data provider in file \"" << n << "\"" << std::endl;
 #endif
-        return myData(args);
+        return ptr<data>(myData(args));
     }
     else
     {
         std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
-        return new vertical_segment() ;
+        return ptr<data>(new vertical_segment()) ;
     }
 }
 ptr<fitter> plugins_manager::get_fitter(const std::string& n)
@@ -462,7 +465,7 @@ ptr<fitter> plugins_manager::get_fitter(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using fitter provider in file \"" << n << "\"" << std::endl;
 #endif
-        return myFitter();
+        return ptr<fitter>(myFitter());
     }
     else
     {
@@ -496,7 +499,7 @@ void plugins_manager::check_compatibility( ptr<data>& d,
 		{
 			std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->input_parametrization()) << std::endl;
       std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
-			ptr<data_params> dd = new data_params(d, f->input_parametrization());
+			ptr<data_params> dd = ptr<data_params>(new data_params(d, f->input_parametrization()));
 			d = dynamic_pointer_cast<data>(dd) ;
 		}
 		else
