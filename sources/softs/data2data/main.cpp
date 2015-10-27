@@ -71,10 +71,10 @@ int main(int argc, char** argv)
 		std::cout << std::endl;
 		std::cout << "Optional arguments:" << std::endl;
 		std::cout << "  --out-data [filename]  Name of the plugin used to save the outputed data file" << std::endl ;
-		std::cout << "                         If none is provided, the exporter will export in ALTA" << std::endl ;
+    std::cout << "                         If none is provided, data2data will export in ALTA" << std::endl ;
 		std::cout << "                         by default." << std::endl ;
 		std::cout << "  --in-data  [filename]  Name of the plugin used to load the input data file" << std::endl ;
-		std::cout << "                         If none is provided, the exporter will import in ALTA" << std::endl ;
+    std::cout << "                         If none is provided, data2data will import in ALTA" << std::endl ;
 		std::cout << "                         by default." << std::endl ;
 		std::cout << "  --param    [NAME]      Name of the parametrization used to output data when" << std::endl;
 		std::cout << "                         No output data plugin is specified. Please see " << std::endl;
