@@ -278,7 +278,33 @@ if have_openexr:
   AlwaysBuild(cmd6)
   env.Alias('tests', cmd6)
 
-  cmd7 = make_command_test('data2brdf',
+  cmd7 = make_command_test('data2data',
+                           ['--input',
+                            test_byproduct('gold-metallic-paint.binary'),
+                            '--in-data', 'data_merl',
+                            '--param', 'RUSIN_TH_TD',
+                            '--out-data', 'data_brdf_slice',
+                            '--output',
+                            test_byproduct('gold-metallic-paint.rusin.exr')],
+                           'merl-to-data-slice-rusin')
+  env.Depends(cmd7, download)
+  AlwaysBuild(cmd7)
+  env.Alias('tests', cmd7)
+
+  cmd8 = make_command_test('data2data',
+                           ['--input',
+                            test_byproduct('gold-metallic-paint.binary'),
+                            '--in-data', 'data_merl',
+                            '--param', 'RUSIN_TH_TD_PD', '--angle', '90',
+                            '--out-data', 'data_brdf_slice',
+                            '--output',
+                            test_byproduct('gold-metallic-paint.rusin.exr')],
+                           'merl-to-data-slice-rusin3d')
+  env.Depends(cmd8, download)
+  AlwaysBuild(cmd8)
+  env.Alias('tests', cmd8)
+
+  cmd9 = make_command_test('data2brdf',
                            ['--input',
                             test_byproduct('gold-metallic-paint.data'),
                             '--output',
@@ -287,9 +313,9 @@ if have_openexr:
                             '--fitter', 'rational_fitter_leastsquare',
                             '--np', '100', '--nq', '50'],
                            'least-square-fit')
-  env.Depends(cmd7, cmd6)
-  AlwaysBuild(cmd7)
-  env.Alias('tests', cmd7)
+  env.Depends(cmd9, cmd6)
+  AlwaysBuild(cmd9)
+  env.Alias('tests', cmd9)
 
 # Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
