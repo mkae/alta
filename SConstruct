@@ -249,15 +249,16 @@ plugins  = env.SConscript('sources/plugins/SConscript')
 softs    = env.SConscript('sources/softs/SConscript')
 
 if 'python' in COMMAND_LINE_TARGETS:
-	python = env.SConscript('sources/python/SConscript')
-	env.Depends(python, core)
-
-if 'tests' in COMMAND_LINE_TARGETS:
-	tests = env.SConscript('sources/tests/SConscript')
-	env.Depends(tests, core)
-	if 'python' in COMMAND_LINE_TARGETS:
-		env.Depends(tests, python)
+  python = env.SConscript('sources/python/SConscript')
+  env.Depends(python, core)
 
 env.Depends(core, external)
 env.Depends(plugins, core)
 env.Depends(softs, core)
+
+if 'tests' in COMMAND_LINE_TARGETS:
+  tests = env.SConscript('sources/tests/SConscript')
+  env.Depends(tests, core)
+  env.Depends(tests, plugins)
+  if 'python' in COMMAND_LINE_TARGETS:
+    env.Depends(tests, python)
