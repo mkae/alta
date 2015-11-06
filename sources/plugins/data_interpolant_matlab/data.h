@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -38,7 +38,6 @@ class data_interpolant : public data
 
 		// Acces to data
 		virtual vec get(int i) const ;
-		virtual vec operator[](int i) const ;
 
 		virtual vec value(const vec& x) const;
 

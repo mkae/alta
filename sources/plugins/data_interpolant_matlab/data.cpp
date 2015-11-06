@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013 Inria
+   Copyright (C) 2013, 2015 Inria
 
    This file is part of ALTA.
 
@@ -108,10 +108,6 @@ vec data_interpolant::get(int id) const
 {
 	vec res(dimX() + dimY()) ;
 	return res ;
-}
-vec data_interpolant::operator[](int i) const 
-{
-	return get(i) ;
 }
 
 void data_interpolant::set(const vec& x)

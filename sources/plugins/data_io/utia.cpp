@@ -185,9 +185,6 @@ public:
 
 		return res;
 	}
-	virtual vec operator[](int i) const {
-		return get(i);
-	}
 
 	virtual void vecToIndex(const vec& in, int& iti, int& ipi, int& itv, int& ipv) const {
 		double theta_i = in[0];

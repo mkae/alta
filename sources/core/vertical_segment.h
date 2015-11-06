@@ -107,7 +107,6 @@ class vertical_segment : public data
 
       // Acces to data
       virtual vec get(int i) const ;
-      virtual vec operator[](int i) const;
 
       virtual vec value(const vec&) const {
          NOT_IMPLEMENTED();

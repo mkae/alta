@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -141,10 +141,6 @@ class BrdfSlice : public data {
 			res[_nX+2] = _data[3*id + 2];
 
 			return res ;
-		}
-		vec operator[](int i) const 
-		{
-			return get(i) ;
 		}
 
 		//! \todo Test this function

@@ -121,11 +121,7 @@ void vertical_segment::get(int i, vec& yl, vec& yu) const
 		yu[j] = _data[i][dimX() + 2*dimY() + j] ;
 	}
 }
-		
-vec vertical_segment::operator[](int i) const
-{
-	return _data[i] ;
-}
+
 vec vertical_segment::get(int i) const 
 {
 	//SLOW !!!!! and useless 

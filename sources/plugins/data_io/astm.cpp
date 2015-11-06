@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2015 Inria
 
    This file is part of ALTA.
 
@@ -92,10 +92,6 @@ public: //methods
 
 	// Acces to data
 	virtual vec get(int i) 
-	{
-		return _data[i];
-	}
-	virtual vec operator[](int i) const 
 	{
 		return _data[i];
 	}

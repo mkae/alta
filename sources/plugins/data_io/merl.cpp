@@ -147,10 +147,6 @@ public: // methods
 		res[5] = brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] * BLUE_SCALE;
 		return res ;
 	}
-	vec operator[](int i) const
-	{
-		return get(i) ;
-	}
 
 	//! \todo Test this function
 	void set(const vec& x)

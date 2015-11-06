@@ -56,7 +56,6 @@ class data : public parametrized
 
 		// Acces to data
 		virtual vec get(int i) const = 0 ;
-		virtual vec operator[](int i) const = 0 ;
 
     //! \brief Provide an evaluation of the data using interpolation. If
     //! the data object does not provide an interpolation mechanism, it
@@ -153,10 +152,6 @@ class data_params : public data
 		virtual vec get(int i) const
 		{
 			return _data[i];
-		}
-		virtual vec operator[](int i) const
-		{
-			return this->get(i);
 		}
 
 		//! \todo This should crash at execution.
