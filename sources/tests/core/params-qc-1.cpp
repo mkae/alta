@@ -104,7 +104,14 @@ struct PropCartToRusin: Property<Angle, Angle>
         auto theta_d = x[2];
         auto phi_d = x[3];
 
-        if (verbose)
+        // Make sure θh = θi and φh = φi, and θd = φd = 0.
+        // Note that we have less precision on φd.
+        bool pass = close_to(theta_h, (double)theta)
+            && close_to(phi_h, (double)phi)
+            && close_to(theta_d, 0.)
+            && close_to(phi_d, 0., 5e-6);
+
+        if (verbose || !pass)
             std::cout << "conf " << theta << " " << phi
                       << " aka. cart = " << cart
                       << " → θh = " << theta_h
@@ -113,12 +120,7 @@ struct PropCartToRusin: Property<Angle, Angle>
                       << " → φd = " << phi_d
                       << std::endl;
 
-        // Make sure θh = θi and φh = φi, and θd = φd = 0.
-        // Note that we have less precision on φd.
-        return close_to(theta_h, (double)theta)
-            && close_to(phi_h, (double)phi)
-            && close_to(theta_d, 0.)
-            && close_to(phi_d, 0., 5e-6);
+        return pass;
     }
     std::string name() const
     {
