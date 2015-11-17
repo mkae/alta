@@ -51,6 +51,22 @@ namespace alta { namespace tests
     }
 
     template<typename T>
+    static Eigen::Matrix<T, 3, 1> spherical_to_cartesian(T theta, T phi)
+    {
+        Eigen::Matrix<T, 3, 1> v(cos(phi) * sin(theta),
+                                 sin(phi) * sin(theta),
+                                 cos(theta));
+        // cart[3] = clamp(cos(phi) * sin(theta), 0., 1.);
+        // cart[4] = clamp(sin(phi) * sin(theta), 0., 1.);
+        // cart[5] = clamp(cos(theta), 0., 1.);
+
+        // Make sure V is on the hemisphere.
+        v.normalize();
+
+        return v;
+    }
+
+    template<typename T>
     class angle_range
     {
     public:

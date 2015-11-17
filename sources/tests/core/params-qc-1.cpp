@@ -90,17 +90,7 @@ struct PropCartToRusin: Property<Angle, Angle>
 
     bool check(const Angle& theta, const Angle& phi) const
     {
-        vec v(3);
-        v[0] = cos(phi) * sin(theta);
-        v[1] = sin(phi) * sin(theta);
-        v[2] = cos(theta);
-        // cart[3] = clamp(cos(phi) * sin(theta), 0., 1.);
-        // cart[4] = clamp(sin(phi) * sin(theta), 0., 1.);
-        // cart[5] = clamp(cos(theta), 0., 1.);
-
-        // Make sure V is on the hemisphere.
-        v.normalize();
-
+        auto v = spherical_to_cartesian(theta, phi);
         vec cart(6);
         cart[0] = v[0], cart[1] = v[1], cart[2] = v[2];
         cart[3] = v[0], cart[4] = v[1], cart[5] = v[2];
