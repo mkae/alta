@@ -435,7 +435,8 @@ static bool is_zero(Real x)
 template<class Vector>
 static bool alongside_z(const Vector& vec)
 {
-    return is_zero(vec[0]) && is_zero(vec[1]);
+    return (is_zero(vec[0]) && is_zero(vec[1]))
+        || close_to(vec[2], 1., 1e-14);
 }
 
 
