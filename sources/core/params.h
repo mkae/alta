@@ -332,48 +332,46 @@ class params
 			  }
 		  }
 
-        //! \brief from the 4D definition of a half vector parametrization,
-        //! export the cartesian coordinates.
-        static void half_to_cartesian(double theta_h, double phi_h,
-                                      double theta_d, double phi_d, double* out)
-        {
-            // Calculate the half vector
-            double half[3];
-            half[0] = sin(theta_h)*cos(phi_h);
-            half[1] = sin(theta_h)*sin(phi_h);
-            half[2] = cos(theta_h);
+      //! \brief from the 4D definition of a half vector parametrization,
+      //! export the cartesian coordinates.
+      template<typename Real>
+      static void half_to_cartesian(Real theta_h, Real phi_h,
+                                    Real theta_d, Real phi_d, Real* out)
+      {
+          // Calculate the half vector
+          Real half[3];
+          half[0] = sin(theta_h) * cos(phi_h);
+          half[1] = sin(theta_h) * sin(phi_h);
+          half[2] = cos(theta_h);
 
-            // Compute the light vector using the rotation formula.
-            out[0] = sin(theta_d)*cos(phi_d);
-            out[1] = sin(theta_d)*sin(phi_d);
-            out[2] = cos(theta_d);
+          // Compute the light vector using the rotation formula.
+          // TODO: Eventually make OUT an Eigen vector.
+          out[0] = sin(theta_d)*cos(phi_d);
+          out[1] = sin(theta_d)*sin(phi_d);
+          out[2] = cos(theta_d);
 
-            // Rotate the diff vector to get the output vector
-            // TODO: Eventually switch to 'vec' everywhere.
-            vec out2(3);
-            out2[0] = out[0];
-            out2[1] = out[1];
-            out2[2] = out[2];
-            rotate_binormal(out2, theta_h);
-            rotate_normal(out2, phi_h);
-            out[0] = out2[0];
-            out[1] = out2[1];
-            out[2] = out2[2];
+          // Rotate the diff vector to get the output vector
+          Eigen::Matrix<Real, 3, 1> out2(out[0], out[1], out[2]);
+          rotate_binormal(out2, theta_h);
+          rotate_normal(out2, phi_h);
+          out[0] = out2[0];
+          out[1] = out2[1];
+          out[2] = out2[2];
 
-            // Compute the out vector from the in vector and the half
-            // vector.
-            const double dot = out[0]*half[0] + out[1]*half[1] + out[2]*half[2];
-            out[3] = -out[0] + 2.0*dot * half[0];
-            out[4] = -out[1] + 2.0*dot * half[1];
-            out[5] = -out[2] + 2.0*dot * half[2];
+          // Compute the out vector from the in vector and the half
+          // vector.
+          const Real dot = out[0]*half[0] + out[1]*half[1] + out[2]*half[2];
+          out[3] = -out[0] + 2.0*dot * half[0];
+          out[4] = -out[1] + 2.0*dot * half[1];
+          out[5] = -out[2] + 2.0*dot * half[2];
 
 #ifdef DEBUG
-				assert(out[2] >= 0.0 && out[5] >= 0.0);
+          assert(out[2] >= 0.0 && out[5] >= 0.0);
 #endif
-        }
-			
-        //! \brief from the 4D definition of a classical vector parametrization,
-        //! export the cartesian coordinates.
+      }
+
+      //! \brief from the 4D definition of a classical vector parametrization,
+      //! export the cartesian coordinates.
 		  static void classical_to_cartesian(double theta_l, double phi_l, 
 		                                     double theta_v, double phi_v, double* out)
 		  {
@@ -387,23 +385,26 @@ class params
 
 		  //! \brief rotate a cartesian vector with respect to the normal of
 		  //! theta degrees.
-		  static void rotate_normal(vec& vec, double theta)
+      template<class Vector, typename Real>
+      static void rotate_normal(Vector& vec, Real theta)
 		  {
-          auto rotz = Eigen::AngleAxis<double>(theta, Eigen::Vector3d(0, 0, 1));
+          auto rotz = Eigen::AngleAxis<Real>(theta, Eigen::Matrix<Real, 3, 1>(0, 0, 1));
           vec = rotz * vec;
 		  }
 
 		  //! \brief rotate a cartesian vector with respect to the bi-normal of
 		  //! theta degrees.
-		  static void rotate_binormal(vec& vec, double theta)
+      template<class Vector, typename Real>
+		  static void rotate_binormal(Vector& vec, Real theta)
 		  {
-          auto roty = Eigen::AngleAxis<double>(theta, Eigen::Vector3d(0, 1, 0));
+          auto roty = Eigen::AngleAxis<Real>(theta, Eigen::Matrix<Real, 3, 1>(0, 1, 0));
           vec = roty * vec;
 		  }
 
       //! \brief Rotate VEC by THETA around the normal, and by PHI around the
       //! binormal.
-      static void rotate(vec& vec, double theta, double phi)
+      template<class Vector, typename Real>
+      static void rotate(Vector& vec, Real theta, Real phi)
       {
           // Naive implementation.
           rotate_normal(vec, theta);
