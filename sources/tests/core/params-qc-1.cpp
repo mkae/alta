@@ -146,6 +146,6 @@ struct PropCartToRusin: Property<Angle, Angle>
 int main(int argc, char** argv)
 {
     verbose = getenv("VERBOSE") != NULL;
-    auto status = quickCheckOutput(PropCartToRusin<Angle>(), std::cout, 200);
+    auto status = quickCheckOutput(PropCartToRusin<Angle>(), std::cout, 1000);
     return status.result == QC_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
 }
