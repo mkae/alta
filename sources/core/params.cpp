@@ -425,10 +425,19 @@ static void half_vector(Real const *invec, Vector &half)
 // Return true if X is essentially zero.  We have to resort to this hack
 // before using functions that have a high derivative around zero, such as
 // 'atan2'.
-static bool is_zero(double x)
+template<typename Real>
+static bool is_zero(Real x)
 {
     return close_to(x, 0., 1e-14);
 }
+
+// Return true if VEC is alongside z⃗.
+template<class Vector>
+static bool alongside_z(const Vector& vec)
+{
+    return is_zero(vec[0]) && is_zero(vec[1]);
+}
+
 
 void params::from_cartesian(const double* invec, params::input outtype,
 		double* outvec)
@@ -540,7 +549,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
       outvec[1] = acos(diff[2]);
 
       // By convention, when DIFF is alongside z⃗, return φd = 0.
-      if (is_zero(diff[0]) && is_zero(diff[1]))
+      if (alongside_z(diff))
           outvec[2] = 0;
       else
           outvec[2] = atan2(diff[1], diff[0]);
@@ -671,7 +680,7 @@ void params::from_cartesian(const double* invec, params::input outtype,
       rotate(diff, -outvec[1], -outvec[0]);
 
       // By convention, when DIFF is alongside z⃗, return φd = θd = 0.
-      if (is_zero(diff[0]) && is_zero(diff[1]))
+      if (alongside_z(diff))
       {
           outvec[2] = 0.;
           outvec[3] = 0.;
