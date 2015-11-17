@@ -21,6 +21,7 @@ using namespace cppqc;
 // STL includes
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <cassert>
 #include <cstdlib>
 
@@ -112,7 +113,8 @@ struct PropCartToRusin: Property<Angle, Angle>
             && close_to(phi_d, 0., 5e-6);
 
         if (verbose || !pass)
-            std::cout << "conf " << theta << " " << phi
+            std::cout << std::setprecision(20)
+                      << "conf " << theta << " " << phi
                       << " aka. cart = " << cart
                       << " → θh = " << theta_h
                       << " → φh = " << phi_h
