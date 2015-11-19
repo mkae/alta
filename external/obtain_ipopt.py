@@ -18,7 +18,7 @@ def getThirdParty(name) :
 
 # Download IpOpt.
 version   = '3.12.4'
-base      = 'IpOpt'
+base      = 'Ipopt'
 name      = 'IpOpt v' + version
 directory = base + '-' + version
 url       = 'http://www.coin-or.org/download/source/Ipopt/Ipopt-' + version + '.tgz'

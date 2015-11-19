@@ -6,7 +6,7 @@ import SCons.SConf as C
 
 # Download NlOpt.
 version   = '2.4.1'
-base      = 'NlOpt'
+base      = 'nlopt'
 name      = 'NlOpt v' + version
 directory = base + '-' + version
 baseurl   = 'http://ab-initio.mit.edu/nlopt/'
