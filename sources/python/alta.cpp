@@ -18,6 +18,7 @@
 #include <core/rational_function.h>
 #include <core/plugins_manager.h>
 #include <core/vertical_segment.h>
+#include <core/metrics.h>
 
 // STL include
 #include <iostream>
@@ -125,6 +126,19 @@ double vec_get_item(const vec& x, int i) {
  */
 void vec_set_item(vec& x, int i, double a) {
 	x(i) = a;
+}
+
+/* Specific convert a vec to a string
+ */
+std::string vec_str(const vec& x) {
+   std::stringstream stream;
+   stream << "[";
+   for(int i=0; i<x.size(); ++i) {
+      if(i > 0) { stream << ", "; }
+      stream << x[i];
+   }
+   stream << "]";
+   return stream.str();
 }
 
 /* This class is a wrapper to ALTA's arguments class to add Python specific
@@ -349,14 +363,14 @@ void data2data(const data* d_in, data* d_out)
 
       // Init the min and max
       vec _min(d_out->dimX()), _max(d_out->dimX());
-      for(unsigned int k=0; k<d_out->dimX(); ++k)
+      for(auto k=0; k<d_out->dimX(); ++k)
       {
          _min[k] =  std::numeric_limits<double>::max() ;
          _max[k] = -std::numeric_limits<double>::max() ;
       }
 
       vec temp(d_out->dimX() + d_out->dimY());
-      for(unsigned int i=0; i<d_in->size(); ++i)
+      for(auto i=0; i<d_in->size(); ++i)
       {
          // Copy the input vector
          vec x = d_in->get(i);
@@ -365,7 +379,7 @@ void data2data(const data* d_in, data* d_out)
          d_out->set(temp);
 
          // Update min and max
-         for(unsigned int k=0; k<d_out->dimX(); ++k)
+         for(auto k=0; k<d_out->dimX(); ++k)
          {
             _min[k] = std::min(_min[k], temp[k]) ;
             _max[k] = std::max(_max[k], temp[k]) ;
@@ -435,6 +449,21 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 	}
 }
 
+/* Compute distance metric between 'in' and 'ref'.
+ */
+bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
+   // Compute the metrics
+   errors::metrics res;
+   errors::compute(in.get(), ref.get(), res);
+
+   // Fill the resulting Python vector
+   bp::dict py_res;
+   for(auto rpair : res) {
+      py_res.setdefault<std::string, vec>(rpair.first, rpair.second);
+   }
+   return py_res;
+}
+
 
 /*! \inpage python
  *  Exporting the ALTA module
@@ -463,7 +492,8 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<vec>("_vec")
 		.def("__len__", &vec::size)
 		.def("__getitem__", &vec_get_item)
-		.def("__setitem__", &vec_set_item);
+		.def("__setitem__", &vec_set_item)
+		.def("__str__", &vec_str);
 	bp::class_<python_vec>("vec")
 		.def(bp::init<vec>())
 		.def(bp::init<bp::list>())
@@ -515,6 +545,7 @@ BOOST_PYTHON_MODULE(alta)
 
 	// Softs
 	//
-	bp::def("data2data", data2data);
-	bp::def("brdf2data", brdf2data);
+	bp::def("data2data",  data2data);
+	bp::def("data2stats", data2stats);
+	bp::def("brdf2data",  brdf2data);
 }
