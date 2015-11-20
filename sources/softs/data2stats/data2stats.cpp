@@ -427,8 +427,8 @@ int main(int argc, char* argv[])
       std::cout << std::endl;
 
       std::cout << "Optional arguments:" << std::endl;
-      std::cout << "  --ref-dat [plugin_name] : a valid ALTA data plugin name" << std::endl;
-      std::cout << "  --in-dat  [plugin_name] : a valid ALTA data plugin name" << std::endl;
+      std::cout << "  --ref-data [plugin_name] : a valid ALTA data plugin name" << std::endl;
+      std::cout << "  --in-data  [plugin_name] : a valid ALTA data plugin name" << std::endl;
 
       return EXIT_FAILURE;
    }
