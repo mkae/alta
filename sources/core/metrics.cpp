@@ -45,20 +45,15 @@ void errors::compute(const data* in, const data* ref, metrics& res) {
 }
 
 
-void errors::evaluate(const data* in,
+void errors::evaluate(const data* inp,
                       const data* ref,
                       Eigen::MatrixXd& inp_y,
                       Eigen::MatrixXd& ref_y) {
 
-   // TODO handle the case of output format conversion
-   if(ref->output_parametrization() != in->output_parametrization()) {
-      NOT_IMPLEMENTED();
-   }
-
    // Temp variables
    vec ref_xy = vec::Zero(ref->dimX() + ref->dimY());
    vec ref_x  = vec::Zero(ref->dimX());
-   vec dat_x  = vec::Zero(in->dimX());
+   vec dat_x  = vec::Zero(inp->dimX());
    vec cart   = vec::Zero(6);
 
    // Constants
@@ -84,13 +79,13 @@ void errors::evaluate(const data* in,
          // Convert to the query data `dat` parametrization
          params::convert(cart.data(),
                          params::CARTESIAN,
-                         in->input_parametrization(),
+                         inp->input_parametrization(),
                          dat_x.data());
 
          ref_y.row(i) = ref_xy.tail(nY);
-         params::convert(in->value(dat_x).data(),
-                         in->output_parametrization(),
-                         in->dimY(),
+         params::convert(inp->value(dat_x).data(),
+                         inp->output_parametrization(),
+                         inp->dimY(),
                          ref->output_parametrization(),
                          ref->dimY(),
                          inp_y.row(i).data());
@@ -130,6 +125,6 @@ void errors::fastNormComputation(const Eigen::MatrixXd& o_data_y,
    }
 
    // Compute the RMSE and MSE
-   mse = dMatrix.array().square().colwise().sum() / o_data_y.rows();
+   mse  = dMatrix.array().square().colwise().sum() / o_data_y.rows();
    rmse = mse.cwiseSqrt();
 }
