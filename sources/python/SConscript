@@ -5,14 +5,14 @@ build_lib = False
 
 # Check whether Python 2.7 and Boost.Python are available.
 if library_available(env, pkgspec='python-2.7',
-										 inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
-										 lib='PYTHON_LIB', header='Python.h'):
-	
+							inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
+							lib='PYTHON_LIB', header='Python.h'):
+
 	conf = Configure(env)
-	
+
 	# Check if OpenMP is available
 	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
-	if conf.CheckLib(env['OPENMP_LIB']):
+	if env['OPENMP_LIB'] and conf.CheckLib(env['OPENMP_LIB'], 'c++'):
 		env.AppendUnique(LIBS    = env['OPENMP_LIB'])
 	#end
 
@@ -21,10 +21,10 @@ if library_available(env, pkgspec='python-2.7',
 	# used on some other platforms (see
 	# <http://stackoverflow.com/questions/2293962/boost-libraries-in-multithreading-aware-mode>.)
 	build_lib = conf.CheckLibWithHeader('boost_python-mt',
-																			'boost/python.hpp', 'c++')
+													'boost/python.hpp', 'c++')
 	if not build_lib:
 		build_lib = conf.CheckLibWithHeader('boost_python',
-														            'boost/python.hpp', 'c++')
+														'boost/python.hpp', 'c++')
 
 	conf.Finish()
 
