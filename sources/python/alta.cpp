@@ -490,6 +490,7 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<python_arguments, bp::bases<arguments>>("arguments")
 		.def(bp::init<>())
 		.def(bp::init<bp::dict>())
+      .def("__getitem__", &arguments::operator[])
 		.def("update", &arguments::update);
 
 
@@ -507,7 +508,13 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<python_vec>("vec")
 		.def(bp::init<vec>())
 		.def(bp::init<bp::list>())
-		.def(bp::self_ns::str(bp::self_ns::self));
+		.def(bp::self_ns::str(bp::self_ns::self))
+		.def("__add__", &vec_add)
+		.def("__sub__", &vec_sub)
+		.def("__len__", &vec::size)
+		.def("__getitem__", &vec_get_item)
+		.def("__setitem__", &vec_set_item)
+		.def("__str__", &vec_str);
 	bp::implicitly_convertible<vec, python_vec>();
 	bp::implicitly_convertible<python_vec, vec>();
 
