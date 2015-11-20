@@ -65,7 +65,7 @@ std::ostream &operator<<(std::ostream &out, const python_vec &x) {
 	out << "[";
 	for(int i=0; i<x.size(); ++i) {
 		if(i != 0) { out << ", "; }
-		out << x[i]; 
+		out << x[i];
 	}
 	return out << "]";
 }
@@ -108,7 +108,7 @@ struct vec_to_list_converter {
 	static PyObject* convert(const vec& x) {
 		auto obj = PyList_New(x.size());
 		for(auto i=0; i<x.size(); ++i) {
-			PyList_SetItem(obj, i, PyFloat_FromDouble(x[i]));	
+			PyList_SetItem(obj, i, PyFloat_FromDouble(x[i]));
 		}
 
 		return obj;
@@ -130,7 +130,7 @@ void vec_set_item(vec& x, int i, double a) {
 /* This class is a wrapper to ALTA's arguments class to add Python specific
  * behaviour such as dictionnary initialization.
  *
- * Right now it does not handle automatic conversion in function call for 
+ * Right now it does not handle automatic conversion in function call for
  * example. The following code is not possible:
  *
  *    import alta
@@ -155,7 +155,7 @@ struct python_arguments : public arguments {
 	}
 };
 
-/* Create a data object from a plugin's name and the data filename. This 
+/* Create a data object from a plugin's name and the data filename. This
  * function is here to accelerate the loading of data file.
  */
 ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
@@ -171,7 +171,7 @@ ptr<data> get_data(const std::string& plugin_name) {
 }
 
 /* Creating functions for the plugins_manager calls
- * 
+ *
  * TODO: Throw python exceptions if the function is not correctly created.
  *       Those function should disapear when the return type of get_Function
  *       in the plugin_manager will be ptr<function>.
@@ -230,7 +230,7 @@ void load_from_file(const ptr<function>& func, const std::string& filename) {
 
 /* Operators on function object. This provide the ability to create compounds
  * and product in the command line. This is only possible for nonlinear_functions
- * 
+ *
  * TODO: The compound and product function should store the shared pointer to the
  * function objects. They might stay in memory longer than the input functions.
  */
@@ -245,7 +245,7 @@ ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 	if(nf1 && nf2) {
 		cf->push_back(nf1, args);
 		cf->push_back(nf2, args);
-	
+
 		return ptr<function>(cf);
 
 	// Failure case, one of the function is a NULL ptr.
@@ -432,12 +432,12 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 		}
 
 		d->set(i, y);
-	}	
+	}
 }
 
 
-/*! \inpage python 
- *  Exporting the ALTA module 
+/*! \inpage python
+ *  Exporting the ALTA module
  */
 BOOST_PYTHON_MODULE(alta)
 {
@@ -516,5 +516,5 @@ BOOST_PYTHON_MODULE(alta)
 	// Softs
 	//
 	bp::def("data2data", data2data);
-	bp::def("brdf2data", brdf2data);	
+	bp::def("brdf2data", brdf2data);
 }
