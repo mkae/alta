@@ -355,7 +355,7 @@ bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<functi
  */
 void data2data(const data* d_in, data* d_out)
 {
-   if(dynamic_cast<vertical_segment*>(d_out)!=NULL)
+   if(dynamic_cast<vertical_segment*>(d_out)!=NULL && d_out->size() == 0)
    {
       d_out->setParametrization(d_in->input_parametrization());
       d_out->setDimX(d_in->dimX());
@@ -411,7 +411,7 @@ void data2data(const data* d_in, data* d_out)
 
          params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
 
-         d_out->set(x);
+         d_out->set(i, x);
       }
    }
 }
