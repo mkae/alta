@@ -20,6 +20,10 @@
 #include <core/function.h>
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
+#include <core/metrics.h>
+
+// Eigen includes
+#include <Eigen/Core>
 
 //TODO: Move to ALTA CORE
 //TODO: Documentation
@@ -239,16 +243,14 @@ bool convertDataToFunctionParam(ptr<data> const & d,
          }
 
       }
-   }// End if
-   else // Input parametrization are different
-   {
-      // Output param are the same
+   } else {
+      // Input parametrization are different & Output param are the same
       // Converting to the function input parametrization
       if( d->output_parametrization() == f->output_parametrization() )
       {
-
          converted_data = new vertical_segment( f->dimX(), f->dimY(), d->size() );
-         converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+         converted_data->setParametrizations(f->input_parametrization(),
+                                             f->output_parametrization());
 
          //Note that: data_x = dat.head( data->dimX() );
          //           data_y = dat.tail( data->dimY() );
@@ -260,22 +262,19 @@ bool convertDataToFunctionParam(ptr<data> const & d,
          vec new_data_y = vec::Zero(f->dimY());
          vec new_data_x = vec::Zero(f->dimX());
 
-         for( unsigned int i=0; i < (unsigned int) converted_data->size(); i++)
-         {
-
+         for(auto i=0; i<converted_data->size(); i++) {
             dat    = d->get(i);
             data_x = dat.head(d->dimX());
             data_y = dat.tail(d->dimY());
 
-            params::convert( &data_x[0], d->input_parametrization() ,
-                  f->input_parametrization(), &new_data_x[0] );
+            params::convert(data_x.data(), d->input_parametrization(),
+                            f->input_parametrization(), new_data_x.data());
 
-            new_data.head( f->dimX() ) = new_data_x;
-            new_data.tail( f->dimY() ) = data_y;
+            new_data.head(f->dimX()) = new_data_x;
+            new_data.tail(f->dimY()) = data_y;
 
-            converted_data->set(i, new_data );
-         }//end of for-loop
-
+            converted_data->set(i, new_data);
+         }
       }
       else //EVERYTHING IS DIFFERENT ! ALL TO FUNCTION PARAMETRIZATIONS
       {
@@ -324,17 +323,15 @@ void computeCosineFactorsFromData( ptr<data> const & data,
 }
 
 
-void  demultiplexData( ptr<data> const & data,
-      Eigen::ArrayXXd & o_data_x,
-      Eigen::ArrayXXd & o_data_y )
-{
+void  demultiplexData(ptr<data> const & data,
+                      Eigen::MatrixXd & o_data_x,
+                      Eigen::MatrixXd & o_data_y) {
 
    vec dat        = vec::Zero( data->dimX() + data->dimY() );
    vec data_x     = vec::Zero( data->dimX() );
    vec data_y     = vec::Zero( data->dimY() );
 
-   for( unsigned int i=0; i < data->size(); i++)
-   {
+   for(auto i=0; i<data->size(); i++) {
       dat    = data->get(i);
       data_x = dat.head( data->dimX() );
       data_y = dat.tail( data->dimY() );
@@ -342,42 +339,92 @@ void  demultiplexData( ptr<data> const & data,
       o_data_x.row(i) = data_x;
       o_data_y.row(i) = data_y;
    }
-
 }
 
-void evaluateDataAtData( Eigen::ArrayXXd const & data_x,
-      ptr<data> const & d,
-      Eigen::ArrayXXd & data_y )
-{
-   //  Eigen::VectorXd vdata_x
-   for(unsigned int i=0; i < data_x.rows(); i++) {
-      data_y.row(i) = d->value(data_x.row(i));
+void evaluateDataAtData(const ptr<data>& ref,
+                        const ptr<data>& dat,
+                        Eigen::MatrixXd& ref_y,
+                        Eigen::MatrixXd& dat_y) {
+
+   // TODO handle the case of output format conversion
+   if(ref->output_parametrization() != dat->output_parametrization()) {
+      NOT_IMPLEMENTED();
+   }
+
+   // Temp variables
+   vec ref_xy = vec::Zero(ref->dimX() + ref->dimY());
+   vec ref_x  = vec::Zero(ref->dimX());
+   vec dat_x  = vec::Zero(dat->dimX());
+   vec cart   = vec::Zero(6);
+
+   // Constants
+   const auto nY = ref->dimY();
+   const auto nX = ref->dimX();
+
+   // Evaluate the input data at each position of data_x configuration
+   for(auto i=0; i<ref->size(); i++) {
+
+      ref_xy = ref->get(i);
+      ref_x  = ref_xy.head(nX);
+
+      params::convert(ref_x.data(),
+                      ref->parametrization(),
+                      params::CARTESIAN,
+                      cart.data());
+
+      // Check if the output configuration is below the hemisphere when
+      // converted to cartesian coordinates. Note that this prevent from
+      // converting BTDF data.
+      if(cart[2] >= 0.0 || cart[5] >= 0.0) {
+
+         // Convert to the query data `dat` parametrization
+         params::convert(cart.data(),
+                         params::CARTESIAN,
+                         dat->parametrization(),
+                         dat_x.data());
+
+         ref_y.row(i) = ref_xy.tail(nY);
+         dat_y.row(i) = dat->value(dat_x);
+      } else {
+         ref_y.row(i).setZero();
+         dat_y.row(i).setZero();
+      }
    }
 }
 
 
-void fastNormComputation( Eigen::ArrayXXd const & o_data_y,
-      Eigen::ArrayXXd const & f_y,
-      Eigen::VectorXd & L1,
-      Eigen::VectorXd & L2,
-      Eigen::VectorXd & L3,
-      Eigen::VectorXd & LInf,
-      Eigen::VectorXd & mse,
-      Eigen::VectorXd & rmse )
+void fastNormComputation(Eigen::MatrixXd const & o_data_y,
+                         Eigen::MatrixXd const & f_y,
+                         Eigen::VectorXd & L1,
+                         Eigen::VectorXd & L2,
+                         Eigen::VectorXd & L3,
+                         Eigen::VectorXd & LInf,
+                         Eigen::VectorXd & mse,
+                         Eigen::VectorXd & rmse )
 {
-   Eigen::MatrixXd  const distance_matrix = (o_data_y - f_y).matrix();
+   assert(o_data_y.rows() == f_y.rows());
+   assert(o_data_y.cols() == f_y.cols());
+   const auto dMatrix = (o_data_y - f_y);
 
-   for( unsigned int i=0; i < f_y.cols(); i++)
-   {
-      L1(i)   = distance_matrix.col(i).lpNorm<1>();
-      L2(i)   = distance_matrix.col(i).lpNorm<2>();
-      L3(i)   = distance_matrix.col(i).lpNorm<3>();
-      LInf(i) = distance_matrix.col(i).lpNorm<Eigen::Infinity>();
+   // Check that the output dimensions match in size for all the
+   // vectors and the difference matrix.
+   const auto ncols = dMatrix.cols();
+   assert(L1.size()   == ncols);
+   assert(L2.size()   == ncols);
+   assert(L3.size()   == ncols);
+   assert(LInf.size() == ncols);
+
+   // Compute the different distance metrics per output dimension
+   for(auto i=0; i<ncols; i++) {
+      L1(i)   = dMatrix.col(i).lpNorm<1>();
+      L2(i)   = dMatrix.col(i).lpNorm<2>();
+      L3(i)   = dMatrix.col(i).lpNorm<3>();
+      LInf(i) = dMatrix.col(i).lpNorm<Eigen::Infinity>();
    }
 
-   mse = distance_matrix.array().square().colwise().sum() / o_data_y.rows();
+   // Compute the RMSE and MSE
+   mse = dMatrix.array().square().colwise().sum() / o_data_y.rows();
    rmse = mse.cwiseSqrt();
-
 }
 
 void fastWeightedErrors( Eigen::ArrayXXd const & o_data_y,
@@ -438,251 +485,85 @@ int main(int argc, char* argv[])
       << std::endl;
 
 
-   if(! args.is_defined("ref"))
-   {
-      std::cerr << "<<ERROR>> the reference data filename is not defined" << std::endl ;
+   if(!args.is_defined("ref")) {
+      std::cerr << "<<ERROR>> Reference data filename is undefined" << std::endl;
       return EXIT_FAILURE ;
    }
 
-   if(! args.is_defined("input"))
-   {
-      std::cerr << "<<ERROR>> the data filename is not defined" << std::endl ;
+   if(!args.is_defined("input")) {
+      std::cerr << "<<ERROR>> Input data filename is undefined" << std::endl ;
       return EXIT_FAILURE ;
    }
 
    std::cout << "<<INFO>> Loading data ..." << std::endl;
-   ptr<data> vs_data = plugins_manager::get_data(args["in-data"]);
-   //ptr<data> vs_data = plugins_manager::get_data("vertical_segment");
+   ptr<data> input = plugins_manager::get_data(args["in-data"]);
+   //ptr<data> input = plugins_manager::get_data("vertical_segment");
 
-   timer  t;
-   try
-   {
-      t.start();
-      vs_data->load(args["input"], args);
-      t.stop();
-   }
-   catch(...)
-   {
+   input->load(args["input"], args);
+   if(!input) {
+      std::cout << "<<ERROR>> Could not load data file \'" << args["input"]
+                << "\'"  << std::endl;
       return EXIT_FAILURE;
    }
-
-
-   std::cout << "<<INFO>> DATA LOADED in " << t << std::endl;
-   t.reset();
-   std::cout << "<<INFO>> DATA Y dimension :" << vs_data->dimY() << std::endl;
-
-
 
    // Load a function file representing the BRDF
    ptr<data> ref = plugins_manager::get_data(args["ref-data"]) ;
    ref->load(args["ref"]);
-   if(ref.get() == NULL)
-   {
-      std::cout << "<<ERROR>> Could not load the Ref. Check your file. ABORTING !!!! "  << std::endl;
+   if(!ref) {
+      std::cout << "<<ERROR>> Could not load data file \'" << args["ref"]
+                << "\'"  << std::endl;
       return EXIT_FAILURE;
    }
-   std::cout << "<<INFO>> BRDF File Loaded. Starting to compute statistics ... " << std::endl;
+   std::cout << "<<INFO>> Starting to compute statistics ... " << std::endl;
 
 
-   //Conversion
-   ptr<data> generic_data = dynamic_pointer_cast<data>( vs_data );
+   /* Compute the different metrics using the CORE functionalities */
+   errors::metrics result;
+   errors::compute(input.get(), ref.get(), result);
 
-   vertical_segment*   conv_vs = NULL;
-   bool conversion_necessary = true;
-   std::cout << "<<INFO>> Converting data to function parametrization if needed" << std::endl;
+   const auto L1_norm   = result["L1"];
+   const auto L2_norm   = result["L2"];
+   const auto L3_norm   = result["L3"];
+   const auto LInf_norm = result["LInf"];
+   const auto mse       = result["MSE"];
+   const auto rmse      = result["RMSE"];
 
-
-   t.start();
-   convertDataToFunctionParam( generic_data, dynamic_pointer_cast<parametrized>(ref), conversion_necessary, conv_vs );
-   t.stop();
-   std::cout << "<<INFO>> Data converted in " << t << std::endl;
-   t.reset();
-
-   ptr<data> converted_data = NULL;
-   if( conversion_necessary )
-   {
-      ptr<vertical_segment> sp_conv_vs( conv_vs );
-      converted_data = dynamic_pointer_cast<data>(sp_conv_vs );
-   }
-   else
-   {
-      converted_data = generic_data;
-   }
-
-   //Here we go new way and faster because we evaluate the function just once
-   Eigen::ArrayXXd data_x =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimX() );
-   Eigen::ArrayXXd data_y =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimY() ) ;
-
-   t.start();
-   demultiplexData( converted_data, data_x, data_y );
-   t.stop();
-   std::cout << "<<INFO>> Demultiplex data in " << t << std::endl;
-   t.reset();
-
-   Eigen::ArrayXXd f_y    = Eigen::ArrayXXd::Zero( ref->size(), ref->dimY() ) ;
-
-   t.start();
-   evaluateDataAtData( data_x, ref, f_y );
-   t.stop();
-   std::cout << "<<INFO>> Evaluate function for all data in  " << t << std::endl;
-   t.reset();
-
-   Eigen::VectorXd L1_norm   = Eigen::VectorXd::Zero( ref->dimY() );
-   Eigen::VectorXd L2_norm   = Eigen::VectorXd::Zero( ref->dimY() );
-   Eigen::VectorXd L3_norm   = Eigen::VectorXd::Zero( ref->dimY() );
-   Eigen::VectorXd LInf_norm = Eigen::VectorXd::Zero( ref->dimY() );
-
-   Eigen::VectorXd mse       = Eigen::VectorXd::Zero( ref->dimY() );
-   Eigen::VectorXd rmse      = Eigen::VectorXd::Zero( ref->dimY() );
-
-   t.start();
-   fastNormComputation( data_y, f_y, L1_norm, L2_norm, L3_norm, LInf_norm, mse, rmse);
-   t.stop();
-   std::cout << "<<INFO>> Fast Norm Computations in  " << t << std::endl;
-   std::cout << "<<INFO>> L1_norm " << L1_norm << std::endl
-      << "<<INFO>> L2_norm " << L2_norm << std::endl
-      << "<<INFO>> L3_norm " << L3_norm << std::endl
-      << "<<INFO>> Linf_norm " << LInf_norm << std::endl
-      << "<<INFO>> Mse  " << mse << std::endl
-      << "<<INFO>> Rmse " << rmse << std::endl;
-   t.reset();
+   std::cout << "<<INFO>> L1_norm "   << L1_norm   << std::endl
+             << "<<INFO>> L2_norm "   << L2_norm   << std::endl
+             << "<<INFO>> L3_norm "   << L3_norm   << std::endl
+             << "<<INFO>> Linf_norm " << LInf_norm << std::endl
+             << "<<INFO>> Mse  "      << mse       << std::endl
+             << "<<INFO>> Rmse "      << rmse      << std::endl;
 
 
-
-
-
-   //Norm L1
-   // t.start();
-   // vec const  norm_l1 = Norm::L1(converted_data, ref);
-   // t.stop();
-   // std::cout << "<<INFO>> From Norm L1:" << norm_l1 << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   //Norm L2
-   // t.start();
-   // vec const norm_l2 = Norm::L2(converted_data, ref);
-   // t.stop();
-   // std::cout << "<<INFO>> From Norm L2:" << norm_l2 << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   //Norm L3
-   // t.start();
-   // vec const norm_l3 = Norm::Lp(converted_data, ref, 3.0);
-   // t.stop();
-   // std::cout << "<<INFO>> From Norm L3:"    << norm_l3 << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   //Norm LInf
-   // t.start();
-   // vec const norm_linf = Norm::LInf(converted_data, ref);
-   // t.stop();
-   // std::cout << "<<INFO>> From Norm LINF: " <<  norm_linf << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   //MSE and RMSE
-   // t.start();
-   // vec const mse = Error::meanSquareError(converted_data, ref);
-   // t.stop();
-   // std::cout << "<<INFO>> Mean Square Error = " << mse << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   // t.start();
-   // vec const rmse = Error::rootMeanSquareError(converted_data, ref);
-   // t.stop();
-   // std::cout << "<<INFO>> Root Mean Square Error = " << rmse << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   // Compute Weighted Norms by cosine factors
-   // vec cosine_theta_view;
-   // vec cosine_theta_light;
-   // computeCosineFactorsFromData( converted_data, cosine_theta_light, cosine_theta_view );
-   // vec cosine_light_view = cosine_theta_light.cwiseProduct( cosine_theta_view );
-
-
-
-   // Eigen::VectorXd w_cosine_light_mse;
-   // Eigen::VectorXd w_cosine_light_rmse;
-
-   // fastWeightedErrors( data_y, f_y, cosine_theta_light, w_cosine_light_mse, w_cosine_light_rmse);
-
-   // std::cout << "<<INFO>> Weighted MSE by cosine of the light direction: " << w_cosine_light_mse << std::endl;
-   // std::cout << "<<INFO>> Weighted Root-MSE by cosine of the light direction: " << w_cosine_light_rmse << std::endl;
-
-
-   // Eigen::VectorXd w_cosine_light_view_mse;
-   // Eigen::VectorXd w_cosine_light_view_rmse;
-   // fastWeightedErrors( data_y, f_y, cosine_light_view, w_cosine_light_view_mse, w_cosine_light_view_rmse);
-
-   // std::cout << "<<INFO>> Weighted MSE by cos(theta_light) cos(theta_view): " << w_cosine_light_view_mse << std::endl;
-   // std::cout << "<<INFO>> Weighted Root-MSE by cos(theta_light) cos(theta_view): " << w_cosine_light_view_rmse << std::endl;
-
-
-
-   // t.start();
-   // vec const norm_l2_cos_light = Norm::weightedL2(converted_data, ref, cosine_theta_light);
-   // t.stop();
-   // std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light) "
-   //           << norm_l2_cos_light << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   // t.start();
-   // vec const norm_l2_cos_light_view = Norm::weightedL2(converted_data, ref, cosine_light_view);
-   // t.stop();
-   // std::cout << "<<INFO>> Weighted L2 with BRDF*cos(theta_light)*cos(theta_view) "
-   //           << norm_l2_cos_light_view << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-
-   //If output is not void we output the different metrics to a file
-   if( args.is_defined("output") )
-   {
+   /* If output is not void we output the different metrics to a file */
+   if(args.is_defined("output")) {
       std::string output_filename = args["output"];
-      if( output_filename != "")
-      {
+      if( output_filename != "") {
          std::ofstream  fwriter(output_filename.c_str() );
 
-         if( fwriter.good() )
-         {
-            fwriter << "#FIT2STATS EXPORT. DIMENSIONS ARE THE ONE FROM THE BRDF FUNCTION" << std::endl;
+         if(fwriter.good()) {
+            fwriter << "#FIT2STATS EXPORT" << std::endl;
             fwriter << "#CMD " << args.get_cmd() << std::endl;
-            fwriter << "#DIM " << ref->dimX() << " " << ref->dimY() << std::endl;
+            fwriter << "#DIM " << ref->dimX() << " "
+                               << ref->dimY() << std::endl;
             fwriter << std::endl;
 
-            fwriter << "L1 :" << L1_norm << std::endl;
-            fwriter << "L2 :" << L2_norm << std::endl;
-            fwriter << "L3 :" << L3_norm << std::endl;
+            fwriter << "L1 :"   << L1_norm   << std::endl;
+            fwriter << "L2 :"   << L2_norm   << std::endl;
+            fwriter << "L3 :"   << L3_norm   << std::endl;
             fwriter << "LINF :" << LInf_norm << std::endl;
-            fwriter << "MSE :" << mse << std::endl;
-            fwriter << "RMSE :" << rmse << std::endl;
-            // fwriter << "MSE * cos(theta_light) :" << w_cosine_light_mse << std::endl;
-            // fwriter << "RMSE * cos(theta_light) :" << w_cosine_light_rmse << std::endl;
-            // fwriter << "MSE * cos(theta_light) * cos(theta_view) :" << w_cosine_light_mse << std::endl;
-            // fwriter << "RMSE * cos(theta_light) cos(theta_view)  :" << w_cosine_light_rmse << std::endl;
+            fwriter << "MSE :"  << mse       << std::endl;
+            fwriter << "RMSE :" << rmse      << std::endl;
             fwriter << std::endl;
-         }
-         else
-         {
-            std::cerr << "<<ERROR>> Could not save metrics to " << output_filename << std::endl;
+
+         } else {
+            std::cerr << "<<ERROR>> Could not save metrics to "
+                      << output_filename << std::endl;
             return EXIT_FAILURE;
          }
       }
    }
-
-
-   //Comparisons with the norm methods provided in function.cpp
-   // t.start();
-   // double const L2   = ref->L2_distance( generic_data ) ;
-   // t.stop();
-   // std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2
-   //           << " (computed in " << t << ")" << std::endl;
-   // t.reset();
-
-   // t.start();
-   // double const Linf = ref->Linf_distance( generic_data );
-   // t.stop();
-   // std::cout << "<<INFO>> Linf distance to data = " << Linf
-   //           << " (computed in " << t << ")" << std::endl;
-   // t.reset();
 
    return EXIT_SUCCESS;
 }

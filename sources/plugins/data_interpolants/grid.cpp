@@ -135,7 +135,9 @@ vec get_max(const params::input& param) {
  *  \class data_grid
  *  \brief Data object storing BRDF values on a grid. Can perform linear
  *  interpolation between grid cells
- *
+ * else if(args.is_defined("param")) {
+            _in_param = params::parse_input(args["param"]);
+         }
  *  \details
  *
  *  It is possible to select the parametrization using the --param NAME
@@ -165,10 +167,17 @@ class BrdfGrid : public vertical_segment {
 
          // Allow to load a different parametrization depending on the
          // parameters provided.
-         if(args.is_defined("param")) {
+         if(args.is_defined("PARAM_IN")) {
+            _in_param = params::parse_input(args["PARAM_IN"]);
+         } else if(args.is_defined("param")) {
             _in_param = params::parse_input(args["param"]);
-            _nX = params::dimension(_in_param);
          }
+         _nX = params::dimension(_in_param);
+
+         if(args.is_defined("PARAM_OUT")) {
+            _out_param = params::parse_output(args["PARAM_OUT"]);
+         }
+         _nY = params::dimension(_out_param);
 
          // Get the grid size, by default use an 10^dimX grid
          int N = 1;

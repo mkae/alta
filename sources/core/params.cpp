@@ -643,6 +643,9 @@ void params::from_cartesian(const double* invec, params::input outtype,
 			double Bz = 0.5*(invec[5]-invec[2]);
 			outvec[1] = sqrt(Bx*Bx + By*By + Bz*Bz);
 			outvec[2] = atan2(By, Bx) -  atan2(Hy, Hx);
+         if(outvec[2] < 0.0) {
+            outvec[2] = 2.0*M_PI + outvec[2];
+         }
 		}
 			break;
 		case NEUMANN_3D:

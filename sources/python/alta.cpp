@@ -18,6 +18,7 @@
 #include <core/rational_function.h>
 #include <core/plugins_manager.h>
 #include <core/vertical_segment.h>
+#include <core/metrics.h>
 
 // STL include
 #include <iostream>
@@ -65,7 +66,7 @@ std::ostream &operator<<(std::ostream &out, const python_vec &x) {
 	out << "[";
 	for(int i=0; i<x.size(); ++i) {
 		if(i != 0) { out << ", "; }
-		out << x[i]; 
+		out << x[i];
 	}
 	return out << "]";
 }
@@ -108,7 +109,7 @@ struct vec_to_list_converter {
 	static PyObject* convert(const vec& x) {
 		auto obj = PyList_New(x.size());
 		for(auto i=0; i<x.size(); ++i) {
-			PyList_SetItem(obj, i, PyFloat_FromDouble(x[i]));	
+			PyList_SetItem(obj, i, PyFloat_FromDouble(x[i]));
 		}
 
 		return obj;
@@ -127,10 +128,23 @@ void vec_set_item(vec& x, int i, double a) {
 	x(i) = a;
 }
 
+/* Specific convert a vec to a string
+ */
+std::string vec_str(const vec& x) {
+   std::stringstream stream;
+   stream << "[";
+   for(int i=0; i<x.size(); ++i) {
+      if(i > 0) { stream << ", "; }
+      stream << x[i];
+   }
+   stream << "]";
+   return stream.str();
+}
+
 /* This class is a wrapper to ALTA's arguments class to add Python specific
  * behaviour such as dictionnary initialization.
  *
- * Right now it does not handle automatic conversion in function call for 
+ * Right now it does not handle automatic conversion in function call for
  * example. The following code is not possible:
  *
  *    import alta
@@ -155,7 +169,7 @@ struct python_arguments : public arguments {
 	}
 };
 
-/* Create a data object from a plugin's name and the data filename. This 
+/* Create a data object from a plugin's name and the data filename. This
  * function is here to accelerate the loading of data file.
  */
 ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
@@ -171,7 +185,7 @@ ptr<data> get_data(const std::string& plugin_name) {
 }
 
 /* Creating functions for the plugins_manager calls
- * 
+ *
  * TODO: Throw python exceptions if the function is not correctly created.
  *       Those function should disapear when the return type of get_Function
  *       in the plugin_manager will be ptr<function>.
@@ -230,7 +244,7 @@ void load_from_file(const ptr<function>& func, const std::string& filename) {
 
 /* Operators on function object. This provide the ability to create compounds
  * and product in the command line. This is only possible for nonlinear_functions
- * 
+ *
  * TODO: The compound and product function should store the shared pointer to the
  * function objects. They might stay in memory longer than the input functions.
  */
@@ -245,7 +259,7 @@ ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 	if(nf1 && nf2) {
 		cf->push_back(nf1, args);
 		cf->push_back(nf2, args);
-	
+
 		return ptr<function>(cf);
 
 	// Failure case, one of the function is a NULL ptr.
@@ -341,7 +355,7 @@ bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<functi
  */
 void data2data(const data* d_in, data* d_out)
 {
-   if(dynamic_cast<vertical_segment*>(d_out)!=NULL)
+   if(dynamic_cast<vertical_segment*>(d_out)!=NULL && d_out->size() == 0)
    {
       d_out->setParametrization(d_in->input_parametrization());
       d_out->setDimX(d_in->dimX());
@@ -349,14 +363,14 @@ void data2data(const data* d_in, data* d_out)
 
       // Init the min and max
       vec _min(d_out->dimX()), _max(d_out->dimX());
-      for(unsigned int k=0; k<d_out->dimX(); ++k)
+      for(auto k=0; k<d_out->dimX(); ++k)
       {
          _min[k] =  std::numeric_limits<double>::max() ;
          _max[k] = -std::numeric_limits<double>::max() ;
       }
 
       vec temp(d_out->dimX() + d_out->dimY());
-      for(unsigned int i=0; i<d_in->size(); ++i)
+      for(auto i=0; i<d_in->size(); ++i)
       {
          // Copy the input vector
          vec x = d_in->get(i);
@@ -365,7 +379,7 @@ void data2data(const data* d_in, data* d_out)
          d_out->set(temp);
 
          // Update min and max
-         for(unsigned int k=0; k<d_out->dimX(); ++k)
+         for(auto k=0; k<d_out->dimX(); ++k)
          {
             _min[k] = std::min(_min[k], temp[k]) ;
             _max[k] = std::max(_max[k], temp[k]) ;
@@ -397,7 +411,7 @@ void data2data(const data* d_in, data* d_out)
 
          params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
 
-         d_out->set(x);
+         d_out->set(i, x);
       }
    }
 }
@@ -432,12 +446,27 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 		}
 
 		d->set(i, y);
-	}	
+	}
+}
+
+/* Compute distance metric between 'in' and 'ref'.
+ */
+bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
+   // Compute the metrics
+   errors::metrics res;
+   errors::compute(in.get(), ref.get(), res);
+
+   // Fill the resulting Python vector
+   bp::dict py_res;
+   for(auto rpair : res) {
+      py_res.setdefault<std::string, vec>(rpair.first, rpair.second);
+   }
+   return py_res;
 }
 
 
-/*! \inpage python 
- *  Exporting the ALTA module 
+/*! \inpage python
+ *  Exporting the ALTA module
  */
 BOOST_PYTHON_MODULE(alta)
 {
@@ -463,7 +492,8 @@ BOOST_PYTHON_MODULE(alta)
 	bp::class_<vec>("_vec")
 		.def("__len__", &vec::size)
 		.def("__getitem__", &vec_get_item)
-		.def("__setitem__", &vec_set_item);
+		.def("__setitem__", &vec_set_item)
+		.def("__str__", &vec_str);
 	bp::class_<python_vec>("vec")
 		.def(bp::init<vec>())
 		.def(bp::init<bp::list>())
@@ -515,6 +545,7 @@ BOOST_PYTHON_MODULE(alta)
 
 	// Softs
 	//
-	bp::def("data2data", data2data);
-	bp::def("brdf2data", brdf2data);	
+	bp::def("data2data",  data2data);
+	bp::def("data2stats", data2stats);
+	bp::def("brdf2data",  brdf2data);
 }
