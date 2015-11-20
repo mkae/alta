@@ -128,6 +128,14 @@ void vec_set_item(vec& x, int i, double a) {
 	x(i) = a;
 }
 
+/* Operators on vec */
+inline vec vec_add(const vec& a, const vec& b) {
+   return a + b;
+}
+inline vec vec_sub(const vec& a, const vec& b) {
+   return a - b;
+}
+
 /* Specific convert a vec to a string
  */
 std::string vec_str(const vec& x) {
@@ -490,6 +498,8 @@ BOOST_PYTHON_MODULE(alta)
 	// TODO: There is a conversion issue right now that prevents us from using vectors
 	// within Python. This needs to be investiguated.
 	bp::class_<vec>("_vec")
+		.def("__add__", &vec_add)
+		.def("__sub__", &vec_sub)
 		.def("__len__", &vec::size)
 		.def("__getitem__", &vec_get_item)
 		.def("__setitem__", &vec_set_item)
