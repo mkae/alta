@@ -13,7 +13,12 @@ z = x - x
 if y[0] != 2.0 and z[0] != 0.0:
     fail = True
 
+# Testing str(vec)
 print "Testing 'str' method on variable 'y': " + str(y)
+
+# Testing the length of the vector
+if len(y) != 3:
+    fail = True
 
 # Print the test result
 if fail:
