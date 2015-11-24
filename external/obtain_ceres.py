@@ -27,7 +27,9 @@ if glog_obtained and not glog_compiled:
       obtain.patch('glog-0.3.3/src/glog/stl_logging.h.in', 'glog.patch')
 
    C.progress_display('configuring and building GLOG for CERES')
-   glog_compiled = obtain.configure_build(directory, '--disable-shared --enable-static --with-pic')
+   glog_compiled = obtain.configure_build(directory,
+                                          ['--disable-shared',
+                                           '--enable-static', '--with-pic'])
 
 
 # Download CERES.  Assume Eigen is already available.

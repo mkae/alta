@@ -90,12 +90,12 @@ def obtain(name, rep, url, filename, sha256):
 # Launch './configure' and 'make install' for UNIX like archives.
 # The command is runned silent. TODO: Add the output of the command
 # to the configuration file.
-def configure_build(rep, options = ''):
+def configure_build(rep, options = []):
    os.chdir(rep)
 
    args = ['./configure', '-q', '--prefix=' + os.getcwd() + os.sep + os.pardir + os.sep + 'build']
    #call = Popen(args + options.split(), stdout=PIPE, stderr=PIPE, stdin=PIPE)
-   call = Popen(args + options.split())
+   call = Popen(args + options)
    ret  = call.wait()
    if ret != 0:
       C.progress_display('Warning: unable to configure package' + rep)

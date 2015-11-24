@@ -31,8 +31,9 @@ if obtained and not compiled:
       obtain.cmake_build(directory)
 
    else:
-      obtain.configure_build(directory, '--enable-static --without-matlab --without-octave --without-python --without-guile')
-   #end
+      obtain.configure_build(directory,
+                             ['--enable-static', '--without-matlab',
+                              '--without-octave', '--without-python',
+                              '--without-guile'])
 else:
    print '<<INSTALL>> NlOpt already installed'
-#end
