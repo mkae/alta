@@ -40,7 +40,7 @@ if obtained and not compiled:
       getThirdParty('Mumps')
 
       obtain.configure_build(directory,
-                             ['--enable-static',
+                             ['--enable-static', '--with-pic',
                               '--enable-dependency-linking'])
 else:
    C.progress_display('IpOpt is already installed')

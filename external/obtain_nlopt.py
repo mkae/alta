@@ -32,7 +32,8 @@ if obtained and not compiled:
 
    else:
       obtain.configure_build(directory,
-                             ['--enable-static', '--without-matlab',
+                             ['--enable-static', '--with-pic',
+                              '--without-matlab',
                               '--without-octave', '--without-python',
                               '--without-guile'])
 else:
