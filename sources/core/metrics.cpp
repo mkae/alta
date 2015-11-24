@@ -83,12 +83,15 @@ void errors::evaluate(const data* inp,
                          dat_x.data());
 
          ref_y.row(i) = ref_xy.tail(nY);
+         inp_y.row(i) = inp->value(dat_x);
+         /*
          params::convert(inp->value(dat_x).data(),
                          inp->output_parametrization(),
                          inp->dimY(),
                          ref->output_parametrization(),
                          ref->dimY(),
                          inp_y.row(i).data());
+         */
       } else {
          ref_y.row(i).setZero();
          inp_y.row(i).setZero();
