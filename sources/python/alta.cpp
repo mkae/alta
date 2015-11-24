@@ -1,6 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 Inria
+   Copyright (C) 2015 Université de Montréal
 
    This file is part of ALTA.
 
@@ -23,6 +24,9 @@
 // STL include
 #include <iostream>
 
+// Local includes
+#include "wrapper_vec.hpp"
+
 #define bp boost::python
 
 
@@ -44,109 +48,6 @@ namespace boost {
          typedef T type;
       };
    }
-}
-
-
-/* Wrapper to ALTA's vec class. This is only here to allow init with Python's
- * list.
- *
- * TODO: Make sure that the value passed to this vector are floatting point
- *       convertible.
- */
-struct python_vec : public vec {
-    python_vec() : vec() {}
-	 python_vec(const vec& x) : vec(x) {}
-	 python_vec(const bp::list& l) : vec(bp::len(l)) {
-		 for(auto i=0; i<bp::len(l); ++i) {
-			 (*this)[i] = bp::extract<double>(l[i]);
-		 }
-	 }
-};
-std::ostream &operator<<(std::ostream &out, const python_vec &x) {
-	out << "[";
-	for(int i=0; i<x.size(); ++i) {
-		if(i != 0) { out << ", "; }
-		out << x[i];
-	}
-	return out << "]";
-}
-
-/* Create special converter from and to list/vec */
-struct list_to_vec_converter {
-
-	// Constructor add the converter to the registry
-	list_to_vec_converter() {
-		bp::converter::registry::push_back(
-				&convertible,
-				&construct,
-				bp::type_id<vec>());
-	}
-
-	// Is the Python object convertible to a vec ?
-	static void* convertible(PyObject* obj_ptr) {
-		if (!PyList_Check(obj_ptr)) return 0;
-		return obj_ptr;
-	}
-
-	// From a PyObject, construct a vector object
-	static void construct(
-			PyObject* obj_ptr,
-			bp::converter::rvalue_from_python_stage1_data* data) {
-
-		auto size = PyList_Size(obj_ptr);
-		vec* _vec = new vec(size);
-		for(auto i=0; i<size; ++i) {
-			auto pyitem = PyList_GetItem(obj_ptr, i);
-			(*_vec)[i] = PyFloat_AsDouble(pyitem);
-		}
-
-		data->convertible = (void*) _vec;;
-	}
-};
-struct vec_to_list_converter {
-
-	// From a vec, create a PyObject
-	static PyObject* convert(const vec& x) {
-		auto obj = PyList_New(x.size());
-		for(auto i=0; i<x.size(); ++i) {
-			PyList_SetItem(obj, i, PyFloat_FromDouble(x[i]));
-		}
-
-		return obj;
-	}
-};
-
-/* Specific function call to acces a vector's element
- */
-double vec_get_item(const vec& x, int i) {
-	return x(i);
-}
-
-/* Specific function call to set a vector's element
- */
-void vec_set_item(vec& x, int i, double a) {
-	x(i) = a;
-}
-
-/* Operators on vec */
-inline vec vec_add(const vec& a, const vec& b) {
-   return a + b;
-}
-inline vec vec_sub(const vec& a, const vec& b) {
-   return a - b;
-}
-
-/* Specific convert a vec to a string
- */
-std::string vec_str(const vec& x) {
-   std::stringstream stream;
-   stream << "[";
-   for(int i=0; i<x.size(); ++i) {
-      if(i > 0) { stream << ", "; }
-      stream << x[i];
-   }
-   stream << "]";
-   return stream.str();
 }
 
 /* This class is a wrapper to ALTA's arguments class to add Python specific
@@ -322,7 +223,7 @@ void set_function_params(ptr<function>& f, const vec& v) {
 	// }
 }
 
-python_vec get_function_params(ptr<function>& f) {
+vec get_function_params(ptr<function>& f) {
 		// Try to set the parameter as a nonlinear function
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
 	if(nf) {
@@ -478,12 +379,6 @@ bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
  */
 BOOST_PYTHON_MODULE(alta)
 {
-	// Custor converters
-	//
-	list_to_vec_converter();
-	vec_to_list_converter();
-
-
 	// Argument class
 	//
 	bp::class_<arguments>("_arguments");
@@ -494,29 +389,9 @@ BOOST_PYTHON_MODULE(alta)
 		.def("update", &arguments::update);
 
 
-	// Vector class
-	//
-	// TODO: There is a conversion issue right now that prevents us from using vectors
-	// within Python. This needs to be investiguated.
-	bp::class_<vec>("_vec")
-		.def("__add__", &vec_add)
-		.def("__sub__", &vec_sub)
-		.def("__len__", &vec::size)
-		.def("__getitem__", &vec_get_item)
-		.def("__setitem__", &vec_set_item)
-		.def("__str__", &vec_str);
-	bp::class_<python_vec>("vec")
-		.def(bp::init<vec>())
-		.def(bp::init<bp::list>())
-		.def(bp::self_ns::str(bp::self_ns::self))
-		.def("__add__", &vec_add)
-		.def("__sub__", &vec_sub)
-		.def("__len__", &vec::size)
-		.def("__getitem__", &vec_get_item)
-		.def("__setitem__", &vec_set_item)
-		.def("__str__", &vec_str);
-	bp::implicitly_convertible<vec, python_vec>();
-	bp::implicitly_convertible<python_vec, vec>();
+   // Vec class
+   //
+   register_wrapper_vec();
 
 
 	// Function interface
