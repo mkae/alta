@@ -135,11 +135,8 @@ vec get_max(const params::input& param) {
  *  \class data_grid
  *  \brief Data object storing BRDF values on a grid. Can perform linear
  *  interpolation between grid cells
- * else if(args.is_defined("param")) {
-            _in_param = params::parse_input(args["param"]);
-         }
+
  *  \details
- *
  *  It is possible to select the parametrization using the --param NAME
  *  argument when loading the BRDF. The default parametrization is
  *  \ref params::STARK_2D "STARK_2D"
