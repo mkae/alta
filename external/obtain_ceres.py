@@ -59,6 +59,10 @@ if obtained and compile_test:
       options = '-DMINIGLOG=ON'
    options = options + ' include -DGFLAGS=OFF -DEIGEN_INCLUDE_DIR=' + build_dir + os.sep + 'include' + ' -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
 
+   if not sys.platform.startswith('win'):
+      # Build PIC so we can link it into our DSOs.
+      options = options + ' -DCMAKE_CXX_FLAGS=-fPIC'
+
    obtain.cmake_build(directory, options)
 
    if not glog_compiled:
