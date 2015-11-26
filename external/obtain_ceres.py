@@ -69,6 +69,17 @@ if obtained and compile_test:
      os.rename(includedir + '/ceres/internal/miniglog/glog',
                includedir + '/glog')
 
+   # CERES's CMakeLists.txt chooses to install to lib64/ or lib/
+   # depending on the phase of the moon.  Rectify that by moving
+   # things to lib/ if need be.
+   libdir = Dir('#external/build/lib').abspath
+   lib64dir = Dir('#external/build/lib64').abspath
+   if os.access(lib64dir, os.R_OK):
+     os.rename(lib64dir + '/libceres.a', libdir + '/libceres.a')
+     if not glog_compiled:
+       os.rename(lib64dir + '/libminiglog.a', libdir + '/libminiglog.a')
+     os.rmdir(lib64dir)
+
 else:
    W.warn(obtain.AltaDependencyWarning,
              'CERES already installed or cannot be installed automatically')
