@@ -61,6 +61,14 @@ if obtained and compile_test:
 
    obtain.cmake_build(directory, options)
 
+   if not glog_compiled:
+     # When CERES builds miniglog, it installs its headers under
+     # $includedir/ceres/internal/miniglog.  Move it to the right
+     # place.
+     includedir = Dir('#external/build/include').abspath
+     os.rename(includedir + '/ceres/internal/miniglog/glog',
+               includedir + '/glog')
+
 else:
    W.warn(obtain.AltaDependencyWarning,
              'CERES already installed or cannot be installed automatically')
