@@ -363,7 +363,7 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
    // Compute the metrics
    errors::metrics res;
-   errors::compute(in.get(), ref.get(), res);
+   errors::compute(in.get(), ref.get(), nullptr, res);
 
    // Fill the resulting Python vector
    bp::dict py_res;

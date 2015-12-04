@@ -519,7 +519,7 @@ int main(int argc, char* argv[])
 
    /* Compute the different metrics using the CORE functionalities */
    errors::metrics result;
-   errors::compute(input.get(), ref.get(), result);
+   errors::compute(input.get(), ref.get(), nullptr, result);
 
    const auto L1_norm   = result["L1"];
    const auto L2_norm   = result["L2"];

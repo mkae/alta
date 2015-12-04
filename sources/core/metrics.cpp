@@ -1,15 +1,19 @@
 #include "metrics.h"
 
-void errors::compute(const data* in, const data* ref, metrics& res) {
+void errors::compute(const data* in,   const data* ref,
+                     const data* mask, metrics& res) {
+
+   const int size = checkMaskSize(ref, mask);
+
    //Here we go new way and faster because we evaluate the function just once
-   Eigen::MatrixXd ref_y = Eigen::MatrixXd::Zero(ref->size(), ref->dimY());
-   Eigen::MatrixXd inp_y = Eigen::MatrixXd::Zero(ref->size(), ref->dimY()) ;
+   Eigen::MatrixXd ref_y = Eigen::MatrixXd::Zero(size, ref->dimY());
+   Eigen::MatrixXd inp_y = Eigen::MatrixXd::Zero(size, ref->dimY()) ;
 
 #ifdef DEBUG
    timer  t;
    t.start();
 #endif
-   evaluate(in, ref, inp_y, ref_y);
+   evaluate(in, ref, mask, inp_y, ref_y);
 #ifdef DEBUG
    t.stop();
    std::cout << "<<INFO>> Evaluate function for all data in  " << t << std::endl;
@@ -44,9 +48,30 @@ void errors::compute(const data* in, const data* ref, metrics& res) {
    res["RMSE"] = rmse;
 }
 
+int errors::checkMaskSize(const data* ref, const data* mask) {
+
+   if(mask == nullptr) {
+      return ref->size();
+   }
+
+   assert(ref->size() == mask->size());
+
+   // Evaluate the input data at each position of data_x configuration
+   int nb_elems = 0;
+   for(auto i=0; i<ref->size(); i++) {
+      // If the mask value is set to zero, skip the current entry
+      if(mask->get(i).tail(1)[0] == 0.0) {
+         ++nb_elems;
+      }
+   }
+
+   return nb_elems;
+}
+
 
 void errors::evaluate(const data* inp,
                       const data* ref,
+                      const data* mask,
                       Eigen::MatrixXd& inp_y,
                       Eigen::MatrixXd& ref_y) {
 
@@ -60,8 +85,16 @@ void errors::evaluate(const data* inp,
    const auto nY = ref->dimY();
    const auto nX = ref->dimX();
 
+   // Is there a mask function to be applied
+   const bool has_mask = mask != nullptr;
+
    // Evaluate the input data at each position of data_x configuration
    for(auto i=0; i<ref->size(); i++) {
+
+      // If the mask value is set to zero, skip the current entry
+      if(has_mask && mask->get(i).tail(1)[0] == 0.0) {
+         continue;
+      }
 
       ref_xy = ref->get(i);
       ref_x  = ref_xy.head(nX);

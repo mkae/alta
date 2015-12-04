@@ -18,7 +18,8 @@
 // STL includes
 #include <map>
 
-/* \brief Error metrics class
+/*!
+ * \brief Error metrics class
  *
  * \details
  * This class contains the functionnalities to compute various error metric
@@ -37,16 +38,27 @@ class errors {
        */
       typedef std::map<std::string, vec> metrics;
 
-      /* Computes different metrics to compate two data objects 'in' to 'ref'.
-      */
-      static void compute(const data* in, const data* ref, metrics& res);
+      /*! Computes different metrics to compate two data objects 'in' to 'ref'.
+       *
+       * This method can remove element from the input dataset to compute the
+       * metric with the mask data. A mask is a data element of R^N -> R where
+       * zero correspond to boolean 'false'. When evaluating the 'ref' data,
+       * the error metric will skip entries for which 'mask' is false. The
+       * 'mask' and the 'ref' data must have the same number of entries.
+       */
+      static void compute(const data* in, const data* ref,
+                          const data* mask, metrics& res);
 
    private:
+
+      /* Return the number of non-zero elements in the 'mask' data object.
+       */
+      static int checkMaskSize(const data* ref, const data* mask);
 
       /* Evaluate the output Eigen matrices containing the evaluation of the
        * interpolated data 'in' with respect to 'ref' abscissas.
        */
-      static void evaluate(const data* in, const data* ref,
+      static void evaluate(const data* in, const data* ref, const data* mask,
                            Eigen::MatrixXd& in_y, Eigen::MatrixXd& ref_y);
 
       /* Use Eigen Norm computation to compute efficiently a bunch of metrics
