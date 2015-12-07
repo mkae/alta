@@ -87,8 +87,12 @@ if obtained and compile_test:
    # When building miniglog, rename it to libglog.a, which is what the
    # rest of the build system expects.
    if not glog_compiled:
-     os.rename(libdir + '/libminiglog.a', libdir + '/libglog.a')
-
+      if not sys.platform.startswith('win'):
+         os.rename(libdir + '/libminiglog.a', libdir + '/libglog.a')
+      else:
+         os.rename(libdir + '/miniglog.lib', libdir + '/libglog.lib')
+      #end ifelse
+   #end if
 else:
    W.warn(obtain.AltaDependencyWarning,
              'CERES already installed or cannot be installed automatically')
