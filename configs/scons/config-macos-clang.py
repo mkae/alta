@@ -14,7 +14,6 @@ import os, sys
 ## Compiler and build flags.
 ##
 #CXX            = 'clang++'
-LINKFLAGS      = []
 
 
 ## ALTA internal flags

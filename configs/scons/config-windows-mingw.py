@@ -12,7 +12,7 @@ import os, sys
 CXX            = 'g++'
 
 # This is not the best place to past static linking since plugins need the -shared options 
-#LINKFLAGS			 = [ '-static-libgcc', '-static-libstdc++']
+#LINKFLAGS			 = '-static-libgcc -static-libstdc++'
 
 ## ALTA internal flags
 ##

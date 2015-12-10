@@ -81,7 +81,7 @@ vars.Add('CXX',               'C++ compiler',
 vars.Add('CCFLAGS',           'Compiler\'s flags',
          default = '-std=c++11 -g -O2 -Wall')
 vars.Add('LINKFLAGS',         'Linker\'s flags',
-		 default = [])
+         default = '')
 vars.Add('PLUGIN_LIB',        'Special links for ALTA plugin')
 vars.Add('EIGEN_INC',         'Eigen include directory (mandatory)')
 vars.Add('PYTHON_INC',        'Python and boost-python include directory')
