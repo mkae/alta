@@ -14,7 +14,7 @@ CXX            = 'cl'
 # We used to have '/arch:AVX' here, but that generates invalid code if
 # the underlying CPU does not support AVX (which is typically the case
 # in VMs.)
-CCFLAGS        = ['/Zi','/nologo', '/O2', '/Ox', '/EHsc']
+CCFLAGS        = '/Zi /nologo /O2 /Ox /EHsc'
 
 
 ## ALTA internal flags
@@ -35,7 +35,7 @@ EIGEN_INC     = ['#external/build/include/Eigen']
 
 ## OpenMP flags
 ##
-OPENMP_FLAG   = ['/openmp']
+OPENMP_FLAG   = ' /openmp'
 OPENMP_LIB    = []
 
 

@@ -14,7 +14,6 @@ import os, sys
 ## Compiler and build flags.
 ##
 #CXX            = 'clang++'
-CCFLAGS        = ['-std=c++11', '-O3', '-g', '-Wall']
 LINKFLAGS      = []
 
 
@@ -44,7 +43,7 @@ EIGEN_INC     = ['#external/build/include']
 ## There is no support for OpenMP on OSX + clang right now. We advise to use
 ## a gcc compiler if performances are required.
 ##
-OPENMP_FLAG   = []
+OPENMP_FLAG   = ''
 OPENMP_LIB    = []
 
 

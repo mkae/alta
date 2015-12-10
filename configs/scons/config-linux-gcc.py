@@ -10,7 +10,6 @@ import os, sys
 ## Compiler and build flags.
 ##
 #CXX            = 'g++'
-CCFLAGS        = ['-O3', '-g', '-Wall', '-std=c++11']
 
 
 ## ALTA internal flags
@@ -32,7 +31,6 @@ EIGEN_INC     = ['#external/build/include/Eigen']
 
 ## OpenMP flags
 ##
-OPENMP_FLAG  = ['-fopenmp']
 OPENMP_LIB   = ['gomp']
 
 

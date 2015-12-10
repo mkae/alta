@@ -21,17 +21,13 @@ CCFLAGS = env['CCFLAGS']
 ## impact the use of dynamic_cast in shared libraries.
 ##
 if sys.platform == 'darwin':
-	CCFLAGS = CCFLAGS + ['-fvisibility=hidden']
-else:
-  CCFLAGS = CCFLAGS + []
+	CCFLAGS = CCFLAGS + ' -fvisibility=hidden'
 
 if env['CC'] != 'cl':
 	# We're not building a real static library, but rather what
 	# Libtool calls a "convenience library": an archive that
 	# contains PIC code.  Thus, force '-fPIC'.
-	CCFLAGS = CCFLAGS + ['-fPIC']
-else:
-  CCFLAGS = CCFLAGS + []
+	CCFLAGS = CCFLAGS + ' -fPIC'
 
 env.StaticLibrary('../build/core', source = sources,
                   LIBS = ALTA_LIBS,

@@ -79,7 +79,7 @@ vars = Variables(configFile)
 vars.Add('CXX',               'C++ compiler',
          default = program_file_name(cxx_compilers))
 vars.Add('CCFLAGS',           'Compiler\'s flags',
-		 default = ['-g', '-O2', '-Wall'])
+         default = '-std=c++11 -g -O2 -Wall')
 vars.Add('LINKFLAGS',         'Linker\'s flags',
 		 default = [])
 vars.Add('PLUGIN_LIB',        'Special links for ALTA plugin')
@@ -96,7 +96,8 @@ vars.Add('FLANN_LIB',         'FLANN libraries')
 vars.Add('CGAL_INC',          'CGAL include directory', default = [])
 vars.Add('CGAL_DIR',          'CGAL libraries directory', default = [])
 vars.Add('CGAL_LIB',          'CGAL libraries', default = [])
-vars.Add('OPENMP_FLAG',       'OpenMP required flags')
+vars.Add('OPENMP_FLAG',       'OpenMP required flags',
+         default = ' -fopenmp')
 vars.Add('OPENMP_LIB',        'OpenMP libraries')
 vars.Add('QUADPROG_INC',      'QUADPROG include directory')
 vars.Add('QUADPROG_DIR',      'QUADPROG libraries directory')

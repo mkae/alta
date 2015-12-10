@@ -10,7 +10,6 @@ import os, sys
 ## Compilators build flags
 ##
 CXX            = 'g++'
-CCFLAGS        = ['-O3', '-g', '-Wall', '-std=c++11']
 
 # This is not the best place to past static linking since plugins need the -shared options 
 #LINKFLAGS			 = [ '-static-libgcc', '-static-libstdc++']
@@ -35,8 +34,7 @@ EIGEN_INC     = ['#external/build/include/Eigen']
 
 ## OpenMP flags
 ##
-OPENMP_FLAG   = ['-fopenmp']
-OPENMP_LIB    = ['gomp' ]
+OPENMP_LIB    = ['gomp']
 
 
 ## OpenEXR library
