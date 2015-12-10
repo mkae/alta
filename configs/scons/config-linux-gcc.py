@@ -29,11 +29,6 @@ PLUGIN_LIB     = ['core']
 EIGEN_INC     = ['#external/build/include/Eigen']
 
 
-## OpenMP flags
-##
-OPENMP_LIB   = ['gomp']
-
-
 ## OpenEXR library
 ##
 #OPENEXR_INC    = ['/usr/include/OpenEXR']

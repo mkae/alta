@@ -35,8 +35,8 @@ EIGEN_INC     = ['#external/build/include/Eigen']
 
 ## OpenMP flags
 ##
-OPENMP_FLAG   = ' /openmp'
-OPENMP_LIB    = []
+OPENMP_CFLAGS    = ' /openmp'
+OPENMP_LINKFLAGS = ''
 
 
 ## OpenEXR library

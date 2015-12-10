@@ -1,15 +1,9 @@
 Import('env', 'ALTA_LIBS')
 env = env.Clone()
 
-# Check whether OpenMP is available.  Do that before 'libcore' is
-# added to 'LIBS', otherwise SCons ends up silently building 'libcore'
-# during the configuration phase.
-conf = Configure(env)
-if env['OPENMP_LIB']:
-   if conf.CheckLib(env['OPENMP_LIB'], language='c++'):
-	   env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
-	   env.AppendUnique(LIBS = env['OPENMP_LIB'])
-env = conf.Finish()
+if env['OPENMP_LINKFLAGS']:
+  env.AppendUnique(CCFLAGS = env['OPENMP_CFLAGS'])
+  env.AppendUnique(LINKFLAGS = env['OPENMP_LINKFLAGS'])
 
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)

@@ -5,31 +5,39 @@ build_lib = False
 
 # Check whether Python 2.7 and Boost.Python are available.
 if library_available(env, pkgspec='python-2.7',
-							inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
-							lib='PYTHON_LIB', header='Python.h'):
+                     inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
+                     lib='PYTHON_LIB', header='Python.h'):
+  # Check if OpenMP is available
+  if env['OPENMP_LINKFLAGS']:
+    env.AppendUnique(CCFLAGS = env['OPENMP_CFLAGS'])
+    env.AppendUnique(LINKFLAGS = env['OPENMP_LINKFLAGS'])
 
-	conf = Configure(env)
+  conf = Configure(env)
 
-	# Check if OpenMP is available
-	env.AppendUnique(CCFLAGS = env['OPENMP_FLAG'])
-	if env['OPENMP_LIB'] and conf.CheckLib(env['OPENMP_LIB'], 'c++'):
-		env.AppendUnique(LIBS    = env['OPENMP_LIB'])
+  # On GNU/Linux the '-mt' suffix is no longer used, but it is still
+  # used on some other platforms (see
+  # <http://stackoverflow.com/questions/2293962/boost-libraries-in-multithreading-aware-mode>.)
+  build_lib = conf.CheckLibWithHeader('boost_python-mt',
+                                      'boost/python.hpp', 'c++')
+  if not build_lib:
+    build_lib = conf.CheckLibWithHeader('boost_python',
+                                        'boost/python.hpp', 'c++')
 
-	# On GNU/Linux the '-mt' suffix is no longer used, but it is still
-	# used on some other platforms (see
-	# <http://stackoverflow.com/questions/2293962/boost-libraries-in-multithreading-aware-mode>.)
-	build_lib = conf.CheckLibWithHeader('boost_python-mt',
-													'boost/python.hpp', 'c++')
-	if not build_lib:
-		build_lib = conf.CheckLibWithHeader('boost_python',
-														'boost/python.hpp', 'c++')
+  # On GNU/Linux the '-mt' suffix is no longer used, but it is still
+  # used on some other platforms (see
+  # <http://stackoverflow.com/questions/2293962/boost-libraries-in-multithreading-aware-mode>.)
+  build_lib = conf.CheckLibWithHeader('boost_python-mt',
+                                      'boost/python.hpp', 'c++')
+  if not build_lib:
+    build_lib = conf.CheckLibWithHeader('boost_python',
+                                        'boost/python.hpp', 'c++')
 
-	env = conf.Finish()
+  env = conf.Finish()
 
 if build_lib:
-	env.Prepend(LIBS = ['core'])
-	env['SHLIBPREFIX']=''
-	env.Alias('python', env.SharedLibrary('../build/alta.so', ['alta.cpp']))
+  env.Prepend(LIBS = ['core'])
+  env['SHLIBPREFIX']=''
+  env.Alias('python', env.SharedLibrary('../build/alta.so', ['alta.cpp']))
 else:
-	print "<<ERROR>> Unable to build the Python interface, please install boost-python"
-	print "          or check your configuration."
+  print "<<ERROR>> Unable to build the Python interface, please install boost-python"
+  print "          or check your configuration."

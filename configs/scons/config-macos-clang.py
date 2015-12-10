@@ -42,8 +42,8 @@ EIGEN_INC     = ['#external/build/include']
 ## There is no support for OpenMP on OSX + clang right now. We advise to use
 ## a gcc compiler if performances are required.
 ##
-OPENMP_FLAG   = ''
-OPENMP_LIB    = []
+OPENMP_CFLAGS    = ''
+OPENMP_LINKFLAGS = ''
 
 
 ## OpenEXR library
