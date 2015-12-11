@@ -68,7 +68,7 @@ QUADPROG_LIB      = ['quadprog++']
 ##
 CERES_INC      = ['#external/build/include']
 CERES_DIR      = ['#external/build/lib']
-CERES_LIB      = ['ceres', 'miniglog']
+CERES_LIB      = ['ceres', 'libglog']
 CERES_OPT_LIB  = ['gomp', 'lapack', 'blas']
 
 
