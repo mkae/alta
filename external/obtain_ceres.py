@@ -57,7 +57,13 @@ if obtained and compile_test:
       options = '-DGLOG_LIBRARY=' + build_dir + 'lib' + os.sep + 'libglog.a' + ' -DGLOG_INCLUDE_DIR=' + build_dir + 'include' + ' -DMINIGLOG=OFF'
    else:
       options = '-DMINIGLOG=ON'
-   options = options + ' include -DGFLAGS=OFF -DEIGEN_INCLUDE_DIR=' + build_dir + os.sep + 'include' + ' -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
+   options = options + ' include -DGFLAGS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF'
+
+   # When Eigen was not found by pkg-config (i.e., it was built
+   # locally under externals/, or the user specified 'EIGEN_INC' in
+   # the config file), then we need to tell CMake where to find it.
+   if env['EIGEN_INC']:
+     options += '-DEIGEN_INCLUDE_DIR=' + env['EIGEN_INC'][0] + '/include'
 
    if not sys.platform.startswith('win'):
       # Build PIC so we can link it into our DSOs.

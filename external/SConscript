@@ -40,6 +40,9 @@ else:
      env.ParseConfig('pkg-config --cflags --libs eigen3')
    if not conf.CheckCXXHeader('Eigen/Core'):
      execfile('obtain_eigen.py')
+
+     # Let other parts of the build system know that we use our own Eigen.
+     env['EIGEN_INC'] = [Dir('#external/build/include').abspath]
    env = conf.Finish()
 
    ##
