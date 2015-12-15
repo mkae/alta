@@ -10,5 +10,5 @@ env.AppendUnique(LIBS    = env['QUADPROG_LIB'])
 env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 
 sources = ['rational_fitter.cpp']
-env.SharedLibrary('../../build/rational_fitter_quadprog', sources)
+env.SharedLibrary('#build/plugins/rational_fitter_quadprog', sources)
 Return('sources')               # always built

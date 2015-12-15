@@ -1,6 +1,6 @@
 Import('env')
 
 sources = ['function.cpp']
-env.SharedLibrary('../../build/nonlinear_shadowing_walter_smith', sources,
+env.SharedLibrary('#build/plugins/nonlinear_shadowing_walter_smith', sources,
                   LIBS = env['PLUGIN_LIB'])
 Return('sources')               # always built

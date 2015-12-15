@@ -1,7 +1,7 @@
 # ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 #
 # Copyright (C) 2014, 2015 CNRS
-# Copyright (C) 2013, 2014, 2015 Inria
+# Copyright (C) 2013, 2014, 2015, 2016 Inria
 # Copyright (C) 2015 Universite de Montreal
 #
 # This file is part of ALTA.
@@ -235,7 +235,7 @@ env = conf.Finish()
 ## paths.
 ##
 env.AppendUnique(LIBPATH = ['#external/build/lib'])
-env.AppendUnique(LIBPATH = ['#sources/build'])
+env.AppendUnique(LIBPATH = ['#build/core'])
 env.AppendUnique(CPPPATH = ['#external/build/include'])
 env.AppendUnique(CPPPATH = ['#sources'])
 
@@ -246,13 +246,18 @@ env.Decider('timestamp-newer')
 ##
 Export('env')
 
+def alta_sconscript(script):
+  return env.SConscript(script,
+                        variant_dir='build/' + os.path.dirname(script),
+                        duplicate=0)
+
 external = env.SConscript('external/SConscript')
-core     = env.SConscript('sources/core/SConscript')
-plugins  = env.SConscript('sources/plugins/SConscript')
-softs    = env.SConscript('sources/softs/SConscript')
+core     = alta_sconscript('sources/core/SConscript')
+plugins  = alta_sconscript('sources/plugins/SConscript')
+softs    = alta_sconscript('sources/softs/SConscript')
 
 if 'python' in COMMAND_LINE_TARGETS:
-  python = env.SConscript('sources/python/SConscript')
+  python = alta_sconscript('sources/python/SConscript')
   env.Depends(python, core)
 
 env.Depends(core, external)
@@ -260,7 +265,7 @@ env.Depends(plugins, core)
 env.Depends(softs, core)
 
 if 'tests' in COMMAND_LINE_TARGETS:
-  tests = env.SConscript('sources/tests/SConscript')
+  tests = alta_sconscript('sources/tests/SConscript')
   env.Depends(tests, core)
   env.Depends(tests, plugins)
   if 'python' in COMMAND_LINE_TARGETS:

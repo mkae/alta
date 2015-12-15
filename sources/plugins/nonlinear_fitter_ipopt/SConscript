@@ -8,6 +8,6 @@ build_lib = library_available(env, pkgspec='ipopt',
                               lib='IPOPT_LIB', header='coin/IpTNLP.hpp')
 
 if build_lib:
-  env.SharedLibrary('../../build/nonlinear_fitter_ipopt', 'fitter.cpp')
+  env.SharedLibrary('#build/plugins/nonlinear_fitter_ipopt', 'fitter.cpp')
 
 Return('build_lib')

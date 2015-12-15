@@ -37,7 +37,7 @@ test_file = File('Kirby2.dat').srcnode().abspath
 test_data_directory = os.path.dirname(test_file)
 
 # Directory for the files produced by the tests.
-test_output_directory = Dir('#sources/tests/build').abspath
+test_output_directory = Dir('#build/tests').abspath
 
 def test_byproduct(file):
   """Return the absolute file name of FILE, a file produced by a test."""
@@ -57,10 +57,10 @@ def build_environment_variables():
   """
   envvars = os.environ.copy()
   envvars['TEST_DATA_DIRECTORY'] = test_data_directory
-  envvars['PYTHONPATH'] = Dir('#sources/build').abspath
-  envvars['ALTA_LIB'] = Dir('#sources/build').abspath;
+  envvars['PYTHONPATH'] = Dir('#build/python').abspath
+  envvars['ALTA_LIB'] = Dir('#build/plugins').abspath;
 
-  libdir = Dir('#sources/build').abspath
+  libdir = Dir('#build/plugins').abspath
   lib_path_var = library_search_path_variable()
   lib_path = ""
   if lib_path_var in envvars and envvars[lib_path_var] != '':
@@ -140,7 +140,7 @@ def run_dash_dash_help(env, target, source):
     return 2
 
 def make_cxx_test_alias(source):
-  program = 'build/' + splitext(basename(source))[0]
+  program = '#build/tests/' + splitext(basename(source))[0]
   command = env.Command(basename(program) + '.log',
                         executable(program),
                         run_unit_test)
@@ -151,7 +151,7 @@ def make_cxx_test_alias(source):
 def make_help_test_alias(program):
   """Add a test that checks the '--help' output of PROGRAM."""
   command = env.Command(basename(program) + '.help.log',
-                        executable("#sources/build/" + program),
+                        executable('#build/softs/' + program),
                         run_dash_dash_help)
   AlwaysBuild(command)
   env.Alias('tests', command)
@@ -159,7 +159,7 @@ def make_help_test_alias(program):
 def make_command_test(program, arguments, identifier):
   """Add a test that invokes PROGRAM with ARGUMENTS."""
   return env.Command(basename(program) + '.' + identifier + '.log',
-                     executable("#sources/build/" + program),
+                     executable('#build/softs/' + program),
                      run_command(arguments))
 
 def make_test_python(script):

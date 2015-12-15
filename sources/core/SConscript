@@ -29,7 +29,7 @@ if env['CC'] != 'cl':
 	# contains PIC code.  Thus, force '-fPIC'.
 	CCFLAGS = CCFLAGS + ' -fPIC'
 
-env.StaticLibrary('../build/core', source = sources,
+env.StaticLibrary('#build/core/core', source = sources,
                   LIBS = ALTA_LIBS,
                   CPPPATH = env['CPPPATH'] + env['EIGEN_INC'],
                   CCFLAGS = CCFLAGS)

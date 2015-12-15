@@ -1,5 +1,5 @@
 Import('env', 'ALTA_LIBS')
 
 sources = ['main.cpp']
-env.Program('../../build/brdf2data', sources,
+env.Program('#build/softs/brdf2data', sources,
             LIBS = ['core'] + ALTA_LIBS)

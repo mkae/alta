@@ -44,11 +44,13 @@ test_env = conf.Finish()
 
 env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
-env.SharedLibrary('../../build/data_grid', ['grid.cpp'])
+env.SharedLibrary('#build/plugins/data_grid', ['grid.cpp'])
 if(build_rbf_lib):
-   env.SharedLibrary('../../build/data_interpolant_rbf', ['rbf.cpp'])
+   env.SharedLibrary('#build/plugins/data_interpolant_rbf',
+                     ['rbf.cpp'])
 if(build_mat_lib):
-   env.SharedLibrary('../../build/data_interpolant_matlab', ['matlab.cpp'])
+   env.SharedLibrary('#build/plugins/data_interpolant_matlab',
+                     ['matlab.cpp'])
 
 # FIXME: We cannot return all three values, so pick one.
 Return('build_rbf_lib')

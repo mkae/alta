@@ -7,4 +7,4 @@ env.AppendUnique(LIBS = ALTA_LIBS)
 # Soft Sources
 sources = ['data2stats.cpp']
 
-env.Program('../../build/data2stats', sources)
+env.Program('#build/softs/data2stats', sources)
