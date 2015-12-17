@@ -1,6 +1,6 @@
 # Plug-ins.
 
-plugins = [ 'data_interpolant',
+plugins = [ 'data_interpolants',
             'data_io',
 
             # Building nonlinear fitters.
