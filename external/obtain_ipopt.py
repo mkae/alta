@@ -45,4 +45,3 @@ if obtained and not compiled:
 else:
    C.progress_display('IpOpt is already installed')
    C.progress_display('if the plugins using IpOpt fail to build, check its installation')
-

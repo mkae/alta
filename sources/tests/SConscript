@@ -184,7 +184,9 @@ if have_cppquickcheck:
   env.AppendUnique(LIBS = ['cppqc'])
 
 
-PYTHON_TESTS = [ 'python/test-python-function.py' ]
+PYTHON_TESTS = [ 'python/test-arguments.py',
+                 'python/test-vec.py',
+                 'python/test-python-function.py']
 
 for test in CXX_TESTS:
   make_cxx_test_alias(test)

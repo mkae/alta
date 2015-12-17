@@ -48,7 +48,7 @@
  *  \brief Data interface for the [MERL][merl] file format.
  *   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/
  *
- *  \details 
+ *  \details
  *  This plugin enables to load data measurments from the Mitsubishi Electric
  *  Research Laboratories. [This dataset][merl] contains 100 reflectance samples
  *  acquired from painted spheres using an imaging system.
@@ -90,8 +90,24 @@ public: // methods
     	delete[] brdf;
     }
 
+    virtual vec min() const {
+       vec _min(3);
+       _min[0] = 0.0;
+       _min[1] = 0.0;
+       _min[2] = 0.0;
+       return _min;
+    }
+
+    virtual vec max() const {
+       vec _max(3);
+       _max[0] = 0.5*M_PI;
+       _max[1] = 0.5*M_PI;
+       _max[2] = 2.0*M_PI;
+       return _max;
+    }
+
 	// Load data from a file
-	void load(const std::string& filename) 
+	void load(const std::string& filename)
 	{
 		if(!read_brdf(filename.c_str(), brdf))
 		{
@@ -108,7 +124,7 @@ public: // methods
 		}
 	}
 
-	void save(const std::string& filename) const 
+	void save(const std::string& filename) const
 	{
 		FILE *f = fopen(filename.c_str(), "wb");
 
@@ -126,11 +142,11 @@ public: // methods
 	}
 
 	// Acces to data
-	vec get(int i) const 
+	vec get(int i) const
 	{
 		int phid_ind = i % (BRDF_SAMPLING_RES_PHI_D / 2);
 		int thed_ind = (i / (BRDF_SAMPLING_RES_PHI_D / 2)) % BRDF_SAMPLING_RES_THETA_D ;
-		int theh_ind = (i / ((BRDF_SAMPLING_RES_PHI_D / 2) * BRDF_SAMPLING_RES_THETA_D)) 
+		int theh_ind = (i / ((BRDF_SAMPLING_RES_PHI_D / 2) * BRDF_SAMPLING_RES_THETA_D))
 			            % BRDF_SAMPLING_RES_THETA_H ;
 
 
@@ -172,9 +188,9 @@ public: // methods
 		int iR = i;
 		int iG = iR + _nSlice;
 		int iB = iG + _nSlice;
-		brdf[iR] = x[0] / RED_SCALE;
-		brdf[iG] = x[1] / GREEN_SCALE;
-		brdf[iB] = x[2] / BLUE_SCALE;
+		brdf[iR] = x[dimX()+0] / RED_SCALE;
+		brdf[iG] = x[dimX()+1] / GREEN_SCALE;
+		brdf[iB] = x[dimX()+2] / BLUE_SCALE;
 	}
 
 	vec value(const vec& in) const {
@@ -189,7 +205,7 @@ public: // methods
 
 	    if( res[0] < 0.0 || res[1] < 0.0 || res[2] < 0.0 )
 	    {
-	    	
+
 #ifdef DEBUG
 	    	std::cout << __FILE__ << " " << __LINE__ << " in[0] = " << in[0]
 	    						<< " in[1] = " << in[1] << " in[2] = " << in[2] << std::endl;
@@ -198,7 +214,7 @@ public: // methods
 	    	res[0] = 0.0;
 	    	res[1] = 0.0;
 	    	res[2] = 0.0;
- 
+
 	    	//assert(0);
 	    }
 	    return res;
@@ -252,7 +268,7 @@ private: //methods
 		out[2] += axis[2] * temp;
 
 		cross_product (axis,vector,cross);
-		
+
 		out[0] += cross[0] * sin_ang;
 		out[1] += cross[1] * sin_ang;
 		out[2] += cross[2] * sin_ang;
@@ -302,8 +318,8 @@ private: //methods
 		// compute diff vector
 		rotate_vector(in, normal , -fi_half, temp);
 		rotate_vector(temp, bi_normal, -theta_half, diff);
-		
-		// compute  theta_diff, fi_diff	
+
+		// compute  theta_diff, fi_diff
 		theta_diff = acos(diff[2]);
 		fi_diff = atan2(diff[1], diff[0]);
 
@@ -376,7 +392,7 @@ private: //methods
 		// In: phi_diff in [0 .. pi]
 		// Out: tmp in [0 .. 179]
 		int tmp = int(phi_diff / M_PI * BRDF_SAMPLING_RES_PHI_D / 2);
-		if (tmp < 0)	
+		if (tmp < 0)
 			return 0;
 		else if (tmp < BRDF_SAMPLING_RES_PHI_D / 2 - 1)
 			return tmp;
@@ -395,8 +411,8 @@ private: //methods
 
 	// Given a pair of incoming/outgoing angles, look up the BRDF.
 	void lookup_brdf_val(double* brdf, double theta_half,
-				  double theta_diff, double fi_diff, 
-				  double& red_val,double& green_val,double& blue_val) const 
+				  double theta_diff, double fi_diff,
+				  double& red_val,double& green_val,double& blue_val) const
 	{
 		// The phi index needs to be positive.
 		if(fi_diff < 0.0) {
@@ -407,12 +423,12 @@ private: //methods
 		if(fi_diff > M_PI) {
 			fi_diff = 2.0*M_PI - fi_diff;
 		}
-		
+
 	    // Testing the input domain to avoid indexing outside of the
 		 // allocated memory.
-		 
+
 		 //ROMAIN PAC:  fi_diff IS ALWAYS >= 0.0 ACCORDING TO WHAT IS DONE BEFORE!!!
-		if(theta_half < 0.0 || theta_half > 0.5*M_PI || 
+		if(theta_half < 0.0 || theta_half > 0.5*M_PI ||
 		   theta_diff < 0.0 || theta_diff > 0.5*M_PI ||
 		   fi_diff > M_PI || fi_diff < 0.0) {
 			red_val   = 0.0;
@@ -457,7 +473,7 @@ private: //methods
 		int n = dims[0] * dims[1] * dims[2];
 		if (n != BRDF_SAMPLING_RES_THETA_H *
 			 BRDF_SAMPLING_RES_THETA_D *
-			 BRDF_SAMPLING_RES_PHI_D / 2) 
+			 BRDF_SAMPLING_RES_PHI_D / 2)
 		{
 			fprintf(stderr, "Dimensions don't match\n");
 			fclose(f);

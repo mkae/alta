@@ -63,6 +63,17 @@ static inline double dot(const vec& a, const vec &b)
 extern vec product(const vec& a, const vec& b);
 
 std::ostream& operator<<(std::ostream& out, const vec& v);
+template<typename T>
+std::ostream& operator<<(std::ostream& out, const std::vector<T>& v) {
+    out << "[";
+    for(int i=0; i<v.size(); ++i)
+    {
+        out << v[i];
+        if(i != v.size()-1) { out << ", "; }
+    }
+    out << "]";
+    return out;
+}
 
 //! \brief locate the first index of value v in vector vec. Complexity in
 //! O(n) is the worst case.

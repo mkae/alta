@@ -9,6 +9,7 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #include <core/data.h>
+#include <core/vertical_segment.h>
 #include <core/common.h>
 #include <core/args.h>
 
@@ -21,111 +22,156 @@
 #include <cmath>
 
 /*! \ingroup datas
+ *  \ingroup plugins
  *  \class data_astm
  *  \brief Data interface for the ASTM file format from [Cornell University][cornell].
  *  [cornell]: http://www.graphics.cornell.edu/online/measurements/reflectance/
  *
- *  \details 
+ *  \details
  *  This plugin enables to load data measurments from Cornell University
- *  program of Computer Graphics (see [here][cornell]). 
+ *  program of Computer Graphics (see [here][cornell]). The file format currently
+ *  only handles integrated luminance [300, 700] and R,G,B color space due to
+ *  ALTA's internal format. The X,Y,Z color space files should not be used with
+ *  this plugin.
+ *
+ *  The resulting data object is a \a vertical_segment and is compatible with all
+ *  rational fitting plugins. However, the dimension of the input space is usually
+ *  not tight (i.e. larger than the dimensionality of the data). Thus it is advised
+ *  to convert those data file before hand.
+ *
  *  [cornell]: http://www.graphics.cornell.edu/online/measurements/reflectance/
  *
  *  \author Laurent Belcour <laurent.belcour@umontreal.ca>
  *
  */
-class ASTM : public data
+class ASTM : public vertical_segment
 {
 
-private: // data
-	std::vector<vec> _data;
-
 public: //methods
-	ASTM() : data() {
+	ASTM() : vertical_segment() {
 
 	}
 
+   // Parse ASTM header.
+   // An ASTM header is composed of a KEY in capital letters and a list
+   // of string/numeric values. An ASTM header finishes after the key VARS.
+   //
+   arguments parse_header(std::istream& in) const {
+
+      arguments args;
+      std::string key, line;
+
+      while(in.good()) {
+
+         // Get the current key
+         in >> key;
+
+         // Extract the current line
+         std::getline(in, line);
+
+         // End of header
+         if(key == "VARS") {
+            args.update(key, std::string("[") + line + std::string("]"));
+            break;
+         } else {
+            args.update(key, line);
+         }
+      }
+
+      return args;
+   }
+
+   // Update the dimX, dimY and input and output dimension based on the
+   // values stored in the VARS list.
+   //
+   // The input parametrization can take the form:
+   //    + theta_i, phi_i, theta_s, phi_s
+   //    + theta_i, theta_s, phi_s
+   //
+   // The output parametrization can take the form:
+   //    + Integrated ..
+   //    + R, G, B
+   //
+   void update_params(const std::vector<std::string>& vars) {
+
+      _nX = 0;
+      _nY = 0;
+
+      for(auto it=vars.begin(); it!=vars.end(); it++) {
+         if(*it == "theta_i" || *it == "phi_i" ||
+            *it == "theta_s" || *it == "phi_s") {
+            _nX += 1;
+         } else {
+            _nY += 1;
+         }
+      }
+
+      if(_nX == 4) {
+         setParametrization(params::SPHERICAL_TL_PL_TV_PV);
+      } else {
+         std::cout << "<<ERROR>> Input format not handled in \'data_astm\'" << std::endl;
+         setParametrization(params::UNKNOWN_INPUT);
+      }
+
+      if(vars.back() == "B") {
+         setParametrization(params::RGB_COLOR);
+      } else if(vars.back().compare(0, 10, "Integrated") == 0) {
+         setParametrization(params::INV_STERADIAN);
+      } else {
+         std::cout << "<<ERROR>> Output format not handled in \'data_astm\'" << std::endl;
+         setParametrization(params::UNKNOWN_INPUT);
+      }
+   }
+
 	// Load data from a file
-	virtual void load(const std::string& filename) 
+	virtual void load(const std::string& filename)
 	{
 		std::ifstream file(filename.c_str());
 		std::string line;
-		
-		// Parse the header
-		for(int i=0; i<22; ++i)
-		{
-			std::getline(file, line);
-		}
+
+		// Parse the header, get the output/input dimensions and params
+		arguments header = parse_header(file);
+      auto vars = header.get_vec<std::string>("VARS");
+      update_params(vars);
+
+      // Check data size from header
+      assert(header.is_defined("NUM_POINTS"));
+      int size = header.get_int("NUM_POINTS", 0);
+      initializeToZero(size);
+
+      // Size of the data
+      const int n = dimX() + dimY();
+      int i = 0;
 
 		while(file.good())
 		{
 			std::getline(file, line);
-			
-			size_t s = 0; // start
-			size_t t;     // end
-			bool sample_wrong = false;
-			vec x(7); 
-			for(int i=0; i<7; ++i)
-			{
-				t = line.find_first_of(',', s);
-				if(t == s || t == std::string::npos)
-				{
-					sample_wrong = true;
-				}
 
-				x[i] = atof(line.substr(s, t-s).c_str());
+         if(line.size() == 0 || line.rfind(',') == std::string::npos)
+            continue;
 
-				s = t+1;
+         std::replace(line.begin(), line.end(), ',', ' ');
+
+         // Create a stream from the line data and extract it as
+         // a vec of dim dimX() + dimY().
+         std::stringstream stream(line);
+			vec x(n);
+			for(int i=0; i<n; ++i) {
+				stream >> x[i];
 			}
 
-			if(!sample_wrong)
-			{
-				_data.push_back(x);
-			}
+			set(i++, x);
 		}
+
+      if(header.is_defined("NUM_POINTS")) {
+         assert(this->size() == header.get_int("NUM_POINTS"));
+      }
 
 		file.close();
 	}
 	virtual void load(const std::string& filename, const arguments& args)
 	{
 		this->load(filename);
-	}
-
-	// Acces to data
-	virtual vec get(int i) 
-	{
-		return _data[i];
-	}
-	virtual vec value(const vec& in) const
-	{
-		NOT_IMPLEMENTED();
-		vec res(4);
-		return res;
-	}
-
-	// Get data size, e.g. the number of samples to fit
-	int size() const 
-	{
-		return _data.size() ;
-	}
-
-	// Get min and max input space values
-	vec min() const 
-	{
-		vec res(4);
-		res[0] = 0.0 ;
-		res[1] = 0.0 ;
-		res[2] = 0.0 ;
-		res[3] = 0.0 ;
-		return res ;
-	}
-	vec max() const
-	{
-		vec res(4);
-		res[0] = M_PI / 2 ;
-		res[1] = 0.0 ;
-		res[2] = M_PI / 2 ;
-		res[3] = M_PI ;
-		return res ;
 	}
 };
 

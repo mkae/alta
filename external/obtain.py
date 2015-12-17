@@ -81,6 +81,8 @@ def obtain(name, rep, url, filename, sha256):
 
       check_integrity(filename, sha256)
       uncompress(filename)
+      #if os.path(filename).splitext in ['.tar', '.gz', '.tgz', '.zip']:
+      #    uncompress(filename)
       return True
 
    else:

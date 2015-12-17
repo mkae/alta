@@ -449,6 +449,8 @@ class parametrized
     {
 		}
 
+    virtual  ~parametrized() {}
+
 		//! \brief provide the input parametrization of the object.
 		virtual params::input parametrization() const
 		{

@@ -7,11 +7,12 @@ Import('env', 'ALTA_LIBS')
 sources = ['common.cpp',
            'data.cpp',
            'data_storage.cpp',
-           'function.cpp', 
-           'params.cpp', 
-           'plugins_manager.cpp', 
-           'rational_function.cpp', 
-           'vertical_segment.cpp']
+           'function.cpp',
+           'params.cpp',
+           'plugins_manager.cpp',
+           'rational_function.cpp',
+           'vertical_segment.cpp',
+           'metrics.cpp']
 
 CCFLAGS = env['CCFLAGS']
 

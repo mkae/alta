@@ -18,7 +18,7 @@
  *  or to perform interpolation of sample values (i.e. to fill gaps).
  *
  *  <h3>Usage</h3>
- *  \verbatim	
+ *  \verbatim
        data2data --input data.file --output data.file --out-data exporter.so --in-data importer.so
     \endverbatim
  *
@@ -107,8 +107,8 @@ int main(int argc, char** argv)
 		return 1 ;
 	}
 	*/
-	
-	
+
+
 	// Import data
 	ptr<data> d_in = plugins_manager::get_data(args["in-data"], args) ;
 	try
@@ -117,17 +117,17 @@ int main(int argc, char** argv)
 	}
 	CATCH_FILE_IO_ERROR(args["input"]);
 
-	if(!d_in) 
+	if(!d_in)
 	{
 		std::cout << "<<INFO>> input data will be treated as ALTA format" << std::endl;
 	}
 
 	ptr<data> d_out = plugins_manager::get_data(args["out-data"], args) ;
-	if(!d_out) 
+	if(!d_out)
 	{
 		std::cout << "<<INFO>> data will be outputed to ALTA format" << std::endl;
 	}
-	
+
 	if(!d_in && !d_out)
 	{
 		std::cerr << "<<ERROR>> cannot import or export data" << std::endl ;
@@ -137,8 +137,10 @@ int main(int argc, char** argv)
 	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->input_parametrization())
 	          << " to " << params::get_name(d_out->input_parametrization()) << std::endl;
 
+   bool is_vs = dynamic_pointer_cast<vertical_segment>(d_out) &&
+                d_out->size() == 0;
 
-	if(dynamic_pointer_cast<vertical_segment>(d_out) || args.is_defined("splat"))
+	if(is_vs || args.is_defined("splat"))
 	{
 		if(dynamic_pointer_cast<vertical_segment>(d_out))
 		{
@@ -169,7 +171,7 @@ int main(int argc, char** argv)
 			params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
 			params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
 			d_out->set(temp);
-		}	
+		}
 	}
 	else
 	{
@@ -181,10 +183,12 @@ int main(int argc, char** argv)
 
 		if(d_out->dimY() != d_in->dimY())
 		{
-			std::cerr << "<<WARNING>> data types have different output dimensions (" << d_in->dimY() 
+			std::cerr << "<<WARNING>> data types have different output dimensions (" << d_in->dimY()
 			          << " and " << d_out->dimY() << ")." << std::endl;
 			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
 		}
+
+      unsigned int stats_incorrect = 0;
 
 		#pragma omp parallel for
 		for(int i=0; i<d_out->size(); ++i)
@@ -195,31 +199,37 @@ int main(int argc, char** argv)
 
 			// Copy the input vector
 			vec x = d_out->get(i);
-			params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
+			params::convert(&x[0], d_out->parametrization(),
+                         params::CARTESIAN, &cart[0]);
 
 
-			// Check if the output configuration is below the hemisphere when converted to
-			// cartesian coordinates. Note that this prevent from converting BTDF data.
+         // Check if the output configuration is below the hemisphere when
+         // converted to cartesian coordinates. Note that this prevent from
+         // converting BTDF data.
 			if(cart[2] >= 0.0 || cart[5] >= 0.0) {
-				params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
-				/*
-				y[0] = temp[0];
-				y[1] = temp[1];
-				y[2] = temp[2];
-				/*/
+				params::convert(&cart[0], params::CARTESIAN,
+                            d_in->parametrization(), &temp[0]);
 				y = d_in->value(temp);
-				//*/
 			} else {
+            ++stats_incorrect;
 				y.setZero();
 			}
-			
-			// Convert the value stored in the input data in the value format of the output
-			// data file.
-			params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
-			
-			d_out->set(x);
-		}	
-	}	
+
+         // Convert the value stored in the input data in the value format of
+         // the output data file.
+			params::convert(&y[0],
+                         d_in->output_parametrization(),  d_in->dimY(),
+                         d_out->output_parametrization(), d_out->dimY(),
+                         &x[d_out->dimX()]);
+
+			d_out->set(i, x);
+		}
+
+      if(stats_incorrect > 0) {
+         std::cerr << "<<DEBUG>> Number of incorrect configuration: "
+                   << stats_incorrect << " / " << d_out->size() << std::endl;
+      }
+	}
 	d_out->save(args["output"]);
 	return 0 ;
 }

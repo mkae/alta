@@ -20,14 +20,14 @@
  *  \class data_brdf_slice
  *  \brief Data interface for the BRDF slice file format.
  *
- *  \details 
+ *  \details
  *
  *  This BRDF data format implements the 2D representation of a BRDF presented
  *  by Brent Burley in BRDF Explorer. It only stores a slice of the BRDF for
  *  different 2D parametrizations. This plugin stores the BRDF data into an
  *  EXR file.
  *
- *  It is possible to select the parametrization using the --param NAME 
+ *  It is possible to select the parametrization using the --param NAME
  *  argument when loading the BRDF. The default parametrization is
  *  \ref params::STARK_2D "STARK_2D"
  *
@@ -50,14 +50,14 @@ class BrdfSlice : public data {
 			slice = 1;
 			_data = new double[3*width*height*slice];
 			_phi = 0.5*M_PI;
-	
+
 			// Set the input and output parametrization
 			_in_param  = params::STARK_2D;
 			_out_param = params::RGB_COLOR;
 			_nX = 2;
 			_nY = 3;
 
-			// Allow to load a different parametrization depending on the 
+			// Allow to load a different parametrization depending on the
 			// parameters provided.
 			if(args.is_defined("param")) {
 				params::input param = params::parse_input(args["param"]);
@@ -86,7 +86,7 @@ class BrdfSlice : public data {
 			_reverse = _in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
 			           _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
 						  _in_param == params::RETRO_TL_TVL_PROJ_DPHI;
-			
+
 			// Update the domain
 			_max = max();
 			_min = min();
@@ -98,7 +98,7 @@ class BrdfSlice : public data {
 		}
 
 		// Load data from a file
-		void load(const std::string& filename) 
+		void load(const std::string& filename)
 		{
 			delete[] _data;
 			t_EXR_IO<double>::LoadEXR(filename.c_str(), width, height, _data);
@@ -109,7 +109,7 @@ class BrdfSlice : public data {
 
 		}
 
-		void save(const std::string& filename) const 
+		void save(const std::string& filename) const
 		{
 			if(!t_EXR_IO<double>::SaveEXR(filename.c_str(), width, slice*height, _data))
 			{
@@ -118,7 +118,7 @@ class BrdfSlice : public data {
 		}
 
 		// Acces to data
-		vec get(int id) const 
+		vec get(int id) const
 		{
 			vec res(_nX+_nY) ;
 			const int i = id % width;
@@ -160,7 +160,7 @@ class BrdfSlice : public data {
 
 			const int i  = floor((_x[0]-_min[0]) * width  / (_max[0] - _min[0]));
 			const int j  = floor((_x[1]-_min[1]) * height / (_max[1] - _min[1]));
-			const int k  = 0; 
+			const int k  = 0;
 			//const int k  = floor(x[2] * slice  / (M_PI));
 			const int id = i + j*width + k*width*height;
 
@@ -170,11 +170,11 @@ class BrdfSlice : public data {
 		}
 		void set(int id, const vec& x)
 		{
-			assert(x.size() == 3);
+			assert(x.size() == dimX() + dimY());
 
-			_data[3*id + 0] = x[0];
-			_data[3*id + 1] = x[1];
-			_data[3*id + 2] = x[2];
+			_data[3*id + 0] = x[dimX()+0];
+			_data[3*id + 1] = x[dimX()+1];
+			_data[3*id + 2] = x[dimX()+2];
 		}
 
 		vec value(const vec& x) const
@@ -200,7 +200,7 @@ class BrdfSlice : public data {
 			*/
 			const int i  = floor((_x[0]-_min[0]) * width  / (_max[0] - _min[0]));
 			const int j  = floor((_x[1]-_min[1]) * height / (_max[1] - _min[1]));
-			const int k  = 1; 
+			const int k  = 1;
 			//const int k  = floor(_x[2] * slice  / (M_PI));
 			const int id = (i + j*width)*k;
 
@@ -215,16 +215,16 @@ class BrdfSlice : public data {
 		}
 
 		// Get data size, e.g. the number of samples to fit
-		int size() const 
+		int size() const
 		{
 			return width*height*slice;
 		}
 
 		// Get min and max input space values
-		vec min() const 
+		vec min() const
 		{
 			vec res(_nX);
-			
+
 			// First fill the third dimension. It can be overwritten by the next
 			// part when the parametrization is reversed (projected ones).
 			if(_nX == 3) {
@@ -234,7 +234,7 @@ class BrdfSlice : public data {
 			// Fill the first two dimension unless the parametrization is a
 			// projected one then it will fill the three components.
 			if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
-				_in_param == params::ISOTROPIC_TV_TL_DPHI) {	
+				_in_param == params::ISOTROPIC_TV_TL_DPHI) {
 				res[0] = -0.5*M_PI ;
 				res[1] = -0.5*M_PI ;
 			} else if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
@@ -261,8 +261,9 @@ class BrdfSlice : public data {
 
 			// Fill the first two dimension unless the parametrization is a
 			// projected one then it will fill the three components.
-			if(_in_param == params::RUSIN_TH_TD_PD || 
-				_in_param == params::ISOTROPIC_TV_TL_DPHI) {	
+			if(_in_param == params::RUSIN_TH_TD ||
+				_in_param == params::RUSIN_TH_TD_PD ||
+				_in_param == params::ISOTROPIC_TV_TL_DPHI) {
 				res[0] = 0.5*M_PI ;
 				res[1] = 0.5*M_PI ;
 			} else if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
@@ -278,12 +279,12 @@ class BrdfSlice : public data {
 			return res ;
 		}
 
-		int dimX() const 
-		{ 
-			return _nX ; 
+		int dimX() const
+		{
+			return _nX ;
 		}
-		int dimY() const 
-		{ 
+		int dimY() const
+		{
 			return 3;
 		}
 };
