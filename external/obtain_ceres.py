@@ -69,35 +69,36 @@ if obtained and compile_test:
       # Build PIC so we can link it into our DSOs.
       options = options + ' -DCMAKE_CXX_FLAGS=-fPIC'
 
-   obtain.cmake_build(directory, options)
+   if obtain.cmake_build(directory, options):
 
-   if not glog_compiled:
-     # When CERES builds miniglog, it installs its headers under
-     # $includedir/ceres/internal/miniglog.  Move it to the right
-     # place.
-     includedir = Dir('#external/build/include').abspath
-     os.rename(includedir + '/ceres/internal/miniglog/glog',
-               includedir + '/glog')
-
-   # CERES's CMakeLists.txt chooses to install to lib64/ or lib/
-   # depending on the phase of the moon.  Rectify that by moving
-   # things to lib/ if need be.
-   libdir = Dir('#external/build/lib').abspath
-   lib64dir = Dir('#external/build/lib64').abspath
-   if os.access(lib64dir, os.R_OK):
-     os.rename(lib64dir + '/libceres.a', libdir + '/libceres.a')
      if not glog_compiled:
-       os.rename(lib64dir + '/libminiglog.a', libdir + '/libminiglog.a')
-     os.rmdir(lib64dir)
+       # When CERES builds miniglog, it installs its headers under
+       # $includedir/ceres/internal/miniglog.  Move it to the right
+       # place.
+       includedir = Dir('#external/build/include').abspath
+       os.rename(includedir + '/ceres/internal/miniglog/glog',
+                 includedir + '/glog')
 
-   # When building miniglog, rename it to libglog.a, which is what the
-   # rest of the build system expects.
-   if not glog_compiled:
-      if not sys.platform.startswith('win'):
-         os.rename(libdir + '/libminiglog.a', libdir + '/libglog.a')
-      else:
-         os.rename(libdir + '/miniglog.lib', libdir + '/libglog.lib')
-      #end ifelse
+     # CERES's CMakeLists.txt chooses to install to lib64/ or lib/
+     # depending on the phase of the moon.  Rectify that by moving
+     # things to lib/ if need be.
+     libdir = Dir('#external/build/lib').abspath
+     lib64dir = Dir('#external/build/lib64').abspath
+     if os.access(lib64dir, os.R_OK):
+       os.rename(lib64dir + '/libceres.a', libdir + '/libceres.a')
+       if not glog_compiled:
+         os.rename(lib64dir + '/libminiglog.a', libdir + '/libminiglog.a')
+       os.rmdir(lib64dir)
+
+     # When building miniglog, rename it to libglog.a, which is what the
+     # rest of the build system expects.
+     if not glog_compiled:
+        if not sys.platform.startswith('win'):
+           os.rename(libdir + '/libminiglog.a', libdir + '/libglog.a')
+        else:
+           os.rename(libdir + '/miniglog.lib', libdir + '/libglog.lib')
+        #end ifelse
+     #end if
    #end if
 else:
    W.warn(obtain.AltaDependencyWarning,
