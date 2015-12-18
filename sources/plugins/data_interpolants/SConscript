@@ -46,3 +46,6 @@ if(build_rbf_lib):
    env.SharedLibrary('../../build/data_interpolant_rbf', ['rbf.cpp'])
 if(build_mat_lib):
    env.SharedLibrary('../../build/data_interpolant_matlab', ['matlab.cpp'])
+
+# FIXME: We cannot return all three values, so pick one.
+Return('build_rbf_lib')
