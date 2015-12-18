@@ -1,10 +1,6 @@
 Import('env')
 env = env.Clone()
 
-# Special linking flags, defined in the OS dependant configuration file
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
-
-
 build_rbf_lib = False
 build_mat_lib = False
 
@@ -42,6 +38,8 @@ if conf.CheckLibWithHeader(env['MATLAB_LIB'], 'engine.h', 'CXX'):
    env.AppendUnique(CPPPATH = env['MATLAB_INC'])
 
 test_env = conf.Finish()
+
+env.AppendUnique(LIBS = env['PLUGIN_LIB'])
 
 env.SharedLibrary('../../build/data_grid', ['grid.cpp'])
 if(build_rbf_lib):
