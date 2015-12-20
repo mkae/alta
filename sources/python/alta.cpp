@@ -239,7 +239,6 @@ void save_function_without_args(const ptr<function>& f, const std::string& filen
  */
 bool fit_data_without_args(const ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func) {
    arguments args;
-   _fitter->set_parameters(args);
    return _fitter->fit_data(_data, _func, args);
 }
 
