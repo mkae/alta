@@ -7,7 +7,8 @@ build_lib = False
 
 conf = Configure(env)
 
-if conf.CheckLibWithHeader(env['MATLAB_LIB'], language='c++', header='engine.h'):
+if 'MATLAB_LIB' in env and conf.CheckLib(env['MATLAB_LIB'],
+                                         language='c++',  header='engine.h'):
   build_lib = True
 else:
   W.warn(W.DependencyWarning, "unable to find MATLAB for Rational Fitter")
