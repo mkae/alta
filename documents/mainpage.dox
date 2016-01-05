@@ -2,15 +2,7 @@
 \mainpage A BRDF analysis library
 
 <center style="color:red">
-ALTA is currently in an alpha stage but the current master branch
-can be freely cloned with:
-</center>
-<!-- We provide an archive that is not  feature complete (see below). You can <a href="contacts.html">contact us</a> to get more information  about its features, roadmap, and missing documentation. -->
-
-<center >
-
-git clone https://scm.gforge.inria.fr/anonscm/git/alta/alta.git
-
+ALTA is currently in an alpha stage.
 </center>
 
 ### Description
@@ -44,11 +36,17 @@ The full list of features is available in the \ref features "features" page.
 ### Download
 
 ALTA is free software available under the [Mozilla Public License,
-version 2.0](http://mozilla.org/MPL/2.0/), from our Git repository:
+version 2.0](http://mozilla.org/MPL/2.0/).  The latest release, version
+0.2, can be obtained from the Git repository:
 
     $ git clone https://gforge.inria.fr/git/alta/alta.git
+    $ git checkout v0.2
 
 See \ref install "the installation instruction" for more information.
+
+The master branch is where new developments take place.  We highly
+recommend using the above release instead of master.
+
 
 ### Getting Started
 
