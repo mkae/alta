@@ -15,7 +15,10 @@ git clone https://scm.gforge.inria.fr/anonscm/git/alta/alta.git
 
 ### Description
 
-ALTA is a multi-platform software library to analyze, fit and understand BRDFs. It provides a set of command line softwares to fit measured data to analytical forms, tools to understand models and data. You can find an overview presentation of ALTA [here][alta-wk].
+ALTA is a cross-platform software library to analyze, fit and understand
+BRDFs.  It provides a set of command line softwares to fit measured data
+to analytical forms, tools to understand models and data.  You can find
+an overview presentation of ALTA [here][alta-wk].
 
   [alta-wk]: http://hal.inria.fr/hal-01016531
 
