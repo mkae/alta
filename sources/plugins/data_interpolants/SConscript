@@ -11,9 +11,6 @@ test_env.AppendUnique(CPPPATH = env['FLANN_INC'])
 test_env.AppendUnique(LIBS    = env['CGAL_LIB'])
 test_env.AppendUnique(LIBPATH = env['CGAL_DIR'])
 test_env.AppendUnique(CPPPATH = env['CGAL_INC'])
-test_env.AppendUnique(LIBS    = env['MATLAB_LIB'])
-test_env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
-test_env.AppendUnique(CPPPATH = env['MATLAB_INC'])
 
 conf = Configure(test_env)
 # Check for the presence of FLANN lib
@@ -31,11 +28,17 @@ if conf.CheckLibWithHeader(env['CGAL_LIB'], 'flann/flann.hpp', 'CXX'):
    env.AppendUnique(CPPPATH = env['CGAL_INC'])
 
 # Check for the presence of Matlab lib
-if conf.CheckLibWithHeader(env['MATLAB_LIB'], 'engine.h', 'CXX'):
-   build_mat_lib = True
-   env.AppendUnique(LIBS    = env['MATLAB_LIB'])
-   env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
-   env.AppendUnique(CPPPATH = env['MATLAB_INC'])
+if 'MATLAB_LIB' in env and 'MATLAB_INC' in env and 'MATLAB_DIR' in env:
+  test_env.AppendUnique(LIBS    = env['MATLAB_LIB'])
+  test_env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
+  test_env.AppendUnique(CPPPATH = env['MATLAB_INC'])
+  build_mat_lib = conf.CheckLibWithHeader(env['MATLAB_LIB'], language='c++',
+                                          header='engine.h')
+
+  if build_mat_lib:
+    env.AppendUnique(LIBS    = env['MATLAB_LIB'])
+    env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
+    env.AppendUnique(CPPPATH = env['MATLAB_INC'])
 
 test_env = conf.Finish()
 
