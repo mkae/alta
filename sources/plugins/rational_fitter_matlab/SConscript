@@ -7,17 +7,17 @@ build_lib = False
 
 conf = Configure(env)
 
-if conf.CheckLibWithHeader(env['MATLAB_LIB'], language='c++', header='engine.h'):
-  build_lib = True
+if 'MATLAB_LIB' in env and 'MATLAB_INC' in env and 'MATLAB_DIR' in env:
+  env.AppendUnique(CPPPATH = env['MATLAB_INC'])
+  env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
+  env.AppendUnique(LIBS    = env['MATLAB_LIB'])
+  build_lib = conf.CheckLibWithHeader(env['MATLAB_LIB'], language='c++',  header='engine.h')
 else:
   W.warn(W.DependencyWarning, "unable to find MATLAB for Rational Fitter")
 
 env = conf.Finish()
 
 if build_lib:
-  env.AppendUnique(CPPPATH = env['MATLAB_INC'])
-  env.AppendUnique(LIBPATH = env['MATLAB_DIR'])
-  env.AppendUnique(LIBS    = env['MATLAB_LIB'])
   env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
 
   sources = ['rational_fitter.cpp']

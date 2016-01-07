@@ -96,6 +96,6 @@ CERES_OPT_LIB  = ['gomp', 'lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 
 
 ## MATLAB library and Engine
 ##
-MATLAB_INC  = ['']
-MATLAB_DIR  = ['']
-MATLAB_LIB  = ['eng', 'mex','mat']
+#MATLAB_INC  = ['']
+#MATLAB_DIR  = ['']
+#MATLAB_LIB  = ['eng', 'mex','mat']
