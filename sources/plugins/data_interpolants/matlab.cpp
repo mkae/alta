@@ -1,6 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2013 Inria
+   Copyright (C) 2015 CNRS
 
    This file is part of ALTA.
 
@@ -43,6 +44,8 @@ char* output = new char[BUFFER_SIZE+1];
  *  This plugin requires the Matlab engine library to compile.
  *
  *  \author Laurent Belcour <laurent.belcour@umontreal.ca>
+ *  \author Romain Pacanowski <romain.pacanowski@institutoptique.fr>
+ *
  */
 class MatlabInterpolant : public data
 {
@@ -54,9 +57,8 @@ class MatlabInterpolant : public data
 
 	public: // methods
 		MatlabInterpolant()
+    : _data( ptr<data>( new vertical_segment() ) )
 		{
-			_data = new vertical_segment();
-
 			// Create matlab engine
 		#ifdef WIN32
 		    if (!(ep = engOpen(NULL)))
@@ -71,9 +73,8 @@ class MatlabInterpolant : public data
 			engOutputBuffer(ep, output, BUFFER_SIZE) ;
 		}
 
-		virtual MatlabInterpolant()
+    virtual ~MatlabInterpolant()
 		{
-			delete _data;
 			delete[] output;
 
 			mxDestroyArray(x);
@@ -140,7 +141,8 @@ class MatlabInterpolant : public data
 		{
 			return _data->get(id);
 		}
-		inline virtual vec data_interpolant::operator[](int i) const
+
+    inline virtual vec operator[](int i) const
 		{
 			return get(i) ;
 		}
