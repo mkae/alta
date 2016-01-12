@@ -18,14 +18,6 @@ import SCons.SConf as C
 top_srcdir = Dir('.').srcnode().abspath
 sys.path += [ top_srcdir + '/external' ]
 
-## Build the documentation. This is independant of everything else and
-## should return afterwards, speeding-up the process of generating doc.
-##
-if 'doc' in COMMAND_LINE_TARGETS:
-   os.chdir('documents')
-   Alias('doc', os.system('doxygen doxygen.conf'))
-   Exit(0)
-
 ## Add ALTA custom cmd configurations
 ##
 AddOption('--cfg', help='Specify a configuration file')
@@ -142,6 +134,13 @@ env['DL_EXTERNALS'] = GetOption('obtain_externals')
 
 # Generate help text for the build variables.
 Help(vars.GenerateHelpText(env))
+
+# Rule to build the documentation.
+if 'doc' in COMMAND_LINE_TARGETS:
+  env.Alias('doc', env.Command(Dir('#documents/doxygen/html'),
+                               '#documents/doxygen.conf',
+                               'doxygen doxygen.conf',
+                               chdir = Dir('#documents').srcnode().abspath))
 
 C.progress_display('the current platform is: ' + env['PLATFORM'])
 
