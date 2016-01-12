@@ -94,6 +94,6 @@ IPOPT_OPT_LIB  = []
 
 ## MATLAB library and Engine
 ##
-MATLAB_INC  = ['']
-MATLAB_DIR  = ['']
-MATLAB_LIB  = ['eng', 'mex','mat']
+#MATLAB_INC  = ['']
+#MATLAB_DIR  = ['']
+#MATLAB_LIB  = ['eng', 'mex','mat']

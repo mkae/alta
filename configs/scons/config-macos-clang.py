@@ -111,6 +111,6 @@ CERES_OPT_LIB  = ['lapack', 'blas', 'amd', 'camd', 'ccolamd', 'colamd', 'cholmod
 
 ## MATLAB library and Engine
 ##
-MATLAB_INC  = ['/Applications/MATLAB_R2014a.app/extern/include/']
-MATLAB_DIR  = ['/Applications/MATLAB_R2014a.app/bin/maci64/']
-MATLAB_LIB  = ['eng', 'mx','mat']
+#MATLAB_INC  = ['/Applications/MATLAB_R2015b.app/extern/include/']
+#MATLAB_DIR  = ['/Applications/MATLAB_R2015b.app/bin/maci64/']
+#MATLAB_LIB  = ['eng', 'mx','mat']
