@@ -1,3 +1,5 @@
+import sys
+
 Import('env', 'library_available')
 env = env.Clone()
 
@@ -36,9 +38,15 @@ if library_available(env, pkgspec='python-2.7',
 
 if build_lib:
   env.Prepend(LIBS = ['core'])
+
   env['SHLIBPREFIX']=''
+  if sys.platform == 'darwin':
+    # On Darwin, the extension would be '.dylib', but Python insists
+    # on search for '.so', so force this extension.
+    env['SHLIBSUFFIX'] = '.so'
+
   env.Alias('python',
-            env.SharedLibrary('#build/python/alta.so', ['alta.cpp']))
+            env.SharedLibrary('#build/python/alta', ['alta.cpp']))
 else:
   print "<<ERROR>> Unable to build the Python interface, please install boost-python"
   print "          or check your configuration."
