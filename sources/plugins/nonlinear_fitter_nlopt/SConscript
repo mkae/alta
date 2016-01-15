@@ -6,6 +6,7 @@ build_lib = library_available(env, pkgspec='nlopt',
                               lib_var='NLOPT_DIR', lib='NLOPT_LIB',
                               header='nlopt.h')
 
+targets = []
 if build_lib:
   env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
   #env.AppendUnique(LIBS    = env['NLOPT_LIB'])
@@ -13,6 +14,6 @@ if build_lib:
   #env.AppendUnique(CPPPATH = env['NLOPT_INC'])
 
   sources = ['fitter.cpp']
-  env.SharedLibrary('#build/plugins/nonlinear_fitter_nlopt', sources)
+  targets = env.SharedLibrary('#build/plugins/nonlinear_fitter_nlopt', sources)
 
-Return('build_lib')
+Return('targets')

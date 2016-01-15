@@ -8,6 +8,7 @@ build_lib = library_available(env, pkgspec='ceres',
                               lib='CERES_LIB',
                               header='ceres/ceres.h')
 
+targets = []
 if build_lib:
   conf = Configure(env)
   libs = []
@@ -19,6 +20,6 @@ if build_lib:
   env.AppendUnique(LIBS = env['PLUGIN_LIB'])
   env.AppendUnique(LIBS = libs)
 
-  env.SharedLibrary('#build/plugins/nonlinear_fitter_ceres', 'fitter.cpp')
+  targets = env.SharedLibrary('#build/plugins/nonlinear_fitter_ceres', 'fitter.cpp')
 
-Return('build_lib')
+Return('targets')
