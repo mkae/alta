@@ -10,4 +10,5 @@ env.AppendUnique(LIBS = ALTA_LIBS)
 
 
 sources = ['main.cpp']
-env.Program('#build/softs/data2data', sources)
+program = env.Program('#build/softs/data2data', sources)
+env.Install(env['INSTALL_PREFIX'] + '/bin', program)

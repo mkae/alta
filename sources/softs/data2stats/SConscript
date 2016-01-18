@@ -4,7 +4,6 @@ env = env.Clone()
 env.Prepend(LIBS = ['core'])
 env.AppendUnique(LIBS = ALTA_LIBS)
 
-# Soft Sources
 sources = ['data2stats.cpp']
-
-env.Program('#build/softs/data2stats', sources)
+program = env.Program('#build/softs/data2stats', sources)
+env.Install(env['INSTALL_PREFIX'] + '/bin', program)

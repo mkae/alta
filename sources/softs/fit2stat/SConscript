@@ -1,5 +1,6 @@
 Import('env', 'ALTA_LIBS')
 
 sources = ['fit2stat.cpp']
-env.Program('#build/softs/fit2stat', sources,
-            LIBS = ['core'] + ALTA_LIBS)
+program = env.Program('#build/softs/fit2stat', sources,
+                      LIBS = ['core'] + ALTA_LIBS)
+env.Install(env['INSTALL_PREFIX'] + '/bin', program)

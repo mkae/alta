@@ -3,7 +3,6 @@ import sys
 
 Import('env', 'ALTA_LIBS')
 
-# Library sources
 sources = ['common.cpp',
            'data.cpp',
            'data_storage.cpp',
@@ -13,6 +12,20 @@ sources = ['common.cpp',
            'rational_function.cpp',
            'vertical_segment.cpp',
            'metrics.cpp']
+
+headers = [ 'args.h',
+            'clustering.h',
+            'common.h',
+            'data.h',
+            'data_storage.h',
+            'fitter.h',
+            'function.h',
+            'metrics.h',
+            'params.h',
+            'plugins_manager.h',
+            'ptr.h',
+            'rational_function.h',
+            'vertical_segment.h' ]
 
 CCFLAGS = env['CCFLAGS']
 
@@ -29,7 +42,10 @@ if env['CC'] != 'cl':
 	# contains PIC code.  Thus, force '-fPIC'.
 	CCFLAGS = CCFLAGS + ' -fPIC'
 
-env.StaticLibrary('#build/core/core', source = sources,
-                  LIBS = ALTA_LIBS,
-                  CPPPATH = env['CPPPATH'] + env['EIGEN_INC'],
-                  CCFLAGS = CCFLAGS)
+lib = env.StaticLibrary('#build/core/core', source = sources,
+                        LIBS = ALTA_LIBS,
+                        CPPPATH = env['CPPPATH'] + env['EIGEN_INC'],
+                        CCFLAGS = CCFLAGS)
+
+env.Install(env['INSTALL_PREFIX'] + '/lib', lib)
+env.Install(env['INSTALL_PREFIX'] + '/include/alta', headers)

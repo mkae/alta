@@ -68,6 +68,9 @@ def program_file_name(choices):
   return choices[0]
 
 vars = Variables(configFile)
+
+vars.Add('INSTALL_PREFIX',    'Parent installation directory',
+         default = '/usr/local')
 vars.Add('CXX',               'C++ compiler',
          default = program_file_name(cxx_compilers))
 vars.Add('CCFLAGS',           'Compiler\'s flags',
@@ -269,3 +272,5 @@ if 'tests' in COMMAND_LINE_TARGETS:
   env.Depends(tests, plugins)
   if 'python' in COMMAND_LINE_TARGETS:
     env.Depends(tests, python)
+
+env.Alias('install', env['INSTALL_PREFIX'])

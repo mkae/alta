@@ -1,5 +1,5 @@
 # Plug-ins.
-
+Import('env')
 import os
 
 plugins = [ 'data_interpolants',
@@ -96,3 +96,5 @@ if not GetOption('silent') and not GetOption('clean'):
     print ""
     print "  See 'config.log' for details."
     print ""
+
+env.Install(env['INSTALL_PREFIX'] + '/lib/alta', targets)
