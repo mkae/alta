@@ -27,7 +27,7 @@
 
 //! Add dynamic library extension (.so or .dll) to a dynamic object as well as
 //! prepending 'lib' depending on the plateform.
-std::string library_name(const std::string name) 
+static std::string library_name(const std::string name)
 {
 	std::string filename;
 
@@ -57,7 +57,7 @@ std::string library_name(const std::string name)
 	return filename;
 }
 
-void plugin_search_path(std::list<std::string>& dirs)
+static void plugin_search_path(std::list<std::string>& dirs)
 {
 	dirs.push_back("");
 
@@ -86,7 +86,8 @@ void plugin_search_path(std::list<std::string>& dirs)
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
 //! provide function. The template argument is used to cast the library to a
 //! specific type.
-template<typename T> T open_library(const std::string& filename, const char* function)
+template<typename T>
+static T open_library(const std::string& filename, const char* function)
 {
 	std::list<std::string> basename;
 	plugin_search_path(basename);
