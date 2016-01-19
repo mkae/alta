@@ -57,30 +57,44 @@ static std::string library_name(const std::string name)
 	return filename;
 }
 
+// Return the plugin search path based on the 'ALTA_PLUGIN_PATH' environment
+// variable.  Empty entries in that variable's value are taken to designate
+// the plugin installation directory.
 static void plugin_search_path(std::list<std::string>& dirs)
 {
-	dirs.push_back("");
-
 	std::string obj_str ;
 	const char *env_str = std::getenv("ALTA_PLUGIN_PATH");
 
 	if(env_str == NULL) {
-		obj_str = "" ;
+		obj_str = "";
 	} else {
-		obj_str = std::string(env_str)+":" ;
+    obj_str = env_str;
 	}
 
-	while(true)	{
-		int lb = obj_str.find_first_not_of(":",0) ;
-		int le = obj_str.find_first_of(":",lb) ;
+  if (obj_str.empty())
+      // Always add at least the system's plugin directory.
+      dirs.push_back(ALTA_PLUGIN_DIRECTORY);
+  else {
+      for (auto start = 0, next = 0;
+           start < obj_str.size();
+           start = next + 1)
+      {
+          next = obj_str.find(':', start);
+          if (next == std::string::npos)
+              next = obj_str.size();
 
-		if(lb < le)	{
-			dirs.push_back(obj_str.substr(lb,le-lb)) ;
-			obj_str = obj_str.substr(le+1,obj_str.size()) ;
-		} else {
-			break ;
-		}
-	}
+          // An empty entry denotes the system directory.
+          auto entry = next == start
+              ? ALTA_PLUGIN_DIRECTORY
+              : obj_str.substr(start, next - start);
+
+          dirs.push_back(entry);
+
+          if (next == obj_str.size() - 1)
+              // This is a trailing empty entry.
+              dirs.push_back(ALTA_PLUGIN_DIRECTORY);
+      }
+  }
 }
 
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
@@ -96,7 +110,7 @@ static T open_library(const std::string& filename, const char* function)
 	for(iter = basename.begin(); iter != basename.end(); ++iter)
 	{
 	 std::string libname = *iter;
-	 libname.append(library_name(filename));
+	 libname += "/" + library_name(filename);
 
 
 #ifdef _WIN32

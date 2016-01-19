@@ -42,6 +42,13 @@ if env['CC'] != 'cl':
 	# contains PIC code.  Thus, force '-fPIC'.
 	CCFLAGS = CCFLAGS + ' -fPIC'
 
+# Tell the plugin manager where to look for plugins by default.
+# Note: This must be kept in sync with 'plugins/SConscript'.
+plugin_dir = env['INSTALL_PREFIX'] + '/lib/alta'
+env.AppendUnique(CPPFLAGS = ['-DALTA_PLUGIN_DIRECTORY=\\"'
+                             + plugin_dir + '\\"'])
+
+
 lib = env.StaticLibrary('#build/core/core', source = sources,
                         LIBS = ALTA_LIBS,
                         CPPPATH = env['CPPPATH'] + env['EIGEN_INC'],
