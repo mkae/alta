@@ -106,14 +106,11 @@ static std::list<std::string> plugin_search_path()
 template<typename T>
 static T open_library(const std::string& filename, const char* function)
 {
-  auto basename = plugin_search_path();
+  auto directories = plugin_search_path();
 
-	std::list<std::string>::iterator iter;
-	for(iter = basename.begin(); iter != basename.end(); ++iter)
+	for (auto&& directory: directories)
 	{
-	 std::string libname = *iter;
-	 libname += "/" + library_name(filename);
-
+    auto libname = directory + "/" + library_name(filename);
 
 #ifdef _WIN32
     HINSTANCE handle = LoadLibraryA(libname.c_str());
@@ -171,7 +168,7 @@ static T open_library(const std::string& filename, const char* function)
     }
 #endif
 	}
-   
+
 	std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
 	return NULL;
 }
