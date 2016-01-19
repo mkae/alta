@@ -58,7 +58,7 @@ def build_environment_variables():
   envvars = os.environ.copy()
   envvars['TEST_DATA_DIRECTORY'] = test_data_directory
   envvars['PYTHONPATH'] = Dir('#build/python').abspath
-  envvars['ALTA_LIB'] = Dir('#build/plugins').abspath;
+  envvars['ALTA_PLUGIN_PATH'] = Dir('#build/plugins').abspath;
 
   libdir = Dir('#build/plugins').abspath
   lib_path_var = library_search_path_variable()

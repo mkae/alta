@@ -65,7 +65,7 @@ Section "ALTA" SecMain
 
   # Update the ENVIROMNENT
   WriteRegStr HKCU "Environment" "ALTA_DIR"   '$INSTDIR'
-  WriteRegStr HKCU "Environment" "ALTA_LIB"   '$INSTDIR\plugins'
+  WriteRegStr HKCU "Environment" "ALTA_PLUGIN_PATH"   '$INSTDIR\plugins'
   ${EnvVarUpdate} $0 "PATH"     "A" "HKCU" '$INSTDIR\bin'
   ${EnvVarUpdate} $1 "PYTHONPATH" "A" "HKCU" '$INSTDIR\python'
 
@@ -93,9 +93,9 @@ Section "Uninstall"
   RMDir /r "$INSTDIR"
 
 
-  ;Remove ALTA_LIB AND ALTA_DIR env. variable
+  ;Remove ALTA_PLUGIN_PATH AND ALTA_DIR env. variable
   DeleteRegKey HKCU "ALTA_DIR"
-  DeleteRegKey HKCU "ALTA_LIB"
+  DeleteRegKey HKCU "ALTA_PLUGIN_PATH"
 
 
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR"

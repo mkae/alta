@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014, 2015 CNRS
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -57,12 +57,12 @@ std::string library_name(const std::string name)
 	return filename;
 }
 
-void get_library_dirs(std::list<std::string>& dirs)
+void plugin_search_path(std::list<std::string>& dirs)
 {
 	dirs.push_back("");
 
 	std::string obj_str ;
-	const char *env_str = std::getenv("ALTA_LIB") ;
+	const char *env_str = std::getenv("ALTA_PLUGIN_PATH");
 
 	if(env_str == NULL) {
 		obj_str = "" ;
@@ -89,7 +89,7 @@ void get_library_dirs(std::list<std::string>& dirs)
 template<typename T> T open_library(const std::string& filename, const char* function)
 {
 	std::list<std::string> basename;
-	get_library_dirs(basename);
+	plugin_search_path(basename);
 
 	std::list<std::string>::iterator iter;
 	for(iter = basename.begin(); iter != basename.end(); ++iter)

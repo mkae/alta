@@ -23,7 +23,7 @@ scripts=${sources}/sources/scripts/
 
 export ALTA=$sources
 export ALTA_DIR=$sources/sources
-export ALTA_LIB="$builddir/plugins"
+export ALTA_PLUGIN_PATH="$builddir/plugins"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$builddir/plugins:$external"
 export PATH="$PATH:$builddir/softs:$scripts"
 export PYTHONPATH="$PYTHONPATH:$builddir/python"
