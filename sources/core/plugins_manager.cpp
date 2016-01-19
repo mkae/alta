@@ -60,8 +60,9 @@ static std::string library_name(const std::string name)
 // Return the plugin search path based on the 'ALTA_PLUGIN_PATH' environment
 // variable.  Empty entries in that variable's value are taken to designate
 // the plugin installation directory.
-static void plugin_search_path(std::list<std::string>& dirs)
+static std::list<std::string> plugin_search_path()
 {
+  std::list<std::string> dirs;
 	std::string obj_str ;
 	const char *env_str = std::getenv("ALTA_PLUGIN_PATH");
 
@@ -95,6 +96,8 @@ static void plugin_search_path(std::list<std::string>& dirs)
               dirs.push_back(ALTA_PLUGIN_DIRECTORY);
       }
   }
+
+  return dirs;
 }
 
 //! \brief Open a dynamic library file (.so or .dll) and extract the associated
@@ -103,8 +106,7 @@ static void plugin_search_path(std::list<std::string>& dirs)
 template<typename T>
 static T open_library(const std::string& filename, const char* function)
 {
-	std::list<std::string> basename;
-	plugin_search_path(basename);
+  auto basename = plugin_search_path();
 
 	std::list<std::string>::iterator iter;
 	for(iter = basename.begin(); iter != basename.end(); ++iter)
