@@ -22,6 +22,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 class shifted_gamma_function : public nonlinear_function
 {
 	public: // methods

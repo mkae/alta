@@ -23,6 +23,8 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
+using namespace alta;
+
 /*! \brief A rational function optimizer following the DCA algorithm.
  * \ingroup plugins
  * \ingroup fitters

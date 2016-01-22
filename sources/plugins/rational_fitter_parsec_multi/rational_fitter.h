@@ -13,6 +13,8 @@
 #include <core/args.h>
 #include "gesvdm2.h"
 
+using namespace alta;
+
 /*! \brief A vertical segment fitter for rational function using the library QuadProg++
  *  You can find the library here: http://quadprog.sourceforge.net/
  *  \ingroup plugins

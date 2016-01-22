@@ -23,6 +23,8 @@
 #include <core/args.h>
 #include <core/ptr.h>
 
+using namespace alta;
+
 /*! \brief A vertical segment fitter for rational function using the library CGAL
  *  \ingroup plugins
  *  \ingroup fitters

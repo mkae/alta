@@ -21,6 +21,8 @@
 # include <endian.h>
 #endif
 
+using namespace alta;
+
 void vertical_segment::load_data_from_text(std::istream& input,
 																					 const arguments& header,
 																					 vertical_segment& result,

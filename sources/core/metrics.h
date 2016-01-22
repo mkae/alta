@@ -18,6 +18,8 @@
 // STL includes
 #include <map>
 
+namespace alta {
+
 /*!
  * \brief Error metrics class
  *
@@ -74,3 +76,4 @@ class errors {
                                       Eigen::VectorXd& mse,
                                       Eigen::VectorXd& rmse);
 };
+}

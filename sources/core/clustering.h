@@ -15,6 +15,8 @@
 
 #include <vector>
 
+namespace alta {
+
 #ifdef OLD
 class clustering : public data
 {
@@ -62,3 +64,4 @@ class clustering : public data
 #endif
 
 #include "clustering.cpp"
+}

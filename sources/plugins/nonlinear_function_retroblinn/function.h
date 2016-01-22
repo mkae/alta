@@ -22,6 +22,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 
 /*! \brief A retroblinn lobe class. It is provided for testing with the 
  *  nonlinear fitting algorithms.

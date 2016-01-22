@@ -13,6 +13,7 @@
 #include <core/params.h>
 #include <tests.h>
 
+using namespace alta;
 using namespace alta::tests;
 
 // STL includes

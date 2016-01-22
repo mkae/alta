@@ -20,12 +20,14 @@
 
 #include "common.h"
 
+namespace alta {
+
 /*! \brief A useful class for storing the high-level arguments of a program
  *  or a function.
  *  \ingroup core
  *  \internal
  *
- *  The set of parameters are parsed from the command line using the 
+ *  The set of parameters are parsed from the command line using the
  *  constructor. They are stored as std::string in a std::map.
  *  \todo add functionalities to provide new parameters values.
  */
@@ -85,7 +87,7 @@ class arguments
   #endif
                     data.append(next);
                 }
-            }//end of if 
+            }//end of if
   #ifdef DEBUG_ARGS
             std::cout << "]" << std::endl;
   #endif
@@ -93,7 +95,7 @@ class arguments
         }//end of if test with "--"
       }//end of for-loop
     }
-		
+
     ~arguments()
 		{
 		}
@@ -140,13 +142,13 @@ class arguments
   			return std::string() ;
   		}
     }
-    
+
     //! \brief update the value \a val stored under key \a key
     void update(const std::string& key, const std::string& val)
     {
         _map[key] = val;
     }
-		
+
     //! \brief acces to the string value associated with the parameter
 		//! \a key.
 		//!
@@ -181,7 +183,7 @@ class arguments
     {
       //IF C++ 2011 is supported and activated
       #if __cplusplus > 199711L
-        
+
       auto search = _map.find(key);
       if ( search != _map.end() )
       {
@@ -190,13 +192,13 @@ class arguments
       return default_value;
 
       #else
-      
+
       std::map<std::string,std::string>::const_iterator res = _map.find(key);
       if ( res != _map.end() )
       {
         return std::atof( res->second.c_str() );
       }
-      
+
       return default_value;
       #endif
     }
@@ -212,8 +214,8 @@ class arguments
 				return atoi(_map.find(key)->second.c_str()) ;
 			else
 				return default_value ;
-		} 
-	
+     }
+
   	//! \brief acces to a vector of float of size \a size associated with
 		//! the parameter \a key.
 		//!
@@ -270,8 +272,8 @@ class arguments
 		{
 		  std::vector<T> res;
 
-      //TODO: RP: it is not very efficient to call count + find 
-      // because find is called twice !!! 
+      //TODO: RP: it is not very efficient to call count + find
+      // because find is called twice !!!
       // My advice: find should be called once, check if the key exist
       // and if yes use the iterator returned by find
 			if(_map.count(key) > 0)
@@ -331,7 +333,7 @@ class arguments
         }
       return res;
     }
-		
+
 		//! \brief access a pair of element of type \a T.
 		//! the string associated with the key \a key should have the form
 		//! "a b" where a, b are compatible with type \a T.
@@ -340,8 +342,8 @@ class arguments
 
 			std::pair<T, T> res;
 
-			//TODO: RP: it is not very efficient to call count + find 
-			// because find is called twice !!! 
+        //TODO: RP: it is not very efficient to call count + find
+        // because find is called twice !!!
 			// My advice: find should be called once, check if the key exist
 			// and if yes use the iterator returned by find
 			if(_map.count(key) > 0) {
@@ -480,7 +482,7 @@ class arguments
 									}
 								}
 
-							// Store the line into the argument 
+                    // Store the line into the argument
 							} else {
 								while(!linestream.eof()	&& std::isspace(linestream.peek()))	{
 									linestream.get();
@@ -491,7 +493,7 @@ class arguments
 							}
 						}
 					}
-					
+
 				// The first non-comment line terminates the header.
 				} else {
 					break;
@@ -506,4 +508,5 @@ class arguments
 
 		std::map<std::string, std::string> _map ;
 
-} ;
+};
+}

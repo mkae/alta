@@ -26,6 +26,8 @@
 //#define USE_MATLAB
 #define DEBUG
 
+using namespace alta;
+
 /*! \brief  A plugin to fit rational function using the  Matlab Engine
  *  \ingroup plugins
  *  \ingroup fitters

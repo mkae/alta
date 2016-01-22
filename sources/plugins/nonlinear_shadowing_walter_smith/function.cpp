@@ -10,7 +10,7 @@
 
 #include <core/common.h>
 
-
+using namespace alta;
 
 ALTA_DLL_EXPORT function* provide_function()
 {

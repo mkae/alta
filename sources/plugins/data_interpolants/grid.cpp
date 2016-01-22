@@ -18,6 +18,8 @@
 #include <iomanip>
 #include <fstream>
 
+using namespace alta;
+
 vec get_min(const params::input& param) {
 
    vec res(params::dimension(param));

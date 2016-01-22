@@ -34,6 +34,8 @@
 # include <unistd.h>
 #endif
 
+using namespace alta;
+
 // Files that are automatically deleted upon destruction.
 class temporary_file
 {

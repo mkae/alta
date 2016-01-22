@@ -23,6 +23,14 @@
 #include "clustering.h"
 #include "ptr.h"
 
+
+namespace alta {
+   class data;
+}
+void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data);
+
+namespace alta {
+
 /*! \brief A data object. Allows to load data from files.
  *  \ingroup core
  */
@@ -79,8 +87,8 @@ class data : public parametrized
 												double epsilon =
                         std::pow(1.0, -int(std::numeric_limits<double>::digits10 - 1)));
 
-		friend void load_data_from_binary(std::istream& in, const arguments& header,
-																			data& data);
+     friend void ::load_data_from_binary(std::istream& in, const alta::arguments& header,
+                                         alta::data& data);
 
 	protected: // data
 } ;
@@ -177,5 +185,6 @@ class data_params : public data
 
 		std::vector<vec> _data;
 };
+}
 
 /* -*- c++ -*- */

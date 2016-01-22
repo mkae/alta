@@ -42,6 +42,8 @@
 #define GREEN_SCALE (1.15/1500.0)
 #define BLUE_SCALE  (1.66/1500.0)
 
+using namespace alta;
+
 
 /*! \ingroup datas
  *  \class data_merl

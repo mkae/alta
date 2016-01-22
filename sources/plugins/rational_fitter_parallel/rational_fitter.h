@@ -22,6 +22,8 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
+using namespace alta;
+
 /*! \brief A vertical segment fitter for rational functions that search for a solution
  *  for a fixed number of coefficient. This plugin can run in parallel with OpenMP and
  *  is using QuadProg++ quadratic solver.

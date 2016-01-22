@@ -24,6 +24,8 @@
 // Matlab includes
 #include <engine.h>
 
+using namespace alta;
+
 mxArray *X, *Y, *x, *y;
 
 #define BUFFER_SIZE 10000

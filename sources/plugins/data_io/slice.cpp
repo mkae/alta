@@ -16,6 +16,8 @@
 
 #include "EXR_IO.h"
 
+using namespace alta;
+
 /*! \ingroup datas
  *  \class data_brdf_slice
  *  \brief Data interface for the BRDF slice file format.

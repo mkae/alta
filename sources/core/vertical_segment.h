@@ -22,6 +22,8 @@
 #include "fitter.h"
 #include "args.h"
 
+namespace alta {
+
 /*! \ingroup core
  *  \ingroup datas
  *
@@ -155,6 +157,7 @@ class vertical_segment : public data
       // relative or absolute intervals? What is the dt used ?
       bool   _is_absolute;
       double _dt;
-} ;
+};
+}
 
 /* -*- c++ -*- */

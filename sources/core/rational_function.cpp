@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <cmath>
 
+using namespace alta;
+
 rational_function_1d::rational_function_1d()
 {
 }
@@ -449,8 +451,10 @@ vec rational_function_1d::value(const vec& x) const
 
 std::ostream& operator<< (std::ostream& out, const rational_function_1d& r) 
 {
-	const unsigned int np = r._p_coeffs.size();
-	const unsigned int nq = r._q_coeffs.size();
+   const auto p = r.getP();
+   const auto q = r.getQ();
+   const unsigned int np = p.size();
+   const unsigned int nq = q.size();
 
 	std::cout << "p = [" ;
 	for(unsigned int i=0; i<np; ++i)
@@ -459,7 +463,7 @@ std::ostream& operator<< (std::ostream& out, const rational_function_1d& r)
 		{
 			std::cout << ", " ;
 		}
-		std::cout << r._p_coeffs[i].a ;
+     std::cout << p[i];
 	}
 	std::cout << "]" << std::endl ;
 
@@ -470,7 +474,7 @@ std::ostream& operator<< (std::ostream& out, const rational_function_1d& r)
 		{
 			std::cout << ", " ;
 		}
-		std::cout << r._q_coeffs[i].a ;
+     std::cout << q[i];
 	}
 	std::cout << "]" << std::endl ;
 
@@ -643,7 +647,7 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 	}
 }
 
-std::ostream& operator<< (std::ostream& out, rational_function& r)
+std::ostream& operator<< (std::ostream& out, const rational_function& r)
 {
 	for(int i=0; i<r.dimY(); ++i)
 	{

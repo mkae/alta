@@ -33,6 +33,8 @@
 #include <core/fitter.h>
 #include <core/plugins_manager.h>
 
+using namespace alta;
+
 //TODO: Move to ALTA CORE
 //TODO: Documentation
 //TODO:  Add the relative error computation

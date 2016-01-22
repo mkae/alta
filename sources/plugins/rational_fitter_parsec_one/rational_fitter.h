@@ -12,6 +12,8 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
+using namespace alta;
+
 /*! \brief A vertical segment fitter for rational function using the library QuadProg++
  *  You can find the library here: http://quadprog.sourceforge.net/
  *  and the [Parsec library](http://icl.cs.utk.edu/parsec/index.html)

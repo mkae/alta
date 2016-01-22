@@ -32,6 +32,8 @@ int dD;
 #include <flann/flann.hpp>
 #endif
 
+using namespace alta;
+
 /*! \ingroup datas
  *  \ingroup plugins
  *  \class data_interpolant_rbf

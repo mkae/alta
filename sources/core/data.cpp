@@ -13,6 +13,8 @@
 #include "data.h"
 #include "data_storage.h"
 
+using namespace alta;
+
 void data::save(const std::string& filename) const
 {
 		std::ofstream file;

@@ -25,6 +25,8 @@
 #include <iostream>
 #include <cassert>
 
+using namespace alta;
+
 vec product(const vec& a, const vec& b)
 {
     if (a.size() == 1)

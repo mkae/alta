@@ -19,6 +19,8 @@
 
 #define one_pi 0.31830988618
 
+using namespace alta;
+
 ALTA_DLL_EXPORT function* provide_function()
 {
     return new shifted_gamma_function();

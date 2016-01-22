@@ -1,5 +1,7 @@
 #include "metrics.h"
 
+using namespace alta;
+
 void errors::compute(const data* in,   const data* ref,
                      const data* mask, metrics& res) {
 

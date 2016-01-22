@@ -20,6 +20,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 
 /*!
  * \class nonlinear_function_diffuse

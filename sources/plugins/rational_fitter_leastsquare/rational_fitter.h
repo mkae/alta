@@ -22,6 +22,8 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
+using namespace alta;
+
 /*! \brief A least square fitter for rational function
  *  \ingroup plugins
  *  \ingroup fitters

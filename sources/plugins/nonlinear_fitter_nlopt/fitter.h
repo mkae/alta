@@ -21,6 +21,8 @@
 #include <core/args.h>
 #include <core/vertical_segment.h>
 
+using namespace alta;
+
 /*! \brief A non-linear fitter using the NLOpt solver
  *  \ingroup plugins
  *  \ingroup fitters

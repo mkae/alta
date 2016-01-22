@@ -20,6 +20,8 @@
 #include <core/fitter.h>
 #include <core/args.h>
 
+using namespace alta;
+
 /*! \brief A non-linear fitter using the COIN-OR IpOpt solver
  *  \ingroup plugins
  *  \ingroup fitters

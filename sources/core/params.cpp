@@ -13,6 +13,8 @@
 #include "common.h"
 #include <cassert>
 
+using namespace alta;
+
 struct param_info
 {
 	param_info(std::string n, int d, std::string i) :

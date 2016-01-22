@@ -21,6 +21,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 
 class schlick : public nonlinear_function
 {

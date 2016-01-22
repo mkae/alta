@@ -15,6 +15,8 @@
 #include "args.h"
 #include "common.h"
 
+namespace alta {
+
 /*! \brief Fitting interface for generic fitting algorithms
  *  \ingroup core
  *
@@ -37,4 +39,5 @@ class fitter
 		//! multiple call to the fit_data procedure
 		virtual void set_parameters(const arguments& args) = 0 ;
 
-} ;
+};
+}

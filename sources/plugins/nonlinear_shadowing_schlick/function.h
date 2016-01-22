@@ -21,6 +21,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 
 /*!
  * \ingroup functions

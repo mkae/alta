@@ -22,6 +22,8 @@
 #include "clustering.h"
 #include "ptr.h"
 
+namespace alta {
+
 /*! \class plugins_manager
  *  \brief This class permits to load plugin from shared library files.
  *  \ingroup core
@@ -76,4 +78,5 @@ class plugins_manager
 		typedef function* (*FunctionPrototype)();
 		typedef fitter*   (*FitterPrototype)();
 		typedef data*     (*DataPrototype)(const arguments&);
-} ;
+};
+}

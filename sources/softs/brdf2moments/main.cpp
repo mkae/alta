@@ -23,6 +23,8 @@
 #include <cstdlib>
 #include <cmath>
 
+using namespace alta;
+
 int main(int argc, char** argv)
 {
     arguments args(argc, argv) ;

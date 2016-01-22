@@ -22,6 +22,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 //#define ADAPT_TO_PARAM
 //#define FIT_DIFFUSE
 

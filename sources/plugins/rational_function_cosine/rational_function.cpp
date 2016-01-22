@@ -14,6 +14,8 @@
 #include <core/common.h>
 #include <core/rational_function.h>
 
+using namespace alta;
+
 ALTA_DLL_EXPORT function* provide_function()
 {
     return new rational_function_legendre();

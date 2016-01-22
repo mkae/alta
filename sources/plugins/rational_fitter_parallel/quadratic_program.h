@@ -16,6 +16,8 @@
 #include <core/rational_function.h>
 #include <core/vertical_segment.h>
 
+using namespace alta;
+
 class quadratic_program
 {
    public:

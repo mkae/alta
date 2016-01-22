@@ -75,6 +75,8 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& v) {
     return out;
 }
 
+namespace alta {
+
 //! \brief locate the first index of value v in vector vec. Complexity in
 //! O(n) is the worst case.
 template<typename T> int is_in(std::vector<T> ve, T v)
@@ -170,6 +172,13 @@ template<typename T> bool isnan(T x)
 #else
 #define ALTA_DLL_EXPORT extern "C"
 #endif
+}
+
+namespace alta {
+   class timer;
+}
+std::ostream& operator<<(std::ostream& out, const alta::timer& t);
+namespace alta {
 
 /*! \brief The timer class: a cross plateform timing solution
  */
@@ -197,7 +206,7 @@ class timer
         void print(std::ostream& out) const;
 
         //! \brief ostream compliant operator
-        friend std::ostream& operator<<(std::ostream& out, const timer& t);
+        friend std::ostream& ::operator<<(std::ostream& out, const timer& t);
 
     private:
 
@@ -238,3 +247,4 @@ class timer
 									<< std::endl;														\
 				exit(EXIT_FAILURE);																\
 		}
+}

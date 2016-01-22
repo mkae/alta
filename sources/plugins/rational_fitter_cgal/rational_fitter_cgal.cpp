@@ -28,6 +28,8 @@ typedef CGAL::Quadratic_program<ET> Program ;
 typedef CGAL::Quadratic_program_solution<ET> Solution ;
 typedef CGAL::Quadratic_program_options Options ;
 
+using namespace alta;
+
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
     return new rational_fitter_cgal();

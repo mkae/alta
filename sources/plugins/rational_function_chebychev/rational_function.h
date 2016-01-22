@@ -22,6 +22,8 @@
 #include <core/args.h>
 #include <core/common.h>
 
+using namespace alta;
+
 class rational_function_chebychev_1d : public rational_function_1d
 {
 public: // methods

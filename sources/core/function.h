@@ -21,6 +21,8 @@
 #include "params.h"
 #include "data.h"
 
+namespace alta {
+
 /*! \brief A representation of an analytical function.
  *  \ingroup core
  *
@@ -426,3 +428,4 @@ class cosine_function : public nonlinear_function
 			return jac;
 		}
 };
+}

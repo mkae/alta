@@ -23,6 +23,17 @@
 #include "common.h"
 
 
+namespace alta {
+   class rational_function_1d;
+   class rational_function;
+}
+// STL stream ouput
+std::ostream& operator<< (std::ostream&, const alta::rational_function_1d&);
+std::ostream& operator<< (std::ostream&, const alta::rational_function&);
+
+
+namespace alta {
+
 /*! \brief A one dimensional rational function class. A rational function has
  *  the form \f$r(x) = \dfrac{\sum_{i} a_i p_i(x)}{b_i q_i(x)}$\f.
  */
@@ -116,10 +127,6 @@ class rational_function_1d : public function
 		}
 
 
-		// STL stream ouput
-		friend std::ostream& operator<< (std::ostream& out,
-		                                 const rational_function_1d& r) ;
-
 		//! Convert a 1D index into a vector of degree for a
 		//! multinomial coeffcient. The resulting vector v should
 		//! be used as prod_k x[k]^v[k] for the monomial basis
@@ -198,9 +205,6 @@ class rational_function : public function
 		virtual rational_function_1d* get(int i) ;
 		virtual rational_function_1d* get(int i) const ;
 
-		// STL stream ouput
-		friend std::ostream& operator<<(std::ostream& out, rational_function& r) ;
-
 		//! Set the dimension of the output space of the function. This function 
 		//! will update the size of the rs vector size.
 		virtual void setDimY(int nY) 
@@ -249,4 +253,5 @@ class rational_function : public function
 		//! \todo Change it by a more adaptive scheme, with different np, nq per 
 		//! color channel?
 		int np, nq;
-} ;
+};
+}

@@ -21,6 +21,8 @@
 #include <cstdlib>
 #include <cmath>
 
+using namespace alta;
+
 /*! \ingroup datas
  *  \ingroup plugins
  *  \class data_astm

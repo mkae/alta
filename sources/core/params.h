@@ -23,6 +23,8 @@
 
 #include "common.h"
 
+namespace alta {
+
 /*! \class params
  *  \ingroup core
  *  \brief a static class allowing to change from one parametrization
@@ -564,3 +566,4 @@ class parametrized
 		int _nX, _nY ;
 		vec _min, _max ;
 };
+}

@@ -19,6 +19,8 @@
 #include <cmath>
 #include <cassert>
 
+using namespace alta;
+
 //#define RELATIVE_ERROR
 
 vertical_segment::vertical_segment(unsigned int dim_X, 

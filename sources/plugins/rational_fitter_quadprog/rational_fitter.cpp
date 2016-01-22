@@ -28,6 +28,8 @@
 
 #include <core/common.h>
 
+using namespace alta;
+
 ALTA_DLL_EXPORT fitter* provide_fitter()
 {
   return new rational_fitter_quadprog();

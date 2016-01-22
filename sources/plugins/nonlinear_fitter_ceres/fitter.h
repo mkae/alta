@@ -24,6 +24,8 @@
 // CERES include
 #include <ceres/ceres.h>
 
+using namespace alta;
+
 /*! \brief A non-linear fitter using the CERES solver
  *  \ingroup plugins
  *  \ingroup fitters

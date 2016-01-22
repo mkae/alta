@@ -25,6 +25,8 @@
 // Eigen includes
 #include <Eigen/Core>
 
+using namespace alta;
+
 //TODO: Move to ALTA CORE
 //TODO: Documentation
 //TODO:  Add the relative error computation

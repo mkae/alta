@@ -15,6 +15,8 @@
 #include "params.h"
 #include "plugins_manager.h"
 
+using namespace alta;
+
 /*--- Functions implementation ----*/
 
 void function::bootstrap(const ptr<data>, const arguments& args)

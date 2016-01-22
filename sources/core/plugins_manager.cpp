@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <list>
 
+using namespace alta;
+
 //#define DEBUG
 
 
