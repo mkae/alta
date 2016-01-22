@@ -29,6 +29,8 @@
 
 #define bp boost::python
 
+using namespace alta;
+
 
 namespace boost {
    namespace python {
