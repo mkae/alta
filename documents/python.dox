@@ -5,13 +5,16 @@ To have access to the python interface, you need to compile the python module. T
 
 	$ scons python
 
-Once the python interface (alta.so) is compiled, you need to update the `PYTHONPATH` environment variable to the build directory. If not, you will not have access to the interface. On UNIX-like systems, it can be done using by sourcing the *setpath.sh* script. On MS-Windows, you need to update the variable by hand.
+Once the python interface (`alta.[so|dll]`) is compiled, you need to update the `PYTHONPATH` environment variable to the build directory. If not, you will not have access to the interface. On UNIX-like systems, it can be done using by sourcing the *setpath.sh* script. On MS-Windows, you need to update the variable by hand.
 
 In python, the ALTA module is simply loaded using:
 
 	>>> import alta
 
-This module provide different basic types such as `arguments` and `vec`. They have the same behaviour as ALTA C++ classes \ref arguments and \ref vec. However, they can be intialized from Python types. An `arguments` object can be created using a dictionnary:
+This module contains all the functions you need to manipulate ALTA and perform
+operations just like in the command line version of ALTA.
+
+However, the interface to pass command line argument is a little bit different than for ALTA softwares. Command line arguments are passed using the `argument` object which is a dictionnary of key values arguments as in `--key value`. An `arguments` object can be created using a dictionnary:
 
     >>> args = alta.arguments({'foo' : 'bar', 'hello' : 'world'})
 
@@ -49,9 +52,21 @@ This will perform a data conversion from the `blue-metallic-paint` of the [MERL]
 
 Available \ref commands "commands" are:
 
- + `data2data` to convert a \ref data "data" object into another one. This function will try to evaluate the input data at every location specified by the output data format when the format has a static set of configurations (this is the case for all `data_io` plugins). Function call: `data2data(data_in, data_out)`.
+ + `data2data(d1, d2)` to convert a \ref data "data" `d1` object into another
+   one `d2`. This function will try to evaluate the input data at every location
+   specified by the output data format when the format has a static set of
+   configurations (this is the case for all `data_io` plugins). Function call:
+   `data2data(data_in, data_out)`.
 
- + `brdf2data` to evalute a \ref function "BRDF" at the configurations defined by the \ref data "data" object. This will replace the content of the data object by the values of the function at the specified locations. Function call `brdf2data(func_in, data_out)`.
+ + `brdf2data(f, d)` to evalute a \ref function "BRDF" `f` at the
+   configurations defined by the \ref data "data" object `d`. This will replace
+   the content of the data object by the values of the function at the specified
+   locations. Function call `brdf2data(func_in, data_out)`.
+
+ + `data2stats(d1, d2)` to compute the distance between two \ref data "data"
+   objects `d1` and `d2`. This function return a dictionnary containing different
+   error metrics such as `L2`, `Linf`, `RMSE`, etc. You can query the value of
+   each metric using ``dic['RMSE']`` for example.
 
 
   [MERL]: http://www.merl.com/brdf/
