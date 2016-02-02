@@ -122,7 +122,8 @@ vars.Add('PYTHON',            'Python interpreter',
 # files contained is #external/build/lib/pkgconfig
 ##
 envVars = {}
-for var in [ 'PATH', 'CPATH', 'LIBRARY_PATH', 'PKG_CONFIG_PATH', 'TMP', 'TMPDIR' ]:
+for var in [ 'PATH', 'CPATH', 'CPLUS_INCLUDE_PATH', 'LIBRARY_PATH',
+             'PKG_CONFIG_PATH', 'TMP', 'TMPDIR' ]:
 	if var in os.environ:
 		envVars[var] = os.environ[var]
 	else:
