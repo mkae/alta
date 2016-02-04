@@ -90,8 +90,8 @@ vars.Add('FLANN_LIB',         'FLANN libraries')
 vars.Add('CGAL_INC',          'CGAL include directory', default = [])
 vars.Add('CGAL_DIR',          'CGAL libraries directory', default = [])
 vars.Add('CGAL_LIB',          'CGAL libraries', default = [])
-vars.Add('OPENMP_CFLAGS',     'OpenMP compiler flags', default = ' -fopenmp')
-vars.Add('OPENMP_LINKFLAGS',  'OpenMP linker flags', default = ' -fopenmp')
+vars.Add('OPENMP_CFLAGS',     'OpenMP compiler flags', default = None)
+vars.Add('OPENMP_LINKFLAGS',  'OpenMP linker flags', default = None)
 vars.Add('QUADPROG_INC',      'QUADPROG include directory')
 vars.Add('QUADPROG_DIR',      'QUADPROG libraries directory')
 vars.Add('QUADPROG_LIB',      'QUADPROG libraries')
@@ -210,10 +210,55 @@ def openexr_available(env):
 								 lib='OPENEXR_LIB',
 								 header='ImfRgbaFile.h')
 
+def CheckOpenMP(context):
+  """
+  Check whether the compiler supports '-fopenmp'.  If it does, add
+  '-fopenmp' to the compilation and link flags.
+
+  """
+  context.Message("Checking whether '-fopenmp' is supported... ")
+  env = context.env
+  save_CCFLAGS = env['CCFLAGS']
+  save_LINKFLAGS = env['LINKFLAGS']
+
+  env['CCFLAGS'] = ' '.join([save_CCFLAGS, '-fopenmp'])
+  env['LINKFLAGS'] = ' '.join([env['LINKFLAGS'], '-fopenmp'])
+
+  # Users of Clang++ sometimes lack libgomp (which is the OpenMP
+  # runtime that Clang uses), so better check that things link.
+  has_fopenmp = conf.TryLink("""
+#include <stdlib.h>
+int frob (int x)
+{
+  return x * x;
+}
+int main (int argc, char *argv[])
+{
+  int z;
+#pragma omp parallel for
+  for (z = 0; z < atoi (argv[1]); z++)
+    frob (z);
+  return 0;
+}
+""", '.cpp')
+  context.Result('yes' if has_fopenmp else 'no')
+
+  env['CCFLAGS'] = save_CCFLAGS
+  env['LINKFLAGS'] = save_LINKFLAGS
+  if has_fopenmp:
+    env['OPENMP_CFLAGS'] = ' -fopenmp'
+    env['OPENMP_LINKFLAGS'] = ' -fopenmp'
+  else:
+    # Don't leave None in there.
+    env['OPENMP_CFLAGS'] = ''
+    env['OPENMP_LINKFLAGS'] = ''
+
+  return has_fopenmp
+
 # Export these for use in SConscripts.
 Export('CheckPKG', 'library_available', 'openexr_available')
 
-conf = Configure(env)
+conf = Configure(env, custom_tests = { 'CheckOpenMP': CheckOpenMP })
 
 # Determine the extra libraries that libcore (and thus everything
 # else) depends on.  Plugins need to specify it in addition to -lcore
@@ -229,6 +274,9 @@ if conf.CheckLibWithHeader('rt', 'sched.h', 'c++'):
 		ALTA_LIBS = ALTA_LIBS + ['rt']
 
 Export('ALTA_LIBS')
+
+if not 'OPENMP_CFLAGS' in env:
+  conf.CheckOpenMP()
 
 env = conf.Finish()
 

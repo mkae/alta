@@ -31,16 +31,6 @@ PYTHON_LIB    = ['python2.7']
 ##
 EIGEN_INC     = ['#external/build/include']
 
-
-## OpenMP flags
-##
-## There is no support for OpenMP on OSX + clang right now. We advise to use
-## a gcc compiler if performances are required.
-##
-OPENMP_CFLAGS    = ''
-OPENMP_LINKFLAGS = ''
-
-
 ## OpenEXR library
 ##
 ## OpenEXR in ports has a default pkgconfig file. If you want to specify your
