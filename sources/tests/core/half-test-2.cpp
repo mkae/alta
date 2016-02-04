@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2015 Inria
+   Copyright (C) 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -51,7 +51,6 @@ int main(int argc, char** argv) {
   for (auto&& theta_i : angle_range<double>(0, ntheta, step)) {
   for (auto&& phi_i : angle_range<double>(0, nphi, step)) {
 
-      #pragma omp parallel for
       for (auto&& theta_o : angle_range<double>(0, ntheta, step)) {
       for (auto&& phi_o : angle_range<double>(0, nphi, step)) {
 
@@ -72,7 +71,6 @@ int main(int argc, char** argv) {
           vec x(4);
           params::convert(&cart[0], params::CARTESIAN, params::RUSIN_TH_PH_TD_PD, &x[0]);
 
-          #pragma omp critical (n)
           if(!in_range(x[0], 0.0, M_PI_2) || !in_range(x[2], 0.0, M_PI_2)
              || !in_range(x[3], -M_PI, M_PI)) {
             std::cout << "<<ERROR>> configuration " <<  cart << " -> " << x << " failed" << std::endl;
