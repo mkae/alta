@@ -2,7 +2,7 @@ Import('env', 'openexr_available')
 env = env.Clone()
 
 # Special linking flags, defined in the OS dependant configuration file
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS = ['core'])
 
 have_openexr = openexr_available(env)
 

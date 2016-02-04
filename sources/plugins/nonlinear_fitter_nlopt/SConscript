@@ -8,7 +8,7 @@ build_lib = library_available(env, pkgspec='nlopt',
 
 targets = []
 if build_lib:
-  env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+  env.AppendUnique(LIBS    = ['core'])
   #env.AppendUnique(LIBS    = env['NLOPT_LIB'])
   #env.AppendUnique(LIBPATH = env['NLOPT_DIR'])
   #env.AppendUnique(CPPPATH = env['NLOPT_INC'])

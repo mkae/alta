@@ -17,7 +17,7 @@ if build_lib:
       libs.append(lib)
   env = conf.Finish()
 
-  env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+  env.AppendUnique(LIBS = ['core'])
   env.AppendUnique(LIBS = libs)
 
   targets = env.SharedLibrary('#build/plugins/nonlinear_fitter_ceres', 'fitter.cpp')

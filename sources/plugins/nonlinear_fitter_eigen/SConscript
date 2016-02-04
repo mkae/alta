@@ -16,7 +16,7 @@ env = conf.Finish()
 
 targets = []
 if build_lib:
-  env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+  env.AppendUnique(LIBS = ['core'])
   sources = ['fitter.cpp']
   targets = env.SharedLibrary('#build/plugins/nonlinear_fitter_eigen', sources)
 

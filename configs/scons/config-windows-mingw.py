@@ -18,7 +18,6 @@ CXX            = 'g++'
 ##
 CORE_LIB       = []
 SOFT_LIB       = ['core']
-PLUGIN_LIB     = ['core']
 
 
 ## Python and boost-python library

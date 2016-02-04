@@ -19,7 +19,7 @@ env = conf.Finish()
 
 targets = []
 if build_lib:
-  env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+  env.AppendUnique(LIBS    = ['core'])
 
   sources = ['rational_fitter.cpp']
   targets = env.SharedLibrary('#build/plugins/rational_fitter_matlab', sources)

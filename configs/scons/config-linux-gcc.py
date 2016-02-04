@@ -12,11 +12,6 @@ import os, sys
 #CXX            = 'g++'
 
 
-## ALTA internal flags
-##
-PLUGIN_LIB     = ['core']
-
-
 ## Python and boost-python library
 ##
 #PYTHON_INC    = ['/usr/include/python2.7']

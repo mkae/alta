@@ -2,5 +2,5 @@ Import('env')
 
 sources = ['function.cpp']
 targets = env.SharedLibrary('#build/plugins/nonlinear_function_diffuse',
-                            sources, LIBS = env['PLUGIN_LIB'])
+                            sources, LIBS = ['core'])
 Return('targets')

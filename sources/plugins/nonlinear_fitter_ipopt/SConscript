@@ -1,7 +1,7 @@
 Import('env', 'library_available')
 env = env.Clone()
 
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS = ['core'])
 
 build_lib = library_available(env, pkgspec='ipopt',
                               inc_var='IPOPT_INC', lib_var='IPOPT_DIR',

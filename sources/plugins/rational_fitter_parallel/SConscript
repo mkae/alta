@@ -11,7 +11,7 @@ if env['OPENMP_LINKFLAGS']:
 env.AppendUnique(CPPPATH = env['QUADPROG_INC'])
 env.AppendUnique(LIBPATH = env['QUADPROG_DIR'])
 env.AppendUnique(LIBS    = env['QUADPROG_LIB'])
-env.AppendUnique(LIBS    = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS    = ['core'])
 
 sources = ['rational_fitter.cpp']
 targets = env.SharedLibrary('#build/plugins/rational_fitter_parallel', sources)

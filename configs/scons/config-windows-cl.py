@@ -17,11 +17,6 @@ CXX            = 'cl'
 CCFLAGS        = '/Zi /nologo /O2 /Ox /EHsc'
 
 
-## ALTA internal flags
-##
-PLUGIN_LIB     = ['core']
-
-
 ## Python and boost-python library
 ##
 PYTHON_INC    = ['C:/Python27/include/']

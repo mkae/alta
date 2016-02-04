@@ -12,11 +12,6 @@ import os, sys
 CXX            = 'gcc'
 
 
-## ALTA internal flags
-##
-PLUGIN_LIB     = ['core']
-
-
 ## Python and boost-python library
 ## Be sure to install boost-python and python
 ## You can do this by using Macports (http://www.macports.org/) 

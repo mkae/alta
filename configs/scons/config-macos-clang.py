@@ -16,11 +16,6 @@ import os, sys
 #CXX            = 'clang++'
 
 
-## ALTA internal flags
-##
-PLUGIN_LIB     = ['core']
-
-
 ## Python and boost-python library
 ##
 ## Be sure to install boost-python and python

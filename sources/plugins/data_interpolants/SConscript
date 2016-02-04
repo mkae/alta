@@ -42,7 +42,7 @@ if 'MATLAB_LIB' in env and 'MATLAB_INC' in env and 'MATLAB_DIR' in env:
 
 test_env = conf.Finish()
 
-env.AppendUnique(LIBS = env['PLUGIN_LIB'])
+env.AppendUnique(LIBS = ['core'])
 
 targets = env.SharedLibrary('#build/plugins/data_grid', ['grid.cpp']) + \
           (env.SharedLibrary('#build/plugins/data_interpolant_rbf', ['rbf.cpp'])
