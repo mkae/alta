@@ -147,18 +147,6 @@ if 'doc' in COMMAND_LINE_TARGETS:
 
 C.progress_display('the current platform is: ' + env['PLATFORM'])
 
-## PLATFORM dependant section
-##
-if env['PLATFORM'] == 'darwin':
-
-	# Adding the /usr/local/lib directory used to store libraries of
-	# MacPorts or Brew.
-	env.AppendUnique(LIBPATH = ['/usr/local/lib'])
-	env.AppendUnique(CPPPATH = ['/usr/local/include'])
-
-	env.AppendUnique(LIBPATH = ['/opt/local/lib/'])
-	env.AppendUnique(CPPPATH = ['/opt/local/include/'])
-
 
 def CheckPKG(context, name):
 		"""Return True if package NAME can be found with 'pkg-config'."""
