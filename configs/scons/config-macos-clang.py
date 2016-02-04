@@ -18,7 +18,7 @@ import os, sys
 
 ## ALTA internal flags
 ##
-PLUGIN_LIB     = ['core', 'stdc++']
+PLUGIN_LIB     = ['core']
 
 
 ## Python and boost-python library
