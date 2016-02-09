@@ -342,7 +342,23 @@ cmd10 = make_command_test('data2data',
                          'cornell-to-vs')
 env.Depends(cmd10, downloadKrylon)
 AlwaysBuild(cmd10)
-env.Alias('tests', cmd10)
+
+
+# Print a summary of the tests.
+
+def display_test_name(node):
+  print "    " + os.path.basename(node.get_abspath())
+
+tests_node = env.Alias('tests', cmd10)
+tests = tests_node[0].children()
+
+tests_actually_run = filter(lambda n: n.get_abspath().endswith(".log"),
+                            tests)
+
+print ""
+print "  The following test logs will be produced:"
+map(display_test_name, tests_actually_run)
+print ""
 
 # Always run all the tests upon 'scons tests'.
 AlwaysBuild("tests")
