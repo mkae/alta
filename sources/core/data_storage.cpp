@@ -21,11 +21,11 @@
 # include <endian.h>
 #endif
 
-using namespace alta;
+//using namespace alta;
 
-void vertical_segment::load_data_from_text(std::istream& input,
+void alta::vertical_segment::load_data_from_text(std::istream& input,
 																					 const arguments& header,
-																					 vertical_segment& result,
+																					 alta::vertical_segment& result,
 																					 const arguments& args)
 {
 	vec min, max ;
@@ -212,8 +212,10 @@ void vertical_segment::load_data_from_text(std::istream& input,
 	std::cout << "<<INFO>> " << result._data.size() << " elements to fit" << std::endl ;
 }
 
-void save_data_as_text(std::ostream& out, const data &data)
+void alta::save_data_as_text(std::ostream& out, const alta::data &data)
 {
+		using namespace alta;
+
 		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
 		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
 		out << "#PARAM_OUT " << params::get_name(data.output_parametrization()) << std::endl;
@@ -229,8 +231,10 @@ void save_data_as_text(std::ostream& out, const data &data)
 		}
 }
 
-void save_data_as_binary(std::ostream &out, const data& data)
+void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 {
+		using namespace alta;
+
 		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
 		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
 		out << "#PARAM_OUT " << params::get_name(data.output_parametrization()) << std::endl;
@@ -262,8 +266,10 @@ void save_data_as_binary(std::ostream &out, const data& data)
 		out << std::endl << "#END_STREAM" << std::endl;
 }
 
-void load_data_from_binary(std::istream& in, const arguments& header, data& data)
+void alta::load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data)
 {
+		using namespace alta;
+
 		// FIXME: For now we make a number of assumptions.
 		assert(header["FORMAT"] == "binary");
 		assert(header.get_int("VERSION") == 0);

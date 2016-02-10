@@ -24,10 +24,10 @@
 #include "ptr.h"
 
 
-namespace alta {
-   class data;
-}
-void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data);
+//namespace alta {
+//   class data;
+//}
+//void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data);
 
 namespace alta {
 
@@ -87,7 +87,7 @@ class data : public parametrized
 												double epsilon =
                         std::pow(1.0, -int(std::numeric_limits<double>::digits10 - 1)));
 
-     friend void ::load_data_from_binary(std::istream& in, const alta::arguments& header,
+     friend void load_data_from_binary(std::istream& in, const alta::arguments& header,
                                          alta::data& data);
 
 	protected: // data

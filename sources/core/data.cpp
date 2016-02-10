@@ -23,7 +23,7 @@ void data::save(const std::string& filename) const
 		file.open(filename.c_str(), std::ios_base::trunc);
 		file.exceptions(std::ios_base::goodbit);
 
-		save_data_as_text(file, *this);
+		alta::save_data_as_text(file, *this);
 
 		file.close();
 }
