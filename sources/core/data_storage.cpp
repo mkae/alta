@@ -214,7 +214,7 @@ void alta::vertical_segment::load_data_from_text(std::istream& input,
 
 void alta::save_data_as_text(std::ostream& out, const alta::data &data)
 {
-		using namespace alta;
+        using namespace alta;
 
 		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
 		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
@@ -224,8 +224,8 @@ void alta::save_data_as_text(std::ostream& out, const alta::data &data)
 				vec x = data.get(i);
 				for(int j=0; j< data.dimX() + data.dimY(); ++j)
 				{
-            out << std::setprecision(std::numeric_limits<double>::digits10)
-                << x[j] << "\t";
+                    out << std::setprecision(std::numeric_limits<double>::digits10)
+                        << x[j] << "\t";
 				}
 				out << std::endl;
 		}
@@ -233,7 +233,7 @@ void alta::save_data_as_text(std::ostream& out, const alta::data &data)
 
 void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 {
-		using namespace alta;
+        using namespace alta;
 
 		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
 		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
@@ -268,7 +268,7 @@ void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 
 void alta::load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data)
 {
-		using namespace alta;
+        using namespace alta;
 
 		// FIXME: For now we make a number of assumptions.
 		assert(header["FORMAT"] == "binary");
