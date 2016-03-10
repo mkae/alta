@@ -13,12 +13,12 @@
 net session >nul 2>&1
 if %ERRORLEVEL% equ 0 (
         setx ALTA_DIR "%~dp0sources" /M
-        setx ALTA_LIB "%~dp0build\sources" /M
-        setx PATH "%PATH%;%~dp0build\sources" /M
-        setx PYTHONPATH "%PYTHONPATH%;%~dp0build\sources" /M
+        setx ALTA_PLUGIN_PATH "%~dp0build\plugins" /M
+        setx PATH "%PATH%;%~dp0build\softs" /M
+        setx PYTHONPATH "%PYTHONPATH%;%~dp0build\python" /M
 ) else (
-        set ALTA_DIR=%~dp0sources\
-        set ALTA_LIB=%~dp0build\sources
-        set PATH=%PATH%;%~dp0build\sources
-        set PYTHONPATH=%PYTHONPATH%;%~dp0build\sources
+        set ALTA_DIR=%~dp0sources
+        set ALTA_PLUGIN_PATH=%~dp0build\plugins
+        set PATH=%PATH%;%~dp0build\softs
+        set PYTHONPATH=%PYTHONPATH%;%~dp0build\python
 )
