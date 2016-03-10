@@ -31,16 +31,6 @@
 
 using namespace alta;
 
-
-namespace boost {
-   namespace python {
-
-      template <typename T> struct pointee< ::ptr<T> > {
-         typedef T type;
-      };
-   }
-}
-
 /* This class is a wrapper to ALTA's arguments class to add Python specific
  * behaviour such as dictionnary initialization.
  *
@@ -364,8 +354,7 @@ bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
 }
 
 
-/*! \inpage python
- *  Exporting the ALTA module
+/* Exporting the ALTA module
  */
 BOOST_PYTHON_MODULE(alta)
 {
@@ -401,6 +390,7 @@ BOOST_PYTHON_MODULE(alta)
 	bp::def("get_function", get_function_from_args);
 	bp::def("load_function", load_function);
 	bp::def("load_function", load_function_with_args);
+   bp::register_ptr_to_python<ptr<function>>();
 
 
 
@@ -416,6 +406,7 @@ BOOST_PYTHON_MODULE(alta)
 	bp::def("get_data",  get_data);
 	bp::def("get_data",  get_data_with_args);
 	bp::def("load_data", load_data);
+   bp::register_ptr_to_python<ptr<data>>();
 
 
 	// Fitter interface
@@ -424,6 +415,7 @@ BOOST_PYTHON_MODULE(alta)
 		.def("fit_data", &fit_data_with_args)
       .def("fit_data", &fit_data_without_args);
 	bp::def("get_fitter", plugins_manager::get_fitter);
+   bp::register_ptr_to_python<ptr<fitter>>();
 
 	// Softs
 	//
