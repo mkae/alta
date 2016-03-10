@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -276,7 +276,8 @@ class BrdfGrid : public vertical_segment {
          arguments header = arguments::parse_header(file);
          initialize(header, false);
 
-         load_data_from_text(file, header, *this, args);
+         // FIXME: ARGS is ignored.
+         load_data_from_text(file, header, *this);
       }
 
       void save(const std::string& filename) const

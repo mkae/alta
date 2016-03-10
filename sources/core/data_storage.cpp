@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -23,11 +23,14 @@
 
 //using namespace alta;
 
-void alta::vertical_segment::load_data_from_text(std::istream& input,
-																					 const arguments& header,
-																					 alta::vertical_segment& result,
-																					 const arguments& args)
+void alta::load_data_from_text(std::istream& input,
+                               const alta::arguments& header,
+                               alta::vertical_segment& result)
 {
+  // FIXME: Eventually reinstate support for extra arguments when loading a
+  // file.
+  static alta::arguments args;
+
 	vec min, max ;
 	vec ymin, ymax;
 

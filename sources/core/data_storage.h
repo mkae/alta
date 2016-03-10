@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include "data.h"
+#include "vertical_segment.h"
 #include "common.h"
 #include "args.h"
 
@@ -22,6 +23,13 @@ namespace alta
 
     // Write DATA to OUT in a compact binary format.
     void save_data_as_binary(std::ostream& out, const alta::data& data);
+
+
+    // Initialize DATA from the content of stream INPUT, which is in ALTA's
+    // native text format.
+    void load_data_from_text(std::istream& input,
+                             const alta::arguments& header,
+                             alta::vertical_segment &data);
 
     // Initialize DATA from the binary-formatted stream IN.
     void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data &data);

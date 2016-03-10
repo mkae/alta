@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -91,7 +91,8 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 
 		load_data_from_binary(file, header, *this);
 	} else {
-		load_data_from_text(file, header, *this, args);
+    // FIXME: ARGS is currently ignored.
+		load_data_from_text(file, header, *this);
 	}
 
 	file.close();

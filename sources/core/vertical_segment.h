@@ -129,6 +129,10 @@ class vertical_segment : public data
       // Get data size
       virtual int size() const ;
 
+      friend void load_data_from_text(std::istream& in,
+                                      const alta::arguments& header,
+                                      alta::vertical_segment& data);
+
    private: // method
 
   protected: // method
@@ -136,11 +140,6 @@ class vertical_segment : public data
       // Pre-allocate 'number_of_data_elements' elements for this data
       // object. Note, the input and output dimension needs to be specified.
       void initializeToZero( unsigned int number_of_data_elements );
-
-      static void load_data_from_text(std::istream& input,
-                                                      const arguments& header,
-                                                      vertical_segment& result,
-                                                      const arguments& args);
 
       //! \brief From a correct input configuration 'x' with size
       //! dimX()+dimY(), generate a vertical ! segment satisfying this object's
