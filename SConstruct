@@ -28,7 +28,7 @@ AddOption('--no-externals', action="store_false", dest="obtain_externals", defau
 ##
 configFile = GetOption('cfg')
 if configFile == None:
-	
+
 	if sys.platform == 'win32':
 		configFile = "./configs/scons/config-windows-cl.py"
 	elif sys.platform == 'darwin':
@@ -50,7 +50,9 @@ else:
 #end
 
 # List of C++ compilers we look for by default.
-cxx_compilers = [ 'g++', 'c++', 'clang++', 'cl' ]
+cxx_compilers = ['g++', 'c++', 'clang++', 'cl' ]
+if(os.environ.has_key('CXX')):
+   cxx_compilers = [os.environ['CXX'], cxx_compilers]
 
 # List of Python 2.x interpreter names to look for.
 python_programs = [ 'python2.7', 'python2', 'python', sys.executable ]
@@ -243,10 +245,39 @@ int main (int argc, char *argv[])
 
   return has_fopenmp
 
+def CheckCXX11(context):
+  """
+  Check whether the compiler supports a small part of C++11 extensions.
+  """
+  context.Message("Checking whether 'c++11' is supported... ")
+  env = context.env
+  has_cxx11 = conf.TryLink("""
+#include <vector>
+#include <memory>
+
+struct A {
+   A(int a) : _a(a) {}
+   int _a;
+};
+
+int main(int argc, char* argv[]) {
+   std::shared_ptr<A> myA(new A(1));
+   std::vector<int> vec;
+   vec.assign(10, myA->_a);
+   for(auto& x : vec) {
+      x += 10;
+   }
+   return 0;
+}""", '.cpp')
+  context.Result('yes' if has_cxx11 else 'no')
+
+  return has_cxx11
+
 # Export these for use in SConscripts.
 Export('CheckPKG', 'library_available', 'openexr_available')
 
-conf = Configure(env, custom_tests = { 'CheckOpenMP': CheckOpenMP })
+conf = Configure(env, custom_tests = { 'CheckOpenMP': CheckOpenMP,
+                                       'CheckCXX11' : CheckCXX11 })
 
 # Determine the extra libraries that libcore (and thus everything
 # else) depends on.  Plugins need to specify it in addition to -lcore
@@ -265,6 +296,10 @@ Export('ALTA_LIBS')
 
 if not 'OPENMP_CFLAGS' in env:
   conf.CheckOpenMP()
+
+if not conf.CheckCXX11():
+   C.progress_display('Error: your compiler is not compatible with c++11 using the \'-std=c++11\' flag.')
+   Exit(1);
 
 env = conf.Finish()
 
