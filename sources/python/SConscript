@@ -1,20 +1,46 @@
 import sys
+import SCons.Errors as Errors
 
 Import('env', 'library_available')
 env = env.Clone()
+env.Prepend(LIBS = ['core'])
 
+## Building a test function for boost::python
+##
+bp_test_source = """
+// STL and Boost includes
+#include <memory>
+#include <boost/python.hpp>
+
+// ALTA includes
+#include <core/ptr.h>
+#include <core/function.h>
+
+int main(int argc, char** argv) {
+
+	boost::python::class_<alta::function, alta::ptr<alta::function>, boost::noncopyable>("function", boost::python::no_init);
+   boost::python::register_ptr_to_python<alta::ptr<function>>();
+
+   return 0;
+}
+"""
+
+def CheckBoostPython(context):
+   context.Message('Checking boost::python using small example...')
+   result = context.TryLink(bp_test_source, '.cpp')
+   context.Result(result)
+   return result
+
+
+## Check whether Python 2.7 and boost::python are available.
+## The small example above is also checked if the two libraries are present.
+##
 build_lib = False
-
-# Check whether Python 2.7 and Boost.Python are available.
 if library_available(env, pkgspec='python-2.7',
                      inc_var='PYTHON_INC', lib_var='PYTHON_DIR',
                      lib='PYTHON_LIB', header='Python.h'):
-  # Check if OpenMP is available
-  if env['OPENMP_LINKFLAGS']:
-    env.AppendUnique(CCFLAGS = env['OPENMP_CFLAGS'])
-    env.AppendUnique(LINKFLAGS = env['OPENMP_LINKFLAGS'])
 
-  conf = Configure(env)
+  conf = Configure(env, custom_tests = {'CheckBoostPython' : CheckBoostPython})
 
   # On GNU/Linux the '-mt' suffix is no longer used, but it is still
   # used on some other platforms (see
@@ -25,20 +51,15 @@ if library_available(env, pkgspec='python-2.7',
     build_lib = conf.CheckLibWithHeader('boost_python',
                                         'boost/python.hpp', 'c++')
 
-  # On GNU/Linux the '-mt' suffix is no longer used, but it is still
-  # used on some other platforms (see
-  # <http://stackoverflow.com/questions/2293962/boost-libraries-in-multithreading-aware-mode>.)
-  build_lib = conf.CheckLibWithHeader('boost_python-mt',
-                                      'boost/python.hpp', 'c++')
-  if not build_lib:
-    build_lib = conf.CheckLibWithHeader('boost_python',
-                                        'boost/python.hpp', 'c++')
+  if build_lib and not conf.CheckBoostPython():
+    build_lib = False;
 
   env = conf.Finish()
 
-if build_lib:
-  env.Prepend(LIBS = ['core'])
 
+## Build the python wrapper if checks are good
+##
+if build_lib:
   env['SHLIBPREFIX']=''
   if sys.platform == 'darwin':
     # On Darwin, the extension would be '.dylib', but Python insists
@@ -48,5 +69,6 @@ if build_lib:
   env.Alias('python',
             env.SharedLibrary('#build/python/alta', ['alta.cpp']))
 else:
-  print "<<ERROR>> Unable to build the Python interface, please install boost-python"
-  print "          or check your configuration."
+  raise Errors.BuildError(errstr = "Unable to build the Python wrapper",
+                          filename = 'alta.cpp',
+                          exitstatus = 1)
