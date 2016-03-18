@@ -20,16 +20,16 @@ RequestExecutionLevel user
 
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_BITMAP "alta-logo-installer.bmp"
- 
+
   !define MUI_ABORTWARNING
   !define MUI_ABORTWARNING_CANCEL_DEFAULT
-  
+
   !define MUI_ICON "alta-logo-installer.ico"
   #!define MUI_WELCOMEFINISHPAGE_BITMAP "alta-logo-installer-welcome.bmp"
-  
+
   !insertmacro MUI_PAGE_WELCOME
-  
-  
+
+
   !insertmacro MUI_PAGE_LICENSE "..\..\LICENSE.txt"
 #	!insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
@@ -50,18 +50,18 @@ RequestExecutionLevel user
 Section "ALTA" SecMain
 
   SetOutPath $INSTDIR\bin
-  File "${ALTADIR}\sources\build\*.exe"
+  File "${ALTADIR}\build\softs\*.exe"
 
   SetOutPath $INSTDIR\lib
-  File "${ALTADIR}\sources\build\core.lib"
+  File "${ALTADIR}\build\core\core.lib"
 
   SetOutPath $INSTDIR\plugins
-  File "${ALTADIR}\sources\build\nonlinear*.dll"
-  File "${ALTADIR}\sources\build\rational*.dll"
-  File "${ALTADIR}\sources\build\data*.dll"
+  File "${ALTADIR}\build\plugins\nonlinear*.dll"
+  File "${ALTADIR}\build\plugins\rational*.dll"
+  File "${ALTADIR}\build\plugins\data*.dll"
 
   SetOutPath $INSTDIR\python
-  File "${ALTADIR}\sources\build\alta.dll"
+  File "${ALTADIR}\build\python\alta.dll"
 
   # Update the ENVIROMNENT
   WriteRegStr HKCU "Environment" "ALTA_DIR"   '$INSTDIR'
