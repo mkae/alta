@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -451,29 +451,27 @@ class parametrized
     {
 		}
 
-    virtual  ~parametrized() {}
+		//! \brief provide the input parametrization of the object.
+		params::input parametrization() const
+		{
+			return _in_param;
+		}
 
 		//! \brief provide the input parametrization of the object.
-		virtual params::input parametrization() const
+		params::input input_parametrization() const
 		{
 			return _in_param;
 		}
-		
-		//! \brief provide the input parametrization of the object.
-		virtual params::input input_parametrization() const
-		{
-			return _in_param;
-		}
-		
+
 		//! \brief provide the outout parametrization of the object.
-		virtual params::output output_parametrization() const
+		params::output output_parametrization() const
 		{
 			return _out_param;
 		}
 
 		//! \brief can set the input parametrization of a non-parametrized
 		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input new_param)
+		void setParametrization(params::input new_param)
 		{
 			//! \todo Here is something strange happening. The equality between
 			//! those enums is not correct for UNKNOWN_INPUT
@@ -492,11 +490,11 @@ class parametrized
 				_in_param = new_param;
 			}
 		}
-		
+
 		//! \brief can set the output parametrization of a non-parametrized
 		//! function. Throw an exception if it tries to erase a previously
 		//! defined one.
-		virtual void setParametrization(params::output new_param)
+		void setParametrization(params::output new_param)
 		{
 			if(_out_param == new_param)
 			{
@@ -509,11 +507,11 @@ class parametrized
 			else
 			{
 				std::cout << "<<ERROR>> an output parametrization is already defined: " << std::endl;
-			}      
+			}
 		}
 
     //! \brief Set the input and output parametrizations directly
-    virtual void setParametrizations(params::input new_in_param, params::output new_out_param)
+    void setParametrizations(params::input new_in_param, params::output new_out_param)
     {
       setParametrization( new_in_param);
       setParametrization( new_out_param );
@@ -522,12 +520,12 @@ class parametrized
 		/* DIMENSION OF THE INPUT AND OUTPUT DOMAIN */
 
 		//! Provide the dimension of the input space of the function
-		virtual int dimX() const { return _nX ; }
+		int dimX() const { return _nX ; }
 		//! Provide the dimension of the output space of the function
-		virtual int dimY() const { return _nY ; }
+		int dimY() const { return _nY ; }
 
 		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX) { 
+		void setDimX(int nX) {
 			if(_nX != nX) {
 				_nX = nX;
 				_min.resize(nX);
@@ -535,7 +533,7 @@ class parametrized
 			}
 		}
 		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY) {
+		void setDimY(int nY) {
 			if(_nY != nY) {
 				_nY = nY;
 			}
@@ -545,16 +543,16 @@ class parametrized
 		/* DEFINITION DOMAIN OF THE FUNCTION */
 
 		//! \brief Set the minimum value the input can take
-		virtual void setMin(const vec& min) ;
+		void setMin(const vec& min) ;
 
 		//! \brief Set the maximum value the input can take
-		virtual void setMax(const vec& max) ;
+		void setMax(const vec& max) ;
 
 		//! \brief Get the minimum value the input can take
-		virtual vec min() const ;
+		vec min() const ;
 
 		//! \brief Get the maximum value the input can take
-		virtual vec max() const ;
+		vec max() const ;
 
 
 	protected:
