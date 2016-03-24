@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2013 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -34,9 +34,15 @@ namespace alta {
  *  Any function used by the fitting algorithm should overload publicly this
  *  interface.
  */
-class function : public parametrized
+class function
 {
 	public: // methods
+
+    function()
+        : _in_param(params::UNKNOWN_INPUT), _out_param(params::UNKNOWN_OUTPUT),
+        _nX(0), _nY(0),
+        _min(vec::Zero(0)), _max(vec::Zero(0)) { };
+
 
 		/* NEEDED FUNCTIONS */
 
@@ -100,6 +106,31 @@ class function : public parametrized
 		//! hemisphere.
 		double Linf_distance(const ptr<data>& d) const ;
 
+
+    // Definition domain of the function.
+    // TODO: Move this to a 'parameterization' class.
+    virtual void setMin(const vec& min) { _min = min; }
+    virtual void setMax(const vec& max) { _max = max; }
+    int dimX() const { return _nX; }
+    int dimY() const { return _nX; }
+    virtual void setDimX(int x) { _nX = x; _min.resize(x); _max.resize(x); }
+    virtual void setDimY(int y) { _nY = y; }
+    void setParametrization(params::input p) { _in_param = p; }
+    void setParametrization(params::output p) { _out_param = p; }
+    params::input parametrization() const { return _in_param; }
+    params::input input_parametrization() const { return _in_param; }
+    params::output output_parametrization() const { return _out_param; }
+    virtual vec min() const { return _min; }
+    virtual vec max() const { return _max; }
+
+
+protected:
+    // Input and output parametrization
+    // TODO: Move this to a 'parameterization' class.
+    params::input  _in_param;
+    params::output _out_param;
+    int _nX, _nY;
+    vec _min, _max;
 };
 
 /*! \brief Non-linear function interface
@@ -384,11 +415,11 @@ class cosine_function : public nonlinear_function
 	public:
 		// Set the input parametrization to CARTESIAN to reduce the number
 		// of transformations in a compound object.
-		cosine_function()
-		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+    cosine_function()
+    {
+        _in_param = params::CARTESIAN;
+        _nX = 6;
+    }
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const 

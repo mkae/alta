@@ -528,7 +528,7 @@ void compound_function::setParametrization(params::input new_param)
 		
 void compound_function::setParametrization(params::output new_param)
 {
-	parametrized::setParametrization(new_param);
+  function::setParametrization(new_param);
 	for(unsigned int i=0; i<fs.size(); ++i)
 	{
 		fs[i]->setParametrization(new_param);

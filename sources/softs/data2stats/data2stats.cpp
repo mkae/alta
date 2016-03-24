@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -200,7 +200,7 @@ class Norm
 
 //Returns true if the conversion was successful
 bool convertDataToFunctionParam(ptr<data> const & d,
-      ptr<parametrized> const & f,
+      ptr<function> const & f,
       bool & conversion_necessary,
       vertical_segment* & converted_data )
 {
