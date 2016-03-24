@@ -264,7 +264,7 @@ class BrdfGrid : public vertical_segment {
       }
 
       // Load data from a file
-      void load(const std::string& filename, const arguments& args)
+      virtual void load(const std::string& filename, const arguments& args)
       {
          std::ifstream file;
 
@@ -279,6 +279,9 @@ class BrdfGrid : public vertical_segment {
          // FIXME: ARGS is ignored.
          load_data_from_text(file, header, *this);
       }
+
+      // We're not overloading this one.
+      virtual void load(const std::string& filename);
 
       void save(const std::string& filename) const
       {
@@ -313,11 +316,6 @@ class BrdfGrid : public vertical_segment {
          out << "#ALTA HEADER END" << std::endl;
       }
 
-      // Acces to data
-      vec get(int id) const
-      {
-         return vertical_segment::get(id) ;
-      }
       inline vec operator[](int i) const
       {
          return get(i) ;
