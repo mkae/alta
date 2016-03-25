@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -830,28 +830,4 @@ void params::print_input_params()
 		for(int i=it->second.name.size(); i<26; ++i) { std::cout << " "; }
 		std::cout << it->second.info << std::endl;
 	}
-}
-
-// Acces to the domain of definition of the function
-void parametrized::setMin(const vec& min)
-{
-#ifdef DEBUG
-    assert(min.size() == _nX) ;
-#endif
-    _min = min ;
-}
-void parametrized::setMax(const vec& max)
-{
-#ifdef DEBUG
-    assert(max.size() == _nX) ;
-#endif
-    _max = max ;
-}
-vec parametrized::min() const
-{
-    return _min ;
-}
-vec parametrized::max() const
-{
-    return _max ;
 }

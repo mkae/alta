@@ -8,8 +8,8 @@ void errors::compute(const data* in,   const data* ref,
    const int size = checkMaskSize(ref, mask);
 
    //Here we go new way and faster because we evaluate the function just once
-   Eigen::MatrixXd ref_y = Eigen::MatrixXd::Zero(size, ref->dimY());
-   Eigen::MatrixXd inp_y = Eigen::MatrixXd::Zero(size, ref->dimY()) ;
+   Eigen::MatrixXd ref_y = Eigen::MatrixXd::Zero(size, ref->parametrization().dimY());
+   Eigen::MatrixXd inp_y = Eigen::MatrixXd::Zero(size, ref->parametrization().dimY()) ;
 
 #ifdef DEBUG
    timer  t;
@@ -23,12 +23,12 @@ void errors::compute(const data* in,   const data* ref,
 #endif
 
    // Ouput norms
-   Eigen::VectorXd L1_norm   = Eigen::VectorXd::Zero(ref->dimY());
-   Eigen::VectorXd L2_norm   = Eigen::VectorXd::Zero(ref->dimY());
-   Eigen::VectorXd L3_norm   = Eigen::VectorXd::Zero(ref->dimY());
-   Eigen::VectorXd LInf_norm = Eigen::VectorXd::Zero(ref->dimY());
-   Eigen::VectorXd mse       = Eigen::VectorXd::Zero(ref->dimY());
-   Eigen::VectorXd rmse      = Eigen::VectorXd::Zero(ref->dimY());
+   Eigen::VectorXd L1_norm   = Eigen::VectorXd::Zero(ref->parametrization().dimY());
+   Eigen::VectorXd L2_norm   = Eigen::VectorXd::Zero(ref->parametrization().dimY());
+   Eigen::VectorXd L3_norm   = Eigen::VectorXd::Zero(ref->parametrization().dimY());
+   Eigen::VectorXd LInf_norm = Eigen::VectorXd::Zero(ref->parametrization().dimY());
+   Eigen::VectorXd mse       = Eigen::VectorXd::Zero(ref->parametrization().dimY());
+   Eigen::VectorXd rmse      = Eigen::VectorXd::Zero(ref->parametrization().dimY());
 
 #ifdef DEBUG
    t.start();
@@ -78,14 +78,14 @@ void errors::evaluate(const data* inp,
                       Eigen::MatrixXd& ref_y) {
 
    // Temp variables
-   vec ref_xy = vec::Zero(ref->dimX() + ref->dimY());
-   vec ref_x  = vec::Zero(ref->dimX());
-   vec dat_x  = vec::Zero(inp->dimX());
+   vec ref_xy = vec::Zero(ref->parametrization().dimX() + ref->parametrization().dimY());
+   vec ref_x  = vec::Zero(ref->parametrization().dimX());
+   vec dat_x  = vec::Zero(inp->parametrization().dimX());
    vec cart   = vec::Zero(6);
 
    // Constants
-   const auto nY = ref->dimY();
-   const auto nX = ref->dimX();
+   const auto nY = ref->parametrization().dimY();
+   const auto nX = ref->parametrization().dimX();
 
    // Is there a mask function to be applied
    const bool has_mask = mask != nullptr;
@@ -102,7 +102,7 @@ void errors::evaluate(const data* inp,
       ref_x  = ref_xy.head(nX);
 
       params::convert(ref_x.data(),
-                      ref->input_parametrization(),
+                      ref->parametrization().input_parametrization(),
                       params::CARTESIAN,
                       cart.data());
 
@@ -114,7 +114,7 @@ void errors::evaluate(const data* inp,
          // Convert to the query data `dat` parametrization
          params::convert(cart.data(),
                          params::CARTESIAN,
-                         inp->input_parametrization(),
+                         inp->parametrization().input_parametrization(),
                          dat_x.data());
 
          ref_y.row(i) = ref_xy.tail(nY);
@@ -122,9 +122,9 @@ void errors::evaluate(const data* inp,
          /*
          params::convert(inp->value(dat_x).data(),
                          inp->output_parametrization(),
-                         inp->dimY(),
+                         inp->parametrization().dimY(),
                          ref->output_parametrization(),
-                         ref->dimY(),
+                         ref->parametrization().dimY(),
                          inp_y.row(i).data());
          */
       } else {

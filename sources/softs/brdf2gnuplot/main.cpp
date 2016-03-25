@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -134,7 +134,8 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				params::convert(&v[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+				params::convert(&v[0], d->parametrization().input_parametrization(),
+                        f->input_parametrization(), &x[0]);
 			}
 
 			// Evaluate the function. I can add the cosine term to the BRDF
@@ -151,7 +152,7 @@ int main(int argc, char** argv)
 
 			if(!linear_plot)
 			{
-				for(int u=0; u<d->dimX(); ++u)
+				for(int u=0; u<d->parametrization().dimX(); ++u)
 					file << v[u] << "\t" ;
 			}
 			else
@@ -159,15 +160,15 @@ int main(int argc, char** argv)
 				file << i << "\t" ;
 			}
 
-			for(int u=0; u<d->dimY(); ++u)
+			for(int u=0; u<d->parametrization().dimY(); ++u)
 			{
 				if(plot_error)
 				{
-					file << (v[d->dimX() + u] - y2[u]) << "\t" ;
+					file << (v[d->parametrization().dimX() + u] - y2[u]) << "\t" ;
 				}
 				else if(linear_plot)
 				{
-					file << (v[d->dimX() + u] - y2[u])/v[d->dimX()+u] << "\t" ;
+					file << (v[d->parametrization().dimX() + u] - y2[u])/v[d->parametrization().dimX()+u] << "\t" ;
 				}
 				else
 				{

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -197,38 +197,43 @@ void diffuse_function::bootstrap(const ptr<data> d, const arguments& args)
         // By taking the minimum value of the BRDF
     {
         // Set the diffuse component
-        if(params::is_cosine_weighted(d->output_parametrization()) || args.is_defined("cos-fit"))
+        if(params::is_cosine_weighted(d->parametrization().output_parametrization())
+           || args.is_defined("cos-fit"))
         {
             vec cart(6);
 
-            for(int i=0; i<d->dimY(); ++i)
+            for(int i=0; i<d->parametrization().dimY(); ++i)
                 _kd[i] = std::numeric_limits<double>::max();
 
             for(int i=1; i<d->size(); ++i)
             {
                 vec x = d->get(i);
-                params::convert(&x[0], d->input_parametrization(), params::CARTESIAN, &cart[0]);
+                params::convert(&x[0],
+                                d->parametrization().input_parametrization(),
+                                params::CARTESIAN,
+                                &cart[0]);
                 double cosine = (cart[2] > 0.0 ? cart[2] : 0.0) * (cart[5] > 0.0 ? cart[5] : 0.0);
 
                 if(cosine > 0.0)
                 {
-                    for(int j=0; j<d->dimY(); ++j)
+                    for(int j=0; j<d->parametrization().dimY(); ++j)
                     {
-                        _kd[j] = std::min(x[d->dimX() + j] / cosine, _kd[j]);
+                        _kd[j] = std::min(x[d->parametrization().dimX() + j] / cosine, _kd[j]);
                     }
                 }
             }
         }
         else
         {
-            for(int i=0; i<d->dimY(); ++i)
+            for(int i=0; i<d->parametrization().dimY(); ++i)
                 _kd[i] = std::numeric_limits<double>::max();
 
             for(int i=0; i<d->size(); ++i)
             {
                 vec xi = d->get(i);
-                for(int j=0; j<d->dimY(); ++j)
-                    _kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+                for(int j=0; j<d->parametrization().dimY(); ++j)
+                    _kd[j] = std::min(xi[d->parametrization().dimX() + j],
+                                      _kd[j]);
             }
         }
     }//end of else case

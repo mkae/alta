@@ -60,8 +60,10 @@ int main(int argc, char *argv[])
             TEST_ASSERT(fitter->fit_data(data, function, arguments()));
 
             // Verify basic properties of FUNCTION.
-            TEST_ASSERT(function->dimX() == data->dimX());
-            TEST_ASSERT(function->dimY() == data->dimY());
+            TEST_ASSERT(function->dimX()
+                        == data->parametrization().dimX());
+            TEST_ASSERT(function->dimY()
+                        == data->parametrization().dimY());
         } else {
             std::cerr << "skipping fitter '" << fitter_name << "'\n";
         }

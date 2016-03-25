@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -54,8 +54,8 @@ bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit
 
   // I need to set the dimension of the resulting function to be equal
   // to the dimension of my fitting problem
-  r->setDimX(d->dimX()) ;
-  r->setDimY(d->dimY()) ;
+  r->setDimX(d->parametrization().dimX()) ;
+  r->setDimY(d->parametrization().dimY()) ;
   r->setMin(d->min()) ;
   r->setMax(d->max()) ;
 
@@ -127,7 +127,7 @@ bool rational_fitter_quadprog::fit_data(const ptr<vertical_segment>& d, int np, 
 {
   // For each output dimension (color channel for BRDFs) perform
   // a separate fit on the y-1D rational function.
-  for(int j=0; j<d->dimY(); ++j)
+  for(int j=0; j<d->parametrization().dimY(); ++j)
   {
     rational_function_1d* rs = r->get(j);
     rs->resize(np, nq);

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -121,8 +121,8 @@ bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, ptr<function>& fit, co
 {
     // I need to set the dimension of the resulting function to be equal
     // to the dimension of my fitting problem
-    fit->setDimX(d->dimX()) ;
-    fit->setDimY(d->dimY()) ;
+    fit->setDimX(d->parametrization().dimX()) ;
+    fit->setDimY(d->parametrization().dimY()) ;
     fit->setMin(d->min()) ;
     fit->setMax(d->max()) ;
 
@@ -160,10 +160,11 @@ bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, ptr<function>& fit, co
 		 vec xf(nf->dimX() + nf->dimY());
 
 		 // Convert the sample to be in the parametrizatio of the function
-		 params::convert(&xi[0], d->input_parametrization(), nf->input_parametrization(), &xf[0]);
+		 params::convert(&xi[0], d->parametrization().input_parametrization(),
+                     nf->input_parametrization(), &xf[0]);
 		 for(int k=0; k<nf->dimY(); ++k)
 		 {
-			 xf[nf->dimX() + k] = xi[d->dimX() + k];
+         xf[nf->dimX() + k] = xi[d->parametrization().dimX() + k];
 		 }
 
 		 problem.AddResidualBlock(new CeresFunctor(nf, xf, args), NULL, &p[0]);

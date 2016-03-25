@@ -60,7 +60,11 @@ private:
 	double* Bd;
 
 public:
-	UTIA() : data() {
+	UTIA()
+      : data(alta::parameters(4, 3,
+                              params::SPHERICAL_TL_PL_TV_PV,
+                              params::RGB_COLOR))
+  {
 		this->step_t = 15;
 		this->step_p = 7.5;
 		this->nti = 6;
@@ -71,18 +75,10 @@ public:
 		this->nPerPlane = nti*npi*ntv*npv;
 		this->Bd = new double[planes*nti*npi*ntv*npv];
 
-		// Set the input and output parametrization
-	    _in_param  = params::SPHERICAL_TL_PL_TV_PV;
-	    _out_param = params::RGB_COLOR;
-	    setDimX(4);
-	    setDimY(3);
-
-	    _min.resize(4);
 	    _min[0] = 0.0;
 	    _min[1] = 0.0;
 	    _min[2] = 0.0;
 	    _min[3] = 0.0;
-	    _max.resize(4);
 	    _max[0] = 0.5*M_PI;
 	    _max[1] = 2.0*M_PI;
 	    _max[2] = 0.5*M_PI;
@@ -320,7 +316,7 @@ public:
 
 	// Set data
 	virtual void set(const vec& x) {
-		assert(x.size() == dimX()+dimY());
+		assert(x.size() == parametrization().dimX()+parametrization().dimY());
 
 		const double PI2 = M_PI*0.5;
 		if(x[0]>PI2 || x[2]>PI2) {
@@ -331,13 +327,13 @@ public:
 		vecToIndex(x, iti, ipi, itv, ipv);
 
 		const int index = ((iti*npi + ipi)*ntv + itv)*npv + ipv;
-		Bd[index + 0*nPerPlane] = x[dimX() + 0];
-		Bd[index + 1*nPerPlane] = x[dimX() + 1];
-		Bd[index + 2*nPerPlane] = x[dimX() + 2];
+		Bd[index + 0*nPerPlane] = x[parametrization().dimX() + 0];
+		Bd[index + 1*nPerPlane] = x[parametrization().dimX() + 1];
+		Bd[index + 2*nPerPlane] = x[parametrization().dimX() + 2];
 	}
 
 	virtual void set(int i, const vec& x) {
-		assert(x.size() == dimY());
+		assert(x.size() == parametrization().dimY());
 		for(int isp=0; isp<planes; ++isp) {
 			Bd[isp*nPerPlane + i] = x[isp];
 		}

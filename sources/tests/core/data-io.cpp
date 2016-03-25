@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2015 Inria
+   Copyright (C) 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -140,8 +140,8 @@ int main(int argc, char** argv)
     TEST_ASSERT(files_are_equal(temp_file1, temp_file2));
     TEST_ASSERT(sample2.equals(sample3));
 
-    TEST_ASSERT(sample1.min().size() == sample1.dimX());
-    TEST_ASSERT(sample1.max().size() == sample1.dimX());
+    TEST_ASSERT(sample1.min().size() == sample1.parametrization().dimX());
+    TEST_ASSERT(sample1.max().size() == sample1.parametrization().dimX());
 
     TEST_ASSERT(sample1.min() == sample2.min());
     TEST_ASSERT(sample1.max() == sample2.max());

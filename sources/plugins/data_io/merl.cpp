@@ -83,30 +83,25 @@ public: // methods
 		std::fill(brdf, brdf + 3*_nSlice, 0.0);
 
 	    // Set the input and output parametrization
-	    _in_param  = params::RUSIN_TH_TD_PD;
-	    _out_param = params::RGB_COLOR;
-	    _nX = 3;
-	    _nY = 3;
+    _parameters.setParametrization(params::RUSIN_TH_TD_PD);
+    _parameters.setParametrization(params::RGB_COLOR);
+    _parameters.setDimX(3);
+    _parameters.setDimY(3);
+
+    _min.resize(3);
+    _min[0] = 0.0;
+    _min[1] = 0.0;
+    _min[2] = 0.0;
+
+    _max.resize(3);
+    _max[0] = 0.5*M_PI;
+    _max[1] = 0.5*M_PI;
+    _max[2] = 2.0*M_PI;
     }
     ~MERL() {
     	delete[] brdf;
     }
 
-    virtual vec min() const {
-       vec _min(3);
-       _min[0] = 0.0;
-       _min[1] = 0.0;
-       _min[2] = 0.0;
-       return _min;
-    }
-
-    virtual vec max() const {
-       vec _max(3);
-       _max[0] = 0.5*M_PI;
-       _max[1] = 0.5*M_PI;
-       _max[2] = 2.0*M_PI;
-       return _max;
-    }
 
 	// Load data from a file
 	void load(const std::string& filename)
@@ -186,13 +181,13 @@ public: // methods
 	}
 
 	void set(int i, const vec& x) {
-		assert(x.size() == dimY());
+    assert(x.size() == parametrization().dimY());
 		int iR = i;
 		int iG = iR + _nSlice;
 		int iB = iG + _nSlice;
-		brdf[iR] = x[dimX()+0] / RED_SCALE;
-		brdf[iG] = x[dimX()+1] / GREEN_SCALE;
-		brdf[iB] = x[dimX()+2] / BLUE_SCALE;
+		brdf[iR] = x[parametrization().dimX()+0] / RED_SCALE;
+		brdf[iG] = x[parametrization().dimX()+1] / GREEN_SCALE;
+		brdf[iB] = x[parametrization().dimX()+2] / BLUE_SCALE;
 	}
 
 	vec value(const vec& in) const {

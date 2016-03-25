@@ -178,9 +178,11 @@ double function::L2_distance(const ptr<data>& d) const
 		}
 		else
 		{
-			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+      params::convert(&dat[0],
+                      d->parametrization().input_parametrization(),
+                      input_parametrization(), &x[0]);
 		}
-		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->parametrization().dimX()], dimY()*sizeof(double));
 
     l2_dist += std::pow(norm(y-value(x)), 2);
 	}
@@ -215,16 +217,19 @@ double function::Linf_distance(const ptr<data>& d) const
     }
     else
     {
-        params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+        params::convert(&dat[0],
+                        d->parametrization().input_parametrization(),
+                        input_parametrization(), &x[0]);
     }
 
 		// Copy the value part of the data vector in a vector to perform vector
 		// operations on it (used in the computation of the mean).
-    memcpy(&y[0], &dat[d->dimX()], d->dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->parametrization().dimX()],
+           d->parametrization().dimY() * sizeof(double));
 
 		// Take the componentwise-max of the two vectors.
 		const vec v = value(x);
-    for(int j=0; j<d->dimY(); ++j)
+    for(int j=0; j<d->parametrization().dimY(); ++j)
 		{
 			linf_dist = std::max<double>(linf_dist, std::abs(y[j]-v[j]));
 		}
@@ -237,7 +242,7 @@ double function::Linf_distance(const ptr<data>& d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-		vec x(dimX()), y(d->dimY()), val(dimY());
+    vec x(dimX()), y(d->parametrization().dimY()), val(dimY());
 		
         // Convert the position of the data sample to the parametrization
         // of the function.
@@ -247,17 +252,20 @@ double function::Linf_distance(const ptr<data>& d) const
         }
         else
         {
-            params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+            params::convert(&dat[0],
+                            d->parametrization().input_parametrization(),
+                            input_parametrization(),
+                            &x[0]);
         }
 
 		// Copy the value part of the data vector in a vector to perform vector
 		// operations on it (used in the computation of the mean).
-		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->parametrization().dimX()], dimY()*sizeof(double));
 
 		val = value(x);
-		for(int j=0; j<d->dimY(); ++j) 
+    for(int j=0; j<d->parametrization().dimY(); ++j)
 		{ 
-			y[j] = dat[d->dimX()+j]; 
+      y[j] = dat[d->parametrization().dimX()+j];
 			var[j] += pow(mean[j] - (val[j]-y[j]), 2) / double(d->size());
 		}
 	}
@@ -400,7 +408,8 @@ vec compound_function::value(const vec& x) const
 	for(unsigned int i=0; i<fs.size(); ++i)
 	{
 		vec temp_x(fs[i]->dimX());
-		params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
+    params::convert(&x[0], input_parametrization(),
+                    fs[i]->input_parametrization(), &temp_x[0]);
 		res = res + fs[i]->value(temp_x);
 	}
 	return res;
@@ -424,7 +433,8 @@ vec compound_function::parametersJacobian(const vec& x) const
 		{
 
 			vec temp_x(func->dimX());
-			params::convert(&x[0], input_parametrization(), func->input_parametrization(), &temp_x[0]);
+      params::convert(&x[0], input_parametrization(),
+                      func->input_parametrization(), &temp_x[0]);
 			vec func_jac = func->parametersJacobian(temp_x);
 
 			for(int i=0; i<nb_f_params; ++i)

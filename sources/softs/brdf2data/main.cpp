@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -83,11 +83,12 @@ int main(int argc, char** argv)
     // Get the output object. In the case where it is not a VS file, we use
     // the load object.
     ptr<data> d_out = plugins_manager::get_data(args["data"], args);
-    if(dynamic_pointer_cast<vertical_segment>(d))
+    if(dynamic_pointer_cast<vertical_segment>(d) != NULL)
     {
-        d_out->setDimX(d->dimX());
-        d_out->setDimY(d->dimY());
-        d_out->setParametrization(d->input_parametrization());
+        parameters p(d->parametrization().dimX(),
+                     d->parametrization().dimY());
+        p.setParametrization(d->parametrization().input_parametrization());
+        d_out->setParametrization(p);
     }
 
 	// Get the function file
@@ -109,30 +110,33 @@ int main(int argc, char** argv)
 		vec temp(f->dimX());
 		for(int i=0; i<d->size(); ++i)
 		{
-			// Copy the input vector
-			vec x = d->get(i);
-			// Convert the data to the function's input space.
-            if(f->input_parametrization() == params::UNKNOWN_INPUT)
-            {
-            	memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
-            }
-            else
-            {
-				params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
-			}
-			vec y = f->value(temp);
+        // Copy the input vector
+        vec x = d->get(i);
+        // Convert the data to the function's input space.
+        if(f->input_parametrization() == params::UNKNOWN_INPUT)
+        {
+            memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
+        }
+        else
+        {
+            params::convert(&x[0],
+                            d->parametrization().input_parametrization(),
+                            f->parametrization(), &temp[0]);
+        }
+        vec y = f->value(temp);
 
-			for(int j=0; j<d->dimY(); ++j) {
-				x[d->dimX() + j] = (output_dif) ? x[d->dimX() + j] - y[j] : y[j];
-			}
+        for(int j=0; j<d->parametrization().dimY(); ++j) {
+            x[d->parametrization().dimX() + j] =
+                (output_dif) ? x[d->parametrization().dimX() + j] - y[j] : y[j];
+        }
 
-			// If the output data is already allocated and has the same size
-			// than the training data, we do simple copy of the index elements.
-			if(out_filled) {
-				d_out->set(i, y);
-			} else {
-            	d_out->set(x);
-            }
+        // If the output data is already allocated and has the same size
+        // than the training data, we do simple copy of the index elements.
+        if(out_filled) {
+            d_out->set(i, y);
+        } else {
+            d_out->set(x);
+        }
 		}	
 
         d_out->save(args["output"]);

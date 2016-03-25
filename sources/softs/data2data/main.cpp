@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -136,8 +136,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->input_parametrization())
-	          << " to " << params::get_name(d_out->input_parametrization()) << std::endl;
+	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->parametrization().input_parametrization())
+	          << " to " << params::get_name(d_out->parametrization().input_parametrization()) << std::endl;
 
    bool is_vs = dynamic_pointer_cast<vertical_segment>(d_out) &&
                 d_out->size() == 0;
@@ -147,10 +147,11 @@ int main(int argc, char** argv)
 		if(dynamic_pointer_cast<vertical_segment>(d_out))
 		{
 			params::input param = params::parse_input(args["param"]);
-			if(param == params::UNKNOWN_INPUT && d_in->input_parametrization() != params::UNKNOWN_INPUT)
+			if(param == params::UNKNOWN_INPUT
+         && d_in->parametrization().input_parametrization() != params::UNKNOWN_INPUT)
 			{
 				std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
-				param = d_in->input_parametrization();
+				param = d_in->parametrization().input_parametrization();
 			}
 			else if(param == params::UNKNOWN_INPUT)
 			{
@@ -158,35 +159,46 @@ int main(int argc, char** argv)
 				return -1;
 			}
 
-			d_out->setParametrization(param);
-			d_out->setDimX(params::dimension(param));
-			d_out->setDimY(d_in->dimY());
+      {
+          parameters p(params::dimension(param),
+                       d_in->parametrization().dimY());
+          p.setParametrization(param);
+          d_out->setParametrization(p);
+      }
 		}
 
-		std::cout << "<<INFO>> output DIM = " << d_out->dimX() << ", " << d_out->dimY() << std::endl;
+		std::cout << "<<INFO>> output DIM = " << d_out->parametrization().dimX() << ", " << d_out->parametrization().dimY() << std::endl;
 
-		vec temp(d_out->dimX() + d_out->dimY());
+		vec temp(d_out->parametrization().dimX() + d_out->parametrization().dimY());
 		for(int i=0; i<d_in->size(); ++i)
 		{
 			// Copy the input vector
 			vec x = d_in->get(i);
-			params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
-			params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
+			params::convert(&x[0],
+                      d_in->parametrization().input_parametrization(),
+                      d_out->parametrization().input_parametrization(),
+                      &temp[0]);
+			params::convert(&x[d_in->parametrization().dimX()],
+                      d_in->parametrization().output_parametrization(),
+                      d_in->parametrization().dimY(),
+                      d_out->parametrization().output_parametrization(),
+                      d_out->parametrization().dimY(),
+                      &temp[d_out->parametrization().dimX()]);
 			d_out->set(temp);
 		}
 	}
 	else
 	{
-		if(d_out->output_parametrization() != d_in->output_parametrization())
+		if(d_out->parametrization().output_parametrization() != d_in->parametrization().output_parametrization())
 		{
 			std::cerr << "<<WARNING>> data types have different output parametrizations." << std::endl;
 			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
 		}
 
-		if(d_out->dimY() != d_in->dimY())
+		if(d_out->parametrization().dimY() != d_in->parametrization().dimY())
 		{
-			std::cerr << "<<WARNING>> data types have different output dimensions (" << d_in->dimY()
-			          << " and " << d_out->dimY() << ")." << std::endl;
+			std::cerr << "<<WARNING>> data types have different output dimensions (" << d_in->parametrization().dimY()
+			          << " and " << d_out->parametrization().dimY() << ")." << std::endl;
 			std::cerr << "            This is currently not handled properly by ALTA." << std::endl;
 		}
 
@@ -195,14 +207,15 @@ int main(int argc, char** argv)
 		#pragma omp parallel for
 		for(int i=0; i<d_out->size(); ++i)
 		{
-			vec temp(d_in->dimX());
+			vec temp(d_in->parametrization().dimX());
 			vec cart(6);
-			vec y(d_in->dimY());
+			vec y(d_in->parametrization().dimY());
 
 			// Copy the input vector
 			vec x = d_out->get(i);
-			params::convert(&x[0], d_out->parametrization(),
-                         params::CARTESIAN, &cart[0]);
+			params::convert(&x[0],
+                      d_out->parametrization().input_parametrization(),
+                      params::CARTESIAN, &cart[0]);
 
 
          // Check if the output configuration is below the hemisphere when
@@ -210,7 +223,8 @@ int main(int argc, char** argv)
          // converting BTDF data.
 			if(cart[2] >= 0.0 || cart[5] >= 0.0) {
 				params::convert(&cart[0], params::CARTESIAN,
-                            d_in->parametrization(), &temp[0]);
+                        d_in->parametrization().input_parametrization(),
+                        &temp[0]);
 				y = d_in->value(temp);
 			} else {
             ++stats_incorrect;
@@ -220,9 +234,10 @@ int main(int argc, char** argv)
          // Convert the value stored in the input data in the value format of
          // the output data file.
 			params::convert(&y[0],
-                         d_in->output_parametrization(),  d_in->dimY(),
-                         d_out->output_parametrization(), d_out->dimY(),
-                         &x[d_out->dimX()]);
+                      d_in->parametrization().output_parametrization(),
+                      d_in->parametrization().dimY(),
+                      d_out->parametrization().output_parametrization(), d_out->parametrization().dimY(),
+                      &x[d_out->parametrization().dimX()]);
 
 			d_out->set(i, x);
 		}

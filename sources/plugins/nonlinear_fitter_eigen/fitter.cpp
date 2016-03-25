@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -33,7 +33,9 @@ ALTA_DLL_EXPORT fitter* provide_fitter()
 struct EigenFunctor: Eigen::DenseFunctor<double>
 {
 	EigenFunctor(const ptr<nonlinear_function>& f, const ptr<data> d, bool use_cosine) :
-		Eigen::DenseFunctor<double>(f->nbParameters(), d->dimY()*d->size()), _f(f), _d(d), _cosine(use_cosine)
+		Eigen::DenseFunctor<double>(f->nbParameters(),
+                                d->parametrization().dimY()*d->size()),
+      _f(f), _d(d), _cosine(use_cosine)
 	{
 #ifndef DEBUG
 		std::cout << "<<DEBUG>> constructing an EigenFunctor for n=" << inputs() << " parameters and m=" << values() << " points" << std::endl ;
@@ -72,20 +74,26 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 		
 			// Convert the sample point into the function space
 			vec x(nx);
-			params::convert(&_x[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
+			params::convert(&_x[0],
+                      _d->parametrization().input_parametrization(),
+                      _f->input_parametrization(),
+                      &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
 			// is set in the object.
 			double cos = 1.0;
 			if(_cosine)
 			{
-				double cart[6]; params::convert(&_x[0], _d->input_parametrization(), params::CARTESIAN, cart);
+				double cart[6];
+        params::convert(&_x[0],
+                        _d->parametrization().input_parametrization(),
+                        params::CARTESIAN, cart);
 				cos = cart[5];
 			}
 
 			vec _di = vec(ny);
 			for(int i=0; i<ny; ++i)
-				_di[i] = _x[_d->dimX() + i];
+				_di[i] = _x[_d->parametrization().dimX() + i];
 
 			// Should add the resulting vector completely
 			vec _y = _di - cos*_f->value(x);
@@ -115,14 +123,20 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			
 			// Convert the sample point into the function space
 			vec x(_f->dimX());
-			params::convert(&xi[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
+			params::convert(&xi[0],
+                      _d->parametrization().input_parametrization(),
+                      _f->input_parametrization(),
+                      &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
 			// is set in the object.
 			double cos = 1.0;
 			if(_cosine)
 			{
-				double cart[6]; params::convert(&xi[0], _d->input_parametrization(), params::CARTESIAN, cart);
+				double cart[6]; params::convert(&xi[0],
+                                        _d->parametrization().input_parametrization(),
+                                        params::CARTESIAN,
+                                        cart);
 				cos = cart[5];
 			}
 
@@ -154,7 +168,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 struct CompoundFunctor: Eigen::DenseFunctor<double>
 {
 	CompoundFunctor(compound_function* f, int index, const ptr<data> d, bool use_cosine) :
-		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->dimY()*d->size()), 
+		Eigen::DenseFunctor<double>((*f)[index]->nbParameters(), d->parametrization().dimY()*d->size()), 
 		_f(f), 
 		_d(d), 
 		_cosine(use_cosine),
@@ -186,7 +200,10 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 			double cos = 1.0;
 			if(_cosine)
 			{
-				double cart[6]; params::convert(&_x[0], _d->input_parametrization(), params::CARTESIAN, cart);
+				double cart[6]; params::convert(&_x[0],
+                                        _d->parametrization().input_parametrization(),
+                                        params::CARTESIAN,
+                                        cart);
 				cos = cart[5];
 			}
 
@@ -199,10 +216,13 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 			for(int i=0; i<_index+1; ++i)
 			{
                 const nonlinear_function* f = (*_f)[i];
-                if(f->input_parametrization() != _d->input_parametrization())
+                if(f->input_parametrization() != _d->parametrization().input_parametrization())
                 {
                     vec x(f->dimX());
-                    params::convert(&_x[0], _d->input_parametrization(), f->input_parametrization(), &x[0]);
+                    params::convert(&_x[0],
+                                    _d->parametrization().input_parametrization(),
+                                    f->input_parametrization(),
+                                    &x[0]);
 
                     _fy += (*f)(x);
                 }
@@ -245,16 +265,22 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 			double cos = 1.0;
 			if(_cosine)
 			{
-				double cart[6]; params::convert(&xi[0], _d->input_parametrization(), params::CARTESIAN, cart);
+				double cart[6]; params::convert(&xi[0],
+                                        _d->parametrization().input_parametrization(),
+                                        params::CARTESIAN,
+                                        cart);
 				cos = cart[5];
 			}
 
 			// Get the associated jacobian
             vec _jac;
-            if(f->input_parametrization() != _d->input_parametrization())
+            if(f->input_parametrization() != _d->parametrization().input_parametrization())
             {
                 vec x(f->dimX());
-                params::convert(&xi[0], _d->input_parametrization(), f->input_parametrization(), &x[0]);
+                params::convert(&xi[0],
+                                _d->parametrization().input_parametrization(),
+                                f->input_parametrization(),
+                                &x[0]);
 
                 _jac = f->parametersJacobian(x);
             }
@@ -298,10 +324,10 @@ bool nonlinear_fitter_eigen::fit_data(const ptr<data>& d, ptr<function>& fit, co
 {
     // I need to set the dimension of the resulting function to be equal
     // to the dimension of my fitting problem
-    fit->setDimX(d->dimX()) ;
-    fit->setDimY(d->dimY()) ;
-    fit->setMin(d->min()) ;
-    fit->setMax(d->max()) ;
+    fit->setDimX(d->parametrization().dimX()) ;
+    fit->setDimY(d->parametrization().dimY()) ;
+    fit->setMin(d->min());
+    fit->setMax(d->max());
 
 	 // Convert the function and bootstrap it with the data
     if(!dynamic_pointer_cast<nonlinear_function>(fit))

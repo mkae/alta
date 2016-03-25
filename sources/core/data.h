@@ -34,36 +34,28 @@ namespace alta {
 /*! \brief A data object. Allows to load data from files.
  *  \ingroup core
  */
-class data : public parametrized
+class data
 {
-	public: // methods
+  public: // methods
 
-		data() : parametrized()
-		{}
+    data() {}
 
-		data( unsigned int dim_X, unsigned int dim_Y)
-			: parametrized( dim_X, dim_Y )
-		{
-		}
+    data(unsigned int dim_X, unsigned int dim_Y)
+      : _parameters(dim_X, dim_Y)
+    {}
 
-		data(params::input in_param, params::output out_param)
-		: parametrized( in_param, out_param)
-		{
+    // Virtual destructor
+    virtual ~data() {}
 
-		}
+    // Load data from a file
+    virtual void load(const std::string& filename) = 0 ;
+    virtual void load(const std::string& filename, const arguments& args) = 0 ;
 
-		// Virtual destructor
-		virtual ~data() {} 
+    // Save the data to a file
+    virtual void save(const std::string& filename) const;
 
-		// Load data from a file
-		virtual void load(const std::string& filename) = 0 ;
-		virtual void load(const std::string& filename, const arguments& args) = 0 ;
-
-		// Save the data to a file
-		virtual void save(const std::string& filename) const;
-
-		// Acces to data
-		virtual vec get(int i) const = 0 ;
+    // Acces to data
+    virtual vec get(int i) const = 0 ;
 
     //! \brief Provide an evaluation of the data using interpolation. If
     //! the data object does not provide an interpolation mechanism, it
@@ -74,24 +66,51 @@ class data : public parametrized
     //! match the total dimension: dimX + dimY.
     virtual vec value(const vec& in) const = 0;
 
-		//! \brief Put the sample inside the data
-		virtual void set(const vec& x) = 0;
-		virtual void set(int i, const vec& x) = 0;
+    //! \brief Put the sample inside the data
+    virtual void set(const vec& x) = 0;
+    virtual void set(int i, const vec& x) = 0;
 
 
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const = 0 ;
+    // Get data size, e.g. the number of samples to fit
+    virtual int size() const = 0 ;
 
-		//! \brief Return true if this object is equal to DATA ±ε.
-		virtual bool equals(const data& data,
-												double epsilon =
+    //! \brief Return true if this object is equal to DATA ±ε.
+    virtual bool equals(const data& data,
+                        double epsilon =
                         std::pow(1.0, -int(std::numeric_limits<double>::digits10 - 1)));
 
 
-     friend void load_data_from_binary(std::istream& in, const alta::arguments& header,
-                                         alta::data& data);
+    friend void load_data_from_binary(std::istream& in, const alta::arguments& header,
+                                      alta::data& data);
 
-	protected: // data
+    const parameters& parametrization() const {
+        return _parameters;
+    }
+
+    void setParametrization(const parameters& p) {
+        _parameters = p;
+    }
+
+
+    /* Maximum values of the data */
+
+    //! \brief Set the minimum value the input can take
+    void setMin(const vec& min) ;
+
+    //! \brief Set the maximum value the input can take
+    void setMax(const vec& max) ;
+
+    //! \brief Get the minimum value the input can take
+    // FIXME: Return a reference.
+    vec min() const { return _min; };
+
+    //! \brief Get the maximum value the input can take
+    vec max() const { return _max; };
+
+  protected: // data
+
+    parameters _parameters;
+    vec _min, _max;
 } ;
 
 /*! \brief Change the parametrization of data to fit the parametrization of the
@@ -103,88 +122,88 @@ class data : public parametrized
  */
 class data_params : public data
 {
-	public: // structures
+  public: // structures
 
-		//! \brief when changing from a parametrization to another, you might
-		//! lose some dimensions. This list enumerate the different operators
-		//! that can be applied on the raw data to be clusterized.
-		//! \note by default we use <em>none</em>, but if the input space
-		//! dimension is reduced, the program will halt.
-		enum clustering
-		{
-			MEAN,
-			MEDIAN,
-			NONE
-		};
+    //! \brief when changing from a parametrization to another, you might
+    //! lose some dimensions. This list enumerate the different operators
+    //! that can be applied on the raw data to be clusterized.
+    //! \note by default we use <em>none</em>, but if the input space
+    //! dimension is reduced, the program will halt.
+    enum clustering
+    {
+      MEAN,
+      MEDIAN,
+      NONE
+    };
 
-	public: // methods
+  public: // methods
 
-		//! \brief contructor requires the definition of a base class that
-		//! has a parametrization, and a new parametrization.
-		data_params(const ptr<data> d, params::input new_param,
-		            data_params::clustering method = data_params::NONE) :
-			_clustering_method(method)
-		{
-			setParametrization(new_param);
-			setParametrization(d->output_parametrization());
+    //! \brief contructor requires the definition of a base class that
+    //! has a parametrization, and a new parametrization.
+    data_params(const ptr<data> d, params::input new_param,
+                data_params::clustering method = data_params::NONE) :
+      _clustering_method(method)
+    {
+      _parameters.setParametrization(new_param);
+      _parameters.setParametrization(d->parametrization().output_parametrization());
 
-			_nX = params::dimension(new_param);
-			_nY = d->dimY();
+      _parameters.setDimX(params::dimension(new_param));
+      _parameters.setDimY(d->parametrization().dimY());
 
-			std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
-			//TODO
-			//clustering<data>(d, _nY, d->parametrization(), new_param, _data);
+      std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
+      //TODO
+      //clustering<data>(d, _nY, d->parametrization(), new_param, _data);
 
-			std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
-			save(std::string("cluster.gnuplot"));
-		}
+      std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
+      save(std::string("cluster.gnuplot"));
+    }
 
-		virtual vec value(const vec&) const
-		{
-			NOT_IMPLEMENTED();
-		}
+    virtual vec value(const vec&) const
+    {
+      NOT_IMPLEMENTED();
+    }
 
-		// Load data from a file
-		virtual void load(const std::string&)
-		{
-			std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
-			throw;
-		}
+    // Load data from a file
+    virtual void load(const std::string&)
+    {
+      std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
+      throw;
+    }
 
-		virtual void load(const std::string&, const arguments&)
-		{
-			std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
-			throw;
-		}
+    virtual void load(const std::string&, const arguments&)
+    {
+      std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
+      throw;
+    }
 
-		// Acces to data
-		virtual vec get(int i) const
-		{
-			return _data[i];
-		}
+    // Acces to data
+    virtual vec get(int i) const
+    {
+      return _data[i];
+    }
 
-		//! \todo This should crash at execution.
-		virtual void set(const vec& x)
-		{
-			this->set(x);
-		}
+    //! \todo This should crash at execution.
+    virtual void set(const vec& x)
+    {
+      this->set(x);
+    }
 
-		virtual void set(int i, const vec& x)
-		{
-			this->set(i, x);
-		}
+    virtual void set(int i, const vec& x)
+    {
+      this->set(i, x);
+    }
 
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const
-		{
-			return _data.size();
-		}
+    // Get data size, e.g. the number of samples to fit
+    virtual int size() const
+    {
+      return _data.size();
+    }
 
-	protected: // data
+  protected: // data
 
-		data_params::clustering _clustering_method;
+    data_params::clustering _clustering_method;
 
-		std::vector<vec> _data;
+    std::vector<vec> _data;
 };
 }
 

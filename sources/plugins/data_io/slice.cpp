@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -17,6 +17,37 @@
 #include "EXR_IO.h"
 
 using namespace alta;
+
+// Allow for a different parametrization depending on the arguments provided.
+static const parameters
+brdf_slice_parameters(const arguments& args)
+{
+    auto result = alta::parameters(2, 3,
+                                   params::STARK_2D, params::RGB_COLOR);
+
+    if(args.is_defined("param")) {
+				params::input param = params::parse_input(args["param"]);
+
+				// The param is a 2D param
+				if(params::dimension(param) == 2) {
+            std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
+            result = alta::parameters(result.dimX(), result.dimY(),
+                                      param, result.output_parametrization());
+
+            // The oaram is a 3D param
+				} else if(params::dimension(param) == 3) {
+            std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
+            result = alta::parameters(3, result.dimY(),
+                                      param, result.output_parametrization());
+
+				} else {
+            std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;
+            std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
+				}
+    }
+
+    return result;
+}
 
 /*! \ingroup datas
  *  \class data_brdf_slice
@@ -45,49 +76,24 @@ class BrdfSlice : public data {
 		double* _data;
 		bool _reverse;
 
-		BrdfSlice(const arguments& args) : data()
+		BrdfSlice(const arguments& args)
+        : data(brdf_slice_parameters(args))
 		{
 			// Allocate data
 			width = 512; height = 512;
 			slice = 1;
 			_data = new double[3*width*height*slice];
-			_phi = 0.5*M_PI;
-
-			// Set the input and output parametrization
-			_in_param  = params::STARK_2D;
-			_out_param = params::RGB_COLOR;
-			_nX = 2;
-			_nY = 3;
-
-			// Allow to load a different parametrization depending on the
-			// parameters provided.
-			if(args.is_defined("param")) {
-				params::input param = params::parse_input(args["param"]);
-
-				// The param is a 2D param
-				if(params::dimension(param) == 2) {
-					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
-					this->setParametrization(param);
-
-				// The oaram is a 3D param
-				} else if(params::dimension(param) == 3) {
-					std::cout << "<<INFO>> Specified param \"" << args["param"] << "\"" << std::endl;
-					this->setParametrization(param);
-					this->_phi = (M_PI / 180.0) * args.get_float("phi", 90);
-					_nX = 3;
-
-
-				} else {
-					std::cout << "<<ERROR>> Invalid specified param \"" << args["param"] << "\"" << std::endl;
-					std::cout << "<<ERROR>> Must have 2D input dimension" << std::endl;
-				}
-			}
+      if (args.is_defined("param") && parametrization().dimX() == 3)
+          _phi = (M_PI / 180.0) * args.get_float("phi", 90);
+      else
+          _phi = 0.5*M_PI;
 
 			// Is the position of the slice componnent (third coordinate)
 			// reversed? This ensure that some params can be displayed.
-			_reverse = _in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
-			           _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
-						  _in_param == params::RETRO_TL_TVL_PROJ_DPHI;
+      auto in_param = parametrization().input_parametrization();
+			_reverse = in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+          in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
+          in_param == params::RETRO_TL_TVL_PROJ_DPHI;
 
 			// Update the domain
 			_max = max();
@@ -122,25 +128,25 @@ class BrdfSlice : public data {
 		// Acces to data
 		vec get(int id) const
 		{
-			vec res(_nX+_nY) ;
+      vec res(parametrization().dimX() + parametrization().dimY());
 			const int i = id % width;
 			const int k = id / (width*height);
 			const int j = (id - k*width*height) / width;
 
 			res[0] = (i+0.5) * (_max[0]-_min[0]) / double(width)  + _min[0];
 			res[1] = (j+0.5) * (_max[1]-_min[1]) / double(height) + _min[1];
-			if(_nX == 3) {
+			if(parametrization().dimX() == 3) {
 				res[2] = _phi;
 			}
 
 			// Reverse the first part of the vector
 			if(_reverse) {
-				res.segment(0, _nX).reverseInPlace();
+				res.segment(0, parametrization().dimX()).reverseInPlace();
 			}
 
-			res[_nX+0] = _data[3*id + 0];
-			res[_nX+1] = _data[3*id + 1];
-			res[_nX+2] = _data[3*id + 2];
+			res[parametrization().dimX()+0] = _data[3*id + 0];
+			res[parametrization().dimX()+1] = _data[3*id + 1];
+			res[parametrization().dimX()+2] = _data[3*id + 2];
 
 			return res ;
 		}
@@ -153,10 +159,10 @@ class BrdfSlice : public data {
 
 			// Reverse the first part of the vector
 			if(_reverse) {
-				_x.segment(0, _nX).reverseInPlace();
+          _x.segment(0, parametrization().dimX()).reverseInPlace();
 			}
 
-			assert(_x.size() == _nX+_nY);
+			assert(_x.size() == parametrization().dimX()+parametrization().dimY());
 			assert(_x[0] <= _max[0] && _x[0] >= _min[0]);
 			assert(_x[1] <= _max[1] && _x[1] >= _min[1]);
 
@@ -166,17 +172,17 @@ class BrdfSlice : public data {
 			//const int k  = floor(x[2] * slice  / (M_PI));
 			const int id = i + j*width + k*width*height;
 
-			_data[3*id + 0] = _x[_nX+0];
-			_data[3*id + 1] = _x[_nX+1];
-			_data[3*id + 2] = _x[_nX+2];
+			_data[3*id + 0] = _x[parametrization().dimX()+0];
+			_data[3*id + 1] = _x[parametrization().dimX()+1];
+			_data[3*id + 2] = _x[parametrization().dimX()+2];
 		}
 		void set(int id, const vec& x)
 		{
-			assert(x.size() == dimX() + dimY());
+			assert(x.size() == parametrization().dimX() + parametrization().dimY());
 
-			_data[3*id + 0] = x[dimX()+0];
-			_data[3*id + 1] = x[dimX()+1];
-			_data[3*id + 2] = x[dimX()+2];
+			_data[3*id + 0] = x[parametrization().dimX()+0];
+			_data[3*id + 1] = x[parametrization().dimX()+1];
+			_data[3*id + 2] = x[parametrization().dimX()+2];
 		}
 
 		vec value(const vec& x) const
@@ -186,7 +192,7 @@ class BrdfSlice : public data {
 
 			// Reverse the first part of the vector
 			if(_reverse) {
-				_x.segment(0, _nX).reverseInPlace();
+				_x.segment(0, parametrization().dimX()).reverseInPlace();
 			}
 
 			// Safeguard. We can use either asserting or returning zero in case
@@ -225,23 +231,23 @@ class BrdfSlice : public data {
 		// Get min and max input space values
 		vec min() const
 		{
-			vec res(_nX);
+			vec res(parametrization().dimX());
 
 			// First fill the third dimension. It can be overwritten by the next
 			// part when the parametrization is reversed (projected ones).
-			if(_nX == 3) {
+			if(parametrization().dimX() == 3) {
 				res[2] = 0.0 ;
 			}
 
 			// Fill the first two dimension unless the parametrization is a
 			// projected one then it will fill the three components.
-			if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
-				_in_param == params::ISOTROPIC_TV_TL_DPHI) {
+			if(parametrization().input_parametrization() == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+				parametrization().input_parametrization() == params::ISOTROPIC_TV_TL_DPHI) {
 				res[0] = -0.5*M_PI ;
 				res[1] = -0.5*M_PI ;
-			} else if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
-					    _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
-						 _in_param == params::RETRO_TL_TVL_PROJ_DPHI) {
+			} else if(parametrization().input_parametrization() == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+					    parametrization().input_parametrization() == params::SCHLICK_TL_TK_PROJ_DPHI   ||
+						 parametrization().input_parametrization() == params::RETRO_TL_TVL_PROJ_DPHI) {
 				res[0] = -0.5*M_PI ;
 				res[1] = -0.5*M_PI ;
 				res[2] = -0.5*M_PI ;
@@ -253,24 +259,24 @@ class BrdfSlice : public data {
 		}
 		vec max() const
 		{
-			vec res(_nX);
+			vec res(parametrization().dimX());
 
 			// First fill the third dimension. It can be overwritten by the next
 			// part when the parametrization is reversed (projected ones).
-			if(_nX == 3) {
+			if(parametrization().dimX() == 3) {
 				res[2] = 2.0*M_PI;
 			}
 
 			// Fill the first two dimension unless the parametrization is a
 			// projected one then it will fill the three components.
-			if(_in_param == params::RUSIN_TH_TD ||
-				_in_param == params::RUSIN_TH_TD_PD ||
-				_in_param == params::ISOTROPIC_TV_TL_DPHI) {
+			if(parametrization().input_parametrization() == params::RUSIN_TH_TD ||
+				parametrization().input_parametrization() == params::RUSIN_TH_TD_PD ||
+				parametrization().input_parametrization() == params::ISOTROPIC_TV_TL_DPHI) {
 				res[0] = 0.5*M_PI ;
 				res[1] = 0.5*M_PI ;
-			} else if(_in_param == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
-					    _in_param == params::SCHLICK_TL_TK_PROJ_DPHI   ||
-						 _in_param == params::RETRO_TL_TVL_PROJ_DPHI) {
+			} else if(parametrization().input_parametrization() == params::ISOTROPIC_TL_TV_PROJ_DPHI ||
+					    parametrization().input_parametrization() == params::SCHLICK_TL_TK_PROJ_DPHI   ||
+						 parametrization().input_parametrization() == params::RETRO_TL_TVL_PROJ_DPHI) {
 				res[0] = 0.5*M_PI ;
 				res[1] = 0.5*M_PI ;
 				res[2] = 0.5*M_PI ;
@@ -279,15 +285,6 @@ class BrdfSlice : public data {
 				res[1] = 1.0 ;
 			}
 			return res ;
-		}
-
-		int dimX() const
-		{
-			return _nX ;
-		}
-		int dimY() const
-		{
-			return 3;
 		}
 };
 

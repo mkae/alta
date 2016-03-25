@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -96,33 +96,35 @@ public: //methods
    //
    void update_params(const std::vector<std::string>& vars) {
 
-      _nX = 0;
-      _nY = 0;
+      unsigned int nX = 0, nY = 0;
 
       for(auto it=vars.begin(); it!=vars.end(); it++) {
          if(*it == "theta_i" || *it == "phi_i" ||
             *it == "theta_s" || *it == "phi_s") {
-            _nX += 1;
+            nX += 1;
          } else {
-            _nY += 1;
+            nY += 1;
          }
       }
 
-      if(_nX == 4) {
-         setParametrization(params::SPHERICAL_TL_PL_TV_PV);
+      parameters param(nX, nY);
+      if(nX == 4) {
+         param.setParametrization(params::SPHERICAL_TL_PL_TV_PV);
       } else {
          std::cout << "<<ERROR>> Input format not handled in \'data_astm\'" << std::endl;
-         setParametrization(params::UNKNOWN_INPUT);
+         param.setParametrization(params::UNKNOWN_INPUT);
       }
 
       if(vars.back() == "B") {
-         setParametrization(params::RGB_COLOR);
+         param.setParametrization(params::RGB_COLOR);
       } else if(vars.back().compare(0, 10, "Integrated") == 0) {
-         setParametrization(params::INV_STERADIAN);
+         param.setParametrization(params::INV_STERADIAN);
       } else {
          std::cout << "<<ERROR>> Output format not handled in \'data_astm\'" << std::endl;
-         setParametrization(params::UNKNOWN_INPUT);
+         param.setParametrization(params::UNKNOWN_INPUT);
       }
+
+      setParametrization(param);
    }
 
 	// Load data from a file
@@ -142,7 +144,7 @@ public: //methods
       initializeToZero(size);
 
       // Size of the data
-      const int n = dimX() + dimY();
+      const int n = parametrization().dimX() + parametrization().dimY();
       int i = 0;
 
 		while(file.good())
@@ -155,7 +157,7 @@ public: //methods
          std::replace(line.begin(), line.end(), ',', ' ');
 
          // Create a stream from the line data and extract it as
-         // a vec of dim dimX() + dimY().
+         // a vec of dim parametrization().dimX() + parametrization().dimY().
          std::stringstream stream(line);
 			vec x(n);
 			for(int i=0; i<n; ++i) {

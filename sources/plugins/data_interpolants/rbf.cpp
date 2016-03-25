@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -95,15 +95,16 @@ class rbf_interpolant : public data
 			_data->load(filename);
 
 			// Copy the informations
-			setDimX(_data->dimX());
-			setDimY(_data->dimY());
+      parameters p(_data->parametrization().dimX(),
+                   _data->parametrization().dimY(),
+                   _data->parametrization().input_parametrization(),
+                   _data->parametrization().output_parametrization());
+      setParametrization(p);
 			setMin(_data->min());
 			setMax(_data->max());
-			setParametrization(_data->input_parametrization());
-			setParametrization(_data->output_parametrization());
 
 		#ifdef USE_DELAUNAY
-			dD = dimX()+dimY();
+			dD = parametrization().dimX()+parametrization().dimY();
 			D  = new Delaunay_d(dD);
 			for(int i=0; i<_data->size(); ++i)
 			{
@@ -117,12 +118,12 @@ class rbf_interpolant : public data
 			std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
 		#else
 			// Update the KDtreee by inserting all points
-			double* _d = new double[dimX()*_data->size()];
-			flann::Matrix<double> pts(_d, _data->size(), dimX());
+			double* _d = new double[parametrization().dimX()*_data->size()];
+			flann::Matrix<double> pts(_d, _data->size(), parametrization().dimX());
 			for(int i=0; i<_data->size(); ++i)
 			{
 				vec x = _data->get(i);
-				memcpy(pts[i], &x[0], dimX()*sizeof(double));
+				memcpy(pts[i], &x[0], parametrization().dimX()*sizeof(double));
 			}
 			_kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
 			_kdtree->buildIndex();
@@ -140,7 +141,7 @@ class rbf_interpolant : public data
 		// Acces to data
 		virtual vec get(int id) const
 		{
-			vec res(dimX() + dimY()) ;
+			vec res(parametrization().dimX() + parametrization().dimY()) ;
 			return res ;
 		}
 		virtual vec operator[](int i) const
@@ -160,12 +161,12 @@ class rbf_interpolant : public data
 
 		virtual vec value(const vec& x) const
 		{
-			vec res = vec::Zero(dimY());
+			vec res = vec::Zero(parametrization().dimY());
 
 		#ifndef USE_DELAUNAY
 			// Query point
 			vec xc(x);
-			flann::Matrix<double> pts(&xc[0], 1, dimX());
+			flann::Matrix<double> pts(&xc[0], 1, parametrization().dimX());
 			std::vector< std::vector<int> >    indices;
 			std::vector< std::vector<double> > dists;
 
@@ -180,7 +181,7 @@ class rbf_interpolant : public data
 
 		      const double kernel = 1.0/(1.0E-10 + dists[0][i]);
 
-				res      += kernel * y.tail(_nY);
+        res      += kernel * y.tail(parametrization().dimY());
 				cum_dist += kernel;
 			}
 			if(cum_dist > 0.0)
@@ -190,7 +191,7 @@ class rbf_interpolant : public data
 		#else
 
 			Point pt_x(dD);
-			for(int j=0; j<dimX(); ++j) { pt_x[j] = x[j]; }
+			for(int j=0; j<parametrization().dimX(); ++j) { pt_x[j] = x[j]; }
 			S_handle simplex = D->locate(pt_x);
 
 			if(simplex == Delaunay_d::Simplex_handle())
@@ -207,21 +208,21 @@ class rbf_interpolant : public data
 
 				// Compute the distance between y and x
 				double dist = 0.0;
-				for(int i=0; i<dimX(); ++i) { dist += pow(y.homogeneous(i)-x[i], 2); }
+				for(int i=0; i<parametrization().dimX(); ++i) { dist += pow(y.homogeneous(i)-x[i], 2); }
 				dist = sqrt(dist);
 
 				// Interpolate the data
 				cum_dist += dist;
-				for(int i=0; i<dimY(); ++i)
+				for(int i=0; i<parametrization().dimY(); ++i)
 				{
-					res[i] += dist * y.homogeneous(dimX() + i);
+					res[i] += dist * y.homogeneous(parametrization().dimX() + i);
 				}
 
 			}
 
 			if(cum_dist > 0.0)
 			{
-				for(int j=0; j<dimY(); ++j)
+				for(int j=0; j<parametrization().dimY(); ++j)
 				{
 					res[j] /= cum_dist;
 				}

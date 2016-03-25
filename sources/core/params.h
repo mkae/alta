@@ -43,38 +43,38 @@ class params
 {
     public: // data
 
-		 //! \brief list of all supported parametrization for the input space.
-		 //! An unsupported parametrization will go under the name ! *unknown*. We
-		 //!use the following notations:
-		 //!   * The View vector is \f$V\f$
-		 //!   * The Light vector is \f$L\f$
-		 //!   * The Normal vector is \f$N\f$
-		 //!   * The Reflected vector is \f$R = 2\mbox{dot}({V}, {N}){N} - {V}\f$
-		 //!   * The Half vector is \f$H = \frac{V+L}{||V+L||}\f$
-		 //!   * The Back vector is \f$K = \frac{V-L}{||V-L||}\f$
-		 //!   * The elevation angle of vector \f$V\f$ is \f$\theta_V\f$
-		 //!   * The azimuth angle of vector \f$V\f$ is \f$\phi_V\f$
+     //! \brief list of all supported parametrization for the input space.
+     //! An unsupported parametrization will go under the name ! *unknown*. We
+     //!use the following notations:
+     //!   * The View vector is \f$V\f$
+     //!   * The Light vector is \f$L\f$
+     //!   * The Normal vector is \f$N\f$
+     //!   * The Reflected vector is \f$R = 2\mbox{dot}({V}, {N}){N} - {V}\f$
+     //!   * The Half vector is \f$H = \frac{V+L}{||V+L||}\f$
+     //!   * The Back vector is \f$K = \frac{V-L}{||V-L||}\f$
+     //!   * The elevation angle of vector \f$V\f$ is \f$\theta_V\f$
+     //!   * The azimuth angle of vector \f$V\f$ is \f$\phi_V\f$
        //!
        //! [stark]: http://dl.acm.org/citation.cfm?id=1042387
        //! [neumann]: https://www.cg.tuwien.ac.at/research/publications/1996/Neumann-1996-NCB/
        //!
-		 enum input
-		 {
+     enum input
+     {
        RUSIN_TH_PH_TD_PD,     /*!< Half-angle parametrization as described by Rusinkiewicz 
                                   [[1998]][rusin] described in spherical coordinates. Coordinates
                                   are: \f$ \left[ \theta_H, \phi_H, \theta_D, \phi_D \right] \f$.
                                   [rusin]: http://link.springer.com/chapter/10.1007/978-3-7091-6453-2_2
                                */
        RUSIN_TH_PH_TD,
-		 RUSIN_TH_TD_PD,			/*!< Isotropic Half-angle parametrization. This
-										  parametrization is defined by the tuple \f$
-										  \vec{x} = [\theta_H, \theta_D, \phi_D] \f$*/
+     RUSIN_TH_TD_PD,      /*!< Isotropic Half-angle parametrization. This
+                      parametrization is defined by the tuple \f$
+                      \vec{x} = [\theta_H, \theta_D, \phi_D] \f$*/
        RUSIN_TH_TD,           /*!< Half-angle parametrization with no azimutal information */
        RUSIN_VH_VD,           /*!< Half-angle parametrization in vector format. Coordinates are:
                                    \f$ [H_x, H_y, H_z, D_x, D_y, D_z] \f$.*/
        RUSIN_VH,              /*!< Half-angle parametrization with no difference direction in 
-  								           vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
-  									        \vec{h}_z\f$]. */
+                             vector format. Coordinates are: [\f$\vec{h}_x, \vec{h}_y, 
+                            \vec{h}_z\f$]. */
        COS_TH_TD,             /*!< Cosine of the RUSIN_TH_TD parametrization: Coordinates are in 
                                    \f$ [\cos_{\theta_H},\cos_{\theta_D}] \f$. */
        COS_TH,
@@ -83,14 +83,14 @@ class params
        SCHLICK_VK,            /*!< Schlick's back vector */
        SCHLICK_TL_TK_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected and
                               the parametrization is centered around the back direction.
-  									 \f$[\theta_L, x, y] = [\theta_L, \theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
+                     \f$[\theta_L, x, y] = [\theta_L, \theta_K \cos(\phi_K), \theta_K \sin(\phi_K)]\f$*/
        COS_TK,                /*!< Schlick's back vector dot product with the normal */
 
 
        RETRO_TL_TVL_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected and
                                the parametrization is centered around the retro direction
-  									  \f$[x, y] = [\theta_{VL} \cos(\Delta\phi), \theta_{VL} 
-  									  \sin(\Delta\phi)]\f$.*/
+                      \f$[x, y] = [\theta_{VL} \cos(\Delta\phi), \theta_{VL} 
+                      \sin(\Delta\phi)]\f$.*/
 
        STEREOGRAPHIC,         /*!< Stereographic projection of the Light and View vectors */
 
@@ -103,19 +103,19 @@ class params
                                    with the difference of azimutal coordinates in the last component  */
        ISOTROPIC_TV_PROJ_DPHI,/*!< 2D Parametrization where the phi component is projected.
                                Coordinates are: \f$\left[\theta_v \cos(\Delta\phi), \theta_v 
-  									  \sin(\Delta\phi)\right]\f$.*/
+                      \sin(\Delta\phi)\right]\f$.*/
        ISOTROPIC_TL_TV_PROJ_DPHI,/*!< 3D Parametrization where the phi component is projected.
                                   Coordinates are: \f$\left[\theta_l, \theta_v \cos(\Delta\phi), 
-  										  \theta_v \sin(\Delta\phi)\right]\f$.*/
+                        \theta_v \sin(\Delta\phi)\right]\f$.*/
        ISOTROPIC_TD_PD,       /*!< Difference between two directions such as R and H */
 
         STARK_2D,             /*!< Modified Stark et al. [[2005]][stark] 2D parametrization by 
                                    Barla et al. [[2015]][barla]. This parametrization is defined 
                                    by the couple \f$ \vec{x} = ||\tilde{H}_p||, ||\tilde{B}|| \f$, 
                                    where \f$ \tilde{H} = \frac{1}{2}(L+V) \f$
-											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
-											  is the projected coordinates of \f$ \tilde{H} \f$ on the
-											  tangent plane.
+                        and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
+                        is the projected coordinates of \f$ \tilde{H} \f$ on the
+                        tangent plane.
                                       [stark]: http://dl.acm.org/citation.cfm?id=1042387 
                                       [barla]: http://todo/
                                */
@@ -131,9 +131,9 @@ class params
                                    parametrization is defined by the couple \f$ \vec{x} = \left[
                                    ||\tilde{H}_p||, ||\tilde{B}_p||\right] \f$, where \f$ 
                                    \tilde{H} = \frac{1}{2}(L+V) \f$
-											  and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
-											  is the projected coordinates of \f$ \tilde{H} \f$ on the
-											  tangent plane.
+                        and \f$ \tilde{B} = \frac{1}{2}(L-V) \f$. \f$ \tilde{H}_p \f$
+                        is the projected coordinates of \f$ \tilde{H} \f$ on the
+                        tangent plane.
                                       [neumann]: https://www.cg.tuwien.ac.at/research/publications/1996/Neumann-1996-NCB/
                                */
         NEUMANN_3D,           /*!< Neumann and Neumann [[1996]][neumann] 3D parametrization. This 
@@ -143,26 +143,26 @@ class params
                                */
        CARTESIAN,             /*!< View and Light vectors represented in cartesian coordinates.
                                We always pack the view vector first: \f$[V.x, V.y, 
-  									  V.z, L.x, L.y, L.z] \f$*/
+                      V.z, L.x, L.y, L.z] \f$*/
 
        UNKNOWN_INPUT          /*!< Default behaviour. Only use this is you do not fit BRDF data. */
-		 };
+     };
 
-		 //! \brief list of all supported parametrization for the output space.
-		 //! An unsupported parametrization will go under the name
-		 //! <em>unknown</em>.
-		 enum output
-		 {
-			 INV_STERADIAN,                /*!< Output values in inverse steradian (sr-1). 
-														   This is the standard definition for a BRDF. */
-			 INV_STERADIAN_COSINE_FACTOR,  /*!< Output values in inverse steradian (sr-1)
-			                                    weighted by the cosine factor of the output
-															direction. */
-			 ENERGY,
-			 RGB_COLOR,
-			 XYZ_COLOR,
-			 UNKNOWN_OUTPUT
-		 };
+     //! \brief list of all supported parametrization for the output space.
+     //! An unsupported parametrization will go under the name
+     //! <em>unknown</em>.
+     enum output
+     {
+       INV_STERADIAN,                /*!< Output values in inverse steradian (sr-1). 
+                               This is the standard definition for a BRDF. */
+       INV_STERADIAN_COSINE_FACTOR,  /*!< Output values in inverse steradian (sr-1)
+                                          weighted by the cosine factor of the output
+                              direction. */
+       ENERGY,
+       RGB_COLOR,
+       XYZ_COLOR,
+       UNKNOWN_OUTPUT
+     };
 
     public: // methods
 
@@ -172,15 +172,15 @@ class params
         //! \brief parse a string to provide a parametrization type.
         static params::output parse_output(const std::string& txt);
 
-		  //! \brief look for the string associated with a parametrization
-		  //! type.
-		  static const std::string& get_name(const params::input param);
+      //! \brief look for the string associated with a parametrization
+      //! type.
+      static const std::string& get_name(const params::input param);
 
-		  //! \brief look for the string associated with a parametrization
-		  //! type.
-		  //! \todo Finish this implementation. It requires another static
-		  //! object.
-		  static const std::string& get_name(const params::output);
+      //! \brief look for the string associated with a parametrization
+      //! type.
+      //! \todo Finish this implementation. It requires another static
+      //! object.
+      static const std::string& get_name(const params::output);
 
         //! \brief static function for input type convertion. This
         //! function allocate the resulting vector.
@@ -211,34 +211,34 @@ class params
         static void convert(const double* invec, params::output intype, int indim,
                             params::output outtype, int outdim, double* outvec)
         {
-        	// The convertion is done using the cartesian parametrization as
-    			// an intermediate one. If the two parametrizations are equals
-    			// there is no need to perform the conversion.
-    			if(outdim == indim)
-    			{
-    				for(int i=0; i<outdim; ++i) { outvec[i] = invec[i]; }
-    			}
-    			// If the dimension of the output data is bigger than the 
-    			// dimensions of the input domain, and the input domain is of
-    			// dimension one, spread the data over all dimensions.
-    			else if(indim == 1)
-    			{
-    				for(int i=0; i<outdim; ++i) { outvec[i] = invec[0]; }
-    			}
-    			// If the output dimension is one, compute the average of the
-    			// input vector values.
-    			else if(outdim == 1)
-    			{
-    				for(int i=0; i<indim; ++i) 
+          // The convertion is done using the cartesian parametrization as
+          // an intermediate one. If the two parametrizations are equals
+          // there is no need to perform the conversion.
+          if(outdim == indim)
+          {
+            for(int i=0; i<outdim; ++i) { outvec[i] = invec[i]; }
+          }
+          // If the dimension of the output data is bigger than the 
+          // dimensions of the input domain, and the input domain is of
+          // dimension one, spread the data over all dimensions.
+          else if(indim == 1)
+          {
+            for(int i=0; i<outdim; ++i) { outvec[i] = invec[0]; }
+          }
+          // If the output dimension is one, compute the average of the
+          // input vector values.
+          else if(outdim == 1)
+          {
+            for(int i=0; i<indim; ++i) 
             { 
                 outvec[0] += invec[i]; 
-            }	
+            } 
             outvec[0] /= static_cast<double>(indim);
-    			}
-    			else
-    			{
-    				NOT_IMPLEMENTED();
-    			}
+          }
+          else
+          {
+            NOT_IMPLEMENTED();
+          }
         }
 
         //! \brief static function for input type convertion. The outvec
@@ -247,34 +247,34 @@ class params
         static void convert(const double* invec, params::input intype,
                             params::input outtype, double* outvec)
         {
-			  // The convertion is done using the cartesian parametrization as
-			  // an intermediate one. If the two parametrizations are equals
-			  // there is no need to perform the conversion.
-			  if(intype == outtype)
-			  {
-				  int dim = dimension(outtype);
-				  for(int i=0; i<dim; ++i) { outvec[i] = invec[i]; }
-			  }
-			  // If the input parametrization is the CARTESIAN param, then 
-			  // there is no need to transform the input data.
-			  else if(intype == params::CARTESIAN)
-			  {
-				  from_cartesian(invec, outtype, outvec);
-			  }
-			  // If the output parametrization is the CARTESIAN param, then
-			  // there is no need to convert back to another param.
-			  else if(outtype == params::CARTESIAN)
-			  {
-				  to_cartesian(invec, intype, outvec);
-			  }
-			  else
-			  {
-				  // temporary CARTESIAN vector
-				  double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        // The convertion is done using the cartesian parametrization as
+        // an intermediate one. If the two parametrizations are equals
+        // there is no need to perform the conversion.
+        if(intype == outtype)
+        {
+          int dim = dimension(outtype);
+          for(int i=0; i<dim; ++i) { outvec[i] = invec[i]; }
+        }
+        // If the input parametrization is the CARTESIAN param, then 
+        // there is no need to transform the input data.
+        else if(intype == params::CARTESIAN)
+        {
+          from_cartesian(invec, outtype, outvec);
+        }
+        // If the output parametrization is the CARTESIAN param, then
+        // there is no need to convert back to another param.
+        else if(outtype == params::CARTESIAN)
+        {
+          to_cartesian(invec, intype, outvec);
+        }
+        else
+        {
+          // temporary CARTESIAN vector
+          double  temvec[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-				  to_cartesian(invec, intype, temvec);
-				  from_cartesian(temvec, outtype, outvec);
-			  }
+          to_cartesian(invec, intype, temvec);
+          from_cartesian(temvec, outtype, outvec);
+        }
         }
 
         //! \brief convert a input vector in a given parametrization to an
@@ -315,24 +315,24 @@ class params
             }
         }
 
-		  //! \brief Is the value stored weighted by a cosine factor
-		  static bool is_cosine_weighted(params::output t)
-		  {
-			  switch(t)
-			  {
-				  case params::INV_STERADIAN_COSINE_FACTOR:
-					  return true;
-					  break;
+      //! \brief Is the value stored weighted by a cosine factor
+      static bool is_cosine_weighted(params::output t)
+      {
+        switch(t)
+        {
+          case params::INV_STERADIAN_COSINE_FACTOR:
+            return true;
+            break;
 
-				  case params::INV_STERADIAN:
-				  case params::ENERGY:
-				  case params::RGB_COLOR:
-				  case params::XYZ_COLOR:
-				  default:
-					  return false;
-					  break;
-			  }
-		  }
+          case params::INV_STERADIAN:
+          case params::ENERGY:
+          case params::RGB_COLOR:
+          case params::XYZ_COLOR:
+          default:
+            return false;
+            break;
+        }
+      }
 
       //! \brief from the 4D definition of a half vector parametrization,
       //! export the cartesian coordinates.
@@ -374,34 +374,34 @@ class params
 
       //! \brief from the 4D definition of a classical vector parametrization,
       //! export the cartesian coordinates.
-		  static void classical_to_cartesian(double theta_l, double phi_l, 
-		                                     double theta_v, double phi_v, double* out)
-		  {
-			  out[0] = cos(phi_l)*sin(theta_l);
-			  out[1] = sin(phi_l)*sin(theta_l);
-			  out[2] = cos(theta_l);
-			  out[3] = cos(phi_v)*sin(theta_v);
-			  out[4] = sin(phi_v)*sin(theta_v);
-			  out[5] = cos(theta_v);
-		  }
+      static void classical_to_cartesian(double theta_l, double phi_l, 
+                                         double theta_v, double phi_v, double* out)
+      {
+        out[0] = cos(phi_l)*sin(theta_l);
+        out[1] = sin(phi_l)*sin(theta_l);
+        out[2] = cos(theta_l);
+        out[3] = cos(phi_v)*sin(theta_v);
+        out[4] = sin(phi_v)*sin(theta_v);
+        out[5] = cos(theta_v);
+      }
 
-		  //! \brief rotate a cartesian vector with respect to the normal of
-		  //! theta degrees.
+      //! \brief rotate a cartesian vector with respect to the normal of
+      //! theta degrees.
       template<class Vector, typename Real>
       static void rotate_normal(Vector& vec, Real theta)
-		  {
+      {
           auto rotz = Eigen::AngleAxis<Real>(theta, Eigen::Matrix<Real, 3, 1>(0, 0, 1));
           vec = rotz * vec;
-		  }
+      }
 
-		  //! \brief rotate a cartesian vector with respect to the bi-normal of
-		  //! theta degrees.
+      //! \brief rotate a cartesian vector with respect to the bi-normal of
+      //! theta degrees.
       template<class Vector, typename Real>
-		  static void rotate_binormal(Vector& vec, Real theta)
-		  {
+      static void rotate_binormal(Vector& vec, Real theta)
+      {
           auto roty = Eigen::AngleAxis<Real>(theta, Eigen::Matrix<Real, 3, 1>(0, 1, 0));
           vec = roty * vec;
-		  }
+      }
 
       //! \brief Rotate VEC by THETA around the normal, and by PHI around the
       //! binormal.
@@ -413,102 +413,92 @@ class params
           rotate_binormal(vec, phi);
       }
 
-		  static void print_input_params();
+      static void print_input_params();
 
 };
 
-/*! \brief A parametrized object. Allow to define function object (either data
+/*! \brief A parameters object. Allow to define function object (either data
  *  or functions that are defined over an input space and output space. This
  *  Object allowas to change the parametrization of the input or output space.
  */
-class parametrized
+class parameters
 {
-	public:
-    parametrized() 
-      : _in_param(params::UNKNOWN_INPUT), 
+  public:
+    parameters()
+      : _in_param(params::UNKNOWN_INPUT),
         _out_param(params::UNKNOWN_OUTPUT),
         _nX( 0 ),
         _nY( 0 )
-    { 
+    {
     }
 
-    parametrized( unsigned int dim_X, unsigned int dim_Y)
-    : _in_param(params::UNKNOWN_INPUT), 
+    parameters( unsigned int dim_X, unsigned int dim_Y)
+    : _in_param(params::UNKNOWN_INPUT),
       _out_param(params::UNKNOWN_OUTPUT),
       _nX( dim_X ),
-      _nY( dim_Y ),
-      _min( vec::Zero( _nX+_nY) ),
-      _max( vec::Zero( _nX+_nY) )
+      _nY( dim_Y )
     {}
 
-		parametrized(params::input in_param, params::output out_param) 
+    parameters(params::input in_param, params::output out_param)
     : _in_param( in_param ),
       _out_param( out_param ),
       _nX( params::dimension(_in_param) ),
-      _nY( params::dimension(_out_param) ) ,
-      _min( vec::Zero( _nX+_nY) ),
-      _max( vec::Zero( _nX+_nY) )
+      _nY( params::dimension(_out_param) )
     {
-		}
+    }
 
-		//! \brief provide the input parametrization of the object.
-		params::input parametrization() const
-		{
-			return _in_param;
-		}
+    //! \brief provide the input parametrization of the object.
+    params::input input_parametrization() const
+    {
+      return _in_param;
+    }
 
-		//! \brief provide the input parametrization of the object.
-		params::input input_parametrization() const
-		{
-			return _in_param;
-		}
+    //! \brief provide the outout parametrization of the object.
+    params::output output_parametrization() const
+    {
+      return _out_param;
+    }
 
-		//! \brief provide the outout parametrization of the object.
-		params::output output_parametrization() const
-		{
-			return _out_param;
-		}
+    //! \brief can set the input parametrization of a non-parametrized
+    //! object. Print an error if it is already defined.
+    void setParametrization(params::input new_param)
+    {
+      //! \todo Here is something strange happening. The equality between
+      //! those enums is not correct for UNKNOWN_INPUT
+      if(_in_param == new_param)
+      {
+        return;
+      }
+      else if(_in_param == params::UNKNOWN_INPUT)
+      {
+        _in_param = new_param;
+      }
+      else
+      {
+        std::cout << "<<ERROR>> an input parametrization is already defined: " << params::get_name(_in_param) << std::endl;
+        std::cout << "<<ERROR>> changing to: " << params::get_name(new_param) << std::endl;
+        _in_param = new_param;
+      }
+    }
 
-		//! \brief can set the input parametrization of a non-parametrized
-		//! object. Print an error if it is already defined.
-		void setParametrization(params::input new_param)
-		{
-			//! \todo Here is something strange happening. The equality between
-			//! those enums is not correct for UNKNOWN_INPUT
-			if(_in_param == new_param)
-			{
-				return;
-			}
-			else if(_in_param == params::UNKNOWN_INPUT)
-			{
-				_in_param = new_param;
-			}
-			else
-			{
-				std::cout << "<<ERROR>> an input parametrization is already defined: " << params::get_name(_in_param) << std::endl;
-				std::cout << "<<ERROR>> changing to: " << params::get_name(new_param) << std::endl;
-				_in_param = new_param;
-			}
-		}
-
-		//! \brief can set the output parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		void setParametrization(params::output new_param)
-		{
-			if(_out_param == new_param)
-			{
-				return;
-			}
+    //! \brief can set the output parametrization of a non-parametrized
+    //! function. Throw an exception if it tries to erase a previously
+    //! defined one.
+    void setParametrization(params::output new_param)
+    {
+      if(_out_param == new_param)
+      {
+        return;
+      }
             else if(_out_param == params::UNKNOWN_OUTPUT)
-			{
-				_out_param = new_param;
-			}
-			else
-			{
-				std::cout << "<<ERROR>> an output parametrization is already defined: " << std::endl;
-			}
-		}
+      {
+        _out_param = new_param;
+      }
+      else
+      {
+        std::cout << "<<ERROR>> an output parametrization is already defined: " << std::endl;
+      }
+    }
 
     //! \brief Set the input and output parametrizations directly
     void setParametrizations(params::input new_in_param, params::output new_out_param)
@@ -517,51 +507,32 @@ class parametrized
       setParametrization( new_out_param );
     }
 
-		/* DIMENSION OF THE INPUT AND OUTPUT DOMAIN */
+    /* DIMENSION OF THE INPUT AND OUTPUT DOMAIN */
 
-		//! Provide the dimension of the input space of the function
-		int dimX() const { return _nX ; }
-		//! Provide the dimension of the output space of the function
-		int dimY() const { return _nY ; }
+    //! Provide the dimension of the input space of the function
+    int dimX() const { return _nX ; }
+    //! Provide the dimension of the output space of the function
+    int dimY() const { return _nY ; }
 
-		//! Set the dimension of the input space of the function
-		void setDimX(int nX) {
-			if(_nX != nX) {
-				_nX = nX;
-				_min.resize(nX);
-				_max.resize(nX);
-			}
-		}
-		//! Set the dimension of the output space of the function
-		void setDimY(int nY) {
-			if(_nY != nY) {
-				_nY = nY;
-			}
-		}
+    //! Set the dimension of the input space of the function
+    void setDimX(int nX) {
+      if(_nX != nX) {
+        _nX = nX;
+      }
+    }
+    //! Set the dimension of the output space of the function
+    void setDimY(int nY) {
+      if(_nY != nY) {
+        _nY = nY;
+      }
+    }
 
+  protected:
+    // Input and output parametrization
+    params::input  _in_param ;
+    params::output _out_param ;
 
-		/* DEFINITION DOMAIN OF THE FUNCTION */
-
-		//! \brief Set the minimum value the input can take
-		void setMin(const vec& min) ;
-
-		//! \brief Set the maximum value the input can take
-		void setMax(const vec& max) ;
-
-		//! \brief Get the minimum value the input can take
-		vec min() const ;
-
-		//! \brief Get the maximum value the input can take
-		vec max() const ;
-
-
-	protected:
-		// Input and output parametrization
-		params::input  _in_param ;
-		params::output _out_param ;
-
-		// Dimension of the function & domain of definition.
-		int _nX, _nY ;
-		vec _min, _max ;
+    // Dimension of the function & domain of definition.
+    int _nX, _nY ;
 };
 }

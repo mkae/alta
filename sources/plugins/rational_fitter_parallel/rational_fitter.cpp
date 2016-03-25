@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -60,18 +60,27 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
     std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
     ptr<vertical_segment> vs(new vertical_segment());
-    vs->setDimX(dat->dimX());
-    vs->setDimY(dat->dimY());
-    vs->setMin(dat->min()) ;
-    vs->setMax(dat->max()) ;
+    parameters p(dat->parametrization().dimX(),
+                 dat->parametrization().dimY());
+
+    vs->setParametrization(p);                    // FIXME: in and out_param?
+    vs->setMin(dat->min());
+    vs->setMax(dat->max());
+
     for(int i=0; i<dat->size(); ++i)
     {
       const vec x = dat->get(i);
-      vec y(dat->dimX() + 3*dat->dimY());
+      vec y(dat->parametrization().dimX() + 3*dat->parametrization().dimY());
 
       for(int k=0; k<x.size()   ; ++k) { y[k]                               = x[k]; }
-      for(int k=0; k<dat->dimY(); ++k) { y[k + dat->dimX() +   dat->dimY()] = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
-      for(int k=0; k<dat->dimY(); ++k) { y[k + dat->dimX() + 2*dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
+      for(int k=0; k<dat->parametrization().dimY(); ++k) {
+          y[k + dat->parametrization().dimX() + dat->parametrization().dimY()] =
+              (1.0 - args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
+      }
+      for(int k=0; k<dat->parametrization().dimY(); ++k) {
+          y[k + dat->parametrization().dimX() + 2*dat->parametrization().dimY()] =
+              (1.0 + args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
+      }
 
       vs->set(y);
     }
@@ -81,10 +90,10 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
 
   // I need to set the dimension of the resulting function to be equal
   // to the dimension of my fitting problem
-  r->setDimX(d->dimX()) ;
-  r->setDimY(d->dimY()) ;
-  r->setMin(d->min()) ;
-  r->setMax(d->max()) ;
+  r->setDimX(d->parametrization().dimX());
+  r->setDimY(d->parametrization().dimY());
+  r->setMin(d->min());
+  r->setMax(d->max());
 
   const int _min_np = args.get_int("min-np", 10);
   const int _max_np = args.get_int("np", _min_np);
@@ -217,7 +226,7 @@ bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, 
                                         double& delta, double& linf_dist, double& l2_dist)
 {
   // Fit the different output dimension independantly
-  for(int j=0; j<d->dimY(); ++j)
+  for(int j=0; j<d->parametrization().dimY(); ++j)
   {
     vec p(np), q(nq);
     rational_function_1d* rf = r->get(j);
