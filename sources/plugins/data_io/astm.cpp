@@ -107,22 +107,20 @@ public: //methods
          }
       }
 
-      parameters param(nX, nY);
-      if(nX == 4) {
-         param.setParametrization(params::SPHERICAL_TL_PL_TV_PV);
-      } else {
-         std::cout << "<<ERROR>> Input format not handled in \'data_astm\'" << std::endl;
-         param.setParametrization(params::UNKNOWN_INPUT);
-      }
+      auto out_param = [&]() {
+          if(vars.back() == "B") {
+              return params::RGB_COLOR;
+          } else if(vars.back().compare(0, 10, "Integrated") == 0) {
+              return params::INV_STERADIAN;
+          } else {
+              std::cout << "<<ERROR>> Output format not handled in \'data_astm\'" << std::endl;
+              return params::UNKNOWN_OUTPUT;
+          }
+      };
 
-      if(vars.back() == "B") {
-         param.setParametrization(params::RGB_COLOR);
-      } else if(vars.back().compare(0, 10, "Integrated") == 0) {
-         param.setParametrization(params::INV_STERADIAN);
-      } else {
-         std::cout << "<<ERROR>> Output format not handled in \'data_astm\'" << std::endl;
-         param.setParametrization(params::UNKNOWN_INPUT);
-      }
+      parameters param(nX, nY,
+                       nX == 4 ? params::SPHERICAL_TL_PL_TV_PV : params::UNKNOWN_INPUT,
+                       out_param());
 
       setParametrization(param);
    }

@@ -78,15 +78,11 @@ private: // data
 
 public: // methods
 
-    MERL() : _nSlice(BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2) {
+    MERL() :
+      data(parameters(3, 3, params::RUSIN_TH_TD_PD, params::RGB_COLOR)),
+      _nSlice(BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2) {
 		brdf = new double[3*_nSlice];
 		std::fill(brdf, brdf + 3*_nSlice, 0.0);
-
-	    // Set the input and output parametrization
-    _parameters.setParametrization(params::RUSIN_TH_TD_PD);
-    _parameters.setParametrization(params::RGB_COLOR);
-    _parameters.setDimX(3);
-    _parameters.setDimY(3);
 
     _min.resize(3);
     _min[0] = 0.0;

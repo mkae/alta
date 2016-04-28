@@ -148,14 +148,12 @@ class data_params : public data
     //! has a parametrization, and a new parametrization.
     data_params(const ptr<data> d, params::input new_param,
                 data_params::clustering method = data_params::NONE) :
+      data(parameters(params::dimension(new_param),
+                      d->parametrization().dimY(),
+                      new_param,
+                      d->parametrization().output_parametrization())),
       _clustering_method(method)
     {
-      _parameters.setParametrization(new_param);
-      _parameters.setParametrization(d->parametrization().output_parametrization());
-
-      _parameters.setDimX(params::dimension(new_param));
-      _parameters.setDimY(d->parametrization().dimY());
-
       std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
       //TODO
       //clustering<data>(d, _nY, d->parametrization(), new_param, _data);

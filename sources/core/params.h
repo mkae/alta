@@ -469,73 +469,12 @@ class parameters
       return _out_param;
     }
 
-    //! \brief can set the input parametrization of a non-parametrized
-    //! object. Print an error if it is already defined.
-    void setParametrization(params::input new_param)
-    {
-      //! \todo Here is something strange happening. The equality between
-      //! those enums is not correct for UNKNOWN_INPUT
-      if(_in_param == new_param)
-      {
-        return;
-      }
-      else if(_in_param == params::UNKNOWN_INPUT)
-      {
-        _in_param = new_param;
-      }
-      else
-      {
-        std::cout << "<<ERROR>> an input parametrization is already defined: " << params::get_name(_in_param) << std::endl;
-        std::cout << "<<ERROR>> changing to: " << params::get_name(new_param) << std::endl;
-        _in_param = new_param;
-      }
-    }
-
-    //! \brief can set the output parametrization of a non-parametrized
-    //! function. Throw an exception if it tries to erase a previously
-    //! defined one.
-    void setParametrization(params::output new_param)
-    {
-      if(_out_param == new_param)
-      {
-        return;
-      }
-            else if(_out_param == params::UNKNOWN_OUTPUT)
-      {
-        _out_param = new_param;
-      }
-      else
-      {
-        std::cout << "<<ERROR>> an output parametrization is already defined: " << std::endl;
-      }
-    }
-
-    //! \brief Set the input and output parametrizations directly
-    void setParametrizations(params::input new_in_param, params::output new_out_param)
-    {
-      setParametrization( new_in_param);
-      setParametrization( new_out_param );
-    }
-
     /* DIMENSION OF THE INPUT AND OUTPUT DOMAIN */
 
     //! Provide the dimension of the input space of the function
     int dimX() const { return _nX ; }
     //! Provide the dimension of the output space of the function
     int dimY() const { return _nY ; }
-
-    //! Set the dimension of the input space of the function
-    void setDimX(int nX) {
-      if(_nX != nX) {
-        _nX = nX;
-      }
-    }
-    //! Set the dimension of the output space of the function
-    void setDimY(int nY) {
-      if(_nY != nY) {
-        _nY = nY;
-      }
-    }
 
   protected:
     // Input and output parametrization
