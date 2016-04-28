@@ -216,8 +216,7 @@ void alta::load_data_from_text(std::istream& input,
             << " -> R^" << dim.second << std::endl ;
   std::cout << "<<INFO>> " << result._data.size() << " elements to fit" << std::endl ;
 
-  parameters param(dim.first, dim.second);
-  param.setParametrizations(in_param, out_param);
+  parameters param(dim.first, dim.second, in_param, out_param);
   result.setParametrization(param);
 }
 
@@ -303,9 +302,9 @@ void alta::load_data_from_binary(std::istream& in, const alta::arguments& header
 
     // vertical_segment::set needs to know dimX and dimY, so we must already
     // call 'setParametrization' once here.
-    parameters param(dim.first, dim.second);
-    param.setParametrization(params::parse_input(header["PARAM_IN"]));
-    param.setParametrization(params::parse_output(header["PARAM_OUT"]));
+    parameters param(dim.first, dim.second,
+                     params::parse_input(header["PARAM_IN"]),
+                     params::parse_output(header["PARAM_OUT"]));
     data.setParametrization(param);
 
     in.exceptions(std::ios_base::failbit);

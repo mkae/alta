@@ -161,8 +161,8 @@ int main(int argc, char** argv)
 
       {
           parameters p(params::dimension(param),
-                       d_in->parametrization().dimY());
-          p.setParametrization(param);
+                       d_in->parametrization().dimY(),
+                       param, params::UNKNOWN_OUTPUT);
           d_out->setParametrization(p);
       }
 		}

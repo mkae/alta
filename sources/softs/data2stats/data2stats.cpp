@@ -218,9 +218,8 @@ bool convertDataToFunctionParam(ptr<data> const & d,
          converted_data = new vertical_segment(d->parametrization().input_parametrization(),
                                                f->output_parametrization(),
                                                d->size());
-         parameters p(f->input_parametrization(), f->output_parametrization());
-         p.setDimX(f->dimX());
-         p.setDimY(f->dimY());
+         parameters p(f->dimX(), f->dimY(),
+                      f->input_parametrization(), f->output_parametrization());
          converted_data->setParametrization(p);
 
          //Note that: data_x = dat.head( data->parametrization().dimX() );
@@ -256,9 +255,8 @@ bool convertDataToFunctionParam(ptr<data> const & d,
       // Converting to the function input parametrization
       if( d->parametrization().output_parametrization() == f->output_parametrization() )
       {
-         parameters p(f->dimX(), f->dimY());
-         p.setParametrization(f->input_parametrization());
-         p.setParametrization(f->output_parametrization());
+         parameters p(f->dimX(), f->dimY(),
+                      f->input_parametrization(), f->output_parametrization());
 
          converted_data = new vertical_segment( f->dimX(), f->dimY(), d->size() );
          converted_data->setParametrization(p);

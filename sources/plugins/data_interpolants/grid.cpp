@@ -154,9 +154,7 @@ class BrdfGrid : public vertical_segment {
       BrdfGrid(const arguments& args) : vertical_segment()
       {
          // Set the input and output parametrization
-         parameters p(params::STARK_2D, params::RGB_COLOR);
-         p.setDimX(2);
-         p.setDimY(3);
+         parameters p(2, 3, params::STARK_2D, params::RGB_COLOR);
          setParametrization(p);
 
          initialize(args);
@@ -214,7 +212,7 @@ class BrdfGrid : public vertical_segment {
             _data.clear();
          }
 
-         parameters p(in_param, out_param);
+         parameters p(nX, nY, in_param, out_param);
          setParametrization(p);
       }
 

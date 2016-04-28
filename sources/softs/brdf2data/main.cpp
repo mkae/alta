@@ -86,8 +86,9 @@ int main(int argc, char** argv)
     if(dynamic_pointer_cast<vertical_segment>(d) != NULL)
     {
         parameters p(d->parametrization().dimX(),
-                     d->parametrization().dimY());
-        p.setParametrization(d->parametrization().input_parametrization());
+                     d->parametrization().dimY(),
+                     d->parametrization().input_parametrization(),
+                     d->parametrization().output_parametrization());
         d_out->setParametrization(p);
     }
 

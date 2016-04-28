@@ -61,9 +61,11 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
 
     ptr<vertical_segment> vs(new vertical_segment());
     parameters p(dat->parametrization().dimX(),
-                 dat->parametrization().dimY());
+                 dat->parametrization().dimY(),
+                 dat->parametrization().input_parametrization(),
+                 dat->parametrization().output_parametrization());
 
-    vs->setParametrization(p);                    // FIXME: in and out_param?
+    vs->setParametrization(p);
     vs->setMin(dat->min());
     vs->setMax(dat->max());
 

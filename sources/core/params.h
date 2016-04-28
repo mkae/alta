@@ -432,6 +432,14 @@ class parameters
     {
     }
 
+    parameters(unsigned int dim_X, unsigned int dim_Y,
+               params::input in_param, params::output out_param)
+    : _in_param(in_param),
+      _out_param(out_param),
+      _nX( dim_X ),
+      _nY( dim_Y )
+    {}
+
     parameters( unsigned int dim_X, unsigned int dim_Y)
     : _in_param(params::UNKNOWN_INPUT),
       _out_param(params::UNKNOWN_OUTPUT),
