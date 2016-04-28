@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -102,6 +102,13 @@ static bool close_to(const T a, const T b, const T epsilon = 1E-7)
     return std::abs(a - b) < epsilon;
 }
 
+
+/* Mark a type, class, method, function, or variable as deprecated.  */
+#ifdef __GNUC__
+# define ALTA_DEPRECATED  __attribute__((__deprecated__))
+#else
+# define ALTA_DEPRECATED
+#endif
 
 #ifdef _MSC_VER
 #define NOT_IMPLEMENTED() \
