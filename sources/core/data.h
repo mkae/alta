@@ -38,11 +38,17 @@ class data
 {
   public: // methods
 
+    data(const parameters &p): _parameters(p) {}
+
+    /* TODO: Eventually mark the following constructors as deprecated.  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     data() {}
 
     data(unsigned int dim_X, unsigned int dim_Y)
       : _parameters(dim_X, dim_Y)
     {}
+#pragma GCC diagnostic pop
 
     // Virtual destructor
     virtual ~data() {}

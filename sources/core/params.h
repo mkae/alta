@@ -441,6 +441,7 @@ class parameters
     {}
 
     parameters( unsigned int dim_X, unsigned int dim_Y)
+        ALTA_DEPRECATED
     : _in_param(params::UNKNOWN_INPUT),
       _out_param(params::UNKNOWN_OUTPUT),
       _nX( dim_X ),
@@ -448,6 +449,7 @@ class parameters
     {}
 
     parameters(params::input in_param, params::output out_param)
+        ALTA_DEPRECATED
     : _in_param( in_param ),
       _out_param( out_param ),
       _nX( params::dimension(_in_param) ),
