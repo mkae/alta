@@ -285,15 +285,6 @@ class compound_function: public nonlinear_function
 		// dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const;
 
-		//! \brief can set the input parametrization of a non-parametrized
-		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input new_param);
-
-		//! \brief can set the output parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		virtual void setParametrization(params::output new_param);
-
 		//! \brief save function specific data. This has no use for ALTA export
 		//! but allows to factorize the code in the C++ or matlab export by
 		//! defining function calls that are common to all the plugins.
@@ -379,11 +370,6 @@ class product_function : public nonlinear_function
 		//! Provide the output parametrization of the object.
 		virtual params::output output_parametrization() const;
 		
-		//! Set the input/output parametrization of a non-parametrized
-		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input  new_param);
-		virtual void setParametrization(params::output new_param);
-
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const;
 		

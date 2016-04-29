@@ -512,39 +512,6 @@ bool compound_function::load(std::istream& in)
 	return nb_good > 0;
 }
 
-void compound_function::setParametrization(params::input new_param)
-{
-	if(new_param == params::UNKNOWN_INPUT)
-		return;
-
-	// If there is more than one parametrization defined to this function, convert
-	// it to the parametrization that conserves the most degrees of freedom. Right now
-	// this is the CARTESIAN param. It might change in future release.
-	if(input_parametrization() != new_param)
-	{
-		function::setParametrization(params::CARTESIAN);
-		function::setDimX(6);
-	}
-
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			fs[i]->setParametrization(new_param);
-			fs[i]->setDimX(params::dimension(new_param));
-		}
-	}
-}
-		
-void compound_function::setParametrization(params::output new_param)
-{
-  function::setParametrization(new_param);
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		fs[i]->setParametrization(new_param);
-	}
-}
-
 void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 {
 	bool const global_bootstrap = args.is_defined("bootstrap");
@@ -1282,26 +1249,6 @@ vec product_function::parametersJacobian(const vec& x) const
 params::output product_function::output_parametrization() const
 {
 	return f1->output_parametrization();
-}
-		
-void product_function::setParametrization(params::input new_param)
-{
-	if(f1->input_parametrization() == params::UNKNOWN_INPUT) 
-	{
-		f1->setParametrization(new_param); 
-		f1->setDimX(params::dimension(new_param));
-	}
-	if(f2->input_parametrization() == params::UNKNOWN_INPUT) 
-	{
-		f2->setParametrization(new_param);
-		f2->setDimX(params::dimension(new_param));
-	}
-}
-
-void product_function::setParametrization(params::output new_param)
-{
-	f1->setParametrization(new_param);
-	f2->setParametrization(new_param);
 }
 
 nonlinear_function* product_function::first() const
