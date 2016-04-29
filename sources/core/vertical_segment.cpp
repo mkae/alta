@@ -23,6 +23,12 @@ using namespace alta;
 
 //#define RELATIVE_ERROR
 
+vertical_segment::vertical_segment(const parameters& params, unsigned int size):
+    data(params), _is_absolute(true), _dt(0.1)
+{
+    initializeToZero(size);
+}
+
 vertical_segment::vertical_segment(unsigned int dim_X, 
                                    unsigned int dim_Y, 
                                    unsigned int size)

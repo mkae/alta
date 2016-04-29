@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -79,6 +79,8 @@ namespace alta {
 class vertical_segment : public data
 {
    public: // methods
+
+      vertical_segment(const parameters& params, unsigned int size);
 
       //! \brief Default constructor that does nothing at all.
       vertical_segment() {}

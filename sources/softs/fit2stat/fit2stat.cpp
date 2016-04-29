@@ -223,13 +223,10 @@ bool convertDataToFunctionParam(ptr<data> const & data,
     else // Ouput parametrizations are different. 
          // Output parametrization of  the Function prevails
     {
-      converted_data = new vertical_segment( data->parametrization().input_parametrization(), 
-                                             f->output_parametrization(),
-                                             data->size() );
       parameters p(f->dimX(), f->dimY(),
                    f->input_parametrization(),
                    f->output_parametrization());
-      converted_data->setParametrization(p);
+      converted_data = new vertical_segment(p, data->size());
 
       //Note that: data_x = dat.head( data->parametrization().dimX() );
       //           data_y = dat.tail( data->parametrization().dimY() );
@@ -267,9 +264,8 @@ bool convertDataToFunctionParam(ptr<data> const & data,
       parameters p(f->dimX(), f->dimY(),
                    f->input_parametrization(), f->output_parametrization());
 
-      converted_data = new vertical_segment( f->dimX(), f->dimY(), data->size() );
-      converted_data->setParametrization(p);
-      
+      converted_data = new vertical_segment(p, data->size());
+
       //Note that: data_x = dat.head( data->parametrization().dimX() );
       //           data_y = dat.tail( data->parametrization().dimY() );
       vec dat        = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
