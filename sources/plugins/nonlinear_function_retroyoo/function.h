@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -46,8 +46,9 @@ class yoo_function : public nonlinear_function
 
 		yoo_function()
 		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+        _parameters = alta::parameters(6, 0,
+                                       params::CARTESIAN,
+                                       params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator
@@ -81,12 +82,6 @@ class yoo_function : public nonlinear_function
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
-
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 6;
-		}
 
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);

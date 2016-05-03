@@ -25,8 +25,8 @@ WalterSmith::WalterSmith()
 SQRT_PI( 1.772453850905516 )
 #endif
 {
-  setParametrization(params::CARTESIAN);
-  setDimX(6);
+    _parameters = alta::parameters(6, 0,
+                                   params::CARTESIAN, params::UNKNOWN_OUTPUT);
 }
 
 
@@ -72,7 +72,7 @@ WalterSmith::load(std::istream& in)
   }
 
   // alpha [double]
-  for(int i=0; i<dimY(); ++i)
+  for(int i=0; i<_parameters.dimY(); ++i)
   {
       in >> token >> _alpha[i];
   }
@@ -95,7 +95,7 @@ WalterSmith::save_call(std::ostream& out, const arguments& args) const
   {
     out << "#FUNC " << FUNCTION_NAME_TOKEN << std::endl ;
 
-    for(int i=0; i< dimY(); ++i)
+    for(int i=0; i< _parameters.dimY(); ++i)
     {
       out << "alpha " << _alpha[i] << std::endl;
     }
@@ -105,10 +105,10 @@ WalterSmith::save_call(std::ostream& out, const arguments& args) const
   else
   {
    out << "walter_smith(L, V, N, X, Y, vec3(";
-   for(int i=0; i<dimY(); ++i)
+   for(int i=0; i<_parameters.dimY(); ++i)
    {
      out << _alpha[i];
-     if(i < dimY()-1) 
+     if(i < _parameters.dimY()-1) 
       { 
         out << ", "; 
       }
@@ -186,7 +186,7 @@ WalterSmith::value(const vec& x) const
   getVectorsFromCartesianParam( x, view, light, n, half_vector);
 
   //Initialize result to zero by default
-  vec res= vec::Zero( dimY() );
+  vec res= vec::Zero( _parameters.dimY() );
 
   if( partialShadowingTerm( x, view, light, n, half_vector) <= 0.0f )
   {
@@ -195,7 +195,7 @@ WalterSmith::value(const vec& x) const
   else
   {
     //Now Compute Shadowing Quantities
-    for(unsigned int i=0; i < dimY(); i++)
+    for(unsigned int i=0; i < _parameters.dimY(); i++)
     {
       //double const tan_theta_v = std::tan( std::acos( v_dot_n) );
       double const tan_theta_v = std::sqrt(1.0 - view[2]*view[2]) / view[2];
@@ -258,7 +258,7 @@ vec
 WalterSmith::parametersJacobian(const vec& x) const 
 {
   //A 3x3 matrix for the Jacobian
-  vec jac = vec::Zero(dimY()*nbParameters());
+  vec jac = vec::Zero(_parameters.dimY()*nbParameters());
 
   vec view(3);   vec light(3);  
   //Normal Vector
@@ -281,9 +281,9 @@ WalterSmith::parametersJacobian(const vec& x) const
   
 
   // if they are not compute derivative of the alpha parameters
-  for(int i=0; i<dimY(); ++i)
+  for(int i=0; i<_parameters.dimY(); ++i)
   {
-   for(int j=0; j<dimY(); ++j)
+   for(int j=0; j<_parameters.dimY(); ++j)
    {
       if(i == j)
       {

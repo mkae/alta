@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -34,10 +34,10 @@ vec yoo_function::operator()(const vec& x) const
 }
 vec yoo_function::value(const vec& x) const 
 {
-	vec res(dimY());
+	vec res(_parameters.dimY());
 
 	const double factor = 3.0 / (16.0*M_PI);
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		const double q = 2.0 * M_PI * x[0] / 633.0;
 		res[i] *= _kr[i] * factor * (2.4 + 1.0 / (1.0 + q*_lt[i]*_lt[i])) * (1.0 + (1.0 - exp(- 2.0 * q * 0.7 * _lt[i]) / (q*_lt[i])));
@@ -48,24 +48,26 @@ vec yoo_function::value(const vec& x) const
 // Reset the output dimension
 void yoo_function::setDimY(int nY)
 {
-    _nY = nY ;
+    _parameters = alta::parameters(_parameters.dimX(), nY,
+                                   _parameters.input_parametrization(),
+                                   _parameters.output_parametrization());
 
     // Update the length of the vectors
-    _lt.resize(_nY) ;
-    _kr.resize(_nY) ;
+    _lt.resize(_parameters.dimY()) ;
+    _kr.resize(_parameters.dimY()) ;
 }
 
 //! Number of parameters to this non-linear function
 int yoo_function::nbParameters() const 
 {
-	return 2*dimY();
+	return 2*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec yoo_function::parameters() const 
 {
-	vec res(3*dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec res(3*_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*2 + 0] = _kr[i];
 		res[i*2 + 1] = _lt[i];
@@ -76,8 +78,8 @@ vec yoo_function::parameters() const
 //! \brief get the min values for the parameters
 vec yoo_function::getParametersMin() const
 {
-	vec res(2*dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec res(2*_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*2 + 0] = 0.0;
 		res[i*2 + 1] = 0.0;
@@ -89,7 +91,7 @@ vec yoo_function::getParametersMin() const
 //! Update the vector of parameters for the function
 void yoo_function::setParameters(const vec& p) 
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_kr[i] = p[i*2 + 0];
 		_lt[i] = p[i*2 + 1];
@@ -103,10 +105,10 @@ vec yoo_function::parametersJacobian(const vec& x) const
 {
 	const double factor = 3.0 / (16.0*M_PI);
 
-	vec jac(dimY()*nbParameters());
-	for(int i=0; i<dimY(); ++i)
+	vec jac(_parameters.dimY()*nbParameters());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
-		for(int j=0; j<dimY(); ++j)
+		for(int j=0; j<_parameters.dimY(); ++j)
 		{
 			if(i == j)
 			{
@@ -132,7 +134,7 @@ vec yoo_function::parametersJacobian(const vec& x) const
 		
 void yoo_function::bootstrap(const ptr<data>, const arguments&)
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_kr[i] = 1.0;
 		_lt[i] = 1.0;
@@ -171,7 +173,7 @@ bool yoo_function::load(std::istream& in)
 	}
 
 	// Parse the lobe
-	for(int i=0; i<_nY; ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 
 		in >> token >> _kr[i];
@@ -190,7 +192,7 @@ void yoo_function::save_call(std::ostream& out, const arguments& args) const
 		out << "#FUNC nonlinear_function_retroyoo" << std::endl ;
 		out << "#TYPE ";
 
-		for(int i=0; i<_nY; ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			out << "Kr " << _kr[i] << std::endl;
 			out << "Lt " << _lt[i]  << std::endl;
@@ -201,17 +203,17 @@ void yoo_function::save_call(std::ostream& out, const arguments& args) const
 	else
 	{
 		out << "retroyoo(L, V, N, X, Y, vec3(";
-		for(int i=0; i<_nY; ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			out << _kr[i];
-			if(i < _nY-1) { out << ", "; }
+			if(i < _parameters.dimY()-1) { out << ", "; }
 		}
 
 		out << "), vec3(";
-		for(int i=0; i<_nY; ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			out << _lt[i];
-			if(i < _nY-1) { out << ", "; }
+			if(i < _parameters.dimY()-1) { out << ", "; }
 		}
 		out << "))";
 	}

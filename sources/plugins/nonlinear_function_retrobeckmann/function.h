@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -43,8 +43,9 @@ class beckmann_function : public nonlinear_function
 
 		beckmann_function(): _use_back_param(true)
 		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+        _parameters = alta::parameters(6, 0,
+                                       params::CARTESIAN,
+                                       params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator

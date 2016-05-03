@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -78,7 +78,7 @@ double rational_function_chebychev_1d::p(const vec& x, int i) const
 {
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0;
-	for(int k=0; k<dimX(); ++k)
+	for(int k=0; k<_parameters.dimX(); ++k)
 	{
 		double xk = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
 		res *= chebychev(xk, deg[k]);
@@ -90,7 +90,7 @@ double rational_function_chebychev_1d::q(const vec& x, int i) const
 {
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0; 
-	for(int k=0; k<dimX(); ++k)
+	for(int k=0; k<_parameters.dimX(); ++k)
 	{
 		double xk = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
 		res *= chebychev(xk, deg[k]);
@@ -102,18 +102,18 @@ double rational_function_chebychev_1d::q(const vec& x, int i) const
 rational_function_1d* rational_function_chebychev::get(int i)
 {
 	// Check for consistency in the index of color channel
-	if(i < _nY)
+	if(i < _parameters.dimY())
 	{
 		if(rs[i] == NULL)
 		{
-			rs[i] = new rational_function_chebychev_1d(dimX(), np, nq);
+			rs[i] = new rational_function_chebychev_1d(_parameters.dimX(), np, nq);
 
 			// Test if the input domain is not empty. If one dimension of
 			// the input domain is a point, I manually inflate this dimension
 			// to avoid numerical issues.
 			vec _min = min();
 			vec _max = max();
-			for(int k=0; k<dimX(); ++k)
+			for(int k=0; k<_parameters.dimX(); ++k)
 			{
 				if(_min[k] == _max[k]) 
 				{

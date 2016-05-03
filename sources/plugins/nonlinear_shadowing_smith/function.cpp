@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -62,7 +62,7 @@ bool smith::load(std::istream& in)
     }
 
     // R [double]
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         in >> token >> w[i];
     }
@@ -76,7 +76,7 @@ void smith::save_call(std::ostream& out, const arguments& args) const
     if(is_alta)
     {
         out << "#FUNC nonlinear_fresnel_smith" << std::endl ;
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
             out << "R " << w[i] << std::endl;
         }
@@ -85,10 +85,10 @@ void smith::save_call(std::ostream& out, const arguments& args) const
     else
     {
         out << "shadowing_smith(L, V, N, X, Y, vec3(";
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
             out << w[i];
-            if(i < _nY-1) { out << ", "; }
+            if(i < _parameters.dimY()-1) { out << ", "; }
         }
         out << "))";
     }
@@ -139,11 +139,11 @@ void smith::save_body(std::ostream& out, const arguments& args) const
 
 vec smith::value(const vec& x) const
 {
-	vec res(dimY());
+	vec res(_parameters.dimY());
     //RP: The Step functions are missing ???? !!!
 	if(x[2] == 1.0)
 	{
-		for(int i=0; i<dimY(); ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			res[i] = 1.0;
 		}
@@ -158,7 +158,7 @@ vec smith::value(const vec& x) const
     
         double const SQRT_ONE_OVER_TWO_PI = 0.398942280401439 ;
         double const SQRT_2_OVER_2        = 0.70710678118655  ;
-		for(int i=0; i<dimY(); ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			double const r = mu / w[i];
 			//double const A = sqrt(0.5 / M_PI) * exp(- 0.5 * (r*r)) / r - 0.5 * (1.0 - erf(sqrt(0.5) * r));
@@ -168,10 +168,10 @@ vec smith::value(const vec& x) const
 		}
 
         //RP: In my opinion this code should be add
-        // vec res2( dimY() );
+        // vec res2( _parameters.dimY() );
         // double const mu2 = x[2] / sqrt(x[0]*x[0] + x[1]*x[1]);
 
-        // for(int i=0; i<dimY(); ++i)
+        // for(int i=0; i<_parameters.dimY(); ++i)
         // {
         //     double const r = mu2 / w[i];
         //     double const A = sqrt(0.5 / M_PI) * exp(- 0.5 * (r*r)) / r - 0.5 * (1.0 - erf(sqrt(0.5) * r));
@@ -187,35 +187,35 @@ vec smith::value(const vec& x) const
 //! \brief Number of parameters to this non-linear function
 int smith::nbParameters() const
 {
-    return dimY();
+    return _parameters.dimY();
 }
 
 vec smith::getParametersMin() const
 {
-    vec m(dimY());
-    for(int i=0; i<dimY(); ++i) { m[i] = 0.0; }
+    vec m(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i) { m[i] = 0.0; }
     return m;
 }
 
 //! \brief Get the vector of parameters for the function
 vec smith::parameters() const
 {
-    vec p(dimY());
-    for(int i=0; i<dimY(); ++i) { p[i] = w[i]; }
+    vec p(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i) { p[i] = w[i]; }
     return p;
 }
 
 //! \brief Update the vector of parameters for the function
 void smith::setParameters(const vec& p)
 {
-    for(int i=0; i<dimY(); ++i) { w[i] = p[i]; }
+    for(int i=0; i<_parameters.dimY(); ++i) { w[i] = p[i]; }
 }
 
 //! \brief Obtain the derivatives of the function with respect to the
 //! parameters.
 vec smith::parametersJacobian(const vec& x) const
 {
-    const int nY = dimY();
+    const int nY = _parameters.dimY();
     vec jac(nY*nY);
 
 	 vec v = value(x);
@@ -228,11 +228,11 @@ vec smith::parametersJacobian(const vec& x) const
 				  const double mu = x[5] / sqrt(x[3]*x[3] + x[4]*x[4]);
 				  const double r = mu / w[i];
 
-				  jac[j*dimY() + i] = (-1.0 / pow(1.0 + v[i], 2)) * exp(-0.5 * r*r) * (r*r*r/w[i] - 2.0*r/w[i]) / sqrt(2.0 * M_PI) ;
+				  jac[j*_parameters.dimY() + i] = (-1.0 / pow(1.0 + v[i], 2)) * exp(-0.5 * r*r) * (r*r*r/w[i] - 2.0*r/w[i]) / sqrt(2.0 * M_PI) ;
 			  }
 			  else 
 			  {
-				  jac[j*dimY() + i] = 0.0;
+				  jac[j*_parameters.dimY() + i] = 0.0;
 			  }
 		  }
 
@@ -242,5 +242,5 @@ vec smith::parametersJacobian(const vec& x) const
 
 void smith::bootstrap(const ptr<data> d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i) { w[i] = 1.0; }
+    for(int i=0; i<_parameters.dimY(); ++i) { w[i] = 1.0; }
 }

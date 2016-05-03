@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -50,8 +50,8 @@ class abc_function : public nonlinear_function
 
 		abc_function()
 		{
-			setParametrization(params::COS_TH);
-			setDimX(1);
+      _parameters = alta::parameters(1, 0,
+                                     params::COS_TH, params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator

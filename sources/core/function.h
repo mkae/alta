@@ -39,9 +39,7 @@ class function
 	public: // methods
 
     function()
-        : _in_param(params::UNKNOWN_INPUT), _out_param(params::UNKNOWN_OUTPUT),
-        _nX(0), _nY(0),
-        _min(vec::Zero(0)), _max(vec::Zero(0)) { };
+        : _min(vec::Zero(0)), _max(vec::Zero(0)) { };
 
 
 		/* NEEDED FUNCTIONS */
@@ -108,28 +106,26 @@ class function
 
 
     // Definition domain of the function.
-    // TODO: Move this to a 'parameterization' class.
     virtual void setMin(const vec& min) { _min = min; }
     virtual void setMax(const vec& max) { _max = max; }
-    int dimX() const { return _nX; }
-    int dimY() const { return _nX; }
-    virtual void setDimX(int x) { _nX = x; _min.resize(x); _max.resize(x); }
-    virtual void setDimY(int y) { _nY = y; }
-    void setParametrization(params::input p) { _in_param = p; }
-    void setParametrization(params::output p) { _out_param = p; }
-    params::input parametrization() const { return _in_param; }
-    params::input input_parametrization() const { return _in_param; }
-    params::output output_parametrization() const { return _out_param; }
     virtual vec min() const { return _min; }
     virtual vec max() const { return _max; }
 
+    const parameters& parametrization() const {
+        return _parameters;
+    }
+
+    void setParametrization(const parameters& p) {
+        _parameters = p;
+    }
+
+    // TODO: Deprecate, then remove these two methods.
+    virtual void setDimX(int x);
+    virtual void setDimY(int y);
 
 protected:
     // Input and output parametrization
-    // TODO: Move this to a 'parameterization' class.
-    params::input  _in_param;
-    params::output _out_param;
-    int _nX, _nY;
+    parameters _parameters;
     vec _min, _max;
 };
 
@@ -367,9 +363,6 @@ class product_function : public nonlinear_function
 		virtual void setMin(const vec& min);
 		virtual void setMax(const vec& max);
 		
-		//! Provide the output parametrization of the object.
-		virtual params::output output_parametrization() const;
-		
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const;
 		
@@ -403,8 +396,7 @@ class cosine_function : public nonlinear_function
 		// of transformations in a compound object.
     cosine_function()
     {
-        _in_param = params::CARTESIAN;
-        _nX = 6;
+        _parameters = alta::parameters(6, 0, params::CARTESIAN, params::UNKNOWN_OUTPUT);
     }
 
 		// Overload the function operator
@@ -414,8 +406,10 @@ class cosine_function : public nonlinear_function
 		}
 		virtual vec value(const vec& x) const
 		{
-			vec res(dimY());
-			for(int i=0; i<dimY(); ++i) { res[i] = ((x[2] > 0.0) ? x[2] : 0.0) * ((x[5] > 0.0) ? x[5] : 0.0); }
+			vec res(parametrization().dimY());
+			for(int i=0; i<parametrization().dimY(); ++i) {
+          res[i] = ((x[2] > 0.0) ? x[2] : 0.0) * ((x[5] > 0.0) ? x[5] : 0.0);
+      }
 			return res;
 		}
 

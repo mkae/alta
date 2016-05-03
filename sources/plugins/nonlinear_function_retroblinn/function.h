@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -58,7 +58,7 @@ class retroblinn_function : public nonlinear_function
 		 //! exponent should not be either.
 		 virtual vec getParametersMin() const
 		 {
-			 return vec::Zero(dimY()*2);
+			 return vec::Zero(_parameters.dimY()*2);
 		 }
 
 		 //! \brief Update the vector of parameters for the function
@@ -68,32 +68,15 @@ class retroblinn_function : public nonlinear_function
 		 //! parameters. 
 		 virtual vec parametersJacobian(const vec& x) const ;
 
-		 //! \brief Provide the dimension of the input space of the function
-		 virtual int dimX() const
-		 {
-			 return 1 ;
-		 }
-
-		 //! \brief Provide the parametrization of the input space of the 
-		 //! function.
-		 virtual params::input input_parametrization() const
-		 {
-			 return params::COS_TK ;
-		 }
-		 virtual void setParametrization(params::input new_param)
-		 {
-			 std::cerr << "Cannot change the input parametrization " 
-			           << __FILE__ << ":" << __LINE__ << std::endl;
-			 throw;
-		 }
-
 		 void setDimY(int nY)
 		 {
-			 _nY = nY ;
+       _parameters = alta::parameters(_parameters.dimX(), nY,
+                                      _parameters.input_parametrization(),
+                                      _parameters.output_parametrization());
 
 			 // Update the length of the vectors
-			 _ks.resize(_nY) ;
-			 _N.resize(_nY) ;
+			 _ks.resize(_parameters.dimY()) ;
+			 _N.resize(_parameters.dimY()) ;
 		 }
 
  		 //! \brief Export function

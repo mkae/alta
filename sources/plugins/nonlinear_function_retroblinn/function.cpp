@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -33,8 +33,8 @@ vec retroblinn_function::operator()(const vec& x) const
 }
 vec retroblinn_function::value(const vec& x) const 
 {
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         if(x[0] >= 0.0)
         {
@@ -82,7 +82,7 @@ bool retroblinn_function::load(std::istream& in)
 
     // ks [double]
 	 // N  [double]
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         in >> token >> _ks[i];
         in >> token >>  _N[i];
@@ -93,14 +93,14 @@ bool retroblinn_function::load(std::istream& in)
 //! Number of parameters to this non-linear function
 int retroblinn_function::nbParameters() const 
 {
-    return 2*dimY();
+    return 2*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec retroblinn_function::parameters() const 
 {
-    vec res(2*dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(2*_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i*2 + 0] = _ks[i];
         res[i*2 + 1] = _N[i];
@@ -112,7 +112,7 @@ vec retroblinn_function::parameters() const
 //! Update the vector of parameters for the function
 void retroblinn_function::setParameters(const vec& p) 
 {
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         _ks[i] = p[i*2 + 0];
         _N[i]  = p[i*2 + 1];
@@ -123,9 +123,9 @@ void retroblinn_function::setParameters(const vec& p)
 //! parameters. 
 vec retroblinn_function::parametersJacobian(const vec& x) const 
 {
-	vec jac(dimY()*nbParameters());
-	for(int i=0; i<dimY(); ++i)
-		for(int j=0; j<dimY(); ++j)
+	vec jac(_parameters.dimY()*nbParameters());
+	for(int i=0; i<_parameters.dimY(); ++i)
+		for(int j=0; j<_parameters.dimY(); ++j)
 		{
 			if(i == j)
 			{
@@ -155,7 +155,7 @@ vec retroblinn_function::parametersJacobian(const vec& x) const
 
 void retroblinn_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         _ks[i] = 1.0;
         _N[i]  = 1.0;
@@ -171,7 +171,7 @@ void retroblinn_function::save_call(std::ostream& out,
     {
 		out << "#FUNC nonlinear_function_retroblinn" << std::endl ;
 
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << "Ks " << _ks[i] << std::endl;
 			 out << "N  " <<  _N[i] << std::endl;
@@ -182,17 +182,17 @@ void retroblinn_function::save_call(std::ostream& out,
 	 else
 	 {
 		 out << "retroblinn(L, V, N, X, Y, vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _ks[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _N[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "))";

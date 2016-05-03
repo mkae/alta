@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -34,12 +34,12 @@ vec ward_function::operator()(const vec& x) const
 }
 vec ward_function::value(const vec& x) const 
 {
-	vec res(dimY());
+	vec res(_parameters.dimY());
 
 	double h[3];
 	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, &h[0]);
 
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		const double ax = _ax[i];
 		const double ay = _ay[i];
@@ -65,25 +65,27 @@ vec ward_function::value(const vec& x) const
 // Reset the output dimension
 void ward_function::setDimY(int nY)
 {
-    _nY = nY ;
+    _parameters = alta::parameters(_parameters.dimX(), nY,
+                                   _parameters.input_parametrization(),
+                                   _parameters.output_parametrization());
 
     // Update the length of the vectors
-    _ax.resize(_nY) ;
-    _ay.resize(_nY) ;
-    _ks.resize(_nY) ;
+    _ax.resize(_parameters.dimY()) ;
+    _ay.resize(_parameters.dimY()) ;
+    _ks.resize(_parameters.dimY()) ;
 }
 
 //! Number of parameters to this non-linear function
 int ward_function::nbParameters() const 
 {
-	return 3*dimY();
+	return 3*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec ward_function::parameters() const 
 {
-	vec res(3*dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec res(3*_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*3 + 0] = _ks[i];
 		res[i*3 + 1] = _ax[i];
@@ -95,8 +97,8 @@ vec ward_function::parameters() const
 //! \brief get the min values for the parameters
 vec ward_function::getParametersMin() const
 {
-	vec res(3*dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec res(3*_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*3 + 0] = 0.0;
 		res[i*3 + 1] = 0.0;
@@ -109,7 +111,7 @@ vec ward_function::getParametersMin() const
 //! Update the vector of parameters for the function
 void ward_function::setParameters(const vec& p) 
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_ks[i] = p[i*3 + 0];
 		_ax[i] = p[i*3 + 1];
@@ -125,10 +127,10 @@ vec ward_function::parametersJacobian(const vec& x) const
 	double h[3];
 	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, h);
 
-    vec jac(dimY()*nbParameters());
-	 for(int i=0; i<dimY(); ++i)
+    vec jac(_parameters.dimY()*nbParameters());
+	 for(int i=0; i<_parameters.dimY(); ++i)
 	 {
-		 for(int j=0; j<dimY(); ++j)
+		 for(int j=0; j<_parameters.dimY(); ++j)
 		 {
              if(i == j && x[2]*x[5]>0.0)
 			 {
@@ -163,7 +165,7 @@ vec ward_function::parametersJacobian(const vec& x) const
 		
 void ward_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_ks[i] = 1.0;
 		_ax[i] = 1.0;
@@ -209,7 +211,7 @@ bool ward_function::load(std::istream& in)
 	}
 
 	// Parse the lobe
-	for(int i=0; i<_nY; ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 
 		in >> token >> _ks[i];
@@ -228,7 +230,7 @@ void ward_function::save_call(std::ostream& out, const arguments& args) const
     {
 		out << "#FUNC nonlinear_function_ward" << std::endl ;
 
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << "Ks " << _ks[i] << std::endl;
 			 out << "ax " << _ax[i] << std::endl;
@@ -240,24 +242,24 @@ void ward_function::save_call(std::ostream& out, const arguments& args) const
 	 else
 	 {
 		 out << "ward(L, V, N, X, Y, vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _ks[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _ax[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _ay[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "))";

@@ -65,8 +65,8 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 		for(int i=0; i<inputs(); ++i) { _p[i] = x(i); }
 		_f->setParameters(_p);
 
-		const int nx = _f->dimX();
-		const int ny = _f->dimY();
+		const int nx = _f->parametrization().dimX();
+		const int ny = _f->parametrization().dimY();
 
 		for(int s=0; s<_d->size(); ++s)
 		{
@@ -76,7 +76,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			vec x(nx);
 			params::convert(&_x[0],
                       _d->parametrization().input_parametrization(),
-                      _f->input_parametrization(),
+                      _f->parametrization().input_parametrization(),
                       &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
@@ -122,10 +122,10 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			vec xi = _d->get(s);
 			
 			// Convert the sample point into the function space
-			vec x(_f->dimX());
+			vec x(_f->parametrization().dimX());
 			params::convert(&xi[0],
                       _d->parametrization().input_parametrization(),
-                      _f->input_parametrization(),
+                      _f->parametrization().input_parametrization(),
                       &x[0]);
 
 			// Compute the cosine factor. Only update the constant if the flag
@@ -148,7 +148,7 @@ struct EigenFunctor: Eigen::DenseFunctor<double>
 			{
 				// For each output channel, update the subpart of the
 				// vector row
-				for(int i=0; i<_f->dimY(); ++i)
+				for(int i=0; i<_f->parametrization().dimY(); ++i)
 				{
 					fjac(i*_d->size() + s, j) = - cos * _jac[i*_f->nbParameters() + j];
 				}
@@ -207,21 +207,21 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 				cos = cart[5];
 			}
 
-			vec _di = vec(f->dimY());
-			for(int i=0; i<f->dimY(); ++i)
-				_di[i] = _x[f->dimX() + i];
+			vec _di = vec(f->parametrization().dimY());
+			for(int i=0; i<f->parametrization().dimY(); ++i)
+				_di[i] = _x[f->parametrization().dimX() + i];
 
 			// Compute the value of the preceding functions
-			vec _fy = vec::Zero(f->dimY());
+			vec _fy = vec::Zero(f->parametrization().dimY());
 			for(int i=0; i<_index+1; ++i)
 			{
                 const nonlinear_function* f = (*_f)[i];
-                if(f->input_parametrization() != _d->parametrization().input_parametrization())
+                if(f->parametrization().input_parametrization() != _d->parametrization().input_parametrization())
                 {
-                    vec x(f->dimX());
+                    vec x(f->parametrization().dimX());
                     params::convert(&_x[0],
                                     _d->parametrization().input_parametrization(),
-                                    f->input_parametrization(),
+                                    f->parametrization().input_parametrization(),
                                     &x[0]);
 
                     _fy += (*f)(x);
@@ -234,7 +234,7 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 
 			// Should add the resulting vector completely
 			vec _y = _di - cos*_fy;
-			for(int i=0; i<f->dimY(); ++i)
+			for(int i=0; i<f->parametrization().dimY(); ++i)
 				y(i*_d->size() + s) = _y[i];
 
 		}
@@ -274,12 +274,12 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 
 			// Get the associated jacobian
             vec _jac;
-            if(f->input_parametrization() != _d->parametrization().input_parametrization())
+            if(f->parametrization().input_parametrization() != _d->parametrization().input_parametrization())
             {
-                vec x(f->dimX());
+                vec x(f->parametrization().dimX());
                 params::convert(&xi[0],
                                 _d->parametrization().input_parametrization(),
-                                f->input_parametrization(),
+                                f->parametrization().input_parametrization(),
                                 &x[0]);
 
                 _jac = f->parametersJacobian(x);
@@ -295,7 +295,7 @@ struct CompoundFunctor: Eigen::DenseFunctor<double>
 			{
 				// For each output channel, update the subpart of the
 				// vector row
-				for(int i=0; i<_f->dimY(); ++i)
+				for(int i=0; i<_f->parametrization().dimY(); ++i)
 				{
 					fjac(i*_d->size() + s, j) = - cos * _jac[i*f->nbParameters() + j];
 				}

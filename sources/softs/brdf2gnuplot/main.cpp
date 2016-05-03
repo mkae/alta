@@ -74,7 +74,8 @@ int main(int argc, char** argv)
 	// Should I export a BRDF or BRDF*cos ?
 	// Cannot export a cosine term if no parametrization is defined for the
 	// input function
-	const bool cos_plot = args.is_defined("cos-plot") && f->input_parametrization() != params::UNKNOWN_INPUT;
+	const bool cos_plot = args.is_defined("cos-plot")
+      && f->parametrization().input_parametrization() != params::UNKNOWN_INPUT;
 
 	// Load a data file
 	if(args.is_defined("data") || args.is_defined("data-file"))
@@ -125,17 +126,18 @@ int main(int argc, char** argv)
 		for(int i=0; i<d->size(); ++i)
 		{
 			vec v = d->get(i) ;
-			vec x(f->dimX());
+			vec x(f->parametrization().dimX());
 
 			// Convert the data to the function's input space.
-			if(f->input_parametrization() == params::UNKNOWN_INPUT)
+			if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
 			{
-				memcpy(&x[0], &v[0], f->dimX()*sizeof(double));
+        memcpy(&x[0], &v[0], f->parametrization().dimX()*sizeof(double));
 			}
 			else
 			{
 				params::convert(&v[0], d->parametrization().input_parametrization(),
-                        f->input_parametrization(), &x[0]);
+                        f->parametrization().input_parametrization(),
+                        &x[0]);
 			}
 
 			// Evaluate the function. I can add the cosine term to the BRDF
@@ -144,7 +146,8 @@ int main(int argc, char** argv)
 			if(cos_plot) 
 			{
 				double cart[6];
-				params::convert(&x[0], f->input_parametrization(), params::CARTESIAN, cart);
+				params::convert(&x[0], f->parametrization().input_parametrization(),
+                        params::CARTESIAN, cart);
 				costerm = cart[5]*cart[2];
 			}
 			vec y2 = costerm * f->value(x) ;
@@ -199,12 +202,13 @@ int main(int argc, char** argv)
 			spherical[2] = 0.5 * M_PI * double(i) / double(N);
 			spherical[3] = M_PI;
 
-			vec x(f->dimX());
-			params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, f->input_parametrization(), &x[0]);
+			vec x(f->parametrization().dimX());
+			params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV,
+                      f->parametrization().input_parametrization(), &x[0]);
 
 			vec y = f->value(x);
 			file << -spherical[2] << "\t";
-			for(int k=0; k<f->dimY(); ++k) { file << y[k] << "\t"; }
+			for(int k=0; k<f->parametrization().dimY(); ++k) { file << y[k] << "\t"; }
 			file << std::endl;
 		}
 
@@ -214,12 +218,13 @@ int main(int argc, char** argv)
 			spherical[2] = 0.5 * M_PI * double(i) / double(N);
 			spherical[3] = 0.0;
 
-			vec x(f->dimX());
-			params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV, f->input_parametrization(), &x[0]);
+			vec x(f->parametrization().dimX());
+			params::convert(&spherical[0], params::SPHERICAL_TL_PL_TV_PV,
+                      f->parametrization().input_parametrization(), &x[0]);
 
 			vec y = f->value(x);
 			file << spherical[2] << "\t";
-			for(int k=0; k<f->dimY(); ++k) { file << y[k] << "\t"; }
+			for(int k=0; k<f->parametrization().dimY(); ++k) { file << y[k] << "\t"; }
 			file << std::endl;
 		}
 			file.close();

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -31,8 +31,9 @@ class smith : public nonlinear_function//fresnel
 
 		smith()
 		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+        _parameters = alta::parameters(6, 0,
+                                       params::CARTESIAN,
+                                       params::UNKNOWN_OUTPUT);
 		}
 
 		//! \brief Load function specific files

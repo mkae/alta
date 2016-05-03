@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -75,15 +75,15 @@ class rational_function_legendre : public rational_function
 		virtual rational_function_1d* get(int i)
 		{
 			// Check for consistency in the index of color channel
-			if(i < _nY)
+      if(i < _parameters.dimY())
 			{
 				if(rs[i] == NULL)
 				{
-					rs[i] = new rational_function_legendre_1d(dimX(), np, nq);
+					rs[i] = new rational_function_legendre_1d(_parameters.dimX(), np, nq);
 					
 					vec _min = min();
 					vec _max = max();
-					for(int k=0; k<dimX(); ++k)
+					for(int k=0; k<_parameters.dimX(); ++k)
 					{
 						if(_min[k] == _max[k])
 						{

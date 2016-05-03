@@ -35,13 +35,13 @@ class Error
    public:
       static vec meanSquareError(ptr<data> const & data, ptr<function> const & f )
       {
-         vec mse = vec::Zero( f->dimY() );
+         vec mse = vec::Zero( f->parametrization().dimY() );
 
          vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
          //Note that: data_x = dat.head( data->parametrization().dimX() );
          //           data_y = dat.tail( data->parametrization().dimY() );
-         vec f_y = vec::Zero( f->dimY() );
+         vec f_y = vec::Zero( f->parametrization().dimY() );
 
          for(unsigned int i=0; i < (unsigned int) data->size(); i++)
          {
@@ -74,13 +74,13 @@ class Norm
    public:
       static vec L2( ptr<data> const & data, ptr<function> const & f )
       {
-         vec l2 = vec::Zero( f->dimY() );
+         vec l2 = vec::Zero( f->parametrization().dimY() );
 
          vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
          //Note that: data_x = dat.head( data->parametrization().dimX() );
          //           data_y = dat.tail( data->parametrization().dimY() );
-         vec f_y = vec::Zero( f->dimY() );
+         vec f_y = vec::Zero( f->parametrization().dimY() );
 
          for(unsigned int i=0; i < (unsigned int) data->size(); i++)
          {
@@ -96,7 +96,7 @@ class Norm
 
       static vec weightedL2( ptr<data> const & data, ptr<function> const & f, vec const & weights)
       {
-         vec l2 = vec::Zero( f->dimY() );
+         vec l2 = vec::Zero( f->parametrization().dimY() );
 
          vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
@@ -111,7 +111,7 @@ class Norm
 
       static vec LInf( ptr<data> const & data, ptr<function> const & f )
       {
-         vec max = vec::Zero( f->dimY() );
+         vec max = vec::Zero( f->parametrization().dimY() );
 
          vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
@@ -129,7 +129,7 @@ class Norm
 
       static vec L1( ptr<data> const & data, ptr<function> const & f )
       {
-         vec L1 = vec::Zero( f->dimY() );
+         vec L1 = vec::Zero( f->parametrization().dimY() );
 
          vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
@@ -157,12 +157,12 @@ class Norm
          // This is another strategy to compute the norm
          // First we put all the data into Eigen::Array
          // Then we perform the computation on the big array directly
-         Eigen::ArrayXd  a_Lp = Eigen::ArrayXd::Zero( f->dimY() );
-         Eigen::ArrayXXd  all_data_y( data->size(), f->dimY() );
-         all_data_y.setZero(data->size(), f->dimY());
+         Eigen::ArrayXd  a_Lp = Eigen::ArrayXd::Zero( f->parametrization().dimY() );
+         Eigen::ArrayXXd  all_data_y( data->size(), f->parametrization().dimY() );
+         all_data_y.setZero(data->size(), f->parametrization().dimY());
 
-         Eigen::ArrayXXd  all_y_fx( data->size(), f->dimY() );
-         all_y_fx.setZero(data->size(), f->dimY());
+         Eigen::ArrayXXd  all_y_fx( data->size(), f->parametrization().dimY() );
+         all_y_fx.setZero(data->size(), f->parametrization().dimY());
 
          //timer chrono;
          //chrono.start();
@@ -205,9 +205,9 @@ bool convertDataToFunctionParam(ptr<data> const & d,
       vertical_segment* & converted_data )
 {
    conversion_necessary = true;
-   if( d->parametrization().input_parametrization() == f->input_parametrization() )
+   if( d->parametrization().input_parametrization() == f->parametrization().input_parametrization() )
    {
-      if( d->parametrization().output_parametrization() == f->output_parametrization() )
+      if( d->parametrization().output_parametrization() == f->parametrization().output_parametrization() )
       {
          conversion_necessary = false;
          return true;
@@ -215,8 +215,8 @@ bool convertDataToFunctionParam(ptr<data> const & d,
       else // Ouput parametrizations are different.
          // Output parametrization of  the Function prevails
       {
-         parameters p(f->dimX(), f->dimY(),
-                      f->input_parametrization(), f->output_parametrization());
+         parameters p(f->parametrization().dimX(), f->parametrization().dimY(),
+                      f->parametrization().input_parametrization(), f->parametrization().output_parametrization());
          converted_data = new vertical_segment(p, d->size());
 
          //Note that: data_x = dat.head( data->parametrization().dimX() );
@@ -224,8 +224,8 @@ bool convertDataToFunctionParam(ptr<data> const & d,
          vec dat        = vec::Zero(d->parametrization().dimX() + d->parametrization().dimY());
          vec data_x     = vec::Zero(d->parametrization().dimX());
          vec data_y     = vec::Zero(d->parametrization().dimY());
-         vec new_data_y = vec::Zero(f->dimY());
-         vec new_data   = vec::Zero(d->parametrization().dimX() + f->dimY());
+         vec new_data_y = vec::Zero(f->parametrization().dimY());
+         vec new_data   = vec::Zero(d->parametrization().dimX() + f->parametrization().dimY());
 
          for( unsigned int i=0; i < converted_data->size(); i++)
          {
@@ -236,12 +236,12 @@ bool convertDataToFunctionParam(ptr<data> const & d,
             params::convert(&data_y[0],
                             d->parametrization().output_parametrization(),
                             d->parametrization().dimY(),
-                            f->output_parametrization(),
-                            f->dimY(),
+                            f->parametrization().output_parametrization(),
+                            f->parametrization().dimY(),
                             &new_data_y[0]);
 
             new_data.head(d->parametrization().dimX()) = data_x;
-            new_data.tail(f->dimY()) = new_data_y;
+            new_data.tail(f->parametrization().dimY()) = new_data_y;
 
             converted_data->set(i, new_data );
          }
@@ -250,10 +250,10 @@ bool convertDataToFunctionParam(ptr<data> const & d,
    } else {
       // Input parametrization are different & Output param are the same
       // Converting to the function input parametrization
-      if( d->parametrization().output_parametrization() == f->output_parametrization() )
+      if( d->parametrization().output_parametrization() == f->parametrization().output_parametrization() )
       {
-         parameters p(f->dimX(), f->dimY(),
-                      f->input_parametrization(), f->output_parametrization());
+         parameters p(f->parametrization().dimX(), f->parametrization().dimY(),
+                      f->parametrization().input_parametrization(), f->parametrization().output_parametrization());
 
          converted_data = new vertical_segment(p, d->size());
 
@@ -263,9 +263,9 @@ bool convertDataToFunctionParam(ptr<data> const & d,
          vec data_x     = vec::Zero(d->parametrization().dimX());
          vec data_y     = vec::Zero(d->parametrization().dimY());
 
-         vec new_data   = vec::Zero(f->dimX() + f->dimY());
-         vec new_data_y = vec::Zero(f->dimY());
-         vec new_data_x = vec::Zero(f->dimX());
+         vec new_data   = vec::Zero(f->parametrization().dimX() + f->parametrization().dimY());
+         vec new_data_y = vec::Zero(f->parametrization().dimY());
+         vec new_data_x = vec::Zero(f->parametrization().dimX());
 
          for(auto i=0; i<converted_data->size(); i++) {
             dat    = d->get(i);
@@ -274,20 +274,20 @@ bool convertDataToFunctionParam(ptr<data> const & d,
 
             params::convert(data_x.data(),
                             d->parametrization().input_parametrization(),
-                            f->input_parametrization(),
+                            f->parametrization().input_parametrization(),
                             new_data_x.data());
 
-            new_data.head(f->dimX()) = new_data_x;
-            new_data.tail(f->dimY()) = data_y;
+            new_data.head(f->parametrization().dimX()) = new_data_x;
+            new_data.tail(f->parametrization().dimY()) = data_y;
 
             converted_data->set(i, new_data);
          }
       }
       else //EVERYTHING IS DIFFERENT ! ALL TO FUNCTION PARAMETRIZATIONS
       {
-         //       unsigned int const new_size = f->dimX() + f->dimY();
-         // converted_data = new vertical_segment( f->dimX(), f->dimY(), data->size() );
-         // converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+         //       unsigned int const new_size = f->parametrization().dimX() + f->parametrization().dimY();
+         // converted_data = new vertical_segment( f->parametrization().dimX(), f->parametrization().dimY(), data->size() );
+         // converted_data->setParametrizations( f->parametrization().input_parametrization(), f->parametrization().output_parametrization() );
 
          // for( unsigned int i=0; i < converted_data->size(); i++)
          // {

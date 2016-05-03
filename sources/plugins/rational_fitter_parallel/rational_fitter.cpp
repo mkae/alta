@@ -152,10 +152,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
           std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
           throw;
       }
-      rk->setParametrization(r->input_parametrization());
-      rk->setParametrization(r->output_parametrization());
-      rk->setDimX(r->dimX()) ;
-      rk->setDimY(r->dimY()) ;
+      rk->setParametrization(r->parametrization());
       rk->setMin(r->min()) ;
       rk->setMax(r->max()) ;
 

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -61,10 +61,10 @@ class isotropic_lafortune_function : public nonlinear_function
 
 	public: // methods
 
-		isotropic_lafortune_function() : _n(1) 
-		{ 
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+		isotropic_lafortune_function() : _n(1)
+		{
+        _parameters = alta::parameters(6, 0,
+                                       params::CARTESIAN, params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator
@@ -118,9 +118,9 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! n for the color channel number c.
 		inline void getCurrentLobe(int n, int c, double& Cx, double& Cz, double& N) const 
 		{
-			Cx = _C[(n*_nY + c)*2 + 0];
-			Cz = _C[(n*_nY + c)*2 + 1];
-			N  = _N[n*_nY + c];
+			Cx = _C[(n*_parameters.dimY() + c)*2 + 0];
+			Cz = _C[(n*_parameters.dimY() + c)*2 + 1];
+			N  = _N[n*_parameters.dimY() + c];
 		}
 
 

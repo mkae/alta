@@ -63,10 +63,10 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		}
 		
 		// Convert the sample point into the function space
-		vec x(f->dimX());
+		vec x(f->parametrization().dimX());
 		params::convert(&xi[0],
                     d->parametrization().input_parametrization(),
-                    f->input_parametrization(),
+                    f->parametrization().input_parametrization(),
                     &x[0]);
  
 		// Get the jacobian of the function at position x_i for the current
@@ -81,7 +81,7 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		{
 			// For each output channel, update the subpart of the
 			// vector row
-			for(int i=0; i<f->dimY(); ++i)
+			for(int i=0; i<f->parametrization().dimY(); ++i)
 			{
 				fjac[j] += 2 * _y[i] * _jac[i*f->nbParameters() + j];
 			}
@@ -114,15 +114,15 @@ double f(unsigned n, const double* x, double* dy, void* dat)
 		}
 
 		// Convert the sample point into the function space
-		vec x(_f->dimX());
+		vec x(_f->parametrization().dimX());
 		params::convert(&xi[0],
                     _d->parametrization().input_parametrization(),
-                    _f->input_parametrization(),
+                    _f->parametrization().input_parametrization(),
                     &x[0]);
 
 		// Should add the resulting vector completely
 		vec _y = (*_f)(x) - _di;
-		for(int i=0; i<_f->dimY(); ++i)
+		for(int i=0; i<_f->parametrization().dimY(); ++i)
 		{
 			y += pow(_y[i], 2);
 		}

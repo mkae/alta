@@ -34,7 +34,7 @@ class CeresFunctor : public ceres::CostFunction
 	public:
 		CeresFunctor(const ptr<nonlinear_function>& f, const vec& xi, const arguments& args) : _f(f), _xi(xi)
 		{
-			set_num_residuals(f->dimY());
+			set_num_residuals(f->parametrization().dimY());
 			mutable_parameter_block_sizes()->push_back(f->nbParameters());
 
 			_log_fit = args.is_defined("log-fit");
@@ -59,15 +59,15 @@ class CeresFunctor : public ceres::CostFunction
 			for(int i=0; i<_f->nbParameters(); ++i) { _p[i] = x[0][i]; }
 			_f->setParameters(_p);
 
-			vec _di = vec(_f->dimY());
-			for(int i=0; i<_f->dimY(); ++i)
+			vec _di = vec(_f->parametrization().dimY());
+			for(int i=0; i<_f->parametrization().dimY(); ++i)
 			{
-				_di[i] = _xi[_f->dimX() + i];
+				_di[i] = _xi[_f->parametrization().dimX() + i];
 			}
 
 			const vec _yi = _f->value(_xi);
 			const vec _y = _di - _yi;
-			for(int i=0; i<_f->dimY(); ++i)
+			for(int i=0; i<_f->parametrization().dimY(); ++i)
 			{
 				y[i] = (_log_fit) ? log(1.0 + _di[i]) - log(1.0 + _yi[i]) : _y[i] ;
 			}
@@ -90,7 +90,7 @@ class CeresFunctor : public ceres::CostFunction
 
 			// For each output channel, update the subpart of the
 			// vector row
-			for(int i=0; i<_f->dimY(); ++i)
+			for(int i=0; i<_f->parametrization().dimY(); ++i)
 			{
 				// Fill the columns of the matrix
 				for(int j=0; j<_f->nbParameters(); ++j)
@@ -119,10 +119,8 @@ nonlinear_fitter_ceres::~nonlinear_fitter_ceres()
 
 bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
-    // I need to set the dimension of the resulting function to be equal
-    // to the dimension of my fitting problem
-    fit->setDimX(d->parametrization().dimX()) ;
-    fit->setDimY(d->parametrization().dimY()) ;
+    // XXX: FIT and D may have different values of dimX() and dimY(), but
+    // this is fine: we convert values as needed in operator().
     fit->setMin(d->min()) ;
     fit->setMax(d->max()) ;
 
@@ -157,14 +155,14 @@ bool nonlinear_fitter_ceres::fit_data(const ptr<data>& d, ptr<function>& fit, co
 	 for(int i=0; i<d->size(); ++i)
 	 {
 		 vec xi = d->get(i);
-		 vec xf(nf->dimX() + nf->dimY());
+		 vec xf(nf->parametrization().dimX() + nf->parametrization().dimY());
 
 		 // Convert the sample to be in the parametrizatio of the function
 		 params::convert(&xi[0], d->parametrization().input_parametrization(),
-                     nf->input_parametrization(), &xf[0]);
-		 for(int k=0; k<nf->dimY(); ++k)
+                     nf->parametrization().input_parametrization(), &xf[0]);
+		 for(int k=0; k<nf->parametrization().dimY(); ++k)
 		 {
-         xf[nf->dimX() + k] = xi[d->parametrization().dimX() + k];
+         xf[nf->parametrization().dimX() + k] = xi[d->parametrization().dimX() + k];
 		 }
 
 		 problem.AddResidualBlock(new CeresFunctor(nf, xf, args), NULL, &p[0]);

@@ -111,25 +111,25 @@ class altaNLP : public Ipopt::TNLP
 
 				// This plugin can for the moment only account for function and data
 				// of the same output size. TODO: Add conversion between spaces.
-				assert(_d->parametrization().dimY() == _f->dimY());
+				assert(_d->parametrization().dimY() == _f->parametrization().dimY());
 				const int dDimX = _d->parametrization().dimX();
 
 				// Extract the objective from the current vector
-				vec _di = vec(_f->dimY());
-				for(int i=0; i<_f->dimY(); ++i)
+				vec _di = vec(_f->parametrization().dimY());
+				for(int i=0; i<_f->parametrization().dimY(); ++i)
 				{
 					_di[i] = _x[dDimX + i];
 				}
 
 				// Convert the sample point into the function space
-				vec x(_f->dimX());
+				vec x(_f->parametrization().dimX());
 				params::convert(&_x[0], _d->parametrization().input_parametrization(),
-                        _f->input_parametrization(), &x[0]);
+                        _f->parametrization().input_parametrization(), &x[0]);
 
 				// Compute the difference vector and add its
 				// components to the obj_value
 				vec _y = _di - _f->value(x);
-				for(int i=0; i<_f->dimY(); ++i)
+				for(int i=0; i<_f->parametrization().dimY(); ++i)
 				{
 					obj_value += pow(_y[i], 2);
 				}
@@ -157,16 +157,16 @@ class altaNLP : public Ipopt::TNLP
 				const int dDimX = _d->parametrization().dimX();
 
 				// Extract the objective from the current vector
-				vec _di = vec(_f->dimY());
-				for(int i=0; i<_f->dimY(); ++i)
+				vec _di = vec(_f->parametrization().dimY());
+				for(int i=0; i<_f->parametrization().dimY(); ++i)
 				{
 					_di[i] = _x[dDimX + i];
 				}
 				
 				// Convert the sample point into the function space
-				vec x(_f->dimX());
+				vec x(_f->parametrization().dimX());
 				params::convert(&_x[0], _d->parametrization().input_parametrization(),
-                        _f->input_parametrization(), &x[0]);
+                        _f->parametrization().input_parametrization(), &x[0]);
 
 				// Compute the difference vector and add its
 				// components to the obj_value
@@ -181,7 +181,7 @@ class altaNLP : public Ipopt::TNLP
 				{
 					// For each output channel, update the subpart of the
 					// vector row
-					for(int i=0; i<_f->dimY(); ++i)
+					for(int i=0; i<_f->parametrization().dimY(); ++i)
 					{
 						grad_f[j] += 2 * _y[i] * _jac[i*_f->nbParameters() + j];
 					}
@@ -243,10 +243,8 @@ nonlinear_fitter_ipopt::~nonlinear_fitter_ipopt()
 
 bool nonlinear_fitter_ipopt::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
-	// I need to set the dimension of the resulting function to be equal
-	// to the dimension of my fitting problem
-	fit->setDimX(d->parametrization().dimX()) ;
-	fit->setDimY(d->parametrization().dimY()) ;
+  // XXX: FIT and D may have different values of dimX() and dimY(), but
+  // this is fine: we convert values as needed in operator().
 	fit->setMin(d->min()) ;
 	fit->setMax(d->max()) ;
 

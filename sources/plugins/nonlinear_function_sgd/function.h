@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2014 Inria
+   Copyright (C) 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -30,8 +30,9 @@ class shifted_gamma_function : public nonlinear_function
 
 		shifted_gamma_function()
 		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+        _parameters = alta::parameters(6, 0,
+                                       params::CARTESIAN,
+                                       params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -47,10 +47,11 @@ class ward_function : public nonlinear_function
 	public: // methods
 
 		ward_function()
-        {
-            isotropic = false;
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
+    {
+        isotropic = false;
+        _parameters = alta::parameters(6, 0,
+                                       params::CARTESIAN,
+                                       params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator
@@ -85,12 +86,6 @@ class ward_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 6;
-		}
-		
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);
 

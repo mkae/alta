@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -28,8 +28,9 @@ ALTA_DLL_EXPORT function* provide_function()
 
 schlick::schlick()
 {
-	setParametrization(params::CARTESIAN);
-	setDimX(6);
+  // XXX: Partial parametrization.
+  setParametrization(alta::parameters(6, 0,
+                                      params::CARTESIAN, params::UNKNOWN_OUTPUT));
 }
 
 //! Load function specific files
@@ -64,7 +65,7 @@ bool schlick::load(std::istream& in)
     }
 
 	// R [double]
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         in >> token >> R[i];
     }
@@ -78,7 +79,7 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
 	if(is_alta)
 	{
         out << "#FUNC nonlinear_fresnel_normalized_schlick" << std::endl ;
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
             out << "R " << R[i] << std::endl;
         }
@@ -87,10 +88,10 @@ void schlick::save_call(std::ostream& out, const arguments& args) const
 	else
 	{
         out << "normalized_schlick_fresnel(L, V, N, X, Y, vec3(";
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
             out << R[i];
-            if(i < _nY-1) { out << ", "; }
+            if(i < _parameters.dimY()-1) { out << ", "; }
         }
         out << "))";
 	}
@@ -116,15 +117,17 @@ void schlick::save_body(std::ostream& out, const arguments& args) const
 vec schlick::value(const vec& x) const
 {
     vec xp(3), cart(6);
-    params::convert(&x[0], input_parametrization(), params::RUSIN_VH, &xp[0]);
-    params::convert(&x[0], input_parametrization(), params::CARTESIAN, &cart[0]);
+    params::convert(&x[0], _parameters.input_parametrization(),
+                    params::RUSIN_VH, &xp[0]);
+    params::convert(&x[0], _parameters.input_parametrization(),
+                    params::CARTESIAN, &cart[0]);
 	 //std::cout << xp << " ===== " << cart << std::endl;
 
 
     const double dotVH = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
 
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i] = 1.0 + (1.0/R[i] - 1.0) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
     }
@@ -139,7 +142,7 @@ vec schlick::value(const vec& x) const
 //! \brief Number of parameters to this non-linear function
 int schlick::nbParameters() const 
 {
-    return dimY();
+    return _parameters.dimY();
 }
 
 vec schlick::getParametersMin() const
@@ -159,25 +162,27 @@ vec schlick::getParametersMax() const
 //! \brief Get the vector of parameters for the function
 vec schlick::parameters() const 
 {
-    vec p(dimY());
-    for(int i=0; i<dimY(); ++i) { p[i] = R[i]; }
+    vec p(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i) { p[i] = R[i]; }
 	return p;
 }
 
 //! \brief Update the vector of parameters for the function
 void schlick::setParameters(const vec& p) 
 {
-    for(int i=0; i<dimY(); ++i) { R[i] = p[i]; }
+    for(int i=0; i<_parameters.dimY(); ++i) { R[i] = p[i]; }
 }
 
 //! \brief Obtain the derivatives of the function with respect to the
 //! parameters. 
 vec schlick::parametersJacobian(const vec& x) const 
 {
-	const int nY = dimY();
+	const int nY = _parameters.dimY();
     double xp[3], cart[6];
-    params::convert(&x[0], input_parametrization(), params::RUSIN_VH, xp);
-    params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
+    params::convert(&x[0], _parameters.input_parametrization(),
+                    params::RUSIN_VH, xp);
+    params::convert(&x[0], _parameters.input_parametrization(),
+                    params::CARTESIAN, cart);
 
     const double dotVH = xp[0]*cart[0] + xp[1]*cart[1] + xp[2]*cart[2];
 
@@ -187,9 +192,9 @@ vec schlick::parametersJacobian(const vec& x) const
         for(int j=0; j<nY; ++j)
         {
             if(i == j) {
-                jac[j*dimY() + i] = - (1.0/R[i]) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
+                jac[j*_parameters.dimY() + i] = - (1.0/R[i]) * pow(1.0 - clamp(dotVH, 0.0, 1.0), 5.0);
             } else {
-                jac[j*dimY() + i] = 0.0;
+                jac[j*_parameters.dimY() + i] = 0.0;
             }
         }
     }
@@ -200,7 +205,7 @@ vec schlick::parametersJacobian(const vec& x) const
 
 void schlick::bootstrap(const ptr<data> d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i) 
+    for(int i=0; i<_parameters.dimY(); ++i) 
     { 
         R[i] = 0.5; 
     }

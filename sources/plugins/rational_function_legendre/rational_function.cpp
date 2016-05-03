@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -50,7 +50,7 @@ double rational_function_legendre_1d::p(const vec& x, int i) const
 {
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0;
-	for(int k=0; k<dimX(); ++k)
+	for(int k=0; k<_parameters.dimX(); ++k)
 	{
 		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
 	}

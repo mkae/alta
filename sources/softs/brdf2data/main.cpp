@@ -108,21 +108,22 @@ int main(int argc, char** argv)
 		const bool out_filled = d->size() == d_out->size();
 		const bool output_dif = args.is_defined("export-diff");
 
-		vec temp(f->dimX());
+		vec temp(f->parametrization().dimX());
 		for(int i=0; i<d->size(); ++i)
 		{
         // Copy the input vector
         vec x = d->get(i);
         // Convert the data to the function's input space.
-        if(f->input_parametrization() == params::UNKNOWN_INPUT)
+        if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
         {
-            memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
+            memcpy(&temp[0], &x[0], f->parametrization().dimX()*sizeof(double));
         }
         else
         {
             params::convert(&x[0],
                             d->parametrization().input_parametrization(),
-                            f->parametrization(), &temp[0]);
+                            f->parametrization().input_parametrization(),
+                            &temp[0]);
         }
         vec y = f->value(temp);
 

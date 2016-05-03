@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -190,10 +190,10 @@ class rational_function : public function
 		// Update the function
 		virtual void update(const ptr<rational_function>& r) 
 		{
-			assert(r->dimX() == dimX());
-			assert(r->dimY() == dimY());
+      assert(r->parametrization().dimX() == _parameters.dimX());
+      assert(r->parametrization().dimY() == _parameters.dimY());
 
-			for(int k=0; k<dimY(); ++k) 
+			for(int k=0; k < _parameters.dimY(); ++k)
 			{
 				get(k)->update(r->get(k));
 			}
@@ -207,10 +207,13 @@ class rational_function : public function
 
 		//! Set the dimension of the output space of the function. This function 
 		//! will update the size of the rs vector size.
-		virtual void setDimY(int nY) 
-		{ 
-			_nY = nY ;
-			rs.resize(nY);
+		virtual void setDimY(int nY)
+		{
+      parameters new_params(_parameters.dimX(), nY,
+                            _parameters.input_parametrization(),
+                            _parameters.output_parametrization());
+      _parameters = new_params;
+      rs.resize(nY);
 		}
 
 		//! \brief Set the size of the rational function. Any newly created 1D 
@@ -226,7 +229,7 @@ class rational_function : public function
 		virtual void clear()
 		{
 			rs.clear();
-			rs.resize(_nY);
+			rs.resize(_parameters.dimY());
 		}
 
 		virtual void setMin(const vec& min)

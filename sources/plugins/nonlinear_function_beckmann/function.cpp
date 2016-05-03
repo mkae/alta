@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -33,9 +33,9 @@ vec beckmann_function::G(const vec& x) const
 	//TThe code below is equivalent to the Walter approximation 
 	// for Smith67 Shadowing
 	// See also plugin nonlinear_shadowing_walter_smith
-	vec res(dimY());
+	vec res(_parameters.dimY());
 
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		const double cl = x[2] / (_a[i] * sqrt(1 - x[2]*x[2]));
 		const double cv = x[5] / (_a[i] * sqrt(1 - x[5]*x[5]));
@@ -64,9 +64,9 @@ vec beckmann_function::value(const vec& x) const
 	params::convert(&x[0], params::CARTESIAN, params::RUSIN_VH, &h[0]);
 
 	// Compute the Shadow term to init res
-	vec res = vec::Zero(dimY()); //G(x);
+	vec res = vec::Zero(_parameters.dimY()); //G(x);
 
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		const double a    = _a[i];
 		const double a2   = a*a;
@@ -88,24 +88,26 @@ vec beckmann_function::value(const vec& x) const
 // Reset the output dimension
 void beckmann_function::setDimY(int nY)
 {
-    _nY = nY ;
+    _parameters = alta::parameters(_parameters.dimX(), nY,
+                                   _parameters.input_parametrization(),
+                                   _parameters.output_parametrization());
 
     // Update the length of the vectors
-    _a.resize(_nY) ;
-    _ks.resize(_nY) ;
+    _a.resize(parametrization().dimY()) ;
+    _ks.resize(parametrization().dimY()) ;
 }
 
 //! Number of parameters to this non-linear function
 int beckmann_function::nbParameters() const 
 {
-	return 2*dimY();
+	return 2*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec beckmann_function::parameters() const 
 {
-	vec res(2*dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec res(2*_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*2 + 0] = _ks[i];
 		res[i*2 + 1] = _a[i];
@@ -116,8 +118,8 @@ vec beckmann_function::parameters() const
 //! \brief get the min values for the parameters
 vec beckmann_function::getParametersMin() const
 {
-	vec res(2*dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec res(2*_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*2 + 0] = 0.0;
 		res[i*2 + 1] = 0.0;
@@ -129,7 +131,7 @@ vec beckmann_function::getParametersMin() const
 //! Update the vector of parameters for the function
 void beckmann_function::setParameters(const vec& p) 
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_ks[i] = p[i*2 + 0];
 		_a[i]  = p[i*2 + 1];
@@ -147,10 +149,10 @@ vec beckmann_function::parametersJacobian(const vec& x) const
 	// Get the geometry term
 	//vec g = G(x);
 
-    vec jac(dimY()*nbParameters());
-	 for(int i=0; i<dimY(); ++i)
+    vec jac(_parameters.dimY()*nbParameters());
+	 for(int i=0; i<_parameters.dimY(); ++i)
 	 {
-		 for(int j=0; j<dimY(); ++j)
+		 for(int j=0; j<_parameters.dimY(); ++j)
 		 {
 			 if(i == j && h[2]>0.0 && x[2]*x[5]>0.0)
 			 {
@@ -188,7 +190,7 @@ void beckmann_function::bootstrap(const ptr<data> d, const arguments& args)
   }
   else //DEFAULT BOOTSTRAPING
   {
-		for(int i=0; i<dimY(); ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			_ks[i] = 1.0;
 			_a[i]  = 1.0;
@@ -233,7 +235,7 @@ bool beckmann_function::load(std::istream& in)
 	}
 
 	// Parse the lobe
-	for(int i=0; i<_nY; ++i)
+	for(int i=0; i<parametrization().dimY(); ++i)
 	{
 
 		in >> token >> _ks[i];
@@ -251,7 +253,7 @@ void beckmann_function::save_call(std::ostream& out, const arguments& args) cons
     {
 		out << "#FUNC nonlinear_function_beckmann" << std::endl ;
 
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << "Ks " << _ks[i] << std::endl;
 			 out << "a  " << _a[i]  << std::endl;
@@ -262,17 +264,17 @@ void beckmann_function::save_call(std::ostream& out, const arguments& args) cons
 	 else
 	 {
 		 out << "beckmann(L, V, N, X, Y, vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << _ks[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < parametrization().dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << _a[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < parametrization().dimY()-1) { out << ", "; }
 		 }
 		 out << "))";
 	 }

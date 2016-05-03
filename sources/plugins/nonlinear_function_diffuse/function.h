@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -71,7 +71,9 @@ class diffuse_function : public nonlinear_function
 
 		virtual void setDimY(int nY)
 		{
-			_nY = nY;
+      _parameters = alta::parameters(_parameters.dimX(), nY,
+                                     _parameters.input_parametrization(),
+                                     _parameters.output_parametrization());
 			_kd.resize(nY);
 		}
 

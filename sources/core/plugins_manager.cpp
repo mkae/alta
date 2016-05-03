@@ -190,7 +190,6 @@ function* plugins_manager::load_function(const std::string& filename)
   file.precision(10);
 
   // Parameters of the function object
-  int nX, nY;
   params::input param_in   = params::UNKNOWN_INPUT;
   params::output param_out = params::UNKNOWN_OUTPUT;
   arguments args;
@@ -211,22 +210,21 @@ function* plugins_manager::load_function(const std::string& filename)
   arguments header = arguments::parse_header(file);
 
   std::pair<int, int> dim = header.get_pair<int>("DIM");
-  nX = dim.first;
-  nY = dim.second;
 
   param_in = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
   param_out = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
   args = arguments::create_arguments(header["CMD"]);
 
+  parameters params(dim.first, dim.second, param_in, param_out);
+
   // Create the function from the command line
   function* f = get_function(args);
-  f->setDimX(nX);
-  f->setDimY(nY);
-  if(f->input_parametrization() == params::UNKNOWN_INPUT)
-  {
-    f->setParametrization(param_in);
-  }
-  f->setParametrization(param_out);
+  f->setParametrization(params);
+
+  // FIXME: Since the above is not quite the same as calling 'setDimY' (which
+  // is virtual), also call it from here.  TODO: Remove it ASAP.
+  f->setDimY(params.dimY());
+  f->setDimX(params.dimX());
 
   // Load the function part from the file object
   if( f->load(file) )
@@ -495,7 +493,7 @@ void plugins_manager::check_compatibility( ptr<data>& d,
                                            const arguments& args)
 {
   if(d->parametrization().input_parametrization() == params::UNKNOWN_INPUT &&
-    f->input_parametrization() == params::UNKNOWN_INPUT)
+    f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
   {
     std::cout << "<<WARNING>> both function and data objects have no parametrization" << std::endl;
   }
@@ -506,16 +504,20 @@ void plugins_manager::check_compatibility( ptr<data>& d,
       std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
     }
 
-    if(f->input_parametrization() == params::UNKNOWN_INPUT)
+    if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
     {
       std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
-      f->setParametrization(d->parametrization().input_parametrization());
+      parameters params(f->parametrization().dimX(),
+                        f->parametrization().dimY(),
+                        d->parametrization().input_parametrization(),
+                        f->parametrization().output_parametrization());
+      f->setParametrization(params);
     }
-    else if(d->parametrization().input_parametrization() != f->input_parametrization() && args.is_defined("change-param"))
+    else if(d->parametrization().input_parametrization() != f->parametrization().input_parametrization() && args.is_defined("change-param"))
     {
       std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->parametrization().input_parametrization()) << std::endl;
-      std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
-      ptr<data_params> dd = ptr<data_params>(new data_params(d, f->input_parametrization()));
+      std::cout << "<<INFO>> to " << params::get_name(f->parametrization().input_parametrization()) << std::endl;
+      ptr<data_params> dd = ptr<data_params>(new data_params(d, f->parametrization().input_parametrization()));
       d = dynamic_pointer_cast<data>(dd) ;
     }
     else
@@ -524,7 +526,7 @@ void plugins_manager::check_compatibility( ptr<data>& d,
     }
   }
 
-  if(f->dimY() != d->parametrization().dimY())
+  if(f->parametrization().dimY() != d->parametrization().dimY())
   {
     f->setDimY(d->parametrization().dimY());
   }

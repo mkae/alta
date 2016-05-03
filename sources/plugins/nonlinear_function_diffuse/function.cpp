@@ -27,10 +27,10 @@ ALTA_DLL_EXPORT function* provide_function()
 }
 
 diffuse_function::diffuse_function() 
-    : _kd( vec::Zero( dimY() ) )
+    : _kd( vec::Zero( _parameters.dimY() ) )
 {
-    setParametrization(params::CARTESIAN);
-    setDimX(6);
+    _parameters = alta::parameters(6, 0,
+                                   params::CARTESIAN, params::UNKNOWN_OUTPUT);
 }
 
 
@@ -42,8 +42,8 @@ vec diffuse_function::operator()(const vec& x) const
 }
 vec diffuse_function::value(const vec& x) const 
 {
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i] = _kd[i];
     }
@@ -83,7 +83,7 @@ bool diffuse_function::load(std::istream &in)
     }
 
     // kd [double]
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         in >> token >> _kd[i];
     }
@@ -98,7 +98,7 @@ void diffuse_function::save_call(std::ostream& out, const arguments& args) const
     if(is_alta)
     {
         out << "#FUNC nonlinear_function_diffuse" << std::endl ;
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
             out << "kd " << _kd[i] << std::endl;
         }
@@ -107,9 +107,9 @@ void diffuse_function::save_call(std::ostream& out, const arguments& args) const
     else
     {
         out << "vec3(";
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
-            out << _kd[i]; if(i < dimY()-1) { out << ", "; }
+            out << _kd[i]; if(i < _parameters.dimY()-1) { out << ", "; }
         }
         out << ")";
     }
@@ -120,7 +120,7 @@ void diffuse_function::save_call(std::ostream& out, const arguments& args) const
 int diffuse_function::nbParameters() const 
 {
 #ifdef FIT_DIFFUSE
-    return dimY();
+    return _parameters.dimY();
 #else
     return 0;
 #endif
@@ -130,8 +130,8 @@ int diffuse_function::nbParameters() const
 vec diffuse_function::parameters() const 
 {
 #ifdef FIT_DIFFUSE
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i*3 + 0] = _kd[i];
     }
@@ -145,7 +145,7 @@ vec diffuse_function::parameters() const
 void diffuse_function::setParameters(const vec& p) 
 {
 #ifdef FIT_DIFFUSE
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         _kd[i] = p[i];
     }
@@ -157,19 +157,19 @@ void diffuse_function::setParameters(const vec& p)
 vec diffuse_function::parametersJacobian(const vec& x) const 
 {
 #ifdef FIT_DIFFUSE
-	vec jac(dimY());
-	for(int i=0; i<dimY(); ++i)
-		for(int j=0; j<dimY(); ++j)
+	vec jac(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
+		for(int j=0; j<_parameters.dimY(); ++j)
 		{
 			if(i == j)
 			{
 				// df / dk_d
-				jac[i*dimY() + j] = 1.0;
+				jac[i*_parameters.dimY() + j] = 1.0;
 
 			}
 			else
 			{
-				jac[i*dimY() + j] = 0.0;
+				jac[i*_parameters.dimY() + j] = 0.0;
 			}
 		}
 #else

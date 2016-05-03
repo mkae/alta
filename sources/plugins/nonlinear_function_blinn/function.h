@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -44,9 +44,8 @@ class blinn_function : public nonlinear_function
 
 		blinn_function()
 		{
-			setParametrization(params::COS_TH);
-			setDimX(1);
-			setDimY(1);	
+        _parameters = alta::parameters(1, 1, params::COS_TH,
+                                       params::UNKNOWN_OUTPUT);
 		}
 
 		// Overload the function operator
@@ -71,7 +70,7 @@ class blinn_function : public nonlinear_function
 		//! exponent should not be either.
 		virtual vec getParametersMin() const
 		{
-			return vec::Zero(dimY()*2);
+			return vec::Zero(_parameters.dimY()*2);
 		}
 
 		//! \brief Update the vector of parameters for the function
@@ -81,19 +80,6 @@ class blinn_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 1 ;
-		}
-
-		//! \brief Provide the parametrization of the input space of the 
-		//! function.
-		virtual params::input input_parametrization() const
-		{
-			return params::COS_TH ;
-		}
-
 		void setDimY(int nY)
 		{
 			//CODE CONSISTENCY WITH THE OTHER PLUGIN
@@ -101,8 +87,8 @@ class blinn_function : public nonlinear_function
 			function::setDimY(nY);
 
 			// Update the length of the vectors
-			_ks.resize(_nY) ;
-			_N.resize(_nY) ;
+			_ks.resize(_parameters.dimY()) ;
+			_N.resize(_parameters.dimY()) ;
 		}
 
 		void save_call(std::ostream& out, const arguments& args) const;
