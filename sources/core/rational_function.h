@@ -203,7 +203,7 @@ class rational_function : public function
 		//! Get the 1D function associated with color channel i. If no one exist, 
 		//! this function allocates a new element. If i > nY, it returns NULL.
 		virtual rational_function_1d* get(int i) ;
-		virtual rational_function_1d* get(int i) const ;
+		virtual rational_function_1d* get(int i) const ALTA_DEPRECATED;
 
 		//! Set the dimension of the output space of the function. This function 
 		//! will update the size of the rs vector size.
