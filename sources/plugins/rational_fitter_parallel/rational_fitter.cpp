@@ -145,14 +145,16 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
       ptr<rational_function> rk(NULL);
       #pragma omp critical (args)
       {
-        rk = dynamic_pointer_cast<rational_function>(ptr<function>(plugins_manager::get_function(args)));
+        rk = dynamic_pointer_cast<rational_function>(
+            ptr<function>(plugins_manager::get_function(args,
+                                                        r->parametrization())));
       }
       if(!rk)
       {
           std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
           throw;
       }
-      rk->setParametrization(r->parametrization());
+
       rk->setMin(r->min()) ;
       rk->setMax(r->max()) ;
 

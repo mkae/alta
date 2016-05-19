@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -17,6 +17,7 @@
 #include "args.h"
 #include "function.h"
 #include "data.h"
+#include "params.h"
 #include "fitter.h"
 #include "args.h"
 #include "clustering.h"
@@ -42,7 +43,8 @@ class plugins_manager
 		//! \details
 		//! This function attemps to load the shared object file specified in the
 		//! <code>--func filename</code>.
-		static function* get_function(const arguments& args) ;
+		static function* get_function(const arguments& args,
+                                  const parameters& params);
 
 		//! \brief load a function from the ALTA input file.
 		static function* load_function(const std::string& filename);

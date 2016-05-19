@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -114,8 +114,8 @@ int main(int argc, char** argv)
 
     fit->set_parameters(args) ;
 
-    ptr<function> f = ptr<function>(plugins_manager::get_function(args));
     ptr<data>     d = ptr<data>(plugins_manager::get_data(args["data"], args));
+    ptr<function> f = ptr<function>(plugins_manager::get_function(args, d->parametrization()));
 
 		try
 		{

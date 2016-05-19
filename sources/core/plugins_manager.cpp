@@ -218,8 +218,7 @@ function* plugins_manager::load_function(const std::string& filename)
   parameters params(dim.first, dim.second, param_in, param_out);
 
   // Create the function from the command line
-  function* f = get_function(args);
-  f->setParametrization(params);
+  function* f = get_function(args, params);
 
   // FIXME: Since the above is not quite the same as calling 'setDimY' (which
   // is virtual), also call it from here.  TODO: Remove it ASAP.
@@ -238,7 +237,8 @@ function* plugins_manager::load_function(const std::string& filename)
 
 //! Get an instance of the function selected based on the name <em>n</em>.
 //! Return NULL if none exists.
-function* plugins_manager::get_function(const arguments& args)
+function* plugins_manager::get_function(const arguments& args,
+                                        const parameters& params)
 {
   #ifdef DEBUG
   std::cout << __FILE__ << " " << __LINE__ << std::endl;
@@ -250,7 +250,7 @@ function* plugins_manager::get_function(const arguments& args)
     #ifdef DEBUG
     std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
     #endif
-    return new rational_function();
+    return new rational_function(params);
   }
 
   // The function to be returned.
@@ -289,7 +289,7 @@ function* plugins_manager::get_function(const arguments& args)
       arguments temp_args = arguments::create_arguments(n);
 
       //Recursive call
-      function* f = get_function(temp_args);
+      function* f = get_function(temp_args, params);
       nonlinear_function *nl_f = dynamic_cast<nonlinear_function*>(f);
       if(nl_f == NULL)
       {
@@ -327,7 +327,7 @@ function* plugins_manager::get_function(const arguments& args)
     else
     {
       std::cerr << "<<ERROR>> no function provider found in file \"" << filename << "\"" << std::endl;
-      return new rational_function() ;
+      return new rational_function(params) ;
     }
   }
 
@@ -375,8 +375,10 @@ function* plugins_manager::get_function(const arguments& args)
       std::cout << __FILE__ << " " << __LINE__ << std::endl;
       std::cout << " n = " << n << std::endl;
       #endif
-       
-      nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
+
+      nonlinear_function* func_fres =
+          dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n),
+                                                         params));
       if(func_fres != NULL)
       {
         bool const fresnel_is_fixed = (args.is_defined("fixed-fresnel")) ? (true) : (false);
