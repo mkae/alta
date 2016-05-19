@@ -20,8 +20,12 @@
 
 using namespace alta;
 
-rational_function_1d::rational_function_1d()
+rational_function_1d::rational_function_1d(const parameters& params,
+                                           unsigned int np, unsigned int nq,
+                                           bool separable)
+    : function(params), _separable(separable)
 {
+    resize(np, nq);
 }
 
 rational_function_1d::rational_function_1d(int nX, unsigned int np, unsigned int nq, 
@@ -480,12 +484,28 @@ std::ostream& operator<< (std::ostream& out, const rational_function_1d& r)
 }
 
 #ifndef TODO
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 rational_function::rational_function() : np(0), nq(0)
 {
 }
 
 
 rational_function::rational_function(int np, int nq) : np(np), nq(nq)
+{
+}
+
+rational_function_1d::rational_function_1d()
+{
+}
+
+#pragma GCC diagnostic pop
+
+rational_function::rational_function(const parameters& params,
+                                     int np, int nq):
+    function(params), np(np), nq(nq)
 {
 }
 

@@ -176,8 +176,12 @@ class rational_function : public function
 
 	public: // methods
 
-		rational_function() ;
-		rational_function(int np, int nq) ;
+		rational_function() ALTA_DEPRECATED;
+		rational_function(int np, int nq) ALTA_DEPRECATED;
+
+    rational_function(const parameters& params,
+                      int np = 0, int nq = 0);
+
 		virtual ~rational_function() ;
 
 		// Overload the function operator
