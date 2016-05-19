@@ -38,13 +38,12 @@ class beckmann_function : public nonlinear_function
 
 	public: // methods
 
-		beckmann_function()
-		{
-        // XXX: Partial initialization.
-        setParametrization(alta::parameters(6, 0,
-                                            params::CARTESIAN,
-                                            params::UNKNOWN_OUTPUT));
-		}
+	  beckmann_function():
+      // XXX: Partial initialization.
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN,
+                                          params::UNKNOWN_OUTPUT))
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

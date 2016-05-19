@@ -28,12 +28,11 @@ class shifted_gamma_function : public nonlinear_function
 {
 	public: // methods
 
-		shifted_gamma_function()
-		{
-        _parameters = alta::parameters(6, 0,
-                                       params::CARTESIAN,
-                                       params::UNKNOWN_OUTPUT);
-		}
+    shifted_gamma_function():
+       nonlinear_function(alta::parameters(6, 0,
+                                           params::CARTESIAN,
+                                           params::UNKNOWN_OUTPUT))
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

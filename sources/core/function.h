@@ -38,8 +38,12 @@ class function
 {
 	public: // methods
 
-    function()
+    function() ALTA_DEPRECATED
         : _min(vec::Zero(0)), _max(vec::Zero(0)) { };
+
+    function(const parameters& params):
+        _parameters(params),
+        _min(vec::Zero(0)), _max(vec::Zero(0)) {};
 
 
 		/* NEEDED FUNCTIONS */
@@ -129,6 +133,11 @@ protected:
     vec _min, _max;
 };
 
+// Suppress warnings about the synthesized zero-argument constructors.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+
 /*! \brief Non-linear function interface
  *  \ingroup core
  *
@@ -145,6 +154,10 @@ protected:
 class nonlinear_function: public function
 {
 	public: // methods
+
+    nonlinear_function() ALTA_DEPRECATED;
+
+    nonlinear_function(const parameters& params): function(params) {};
 
 		//! \brief Provide a first rough fit of the function.
 		//!
@@ -307,6 +320,8 @@ class product_function : public nonlinear_function
 {
 	public: // methods
 
+    product_function() ALTA_DEPRECATED;
+
 		//! \brief Constructor of the product function, affect the two function
 		//! to already created nonlinear_function objects.
 		product_function(const ptr<nonlinear_function>& g1, const ptr<nonlinear_function>& g2, 
@@ -394,9 +409,11 @@ class cosine_function : public nonlinear_function
 	public:
 		// Set the input parametrization to CARTESIAN to reduce the number
 		// of transformations in a compound object.
-    cosine_function()
+    cosine_function():
+       nonlinear_function(alta::parameters(6, 0,
+                                           params::CARTESIAN,
+                                           params::UNKNOWN_OUTPUT))
     {
-        _parameters = alta::parameters(6, 0, params::CARTESIAN, params::UNKNOWN_OUTPUT);
     }
 
 		// Overload the function operator
@@ -440,3 +457,5 @@ class cosine_function : public nonlinear_function
 		}
 };
 }
+
+#pragma GCC diagnostic pop

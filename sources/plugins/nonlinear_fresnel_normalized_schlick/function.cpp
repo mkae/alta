@@ -26,11 +26,11 @@ ALTA_DLL_EXPORT function* provide_function()
 	return new schlick();
 }
 
-schlick::schlick()
+schlick::schlick():
+    // XXX: Partial parametrization.
+    nonlinear_function(alta::parameters(6, 0,
+                                        params::CARTESIAN, params::UNKNOWN_OUTPUT))
 {
-  // XXX: Partial parametrization.
-  setParametrization(alta::parameters(6, 0,
-                                      params::CARTESIAN, params::UNKNOWN_OUTPUT));
 }
 
 //! Load function specific files

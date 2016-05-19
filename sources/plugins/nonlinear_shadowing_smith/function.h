@@ -29,12 +29,11 @@ class smith : public nonlinear_function//fresnel
 
 	public: // methods
 
-		smith()
-		{
-        _parameters = alta::parameters(6, 0,
-                                       params::CARTESIAN,
-                                       params::UNKNOWN_OUTPUT);
-		}
+    smith():
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN,
+                                          params::UNKNOWN_OUTPUT))
+    {}
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;

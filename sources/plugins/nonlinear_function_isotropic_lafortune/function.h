@@ -61,11 +61,11 @@ class isotropic_lafortune_function : public nonlinear_function
 
 	public: // methods
 
-		isotropic_lafortune_function() : _n(1)
-		{
-        _parameters = alta::parameters(6, 0,
-                                       params::CARTESIAN, params::UNKNOWN_OUTPUT);
-		}
+		isotropic_lafortune_function():
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN, params::UNKNOWN_OUTPUT)),
+      _n(1)
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

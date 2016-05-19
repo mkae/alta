@@ -48,11 +48,10 @@ class abc_function : public nonlinear_function
 
 	public: // methods
 
-		abc_function()
-		{
-      _parameters = alta::parameters(1, 0,
-                                     params::COS_TH, params::UNKNOWN_OUTPUT);
-		}
+    abc_function():
+      nonlinear_function(alta::parameters(1, 0,
+                                          params::COS_TH, params::UNKNOWN_OUTPUT))
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

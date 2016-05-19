@@ -18,15 +18,16 @@ ALTA_DLL_EXPORT function* provide_function()
 }
 
 WalterSmith::WalterSmith() 
-: LOCAL_EPSILON (1e-6),
+:
+  nonlinear_function(alta::parameters(6, 0,
+                                      params::CARTESIAN, params::UNKNOWN_OUTPUT)),
+  LOCAL_EPSILON (1e-6),
   FUNCTION_NAME_TOKEN("nonlinear_shadowing_walter_smith")
 #ifdef WALTER_SMITH_EXACT
   ,
 SQRT_PI( 1.772453850905516 )
 #endif
 {
-    _parameters = alta::parameters(6, 0,
-                                   params::CARTESIAN, params::UNKNOWN_OUTPUT);
 }
 
 

@@ -293,7 +293,11 @@ void function::setDimY(int y)
 
 
 /*--- Non-linear functions implementation ----*/
-		
+
+nonlinear_function::nonlinear_function()
+{
+}
+
 bool nonlinear_function::load(std::istream& in)
 {
 	// Parse line until the next comment

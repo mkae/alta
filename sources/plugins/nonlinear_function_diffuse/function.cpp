@@ -27,10 +27,10 @@ ALTA_DLL_EXPORT function* provide_function()
 }
 
 diffuse_function::diffuse_function() 
-    : _kd( vec::Zero( _parameters.dimY() ) )
+    : _kd( vec::Zero( _parameters.dimY() ) ),
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN, params::UNKNOWN_OUTPUT))
 {
-    _parameters = alta::parameters(6, 0,
-                                   params::CARTESIAN, params::UNKNOWN_OUTPUT);
 }
 
 

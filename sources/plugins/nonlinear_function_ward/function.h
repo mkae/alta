@@ -46,13 +46,12 @@ class ward_function : public nonlinear_function
 
 	public: // methods
 
-		ward_function()
-    {
-        isotropic = false;
-        _parameters = alta::parameters(6, 0,
-                                       params::CARTESIAN,
-                                       params::UNKNOWN_OUTPUT);
-		}
+    ward_function():
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN,
+                                          params::UNKNOWN_OUTPUT)),
+      isotropic(false)
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

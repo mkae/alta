@@ -44,12 +44,11 @@ class yoo_function : public nonlinear_function
 
 	public: // methods
 
-		yoo_function()
-		{
-        _parameters = alta::parameters(6, 0,
-                                       params::CARTESIAN,
-                                       params::UNKNOWN_OUTPUT);
-		}
+    yoo_function():
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN,
+                                          params::UNKNOWN_OUTPUT))
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

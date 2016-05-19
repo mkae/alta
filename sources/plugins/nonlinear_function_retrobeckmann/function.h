@@ -41,12 +41,12 @@ class beckmann_function : public nonlinear_function
 
 	public: // methods
 
-		beckmann_function(): _use_back_param(true)
-		{
-        _parameters = alta::parameters(6, 0,
-                                       params::CARTESIAN,
-                                       params::UNKNOWN_OUTPUT);
-		}
+		beckmann_function():
+        nonlinear_function(alta::parameters(6, 0,
+                                            params::CARTESIAN,
+                                            params::UNKNOWN_OUTPUT)),
+       _use_back_param(true)
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;

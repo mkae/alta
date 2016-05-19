@@ -33,12 +33,11 @@ class schlick_fresnel : public nonlinear_function
 
 	public: // methods
 
-		schlick_fresnel()
-    {
+    schlick_fresnel():
       // XXX: Partial parametrization.
-      setParametrization(alta::parameters(6, 0,
-                                          params::CARTESIAN, params::UNKNOWN_OUTPUT));
-    }
+      nonlinear_function(alta::parameters(6, 0,
+                                          params::CARTESIAN, params::UNKNOWN_OUTPUT))
+    {}
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;

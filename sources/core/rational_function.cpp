@@ -25,11 +25,9 @@ rational_function_1d::rational_function_1d()
 }
 
 rational_function_1d::rational_function_1d(int nX, unsigned int np, unsigned int nq, 
-                                           bool separable) 
+                                           bool separable):
+    function(parameters(nX, 1, params::UNKNOWN_INPUT, params::UNKNOWN_OUTPUT))
 {
-	setDimX(nX);
-	setDimY(1);
-
 	resize(np, nq);
 	_separable = separable;
 }

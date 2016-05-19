@@ -42,11 +42,10 @@ class blinn_function : public nonlinear_function
 
 	public: // methods
 
-		blinn_function()
-		{
-        _parameters = alta::parameters(1, 1, params::COS_TH,
-                                       params::UNKNOWN_OUTPUT);
-		}
+    blinn_function():
+    nonlinear_function(alta::parameters(1, 1, params::COS_TH,
+                                        params::UNKNOWN_OUTPUT))
+    {}
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
