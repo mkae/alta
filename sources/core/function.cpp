@@ -471,37 +471,52 @@ vec compound_function::parametersJacobian(const vec& x) const
 	return jac;
 }
 
-void compound_function::push_back(const ptr<nonlinear_function>& f, const arguments& f_args)
+// Return the parameters of the composition of FUNCTIONS.
+static const parameters
+compound_parameters(const std::vector<ptr<nonlinear_function> >& functions)
 {
-    // FIXME: Update to work with new 'parameters' class.
-    abort();
-#if 0
-	// Update the input param
-	if(parametrization().input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		setParametrization(f->parametrization().input_parametrization());
-	}
-	else if(parametrization().input_parametrization() != f->parametrization().input_parametrization())
-	{
-		setParametrization(params::CARTESIAN);
-	}
+    assert(functions.size() > 0);
 
-	// Update the output param
-	if(output_parametrization() == params::UNKNOWN_OUTPUT)
-	{
-		setParametrization(f->output_parametrization());
-	}
-	else if(output_parametrization() != f->output_parametrization())
-	{
-		std::cerr << "Creating a compound function with different output dimensions, this is not allowed" << std::endl;
-		throw;
-	}
+    parameters result = functions[0]->parametrization();
 
-	fs.push_back(f);
-	fs_args.push_back(f_args);
-	is_fixed.push_back(f_args.is_defined("fixed"));
-#endif
+    for (auto f: functions)
+    {
+        auto input = f->parametrization().input_parametrization();
+        auto output = f->parametrization().output_parametrization();
+
+        if (result.input_parametrization() == params::UNKNOWN_INPUT)
+            result = alta::parameters(result.dimX(), result.dimY(),
+                                      input,
+                                      result.output_parametrization());
+        else if (result.input_parametrization() != input)
+            // Parametrization mismatch: fall back to Cartesian.
+            result = result.set_input(6, params::CARTESIAN);
+
+        if (result.output_parametrization() == params::UNKNOWN_OUTPUT)
+            result = alta::parameters(result.dimX(), result.dimY(),
+                                      result.input_parametrization(),
+                                      output);
+        else if (result.output_parametrization() != output)
+            abort();
+    }
+
+    return result;
 }
+
+compound_function::compound_function(const std::vector<ptr<nonlinear_function> >& functions,
+                                     const std::vector<arguments> args)
+    : nonlinear_function(compound_parameters(functions)),
+      fs(functions), fs_args(args)
+{
+    assert(functions.size() == args.size());
+
+    is_fixed.resize(functions.size());
+    for (unsigned int x = 0; x < functions.size(); x++)
+    {
+        is_fixed[x] = args[x].is_defined("fixed");
+    }
+}
+
 
 nonlinear_function* compound_function::operator[](int i) const
 {

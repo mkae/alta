@@ -214,18 +214,15 @@ class compound_function: public nonlinear_function
 {
 	public: // methods
 
+    compound_function(const std::vector<ptr<nonlinear_function> >& functions,
+                      const std::vector<arguments> args);
+
 		//Destructor
 		virtual ~compound_function();
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const;
 		virtual vec value(const vec& x) const;
-
-		//! Provide a vector like interface
-		//! This function allows to put a new nonlinear function \a f in the 
-		//! compound object. This function will be processed for nonlinear
-		//! optimisation only if \a fixed equals true.
-		virtual void push_back(const ptr<nonlinear_function>& f, const arguments& f_args);
 
 		//! \brief Access to the i-th function of the compound
 		nonlinear_function* operator[](int i) const;
@@ -303,6 +300,9 @@ class compound_function: public nonlinear_function
 		//! coefficients will be exported. For a C++ or matlab export, the call
 		//! to the associated function will be done.
 		virtual void save_call(std::ostream& out, const arguments& args) const;
+
+  private:
+    compound_function() ALTA_DEPRECATED { abort(); }
 
 	protected:
 		std::vector<ptr<nonlinear_function>> fs;

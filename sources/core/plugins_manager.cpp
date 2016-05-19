@@ -270,11 +270,11 @@ function* plugins_manager::get_function(const arguments& args)
         return NULL;
     }
 
-   //! create a *compound* class to store multiple ! functions in it.
-    compound_function* compound = new compound_function();
-
    //! For each args_vec element, create a function object and add ! it to the
    //compound one.
+    std::vector<ptr<nonlinear_function> > functions(args_vec.size());
+    std::vector<arguments> function_args(args_vec.size());
+
     for(unsigned int i=0; i<args_vec.size(); ++i)
     {
       std::string n("--func ");
@@ -297,9 +297,14 @@ function* plugins_manager::get_function(const arguments& args)
       }
       else
       {
-          compound->push_back(ptr<nonlinear_function>(nl_f), temp_args);
+          functions[i] = ptr<nonlinear_function>(nl_f);
+          function_args[i] = temp_args;
       }
     }
+
+    //! create a *compound* class to store multiple ! functions in it.
+    compound_function* compound = new compound_function(functions, function_args);
+
 
       //! return the compound class
       func = compound;
