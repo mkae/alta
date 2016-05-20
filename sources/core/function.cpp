@@ -852,32 +852,35 @@ void compound_function::save_call(std::ostream& out, const arguments& args) cons
 }
 
 
+
+// Return the parameters of the product of G1 and G2.
+static const parameters
+product_parameters(const ptr<nonlinear_function>& g1,
+                   const ptr<nonlinear_function>& g2)
+{
+    parameters result = g1->parametrization();
+
+    if(g1->parametrization().input_parametrization() !=
+       g2->parametrization().input_parametrization())
+    {
+        result = alta::parameters(6, result.dimY(),
+                                  params::CARTESIAN,
+                                  result.output_parametrization());
+    }
+
+    return result;
+}
 
 /*--- Product functions implementation ----*/
 
-product_function::product_function(const ptr<nonlinear_function>& g1, 
+product_function::product_function(const ptr<nonlinear_function>& g1,
                                    const ptr<nonlinear_function>& g2,
-                                   bool is_g1_fixed, bool is_g2_fixed) 
-: f1( g1 ),
+                                   bool is_g1_fixed, bool is_g2_fixed)
+: nonlinear_function(product_parameters(g1, g2)),
+  f1( g1 ),
 	f2( g2 ),
 	_is_fixed( std::pair<bool,bool>( is_g1_fixed, is_g2_fixed) )
 {
-  // FIXME: Update to work with new 'parameters' class.
-  abort();
-#if 0
-	// If the two parametrization are different, use the CARTESIAN parametrization
-	// as the input parametrization, then do the convertion for all the functions.
-	if(g1->parametrization().input_parametrization() != g2->parametrization().input_parametrization())
-	{
-   	function::setParametrization(params::CARTESIAN);
-		function::setDimX(6);
-	}
-	else
-	{
-    function::setParametrization(g1->parametrization().input_parametrization());
-		function::setDimX(g1->parametrization().dimX());
-	}
-#endif
 }
 
 product_function::~product_function()
