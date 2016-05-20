@@ -43,7 +43,9 @@ class function
 
     function(const parameters& params):
         _parameters(params),
-        _min(vec::Zero(0)), _max(vec::Zero(0)) {};
+        _min(vec::Zero(params.dimX())),
+        _max(vec::Zero(params.dimX()))
+    {};
 
 
 		/* NEEDED FUNCTIONS */

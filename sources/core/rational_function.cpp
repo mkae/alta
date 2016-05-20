@@ -507,6 +507,7 @@ rational_function::rational_function(const parameters& params,
                                      int np, int nq):
     function(params), np(np), nq(nq)
 {
+    rs.resize(params.dimY());
 }
 
 //! \todo clean memory here
