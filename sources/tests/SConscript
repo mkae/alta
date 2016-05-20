@@ -324,7 +324,7 @@ if have_openexr:
                            ['--input',
                             test_byproduct('gold-metallic-paint.data'),
                             '--output',
-                            test_byproduct('gold-metallic-pain.brdf'),
+                            test_byproduct('gold-metallic-paint.brdf'),
                             '--func', 'rational_function_chebychev',
                             '--fitter', 'rational_fitter_leastsquare',
                             '--np', '100', '--nq', '50'],
