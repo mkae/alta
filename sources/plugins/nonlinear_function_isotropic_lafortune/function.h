@@ -100,12 +100,6 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 6;
-		}
-		
 		//! \brief Set the number of output dimensions
 		void setDimY(int nY);
 

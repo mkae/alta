@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -77,16 +77,6 @@ class lafortune_function : public nonlinear_function
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
-
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-#ifdef ADAPT_TO_PARAM
-			return _nX;
-#else
-			return 6;
-#endif
-		}
 
 		//! \brief Provide the parametrization of the input space of the function.
 		//! For this one, we fix that the parametrization is in THETAD_PHID
