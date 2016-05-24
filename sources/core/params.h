@@ -476,6 +476,16 @@ class parameters
     //! Provide the dimension of the output space of the function
     int dimY() const { return _nY ; }
 
+    const parameters set_input(int nX, params::input p) const
+    {
+        return alta::parameters(nX, _nY, p, _out_param);
+    }
+
+    const parameters set_output(int nY, params::output p) const
+    {
+        return alta::parameters(_nX, nY, _in_param, p);
+    }
+
   protected:
     // Input and output parametrization
     params::input  _in_param ;
