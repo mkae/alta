@@ -67,7 +67,8 @@ class rational_function_legendre : public rational_function
 {
 	public: // methods
 
-		rational_function_legendre() ;
+    rational_function_legendre(const parameters& params);
+		rational_function_legendre() ALTA_DEPRECATED;
 		virtual ~rational_function_legendre() ;
 
 		//! Get the 1D function associated with color channel i. If no one exist, 

@@ -41,9 +41,13 @@ class rational_function_1d : public function
 {
 	public: // methods
 
-		rational_function_1d() ;
+		rational_function_1d(const parameters& params,
+                         unsigned int np = 0, unsigned int nq = 0,
+                         bool separable = false);
+
+    rational_function_1d() ALTA_DEPRECATED;
 		rational_function_1d(int nX, unsigned int np, unsigned int nq, 
-									bool separable = false) ;
+									bool separable = false) ALTA_DEPRECATED;
 		virtual ~rational_function_1d() {}
 
 

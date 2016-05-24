@@ -28,6 +28,8 @@ class rational_function_legendre_1d : public rational_function_1d
 {
 	public: // methods
 
+    rational_function_legendre_1d(const parameters& params, int np, int nq);
+
 		rational_function_legendre_1d() ;
 		rational_function_legendre_1d(int nX, int np, int nq, params::input params) ;
 		virtual ~rational_function_legendre_1d() {}
@@ -60,7 +62,8 @@ class rational_function_legendre : public rational_function
 {
 	public: // methods
 
-		rational_function_legendre() ;
+    rational_function_legendre(const parameters& params);
+		rational_function_legendre() ALTA_DEPRECATED;
 		virtual ~rational_function_legendre() ;
 
 		//! Get the 1D function associated with color channel i. If no one exist, 

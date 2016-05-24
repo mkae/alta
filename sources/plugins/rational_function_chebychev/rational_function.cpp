@@ -26,6 +26,16 @@ ALTA_DLL_EXPORT function* provide_function()
     return new rational_function_chebychev();
 }
 
+
+rational_function_chebychev::rational_function_chebychev(const alta::parameters& params,
+                                                         int np, int nq)
+    : rational_function(params, np, nq)
+{
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 rational_function_chebychev::rational_function_chebychev() : rational_function() 
 {
 }
@@ -43,7 +53,15 @@ rational_function_chebychev_1d::rational_function_chebychev_1d(int nX, int np, i
     rational_function_1d(nX, np, nq)
 {
 }
-		
+
+#pragma GCC diagnostic pop
+
+rational_function_chebychev_1d::rational_function_chebychev_1d(const parameters& params,
+                                                               int np, int nq)
+    : rational_function_1d(params, np, nq)
+{
+}
+
 double recursive_chebychev(double x, int i) {
    switch(i) {
       case 0:

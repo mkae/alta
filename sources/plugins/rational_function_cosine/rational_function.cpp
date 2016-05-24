@@ -21,6 +21,8 @@ ALTA_DLL_EXPORT function* provide_function()
     return new rational_function_legendre();
 }
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 rational_function_legendre_1d::rational_function_legendre_1d()
 {
 }
@@ -29,6 +31,14 @@ rational_function_legendre_1d::rational_function_legendre_1d(int nX, int np, int
     rational_function_1d(nX, np, nq)
 {
     _parameters = alta::parameters(nX, 0, param, params::UNKNOWN_OUTPUT);
+}
+
+#pragma GCC diagnostic pop
+
+rational_function_legendre_1d::rational_function_legendre_1d(const parameters& params,
+                                                             int np, int nq)
+    : rational_function_1d(params, np, nq)
+{
 }
 
 double rational_function_legendre_1d::legendre(double x, int i) const
@@ -106,10 +116,18 @@ double rational_function_legendre_1d::q(const vec& x, int i) const
 	return res ;
 }
 
+rational_function_legendre::rational_function_legendre(const parameters& params)
+    : rational_function(params)
+{
+}
+
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 rational_function_legendre::rational_function_legendre()
 {
 }
+
+#pragma GCC diagnostic pop
 
 rational_function_legendre::~rational_function_legendre()
 {

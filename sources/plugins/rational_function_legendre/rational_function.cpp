@@ -63,9 +63,19 @@ double rational_function_legendre_1d::q(const vec& x, int i) const
 }
 
 
+rational_function_legendre::rational_function_legendre(const parameters& params)
+    : rational_function(params)
+{
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 rational_function_legendre::rational_function_legendre()
 {
 }
+
+#pragma GCC diagnostic pop
 
 rational_function_legendre::~rational_function_legendre()
 {
