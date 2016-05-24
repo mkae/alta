@@ -44,7 +44,7 @@ class WalterSmith : public nonlinear_function
 
   public: // methods
 
-    WalterSmith();
+    WalterSmith(const alta::parameters&);
 
     //! \brief Load function specific files
     virtual bool load(std::istream& in) ;
@@ -142,6 +142,7 @@ class WalterSmith : public nonlinear_function
   double const SQRT_PI;
   #endif
 
+  WalterSmith(): LOCAL_EPSILON(0.) {};
 } ;
 
 

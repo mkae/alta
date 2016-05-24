@@ -22,11 +22,17 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-    return new beckmann_function();
+    return new beckmann_function(params);
 }
-		
+
+beckmann_function::beckmann_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN))
+{
+}
+
+
 vec beckmann_function::G(const vec& x) const
 {
 	//TODO : RP: REMOVE THIS CODE BECAUSE IT IS NEVER CALLED ?

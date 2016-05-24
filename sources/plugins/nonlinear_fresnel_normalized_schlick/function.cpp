@@ -21,15 +21,13 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-	return new schlick();
+	return new schlick(params);
 }
 
-schlick::schlick():
-    // XXX: Partial parametrization.
-    nonlinear_function(alta::parameters(6, 0,
-                                        params::CARTESIAN, params::UNKNOWN_OUTPUT))
+schlick::schlick(const alta::parameters& params):
+    nonlinear_function(params.set_input(6, params::CARTESIAN))
 {
 }
 

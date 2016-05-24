@@ -21,10 +21,15 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new shifted_gamma_function();
+    return new shifted_gamma_function(params);
 }
+
+shifted_gamma_function::shifted_gamma_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN))
+{}
+
 
 // Overload the function operator
 vec shifted_gamma_function::operator()(const vec& x) const 

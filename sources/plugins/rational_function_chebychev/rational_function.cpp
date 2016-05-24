@@ -21,9 +21,9 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new rational_function_chebychev();
+    return new rational_function_chebychev(params);
 }
 
 

@@ -41,12 +41,7 @@ class beckmann_function : public nonlinear_function
 
 	public: // methods
 
-		beckmann_function():
-        nonlinear_function(alta::parameters(6, 0,
-                                            params::CARTESIAN,
-                                            params::UNKNOWN_OUTPUT)),
-       _use_back_param(true)
-    {}
+    beckmann_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -87,5 +82,7 @@ class beckmann_function : public nonlinear_function
 
 		vec _ks, _a; // Lobes data
 		bool _use_back_param;
+
+    beckmann_function() {};
 } ;
 

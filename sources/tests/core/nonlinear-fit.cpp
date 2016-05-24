@@ -48,7 +48,8 @@ int main(int argc, char *argv[])
     data->load(input_file);
 
     for (auto&& fitter_name: fitters) {
-        auto function = plugins_manager::get_function("nonlinear_function_diffuse");
+        auto function = plugins_manager::get_function("nonlinear_function_diffuse",
+                                                      data->parametrization());
         TEST_ASSERT(function != NULL);
 
         auto fitter = plugins_manager::get_fitter(fitter_name);

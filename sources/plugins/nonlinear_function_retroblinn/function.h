@@ -36,6 +36,8 @@ class retroblinn_function : public nonlinear_function
 
     public: // methods
 
+     retroblinn_function(const alta::parameters& params);
+
 		 // Overload the function operator
 		 virtual vec operator()(const vec& x) const ;
 		 virtual vec value(const vec& x) const ;
@@ -89,5 +91,7 @@ class retroblinn_function : public nonlinear_function
 
 		 //! \brief The retroblinn lobe data
 		 vec _ks, _N;
+
+     retroblinn_function() {};
 } ;
 

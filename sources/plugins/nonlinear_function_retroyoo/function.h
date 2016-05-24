@@ -44,11 +44,7 @@ class yoo_function : public nonlinear_function
 
 	public: // methods
 
-    yoo_function():
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN,
-                                          params::UNKNOWN_OUTPUT))
-    {}
+    yoo_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -88,5 +84,7 @@ class yoo_function : public nonlinear_function
 	private: // data
 
 		vec _kr, _lt; // Lobes data
+
+    yoo_function() {};
 } ;
 

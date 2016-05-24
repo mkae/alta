@@ -46,12 +46,7 @@ class ward_function : public nonlinear_function
 
 	public: // methods
 
-    ward_function():
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN,
-                                          params::UNKNOWN_OUTPUT)),
-      isotropic(false)
-    {}
+    ward_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -94,5 +89,7 @@ class ward_function : public nonlinear_function
 
         //! Allows to set the lobe to be isotropic or not
         bool isotropic;
+
+    ward_function() {};
 } ;
 

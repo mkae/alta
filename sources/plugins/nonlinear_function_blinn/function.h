@@ -42,10 +42,7 @@ class blinn_function : public nonlinear_function
 
 	public: // methods
 
-    blinn_function():
-    nonlinear_function(alta::parameters(1, 1, params::COS_TH,
-                                        params::UNKNOWN_OUTPUT))
-    {}
+    blinn_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -97,5 +94,7 @@ class blinn_function : public nonlinear_function
 
 		//! \brief The blinn lobe parameters
 		vec _ks, _N;
+
+    blinn_function() {};
 } ;
 

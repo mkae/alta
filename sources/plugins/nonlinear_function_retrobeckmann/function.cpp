@@ -22,10 +22,17 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new beckmann_function();
+    return new beckmann_function(params);
 }
+
+beckmann_function::beckmann_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN)),
+      _use_back_param(true)
+{
+}
+
 
 // Overload the function operator
 vec beckmann_function::operator()(const vec& x) const 

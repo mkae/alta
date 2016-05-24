@@ -38,12 +38,7 @@ class beckmann_function : public nonlinear_function
 
 	public: // methods
 
-	  beckmann_function():
-      // XXX: Partial initialization.
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN,
-                                          params::UNKNOWN_OUTPUT))
-    {}
+	  beckmann_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -87,5 +82,7 @@ class beckmann_function : public nonlinear_function
 
 		vec _ks; //Specular coefficients. One per color/wavelength
 		vec _a; // Roughness parameters.  One per color/wavelength
+
+    beckmann_function();
 } ;
 

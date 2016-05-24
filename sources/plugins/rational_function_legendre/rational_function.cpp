@@ -15,9 +15,9 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-    return new rational_function_legendre();
+    return new rational_function_legendre(params);
 }
 
 rational_function_legendre_1d::rational_function_legendre_1d()

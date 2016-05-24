@@ -50,7 +50,8 @@ class plugins_manager
 		static function* load_function(const std::string& filename);
 		
 		//! \brief load a function from the ALTA input file.
-		static ptr<function> get_function(const std::string& n);
+		static ptr<function> get_function(const std::string& n,
+                                      const parameters& params);
 
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
@@ -77,7 +78,7 @@ class plugins_manager
 	private: //data
 
 		// Object provider prototypes
-		typedef function* (*FunctionPrototype)();
+		typedef function* (*FunctionPrototype)(const parameters&);
 		typedef fitter*   (*FitterPrototype)();
 		typedef data*     (*DataPrototype)(const arguments&);
 };

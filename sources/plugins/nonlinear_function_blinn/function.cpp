@@ -21,10 +21,15 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new blinn_function();
+    return new blinn_function(params);
 }
+
+blinn_function::blinn_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(1, params::COS_TH))
+{}
+
 
 // Overload the function operator
 vec blinn_function::operator()(const vec& x) const 

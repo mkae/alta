@@ -42,7 +42,7 @@ class diffuse_function : public nonlinear_function
 
     // Set the input parametrization to CARTESIAN to reduce the number
     // of transformations in a compound object.
-    diffuse_function();
+    diffuse_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -80,5 +80,7 @@ class diffuse_function : public nonlinear_function
 	private: // data
 
 		vec _kd;
+
+    diffuse_function() {};
 } ;
 

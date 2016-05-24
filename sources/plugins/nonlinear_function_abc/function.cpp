@@ -22,9 +22,9 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-    return new abc_function();
+    return new abc_function(params);
 }
 
 // Overload the function operator

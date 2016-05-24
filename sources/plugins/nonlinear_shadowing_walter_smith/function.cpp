@@ -12,15 +12,14 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-  return new WalterSmith();
+  return new WalterSmith(params);
 }
 
-WalterSmith::WalterSmith() 
+WalterSmith::WalterSmith(const alta::parameters& params)
 :
-  nonlinear_function(alta::parameters(6, 0,
-                                      params::CARTESIAN, params::UNKNOWN_OUTPUT)),
+  nonlinear_function(params.set_input(6, params::CARTESIAN)),
   LOCAL_EPSILON (1e-6),
   FUNCTION_NAME_TOKEN("nonlinear_shadowing_walter_smith")
 #ifdef WALTER_SMITH_EXACT

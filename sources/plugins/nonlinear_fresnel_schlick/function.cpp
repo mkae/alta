@@ -21,9 +21,14 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-	return new schlick_fresnel();
+	return new schlick_fresnel(params);
+}
+
+schlick_fresnel::schlick_fresnel(const alta::parameters& params)
+    : nonlinear_function(params)
+{
 }
 
 //! Load function specific files

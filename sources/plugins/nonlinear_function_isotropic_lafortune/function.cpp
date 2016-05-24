@@ -21,10 +21,15 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new isotropic_lafortune_function();
+    return new isotropic_lafortune_function(params);
 }
+
+isotropic_lafortune_function::isotropic_lafortune_function(const alta::parameters& params):
+    nonlinear_function(params.set_input(6, params::CARTESIAN)),
+    _n(1)
+{}
 
 // Overload the function operator
 vec isotropic_lafortune_function::operator()(const vec& x) const 

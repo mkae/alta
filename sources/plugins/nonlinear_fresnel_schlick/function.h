@@ -33,11 +33,7 @@ class schlick_fresnel : public nonlinear_function
 
 	public: // methods
 
-    schlick_fresnel():
-      // XXX: Partial parametrization.
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN, params::UNKNOWN_OUTPUT))
-    {}
+    schlick_fresnel(const alta::parameters& params);
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
@@ -83,5 +79,7 @@ class schlick_fresnel : public nonlinear_function
 
 		//! Fresnel reflectance at theta = 0
 		vec R;
+
+    schlick_fresnel() {};
 } ;
 

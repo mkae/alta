@@ -21,15 +21,14 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new diffuse_function();
+    return new diffuse_function(params);
 }
 
-diffuse_function::diffuse_function() 
-    : _kd( vec::Zero( _parameters.dimY() ) ),
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN, params::UNKNOWN_OUTPUT))
+diffuse_function::diffuse_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN)),
+      _kd( vec::Zero(params.dimY()))
 {
 }
 

@@ -48,9 +48,8 @@ class abc_function : public nonlinear_function
 
 	public: // methods
 
-    abc_function():
-      nonlinear_function(alta::parameters(1, 0,
-                                          params::COS_TH, params::UNKNOWN_OUTPUT))
+    abc_function(const alta::parameters& params)
+        : nonlinear_function(params)
     {}
 
 		// Overload the function operator
@@ -91,5 +90,7 @@ class abc_function : public nonlinear_function
 	private: // data
 
 		vec _a, _b, _c; // Lobes data
+
+    abc_function() {};
 } ;
 

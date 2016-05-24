@@ -322,7 +322,7 @@ function* plugins_manager::get_function(const arguments& args,
       std::cout << "<<DEBUG>> using function provider in file \"" << filename << "\"" << std::endl;
       #endif
       
-      func =  myFunction();
+      func =  myFunction(params);
     }
     else
     {
@@ -420,7 +420,8 @@ function* plugins_manager::get_function(const arguments& args,
 }
 
 
-ptr<function> plugins_manager::get_function(const std::string& n)
+ptr<function> plugins_manager::get_function(const std::string& n,
+                                            const parameters& params)
 {
     if(n.empty())
     {
@@ -436,7 +437,7 @@ ptr<function> plugins_manager::get_function(const std::string& n)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
 #endif
-        return ptr<function>(myFunc());
+        return ptr<function>(myFunc(params));
     }
     else
     {

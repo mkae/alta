@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -15,6 +15,7 @@
 #include <string>
 
 // Interface
+#include <core/params.h>
 #include <core/function.h>
 #include <core/data.h>
 #include <core/fitter.h>
@@ -29,8 +30,7 @@ class retro_schlick : public nonlinear_function
 
 	public: // methods
 
-		//! \brief Constructor
-		retro_schlick();
+		retro_schlick(const alta::parameters& params);
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
@@ -74,5 +74,6 @@ class retro_schlick : public nonlinear_function
 
 		//! Unidimensional Fresnel reflectance at theta = 0
 		vec R;
+		retro_schlick();
 } ;
 

@@ -22,9 +22,15 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new ward_function();
+    return new ward_function(params);
+}
+
+ward_function::ward_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN)),
+      isotropic(false)
+{
 }
 
 // Overload the function operator

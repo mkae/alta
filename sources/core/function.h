@@ -126,8 +126,8 @@ class function
     }
 
     // TODO: Deprecate, then remove these two methods.
-    virtual void setDimX(int x);
-    virtual void setDimY(int y);
+    virtual void setDimX(int x) ALTA_DEPRECATED;
+    virtual void setDimY(int y) ALTA_DEPRECATED;
 
 protected:
     // Input and output parametrization

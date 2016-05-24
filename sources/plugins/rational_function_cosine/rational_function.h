@@ -28,10 +28,8 @@ class rational_function_legendre_1d : public rational_function_1d
 {
 	public: // methods
 
-    rational_function_legendre_1d(const parameters& params, int np, int nq);
-
-		rational_function_legendre_1d() ;
-		rational_function_legendre_1d(int nX, int np, int nq, params::input params) ;
+    rational_function_legendre_1d(const parameters& params,
+                                  int np = 0, int nq = 0);
 		virtual ~rational_function_legendre_1d() {}
 
 		// Get the p_i and q_j function
@@ -42,6 +40,9 @@ class rational_function_legendre_1d : public rational_function_1d
 
 		// Legendre polynomial evaluation
 		double legendre(double x, int i) const;
+
+  private:
+		rational_function_legendre_1d() ;
 } ;
 
 /*! \ingroup functions
@@ -63,7 +64,7 @@ class rational_function_legendre : public rational_function
 	public: // methods
 
     rational_function_legendre(const parameters& params);
-		rational_function_legendre() ALTA_DEPRECATED;
+
 		virtual ~rational_function_legendre() ;
 
 		//! Get the 1D function associated with color channel i. If no one exist, 
@@ -75,9 +76,8 @@ class rational_function_legendre : public rational_function
 			{
 				if(rs[i] == NULL)
 				{
-					rs[i] = new rational_function_legendre_1d(_parameters.dimX(), np, nq,
-                                                    _parameters.input_parametrization());
-					
+          rs[i] = new rational_function_legendre_1d(_parameters, np, nq);
+
 					vec _min = min();
 					vec _max = max();
 					for(int k=0; k<_parameters.dimX(); ++k)
@@ -118,5 +118,8 @@ class rational_function_legendre : public rational_function
 #endif
 			}
 		}
+
+private:
+		rational_function_legendre() {};
 } ;
 

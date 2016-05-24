@@ -23,9 +23,14 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-	return new smith();
+	return new smith(params);
+}
+
+smith::smith(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN))
+{
 }
 
 //! Load function specific files

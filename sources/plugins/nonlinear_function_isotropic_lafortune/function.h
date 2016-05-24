@@ -61,11 +61,7 @@ class isotropic_lafortune_function : public nonlinear_function
 
 	public: // methods
 
-		isotropic_lafortune_function():
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN, params::UNKNOWN_OUTPUT)),
-      _n(1)
-    {}
+    isotropic_lafortune_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -116,6 +112,8 @@ class isotropic_lafortune_function : public nonlinear_function
 			Cz = _C[(n*_parameters.dimY() + c)*2 + 1];
 			N  = _N[n*_parameters.dimY() + c];
 		}
+
+    isotropic_lafortune_function() {};
 
 
 	private: // data

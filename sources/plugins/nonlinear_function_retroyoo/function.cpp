@@ -22,10 +22,16 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new yoo_function();
+    return new yoo_function(params);
 }
+
+yoo_function::yoo_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN))
+{
+}
+
 
 // Overload the function operator
 vec yoo_function::operator()(const vec& x) const 

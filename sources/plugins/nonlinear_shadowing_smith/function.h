@@ -29,11 +29,7 @@ class smith : public nonlinear_function//fresnel
 
 	public: // methods
 
-    smith():
-      nonlinear_function(alta::parameters(6, 0,
-                                          params::CARTESIAN,
-                                          params::UNKNOWN_OUTPUT))
-    {}
+    smith(const alta::parameters& params);
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
@@ -78,5 +74,7 @@ class smith : public nonlinear_function//fresnel
 		//! RP: I DOUBLT IT . Seems to be a brute copy and paste ???
 		//! RP: w^2 should be the mean-square surface slope
 		vec w;
+
+    smith() {};
 } ;
 

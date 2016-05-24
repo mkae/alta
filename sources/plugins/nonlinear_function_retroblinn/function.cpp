@@ -21,9 +21,14 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new retroblinn_function();
+    return new retroblinn_function(params);
+}
+
+retroblinn_function::retroblinn_function(const alta::parameters &params)
+    : nonlinear_function(params)
+{
 }
 
 // Overload the function operator
