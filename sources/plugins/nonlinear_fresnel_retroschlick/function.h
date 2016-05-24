@@ -63,13 +63,6 @@ class retro_schlick : public nonlinear_function
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		//! \brief resize the parameter vector
-		virtual void setDimY(int nY)
-		{
-			function::setDimY(nY);
-			R.resize(nY);
-		}
-
 	private: // data
 
 		//! Unidimensional Fresnel reflectance at theta = 0

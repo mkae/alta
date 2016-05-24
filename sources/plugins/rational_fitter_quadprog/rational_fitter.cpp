@@ -52,10 +52,8 @@ bool rational_fitter_quadprog::fit_data(const ptr<data>& dat, ptr<function>& fit
     return false ;
   }
 
-  // I need to set the dimension of the resulting function to be equal
-  // to the dimension of my fitting problem
-  r->setDimX(d->parametrization().dimX()) ;
-  r->setDimY(d->parametrization().dimY()) ;
+  // XXX: FIT and D may have different values of dimX() and dimY(), but
+  // this is fine: we convert values as needed in operator().
   r->setMin(d->min()) ;
   r->setMax(d->max()) ;
 

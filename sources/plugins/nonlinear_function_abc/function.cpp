@@ -53,20 +53,6 @@ vec abc_function::value(const vec& x) const
 	return res;
 }
 
-// Reset the output dimension
-void abc_function::setDimY(int nY)
-{
-    alta::parameters new_params(_parameters.dimX(), nY,
-                                _parameters.input_parametrization(),
-                                _parameters.output_parametrization());
-    _parameters = new_params;
-
-    // Update the length of the vectors
-    _a.resize(parametrization().dimY()) ;
-    _b.resize(parametrization().dimY()) ;
-    _c.resize(parametrization().dimY()) ;
-}
-
 //! Number of parameters to this non-linear function
 int abc_function::nbParameters() const 
 {

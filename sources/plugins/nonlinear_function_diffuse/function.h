@@ -66,16 +66,8 @@ class diffuse_function : public nonlinear_function
 		virtual void setParameters(const vec& p) ;
 
 		//! \brief Obtain the derivatives of the function with respect to the
-		//! parameters. 
+		//! parameters.
 		virtual vec parametersJacobian(const vec& x) const ;
-
-		virtual void setDimY(int nY)
-		{
-      _parameters = alta::parameters(_parameters.dimX(), nY,
-                                     _parameters.input_parametrization(),
-                                     _parameters.output_parametrization());
-			_kd.resize(nY);
-		}
 
 	private: // data
 

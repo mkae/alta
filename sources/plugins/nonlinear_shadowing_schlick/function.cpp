@@ -26,6 +26,12 @@ ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 	return new schlick_masking(params);
 }
 
+schlick_masking::schlick_masking(const parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN))
+{
+    w.resize(params.dimY());
+}
+
 //! Load function specific files
 bool schlick_masking::load(std::istream& in)
 {

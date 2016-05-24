@@ -29,6 +29,7 @@ ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 retro_schlick::retro_schlick(const alta::parameters& params):
     nonlinear_function(params.set_input(6, params::CARTESIAN))
 {
+    R.resize(params.dimY());
 }
 
 vec retro_schlick::value(const vec& x) const

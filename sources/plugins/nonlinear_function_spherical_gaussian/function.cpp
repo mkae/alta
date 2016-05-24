@@ -27,6 +27,15 @@ ALTA_DLL_EXPORT function* provide_function(const parameters& params)
     return new spherical_gaussian_function(params);
 }
 
+spherical_gaussian_function::spherical_gaussian_function(const parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN)),
+      _non_a(1), _type(Mirror)
+{
+    // Update the length of the vectors
+    _n.resize(_nY) ;
+    _ks.resize(_nY) ;
+}
+
 // Overload the function operator
 vec spherical_gaussian_function::operator()(const vec& x) const 
 {
@@ -45,16 +54,6 @@ vec spherical_gaussian_function::value(const vec& x) const
 	return res;
 }
 
-// Reset the output dimension
-void spherical_gaussian_function::setDimY(int nY)
-{
-    _nY = nY ;
-
-    // Update the length of the vectors
-    _n.resize(_nY) ;
-    _ks.resize(_nY) ;
-}
-		
 double spherical_gaussian_function::compute_dot(const vec& x) const
 {
 	double dot;

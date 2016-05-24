@@ -70,17 +70,6 @@ class retroblinn_function : public nonlinear_function
 		 //! parameters. 
 		 virtual vec parametersJacobian(const vec& x) const ;
 
-		 void setDimY(int nY)
-		 {
-       _parameters = alta::parameters(_parameters.dimX(), nY,
-                                      _parameters.input_parametrization(),
-                                      _parameters.output_parametrization());
-
-			 // Update the length of the vectors
-			 _ks.resize(_parameters.dimY()) ;
-			 _N.resize(_parameters.dimY()) ;
-		 }
-
  		 //! \brief Export function
 		virtual void save_call(std::ostream& out, 
 		                       const arguments& args) const;

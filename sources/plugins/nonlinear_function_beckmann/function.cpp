@@ -30,6 +30,9 @@ ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 beckmann_function::beckmann_function(const alta::parameters& params)
     : nonlinear_function(params.set_input(6, params::CARTESIAN))
 {
+    // Update the length of the vectors
+    _a.resize(parametrization().dimY()) ;
+    _ks.resize(parametrization().dimY()) ;
 }
 
 
@@ -89,18 +92,6 @@ vec beckmann_function::value(const vec& x) const
 		}
 	}
 	return res;
-}
-
-// Reset the output dimension
-void beckmann_function::setDimY(int nY)
-{
-    _parameters = alta::parameters(_parameters.dimX(), nY,
-                                   _parameters.input_parametrization(),
-                                   _parameters.output_parametrization());
-
-    // Update the length of the vectors
-    _a.resize(parametrization().dimY()) ;
-    _ks.resize(parametrization().dimY()) ;
 }
 
 //! Number of parameters to this non-linear function

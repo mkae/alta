@@ -50,7 +50,12 @@ class abc_function : public nonlinear_function
 
     abc_function(const alta::parameters& params)
         : nonlinear_function(params)
-    {}
+    {
+        // Update the length of the vectors
+        _a.resize(params.dimY());
+        _b.resize(params.dimY());
+        _c.resize(params.dimY());
+    }
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -83,9 +88,6 @@ class abc_function : public nonlinear_function
 		//! \brief Obtain the derivatives of the function with respect to the
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
-
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
 
 	private: // data
 

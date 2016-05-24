@@ -115,13 +115,14 @@ int main(int argc, char** argv)
     fit->set_parameters(args) ;
 
     ptr<data>     d = ptr<data>(plugins_manager::get_data(args["data"], args));
-    ptr<function> f = ptr<function>(plugins_manager::get_function(args, d->parametrization()));
 
 		try
 		{
 			d->load(args["input"], args);
 		}
 		CATCH_FILE_IO_ERROR(args["input"]);
+
+    ptr<function> f = ptr<function>(plugins_manager::get_function(args, d->parametrization()));
 
     if(!f || !d)
     {

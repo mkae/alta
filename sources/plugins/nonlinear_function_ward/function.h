@@ -80,9 +80,6 @@ class ward_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
-
 	private: // data
 
 		vec _ks, _ax, _ay; // Lobes data

@@ -75,9 +75,6 @@ class beckmann_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
-
 	private: // data
 
 		vec _ks, _a; // Lobes data

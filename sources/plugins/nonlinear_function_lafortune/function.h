@@ -44,11 +44,7 @@ class lafortune_function : public nonlinear_function
 
 	public: // methods
 
-        lafortune_function() : _n(1), _isotropic(false)
-        {
-            nonlinear_function::setParametrization(params::CARTESIAN);
-            nonlinear_function::setDimX(6);
-        }
+    lafortune_function(const parameters& params);
 
         // Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -98,9 +94,6 @@ class lafortune_function : public nonlinear_function
 #endif
 		}
 
-        //! \brief Set the number of output dimensions
-        void setDimY(int nY);
-
         //! \brief Set the number of lobes to be used in the fit
         void setNbLobes(int N);
 
@@ -135,5 +128,11 @@ class lafortune_function : public nonlinear_function
 
 		//!\brief Flags to get an isotropic lobe
 		bool _isotropic;
+
+    lafortune_function()
+        : nonlinear_function(6, 0,
+                             params::CARTESIAN, params::UNKNOWN_OUTPUT)
+    {
+    };
 } ;
 

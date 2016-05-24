@@ -28,7 +28,11 @@ ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 
 blinn_function::blinn_function(const alta::parameters& params)
     : nonlinear_function(params.set_input(1, params::COS_TH))
-{}
+{
+    // Update the length of the vectors
+    _ks.resize(_parameters.dimY()) ;
+    _N.resize(_parameters.dimY()) ;
+}
 
 
 // Overload the function operator

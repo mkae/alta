@@ -61,13 +61,6 @@ class smith : public nonlinear_function//fresnel
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		//! \brief resize the parameter vector
-		virtual void setDimY(int nY)
-		{
-			function::setDimY(nY);
-			w.resize(nY);
-		}
-
 	private: // data
 
 		//! Fresnel reflectance at theta = 0 ?

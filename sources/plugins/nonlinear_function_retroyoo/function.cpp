@@ -30,6 +30,9 @@ ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 yoo_function::yoo_function(const alta::parameters& params)
     : nonlinear_function(params.set_input(6, params::CARTESIAN))
 {
+    // Update the length of the vectors
+    _lt.resize(_parameters.dimY()) ;
+    _kr.resize(_parameters.dimY()) ;
 }
 
 
@@ -49,18 +52,6 @@ vec yoo_function::value(const vec& x) const
 		res[i] *= _kr[i] * factor * (2.4 + 1.0 / (1.0 + q*_lt[i]*_lt[i])) * (1.0 + (1.0 - exp(- 2.0 * q * 0.7 * _lt[i]) / (q*_lt[i])));
 	}
 	return res;
-}
-
-// Reset the output dimension
-void yoo_function::setDimY(int nY)
-{
-    _parameters = alta::parameters(_parameters.dimX(), nY,
-                                   _parameters.input_parametrization(),
-                                   _parameters.output_parametrization());
-
-    // Update the length of the vectors
-    _lt.resize(_parameters.dimY()) ;
-    _kr.resize(_parameters.dimY()) ;
 }
 
 //! Number of parameters to this non-linear function

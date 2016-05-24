@@ -220,11 +220,6 @@ function* plugins_manager::load_function(const std::string& filename)
   // Create the function from the command line
   function* f = get_function(args, params);
 
-  // FIXME: Since the above is not quite the same as calling 'setDimY' (which
-  // is virtual), also call it from here.  TODO: Remove it ASAP.
-  f->setDimY(params.dimY());
-  f->setDimX(params.dimX());
-
   // Load the function part from the file object
   if( f->load(file) )
   {
@@ -536,7 +531,9 @@ void plugins_manager::check_compatibility( ptr<data>& d,
 
   if(f->parametrization().dimY() != d->parametrization().dimY())
   {
-    f->setDimY(d->parametrization().dimY());
+    abort();
+    // FIXME: Used to be this:
+    // f->setDimY(d->parametrization().dimY());
   }
 
   /*

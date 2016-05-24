@@ -276,21 +276,6 @@ double function::Linf_distance(const ptr<data>& d) const
 	return linf_dist;
 }
 
-void function::setDimX(int x)
-{
-    _parameters = parameters(x, _parameters.dimY(),
-                             _parameters.input_parametrization(),
-                             _parameters.output_parametrization());
-    _min.resize(x); _max.resize(x);
-}
-
-void function::setDimY(int y)
-{
-    _parameters = parameters(_parameters.dimX(), y,
-                             _parameters.input_parametrization(),
-                             _parameters.output_parametrization());
-}
-
 
 /*--- Non-linear functions implementation ----*/
 
@@ -654,31 +639,6 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 		{
 			fs[i]->bootstrap(d, fs_args[i]);
 		}
-	}
-}
-
-void compound_function::setDimX(int nX) 
-{
-	if(parametrization().input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		function::setDimX(nX);
-	}
-	
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		if(fs[i]->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			fs[i]->setDimX(nX);
-		}
-	}
-}
-		
-void compound_function::setDimY(int nY)
-{
-	function::setDimY(nY);
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		fs[i]->setDimY(nY);
 	}
 }
 
@@ -1048,22 +1008,6 @@ void product_function::bootstrap(const ptr<data> d, const arguments& args)
 		f1->bootstrap(d, args);
 		f2->bootstrap(d, args);
 	}
-}
-		
-void product_function::setDimX(int nX) 
-{
-	f1->setDimX(nX);
-	f2->setDimX(nX);
-	
-	function::setDimX(f1->parametrization().dimX());
-}
-
-void product_function::setDimY(int nY)
-{
-	f1->setDimY(nY);
-	f2->setDimY(nY);
-	
-	function::setDimY(f1->parametrization().dimY());
 }
 
 void product_function::setMin(const vec& min) 

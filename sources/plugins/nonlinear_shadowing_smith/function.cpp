@@ -31,6 +31,7 @@ ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 smith::smith(const alta::parameters& params)
     : nonlinear_function(params.set_input(6, params::CARTESIAN))
 {
+    w.resize(params.dimY());
 }
 
 //! Load function specific files

@@ -96,9 +96,6 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
-
 		//! \brief Set the number of lobes to be used in the fit
 		void setNbLobes(int N);
 

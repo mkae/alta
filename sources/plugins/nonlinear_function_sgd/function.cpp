@@ -28,7 +28,24 @@ ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 
 shifted_gamma_function::shifted_gamma_function(const alta::parameters& params)
     : nonlinear_function(params.set_input(6, params::CARTESIAN))
-{}
+{
+    auto nY = params.dimY();
+
+    // Update the length of the vectors
+    sh_c      = vec::Zero(nY);
+    sh_theta0 = vec::Zero(nY);
+    sh_k      = vec::Zero(nY);
+    sh_lambda = vec::Zero(nY);
+    p         = vec::Zero(nY);
+    F_0       = vec::Zero(nY);
+    F_1       = vec::Zero(nY);
+    K_ap      = vec::Zero(nY);
+    rho_d     = vec::Zero(nY);
+    rho_s     = vec::Zero(nY);
+    alpha     = vec::Zero(nY); 
+
+    alpha.fill(1.0);
+}
 
 
 // Overload the function operator

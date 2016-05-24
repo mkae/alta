@@ -20,6 +20,7 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 
 #include <core/common.h>
 
@@ -322,10 +323,8 @@ nonlinear_fitter_eigen::~nonlinear_fitter_eigen()
 
 bool nonlinear_fitter_eigen::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
-    // I need to set the dimension of the resulting function to be equal
-    // to the dimension of my fitting problem
-    fit->setDimX(d->parametrization().dimX()) ;
-    fit->setDimY(d->parametrization().dimY()) ;
+    // XXX: FIT and D may have different values of dimX() and dimY(), but
+    // this is fine: we convert values as needed in operator().
     fit->setMin(d->min());
     fit->setMax(d->max());
 

@@ -27,6 +27,7 @@ WalterSmith::WalterSmith(const alta::parameters& params)
 SQRT_PI( 1.772453850905516 )
 #endif
 {
+    _alpha.resize(params.dimY());
 }
 
 
@@ -310,14 +311,6 @@ WalterSmith::bootstrap(const ptr<data> d, const arguments& args)
     _alpha[i] = 1.0; 
   }
 }
-
-void 
-WalterSmith:: setDimY(int nY)
-{
-  function::setDimY(nY);
-  _alpha.resize(nY);
-}
-
 
 double  WalterSmith::shadowTerm( double a ) const 
 {

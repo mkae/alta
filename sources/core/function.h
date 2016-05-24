@@ -125,10 +125,6 @@ class function
         _parameters = p;
     }
 
-    // TODO: Deprecate, then remove these two methods.
-    virtual void setDimX(int x) ALTA_DEPRECATED;
-    virtual void setDimY(int y) ALTA_DEPRECATED;
-
 protected:
     // Input and output parametrization
     parameters _parameters;
@@ -257,12 +253,6 @@ class compound_function: public nonlinear_function
 		//! Local bootstrap can not overload the global bootstrap.
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX);
-
-		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY);
-
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min);
 		virtual void setMax(const vec& max);
@@ -371,10 +361,6 @@ class product_function : public nonlinear_function
 
 		//! \brief Provide a first rough fit of the function. 
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
-
-		// Set the dimension of the input/output space of the function
-		virtual void setDimX(int nX);
-		virtual void setDimY(int nY);
 
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min);

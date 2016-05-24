@@ -29,6 +29,7 @@ ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 schlick_fresnel::schlick_fresnel(const alta::parameters& params)
     : nonlinear_function(params)
 {
+    R.resize(params.dimY());
 }
 
 //! Load function specific files

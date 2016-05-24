@@ -29,6 +29,9 @@ ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 retroblinn_function::retroblinn_function(const alta::parameters &params)
     : nonlinear_function(params)
 {
+    // Update the length of the vectors
+    _ks.resize(_parameters.dimY()) ;
+    _N.resize(_parameters.dimY()) ;
 }
 
 // Overload the function operator

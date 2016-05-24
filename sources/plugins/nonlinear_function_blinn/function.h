@@ -76,17 +76,6 @@ class blinn_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		void setDimY(int nY)
-		{
-			//CODE CONSISTENCY WITH THE OTHER PLUGIN
-			//_nY = nY ;
-			function::setDimY(nY);
-
-			// Update the length of the vectors
-			_ks.resize(_parameters.dimY()) ;
-			_N.resize(_parameters.dimY()) ;
-		}
-
 		void save_call(std::ostream& out, const arguments& args) const;
 		void save_body(std::ostream& out, const arguments& args) const;
 

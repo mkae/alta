@@ -29,7 +29,17 @@ ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 isotropic_lafortune_function::isotropic_lafortune_function(const alta::parameters& params):
     nonlinear_function(params.set_input(6, params::CARTESIAN)),
     _n(1)
-{}
+{
+    // Update the length of the vectors
+    _C.resize(_n*_parameters.dimY()*2) ;
+    _N.resize(_n*_parameters.dimY()) ;
+#ifdef USE_DIFFUSE
+    _kd.resize(_parameters.dimY());
+
+    for(int i=0; i<nY; ++i)
+        _kd[i] = 0.0;
+#endif
+}
 
 // Overload the function operator
 vec isotropic_lafortune_function::operator()(const vec& x) const 
@@ -131,24 +141,6 @@ void isotropic_lafortune_function::setNbLobes(int N)
     // Update the length of the vectors
     _C.resize(_n*_parameters.dimY()*2) ;
     _N.resize(_n*_parameters.dimY()) ;
-}
-
-// Reset the output dimension
-void isotropic_lafortune_function::setDimY(int nY)
-{
-    _parameters = alta::parameters(_parameters.dimX(), nY,
-                                   _parameters.input_parametrization(),
-                                   _parameters.output_parametrization());
-
-    // Update the length of the vectors
-    _C.resize(_n*_parameters.dimY()*2) ;
-    _N.resize(_n*_parameters.dimY()) ;
-#ifdef USE_DIFFUSE
-    _kd.resize(_parameters.dimY());
-
-    for(int i=0; i<nY; ++i)
-        _kd[i] = 0.0;
-#endif
 }
 
 //! Number of parameters to this non-linear function
