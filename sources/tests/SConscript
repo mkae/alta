@@ -333,15 +333,41 @@ if have_openexr:
   AlwaysBuild(cmd9)
   env.Alias('tests', cmd9)
 
-cmd10 = make_command_test('data2data',
+  cmd10 = make_command_test('data2brdf',
+                            ['--input',
+                             test_byproduct('gold-metallic-paint.data'),
+                             '--output',
+                             test_byproduct('gold-metallic-paint2.brdf'),
+                             '--func', '[nonlinear_function_diffuse, nonlinear_function_blinn]',
+                             '--fitter', 'nonlinear_fitter_eigen'],
+                            'nonlinear-eigen-fit')
+  env.Depends(cmd10, cmd6)
+  AlwaysBuild(cmd10)
+  env.Alias('tests', cmd10)
+
+  cmd11 = make_command_test('brdf2data',
+                            ['--input',
+                             test_byproduct('gold-metallic-paint2.brdf'),
+                             '--output',
+                             test_byproduct('gold-metallic-paint2.data'),
+                             '--data-file',
+                             test_byproduct('gold-metallic-paint.data'),
+                             '--data', 'vertical_segment'],
+                            'compound-function-to-vs')
+  env.Depends(cmd11, cmd9)
+  env.Depends(cmd11, cmd6)
+  AlwaysBuild(cmd11)
+  env.Alias('tests', cmd11)
+
+cmd20 = make_command_test('data2data',
                          ['--input',
                           test_byproduct('krylon_blue_RGB.astm'),
                           '--in-data', 'data_astm',
                           '--output',
                           test_byproduct('krylon.alta')],
                          'cornell-to-vs')
-env.Depends(cmd10, downloadKrylon)
-AlwaysBuild(cmd10)
+env.Depends(cmd20, downloadKrylon)
+AlwaysBuild(cmd20)
 
 
 # Print a summary of the tests.
