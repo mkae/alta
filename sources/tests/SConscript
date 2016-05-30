@@ -375,7 +375,7 @@ AlwaysBuild(cmd20)
 def display_test_name(node):
   print "    " + os.path.basename(node.get_abspath())
 
-tests_node = env.Alias('tests', cmd10)
+tests_node = env.Alias('tests', cmd20)
 tests = tests_node[0].children()
 
 tests_actually_run = filter(lambda n: n.get_abspath().endswith(".log"),
