@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -14,6 +14,8 @@
 #include "common.h"
 #include "params.h"
 #include "plugins_manager.h"
+
+#include <cassert>
 
 using namespace alta;
 
@@ -182,7 +184,10 @@ double function::L2_distance(const ptr<data>& d) const
 
     l2_dist += std::pow(norm(y-value(x)), 2);
 	}
+
+  assert(d->size() > 0.);
 	l2_dist = std::sqrt(l2_dist / d->size());
+
 	return l2_dist;
 }
 
