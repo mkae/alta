@@ -176,7 +176,8 @@ CXX_TESTS = [ 'core/half-test-1.cpp',
               'core/half-test-3.cpp',
               'core/half-test-4.cpp',
               'core/params-test-1.cpp',
-              'core/data-io.cpp' ]
+              'core/data-io.cpp',
+              'core/nonlinear-fit.cpp' ]
 
 # Optionally, built the CppQuickCheck tests.
 if have_cppquickcheck:
