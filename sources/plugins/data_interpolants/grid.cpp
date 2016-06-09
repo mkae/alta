@@ -285,9 +285,6 @@ class BrdfGrid : public vertical_segment {
          load_data_from_text(file, header, *this);
       }
 
-      // We're not overloading this one.
-      virtual void load(const std::string& filename);
-
       void save(const std::string& filename) const
       {
          std::ofstream file;

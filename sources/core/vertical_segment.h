@@ -94,9 +94,6 @@ class vertical_segment : public data
                       unsigned int size );
 
 
-      // Load data from a file
-      virtual void load(const std::string& filename) ;
-
       //! \brief Load data from a file using the command line arguments
       //!
       //! \details
@@ -106,7 +103,8 @@ class vertical_segment : public data
       //!   --data-positive for the data to be positive
       //!   --dt-relative use a relative segment intervale. The dt is used
       //!     multipled by the data
-      virtual void load(const std::string& filename, const arguments& args) ;
+      virtual void load(const std::string& filename,
+                        const arguments& args = arguments()) ;
 
 
       // Acces to data

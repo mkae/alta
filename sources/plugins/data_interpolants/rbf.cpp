@@ -89,10 +89,10 @@ class rbf_interpolant : public data
 		}
 
 		// Load data from a file
-		virtual void load(const std::string& filename)
+		virtual void load(const std::string& filename, const arguments& args)
 		{
 			// Load the data
-			_data->load(filename);
+      _data->load(filename, args);
 
 			// Copy the informations
       parameters p(_data->parametrization().dimX(),
@@ -128,10 +128,6 @@ class rbf_interpolant : public data
 			_kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
 			_kdtree->buildIndex();
 		#endif
-		}
-		virtual void load(const std::string& filename, const arguments&)
-		{
-			load(filename);
 		}
 
 		virtual void save(const std::string& filename) const

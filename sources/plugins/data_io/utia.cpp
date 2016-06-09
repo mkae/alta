@@ -90,7 +90,7 @@ public:
 	}
 
 	// Load data from a file
-	virtual void load(const std::string& filename) {
+    virtual void load(const std::string& filename, const arguments& args) {
 
 		/* If the file is an OpenEXR image */
 		if(filename.substr(filename.find_last_of(".") + 1) == "exr") {
@@ -134,9 +134,6 @@ public:
 		}
 
 		std::cout << "<<INFO>> Reading BRDF from file '" << filename << "' ...done" << std::endl;
-	}
-	virtual void load(const std::string& filename, const arguments&) {
-		load(filename);
 	}
 
 	virtual void save(const std::string& filename) const {

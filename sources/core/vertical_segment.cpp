@@ -61,13 +61,7 @@ vertical_segment::initializeToZero( unsigned int number_of_data_elements )
 
 
 
-void vertical_segment::load(const std::string& filename) 
-{
-	arguments args ;
-	load(filename, args) ;
-}
-
-void vertical_segment::load(const std::string& filename, const arguments& args) 
+void vertical_segment::load(const std::string& filename, const arguments& args)
 {
 	std::ifstream file;
 

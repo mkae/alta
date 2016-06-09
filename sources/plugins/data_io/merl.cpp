@@ -100,15 +100,7 @@ public: // methods
 
 
 	// Load data from a file
-	void load(const std::string& filename)
-	{
-		if(!read_brdf(filename.c_str(), brdf))
-		{
-			std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
-			throw;
-		}
-	}
-	void load(const std::string& filename, const arguments&)
+  void load(const std::string& filename, const arguments& args)
 	{
 		if(!read_brdf(filename.c_str(), brdf))
 		{

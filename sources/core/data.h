@@ -54,8 +54,8 @@ class data
     virtual ~data() {}
 
     // Load data from a file
-    virtual void load(const std::string& filename) = 0 ;
-    virtual void load(const std::string& filename, const arguments& args) = 0 ;
+    virtual void load(const std::string& filename,
+                      const arguments& args = arguments()) = 0;
 
     // Save the data to a file
     virtual void save(const std::string& filename) const;
@@ -165,13 +165,6 @@ class data_params : public data
     virtual vec value(const vec&) const
     {
       NOT_IMPLEMENTED();
-    }
-
-    // Load data from a file
-    virtual void load(const std::string&)
-    {
-      std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
-      throw;
     }
 
     virtual void load(const std::string&, const arguments&)

@@ -126,7 +126,7 @@ public: //methods
    }
 
 	// Load data from a file
-	virtual void load(const std::string& filename)
+  virtual void load(const std::string& filename, const arguments& args)
 	{
 		std::ifstream file(filename.c_str());
 		std::string line;
@@ -170,10 +170,6 @@ public: //methods
       }
 
 		file.close();
-	}
-	virtual void load(const std::string& filename, const arguments& args)
-	{
-		this->load(filename);
 	}
 };
 

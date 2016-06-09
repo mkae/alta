@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013 Inria
+   Copyright (C) 2013, 2016 Inria
    Copyright (C) 2015 CNRS
 
    This file is part of ALTA.
@@ -87,10 +87,10 @@ class MatlabInterpolant : public data
 		}
 
 		// Load data from a file
-		virtual void load(const std::string& filename)
+		virtual void load(const std::string& filename, const arguments& args)
 		{
 			// Load the data
-			_data->load(filename);
+      _data->load(filename, args);
 
 			// Copy the informations
 			setDimX(_data->dimX());
@@ -127,10 +127,6 @@ class MatlabInterpolant : public data
 			engPutVariable(ep, "Y", Y);
 
 			x = mxCreateDoubleMatrix(1, dimX(), mxREAL);
-		}
-		virtual void load(const std::string& filename, const arguments&)
-		{
-			load(filename);
 		}
 
 		virtual void save(const std::string& filename) const

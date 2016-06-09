@@ -106,15 +106,10 @@ class BrdfSlice : public data {
 		}
 
 		// Load data from a file
-		void load(const std::string& filename)
+		void load(const std::string& filename, const arguments& args)
 		{
 			delete[] _data;
 			t_EXR_IO<double>::LoadEXR(filename.c_str(), width, height, _data);
-		}
-		void load(const std::string& filename, const arguments& args)
-		{
-			load(filename);
-
 		}
 
 		void save(const std::string& filename) const
