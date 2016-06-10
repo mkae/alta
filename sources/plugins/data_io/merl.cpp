@@ -131,9 +131,9 @@ public: // methods
 		FILE *f = fopen(filename.c_str(), "wb");
 
 		int dims[3];
-		dims[0] = BRDF_SAMPLING_RES_PHI_D/2;
+		dims[0] = BRDF_SAMPLING_RES_THETA_H;
 		dims[1] = BRDF_SAMPLING_RES_THETA_D;
-		dims[2] = BRDF_SAMPLING_RES_THETA_H;
+		dims[2] = BRDF_SAMPLING_RES_PHI_D/2;
 
 		const int n = dims[0]*dims[1]*dims[2];
 
