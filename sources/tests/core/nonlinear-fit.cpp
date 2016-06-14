@@ -44,8 +44,7 @@ int main(int argc, char *argv[])
         input_file = data_dir + "/" + data_file;
     }
 
-    auto data = ptr<alta::data>(new vertical_segment());
-    data->load(input_file);
+    auto data = plugins_manager::load_data(input_file, "vertical_segment");
 
     for (auto&& fitter_name: fitters) {
         auto function = plugins_manager::get_function("nonlinear_function_diffuse",

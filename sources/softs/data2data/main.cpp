@@ -112,10 +112,11 @@ int main(int argc, char** argv)
 
 
 	// Import data
-	ptr<data> d_in = plugins_manager::get_data(args["in-data"], args) ;
+	ptr<data> d_in;
+
 	try
 	{
-		d_in->load(args["input"], args);
+      d_in = plugins_manager::load_data(args["input"], args["in-data"], args) ;
 	}
 	CATCH_FILE_IO_ERROR(args["input"]);
 

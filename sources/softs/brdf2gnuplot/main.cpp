@@ -80,22 +80,13 @@ int main(int argc, char** argv)
 	// Load a data file
 	if(args.is_defined("data") || args.is_defined("data-file"))
 	{
-		ptr<data> d = plugins_manager::get_data(args["data"], args);
+    ptr<data> d;
 
-		// Load data file if the plugin manager created a plugin object.
-		if(d)
-		{
-				try
-				{
-					d->load(args["data-file"]);
-				}
-				CATCH_FILE_IO_ERROR (args["data-file"]);
-		}
-		else
-		{
-			std::cerr << "<<ERROR>> unable to load the data plugin" << std::endl;
-			return EXIT_FAILURE;
-		}
+    try
+    {
+        d = plugins_manager::load_data(args["data-file"], args["data"], args);
+    }
+    CATCH_FILE_IO_ERROR (args["data-file"]);
 
 		// Create output file now that we are sure that needed data are loaded
 		std::ofstream file(args["output"].c_str(), std::ios_base::trunc);

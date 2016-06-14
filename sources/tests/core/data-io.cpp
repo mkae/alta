@@ -118,11 +118,17 @@ int main(int argc, char** argv)
 
     try
     {
+        std::ifstream input;
+        input.open(input_file);
+
         // Use the standard load/save methods.
-        ((data&)sample1).load(input_file);
+        ((data&)sample1).load(input);
         sample1.save(temp_file1);
 
-        ((data&)sample2).load(temp_file1);
+        std::ifstream temp1;
+        temp1.open(temp_file1);
+
+        ((data&)sample2).load(temp1);
         sample2.save(temp_file2);
 
         // Now use the binary output format.
@@ -132,7 +138,9 @@ int main(int argc, char** argv)
         out.close();
 
         // This should automatically load using the binary format loader.
-        ((data&)sample3).load(temp_file3);
+        std::ifstream temp3;
+        temp3.open(temp_file3);
+        ((data&)sample3).load(temp3);
     }
     CATCH_FILE_IO_ERROR(input_file);
 

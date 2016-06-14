@@ -504,10 +504,15 @@ int main(int argc, char* argv[])
    }
 
    std::cout << "<<INFO>> Loading data ..." << std::endl;
-   ptr<data> input = plugins_manager::get_data(args["in-data"]);
+   ptr<data> input;
    //ptr<data> input = plugins_manager::get_data("vertical_segment");
 
-   input->load(args["input"], args);
+   try
+   {
+       input = plugins_manager::load_data(args["input"], args["in-data"]);
+   }
+   CATCH_FILE_IO_ERROR (args["input"]);
+
    if(!input) {
       std::cout << "<<ERROR>> Could not load data file \'" << args["input"]
                 << "\'"  << std::endl;
@@ -515,8 +520,14 @@ int main(int argc, char* argv[])
    }
 
    // Load a function file representing the BRDF
-   ptr<data> ref = plugins_manager::get_data(args["ref-data"]) ;
-   ref->load(args["ref"]);
+   ptr<data> ref;
+
+   try
+   {
+       ref = plugins_manager::load_data(args["ref"], args["ref-data"]);
+   }
+   CATCH_FILE_IO_ERROR (args["ref"]);
+
    if(!ref) {
       std::cout << "<<ERROR>> Could not load data file \'" << args["ref"]
                 << "\'"  << std::endl;

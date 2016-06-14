@@ -81,17 +81,16 @@ int main(int argc, char** argv)
 
 	// Import data
 	ptr<data> d = NULL ;
-	d = plugins_manager::get_data(args["data"], args) ;
+	try
+	{
+      d = plugins_manager::load_data(args["input"], args["data"], args) ;
+	}
+	CATCH_FILE_IO_ERROR(args["input"]);
 
 	if(dynamic_pointer_cast<vertical_segment>(d)) {
 		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;
 		return 1;
 	}
-	try
-	{
-		d->load(args["input"]);
-	}
-	CATCH_FILE_IO_ERROR(args["input"]);
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);

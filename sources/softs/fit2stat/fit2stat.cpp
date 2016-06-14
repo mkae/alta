@@ -466,15 +466,14 @@ main(int argc, char* argv[])
   }
 
   std::cout << "<<INFO>> Loading data ..." << std::endl;
-  ptr<vertical_segment> vs_data = ptr<vertical_segment>(new vertical_segment());
-  //ptr<data> vs_data = plugins_manager::get_data("vertical_segment");
-  
+  ptr<data> vs_data;
+
   timer  t;
   try
   {
     t.start();
-    ptr<data> data = vs_data;
-    data->load(args["input"], args);
+    vs_data = plugins_manager::load_data(args["input"],
+                                         "vertical_segment", args);
     t.stop();
   }
   catch(...)
@@ -499,16 +498,13 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> BRDF File Loaded. Starting to compute statistics ... " << std::endl;
 
 
-  //Conversion 
-  ptr<data> generic_data = dynamic_pointer_cast<data>( vs_data );
-
   vertical_segment*   conv_vs = NULL;
   bool conversion_necessary = true;
   std::cout << "<<INFO>> Converting data to function parametrization if needed" << std::endl;
 
   
   t.start();
-  convertDataToFunctionParam( generic_data, brdf, conversion_necessary, conv_vs );
+  convertDataToFunctionParam( vs_data, brdf, conversion_necessary, conv_vs );
   t.stop();
   std::cout << "<<INFO>> Data converted in " << t << std::endl;
   t.reset();
@@ -521,7 +517,7 @@ main(int argc, char* argv[])
   }
   else
   {
-    converted_data = generic_data;
+    converted_data = vs_data;
   }
 
   //Here we go new way and faster because we evaluate the function just once
@@ -686,14 +682,14 @@ main(int argc, char* argv[])
 
   //Comparisons with the norm methods provided in function.cpp
   t.start();
-  double const L2   = brdf->L2_distance( generic_data ) ;
+  double const L2   = brdf->L2_distance( vs_data ) ;
   t.stop();
   std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
             << " (computed in " << t << ")" << std::endl;
   t.reset();
 
   t.start();
-  double const Linf = brdf->Linf_distance( generic_data );  
+  double const Linf = brdf->Linf_distance( vs_data );
   t.stop();
   std::cout << "<<INFO>> Linf distance to data = " << Linf 
             << " (computed in " << t << ")" << std::endl;

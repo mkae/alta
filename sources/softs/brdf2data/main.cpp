@@ -70,15 +70,13 @@ int main(int argc, char** argv)
 	}
 	
 	// Get the associated data object and load the file is any
-	ptr<data> d = plugins_manager::get_data(args["data"], args) ;
-	if(args.is_defined("data-file"))
-	{
-			try
-			{
-				d->load(args["data-file"]);
-			}
-			CATCH_FILE_IO_ERROR(args["data-file"]);
+	ptr<data> d;
+
+  try
+  {
+      d = plugins_manager::load_data(args["data-file"], args["data"], args);
 	}
+  CATCH_FILE_IO_ERROR(args["data-file"]);
 
     // Get the output object. In the case where it is not a VS file, we use
     // the load object.

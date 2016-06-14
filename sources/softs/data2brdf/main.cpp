@@ -114,11 +114,10 @@ int main(int argc, char** argv)
 
     fit->set_parameters(args) ;
 
-    ptr<data>     d = ptr<data>(plugins_manager::get_data(args["data"], args));
-
+    ptr<data> d;
 		try
 		{
-			d->load(args["input"], args);
+        d = plugins_manager::load_data(args["input"], args["data"], args);
 		}
 		CATCH_FILE_IO_ERROR(args["input"]);
 
