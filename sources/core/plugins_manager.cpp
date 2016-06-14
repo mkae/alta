@@ -466,6 +466,36 @@ ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
         return ptr<data>(new vertical_segment()) ;
     }
 }
+
+ptr<data> plugins_manager::load_data(const std::string& type, std::istream& input,
+                                     const arguments& args)
+{
+    ptr<data> result = get_data(type, args);
+    if (result) result->load(input, args);
+    return result;
+}
+
+// Load data from an input file.
+ptr<data> plugins_manager::load_data(const std::string& file,
+                                     const std::string& type,
+                                     const arguments& args)
+{
+    std::ifstream stream;
+
+    // Raise an exception when 'open' fails, and open in binary mode to
+    // placate Windows.
+    stream.exceptions(std::ios::failbit);
+    stream.open(file.c_str(), std::ifstream::binary);
+    stream.exceptions(std::ios::goodbit);
+    ptr<data> result = load_data(type, stream, args);
+    stream.close();                          // FIXME: make it auto-close
+
+    return result;
+}
+
+
+
+
 ptr<fitter> plugins_manager::get_fitter(const std::string& n)
 {
     if(n.empty())

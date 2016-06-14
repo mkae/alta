@@ -57,6 +57,15 @@ class plugins_manager
 		//! filename n. Return null if no one exist.
 		static ptr<data> get_data(const std::string& n, const arguments& args = arguments());
 
+    //! \brief Load from INPUT an instance of TYPE and return it.
+    static ptr<data> load_data(const std::string& type, std::istream& input,
+                               const arguments& args = arguments());
+
+    //! \brief Load from FILE an instance of TYPE and return it.
+    static ptr<data> load_data(const std::string& file,
+                               const std::string& type,
+                               const arguments& args = arguments());
+
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
 		static ptr<fitter> get_fitter(const std::string& n) ;
