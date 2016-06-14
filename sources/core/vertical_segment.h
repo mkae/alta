@@ -94,7 +94,7 @@ class vertical_segment : public data
                       unsigned int size );
 
 
-      //! \brief Load data from a file using the command line arguments
+      //! \brief Load data from a stream using the command line arguments.
       //!
       //! \details
       //! Specific arguments for the vertical segment data
@@ -103,7 +103,7 @@ class vertical_segment : public data
       //!   --data-positive for the data to be positive
       //!   --dt-relative use a relative segment intervale. The dt is used
       //!     multipled by the data
-      virtual void load(const std::string& filename,
+      virtual void load(std::istream& input,
                         const arguments& args = arguments()) ;
 
 

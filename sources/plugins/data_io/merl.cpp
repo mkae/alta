@@ -100,9 +100,9 @@ public: // methods
 
 
 	// Load data from a file
-  void load(const std::string& filename, const arguments& args)
+  void load(std::istream& input, const arguments& args)
 	{
-		if(!read_brdf(filename.c_str(), brdf))
+    if(!read_brdf(input, brdf))
 		{
 			std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
 			throw;
@@ -445,29 +445,21 @@ private: //methods
 	}
 
 	// Read BRDF data
-	bool read_brdf(const char *filename, double* &brdf)
+  bool read_brdf(std::istream& input, double* &brdf)
 	{
-		FILE *f = fopen(filename, "rb");
-		if (!f) {
-			std::cerr << "<<ERROR>> File \"" << filename << "\" is not present, please check path and use absolute path." << std::endl;
-			return false;
-		}
-
 		int dims[3];
-		fread(dims, sizeof(int), 3, f);
+    input.read((char *) &dims, sizeof dims);
 		int n = dims[0] * dims[1] * dims[2];
 		if (n != BRDF_SAMPLING_RES_THETA_H *
 			 BRDF_SAMPLING_RES_THETA_D *
 			 BRDF_SAMPLING_RES_PHI_D / 2)
 		{
 			fprintf(stderr, "Dimensions don't match\n");
-			fclose(f);
 			return false;
 		}
 
-		fread(brdf, sizeof(double), 3*n, f);
+    input.read((char *) brdf, 3 * n * sizeof(double));
 
-		fclose(f);
 		return true;
 	}
 

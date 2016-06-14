@@ -53,9 +53,25 @@ class data
     // Virtual destructor
     virtual ~data() {}
 
-    // Load data from a file
-    virtual void load(const std::string& filename,
+    // Load data from an input stream.
+    virtual void load(std::istream& input,
                       const arguments& args = arguments()) = 0;
+
+    // Load data from an input file.
+    void load(const std::string& file,
+              const arguments& args = arguments())
+    {
+        std::ifstream stream;
+
+        // Raise an exception when 'open' fails, and open in binary mode to
+        // placate Windows.
+        stream.exceptions(std::ios::failbit);
+        stream.open(file.c_str(), std::ifstream::binary);
+        stream.exceptions(std::ios::goodbit);
+        load(stream, args);
+        stream.close();                          // FIXME: make it auto-close
+    }
+
 
     // Save the data to a file
     virtual void save(const std::string& filename) const;
@@ -167,7 +183,7 @@ class data_params : public data
       NOT_IMPLEMENTED();
     }
 
-    virtual void load(const std::string&, const arguments&)
+    virtual void load(std::istream&, const arguments&)
     {
       std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
       throw;

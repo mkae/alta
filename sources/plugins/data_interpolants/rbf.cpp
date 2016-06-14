@@ -89,10 +89,10 @@ class rbf_interpolant : public data
 		}
 
 		// Load data from a file
-		virtual void load(const std::string& filename, const arguments& args)
+		virtual void load(std::istream& input, const arguments& args)
 		{
 			// Load the data
-      _data->load(filename, args);
+      _data->load(input, args);
 
 			// Copy the informations
       parameters p(_data->parametrization().dimX(),

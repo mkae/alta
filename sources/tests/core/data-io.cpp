@@ -119,10 +119,10 @@ int main(int argc, char** argv)
     try
     {
         // Use the standard load/save methods.
-        sample1.load(input_file);
+        ((data&)sample1).load(input_file);
         sample1.save(temp_file1);
 
-        sample2.load(temp_file1);
+        ((data&)sample2).load(temp_file1);
         sample2.save(temp_file2);
 
         // Now use the binary output format.
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
         out.close();
 
         // This should automatically load using the binary format loader.
-        sample3.load(temp_file3);
+        ((data&)sample3).load(temp_file3);
     }
     CATCH_FILE_IO_ERROR(input_file);
 

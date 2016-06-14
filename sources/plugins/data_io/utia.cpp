@@ -90,8 +90,9 @@ public:
 	}
 
 	// Load data from a file
-    virtual void load(const std::string& filename, const arguments& args) {
+    virtual void load(std::istream& input, const arguments& args) {
 
+#if 0 // FIXME: backport this
 		/* If the file is an OpenEXR image */
 		if(filename.substr(filename.find_last_of(".") + 1) == "exr") {
 			double* temp;
@@ -115,25 +116,19 @@ public:
 			}
 
 		/* If the file is a binary */
-		} else {
-
-			std::ifstream stream(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-			/*
-			if (!stream.is_open()) {
-			  std::cerr << "<<ERROR>> Unable to open file '" << filename << "' !" << std::endl;
-			  throw;
-			}*/
-
+		} else
+#endif
+    {
 			int count = 0;
 			for(int isp=0;isp<planes;isp++)	{
 			  for(int ni=0;ni<nti*npi;ni++)
 			    for(int nv=0;nv<ntv*npv;nv++) {
-			    	stream >> Bd[count++];
+			    	input >> Bd[count++];
 			    }
 			}
 		}
 
-		std::cout << "<<INFO>> Reading BRDF from file '" << filename << "' ...done" << std::endl;
+		std::cout << "<<INFO>> Successfully read BRDF" << std::endl;
 	}
 
 	virtual void save(const std::string& filename) const {

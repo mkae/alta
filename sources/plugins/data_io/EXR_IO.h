@@ -6,17 +6,31 @@
 
 
 #include <stdexcept>
+#include <cassert>
 
 #include <ImfRgbaFile.h>
 #include <ImfArray.h>
+
+// XXX: This header is not installed as of version 2.2.0 of OpenEXR, see
+// <https://lists.nongnu.org/archive/html/openexr-devel/2016-06/msg00001.html>
+// and <https://github.com/openexr/openexr/pull/184>.
+#include <ImfStdIO.h>
 
 template<typename FType>
 class t_EXR_IO
 {
 	public:
-		static bool LoadEXR(const char *filename,int& W,int& H, FType *& pix,int nC=3) 
+		static bool LoadEXR(std::istream& input, int& W,int& H, FType *& pix,int nC=3) 
 		{
-			Imf::RgbaInputFile file(filename);
+      // XXX: OpenEXR implements its own IStream and OStream classes, but
+      // they are completely independent from those of libstdc++.  The
+      // closest thing it has is 'StdIFStream', hence this hack.
+      std::ifstream* ifstream = dynamic_cast<std::ifstream*>(&input);
+      assert(ifstream != NULL);
+
+      Imf::StdIFStream iifstream(*ifstream, "unknown file name");
+
+      Imf::RgbaInputFile file(iifstream);
 			Imath::Box2i dw = file.dataWindow();
 
 			W = dw.max.x - dw.min.x + 1;

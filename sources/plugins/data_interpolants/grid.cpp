@@ -269,20 +269,13 @@ class BrdfGrid : public vertical_segment {
       }
 
       // Load data from a file
-      virtual void load(const std::string& filename, const arguments& args)
+      virtual void load(std::istream& input, const arguments& args)
       {
-         std::ifstream file;
-
-         // Raise an exception when 'open' fails.
-         file.exceptions (std::ios::failbit);
-         file.open(filename.c_str());
-         file.exceptions (std::ios::goodbit);
-
-         arguments header = arguments::parse_header(file);
+         arguments header = arguments::parse_header(input);
          initialize(header, false);
 
          // FIXME: ARGS is ignored.
-         load_data_from_text(file, header, *this);
+         load_data_from_text(input, header, *this);
       }
 
       void save(const std::string& filename) const

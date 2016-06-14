@@ -473,8 +473,9 @@ main(int argc, char* argv[])
   try
   {
     t.start();
-    vs_data->load(args["input"], args);  
-      t.stop();
+    ptr<data> data = vs_data;
+    data->load(args["input"], args);
+    t.stop();
   }
   catch(...)
   {

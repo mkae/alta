@@ -126,13 +126,12 @@ public: //methods
    }
 
 	// Load data from a file
-  virtual void load(const std::string& filename, const arguments& args)
+  virtual void load(std::istream& input, const arguments& args)
 	{
-		std::ifstream file(filename.c_str());
 		std::string line;
 
 		// Parse the header, get the output/input dimensions and params
-		arguments header = parse_header(file);
+		arguments header = parse_header(input);
       auto vars = header.get_vec<std::string>("VARS");
       update_params(vars);
 
@@ -145,9 +144,9 @@ public: //methods
       const int n = parametrization().dimX() + parametrization().dimY();
       int i = 0;
 
-		while(file.good())
+		while(input.good())
 		{
-			std::getline(file, line);
+			std::getline(input, line);
 
          if(line.size() == 0 || line.rfind(',') == std::string::npos)
             continue;
@@ -168,8 +167,6 @@ public: //methods
       if(header.is_defined("NUM_POINTS")) {
          assert(this->size() == header.get_int("NUM_POINTS"));
       }
-
-		file.close();
 	}
 };
 

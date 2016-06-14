@@ -61,16 +61,9 @@ vertical_segment::initializeToZero( unsigned int number_of_data_elements )
 
 
 
-void vertical_segment::load(const std::string& filename, const arguments& args)
+void vertical_segment::load(std::istream& input, const arguments& args)
 {
-	std::ifstream file;
-
-	// Raise an exception when 'open' fails.
-	file.exceptions (std::ios::failbit);
-	file.open(filename.c_str());
-	file.exceptions (std::ios::goodbit);
-
-	arguments header = arguments::parse_header(file);
+	arguments header = arguments::parse_header(input);
 
 	// Default behaviour: parsing a file as TEXT file. Send a message error in case
 	// the user did not set it.
@@ -79,23 +72,11 @@ void vertical_segment::load(const std::string& filename, const arguments& args)
 	}
 
 	if (header["FORMAT"] == "binary") {
-
-#ifdef _WIN32
-      // On MS Windows strange things happen when the ifstream is not opened in
-      // binary mode.  To avoid having badbit set after a few entries read, we
-      // close and re-open the file with correct flags.
-      file.close();
-      file.open(filename.c_str(), std::ifstream::binary);
-      header = arguments::parse_header(file);
-#endif
-
-		load_data_from_binary(file, header, *this);
+		load_data_from_binary(input, header, *this);
 	} else {
     // FIXME: ARGS is currently ignored.
-		load_data_from_text(file, header, *this);
+		load_data_from_text(input, header, *this);
 	}
-
-	file.close();
 }
 
 void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
