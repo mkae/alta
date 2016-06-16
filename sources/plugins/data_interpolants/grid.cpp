@@ -20,7 +20,7 @@
 
 using namespace alta;
 
-vec get_min(const params::input& param) {
+static vec get_min(const params::input& param) {
 
    vec res(params::dimension(param));
    switch(param)
@@ -76,7 +76,7 @@ vec get_min(const params::input& param) {
    return res;
 }
 
-vec get_max(const params::input& param) {
+static vec get_max(const params::input& param) {
 
    vec res(params::dimension(param));
    switch(param)
