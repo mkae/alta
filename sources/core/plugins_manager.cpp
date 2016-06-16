@@ -470,8 +470,34 @@ ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
 ptr<data> plugins_manager::load_data(const std::string& type, std::istream& input,
                                      const arguments& args)
 {
-    ptr<data> result = get_data(type, args);
-    if (result) result->load(input, args);
+    ptr<data> result;
+
+    if (type.empty() || type == "vertical_segment")
+    {
+        auto header = arguments::parse_header(input);
+        auto vs = new vertical_segment();
+
+        if(!header.is_defined("FORMAT")) {
+            std::cerr << "<<DEBUG>> The file format is undefined, assuming TEXT"
+                      << std::endl;
+        }
+
+        if (header["FORMAT"] == "binary") {
+            load_data_from_binary(input, header, *vs);
+        } else {
+            // FIXME: ARGS is currently ignored.
+            load_data_from_text(input, header, *vs);
+        }
+
+        result = ptr<data>(vs);
+    }
+    else
+    {
+        LoadDataPrototype load;
+        load = open_library<LoadDataPrototype>(type, "load_data");
+        if (load != NULL) result = ptr<data>(load(input, args));
+    }
+
     return result;
 }
 

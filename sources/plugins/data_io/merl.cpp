@@ -70,6 +70,9 @@ using namespace alta;
  *   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/
  *   [ngan]: http://people.csail.mit.edu/addy/research/brdf/
  */
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
+
 class MERL : public data
 {
 private: // data
@@ -98,16 +101,6 @@ public: // methods
     	delete[] brdf;
     }
 
-
-	// Load data from a file
-  void load(std::istream& input, const arguments& args)
-	{
-    if(!read_brdf(input, brdf))
-		{
-			std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
-			throw;
-		}
-	}
 
 	void save(const std::string& filename) const
 	{
@@ -445,28 +438,42 @@ private: //methods
 	}
 
 	// Read BRDF data
-  bool read_brdf(std::istream& input, double* &brdf)
-	{
+  friend data* load_data(std::istream&, const arguments&);
+};
+
+static bool read_brdf(std::istream& input, double* &brdf)
+{
 		int dims[3];
     input.read((char *) &dims, sizeof dims);
 		int n = dims[0] * dims[1] * dims[2];
 		if (n != BRDF_SAMPLING_RES_THETA_H *
-			 BRDF_SAMPLING_RES_THETA_D *
-			 BRDF_SAMPLING_RES_PHI_D / 2)
+        BRDF_SAMPLING_RES_THETA_D *
+        BRDF_SAMPLING_RES_PHI_D / 2)
 		{
-			fprintf(stderr, "Dimensions don't match\n");
-			return false;
+        fprintf(stderr, "Dimensions don't match\n");
+        return false;
 		}
 
     input.read((char *) brdf, 3 * n * sizeof(double));
 
 		return true;
-	}
-
-};
+}
 
 
 ALTA_DLL_EXPORT data* provide_data(const arguments&)
 {
     return new MERL();
+}
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
+{
+    MERL* result = new MERL();
+
+    if(!read_brdf(input, result->brdf))
+		{
+        std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
+        throw;
+		}
+
+    return result;
 }

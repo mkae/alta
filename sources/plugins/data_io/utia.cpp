@@ -30,6 +30,8 @@
 
 using namespace alta;
 
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
+
 /*! \ingroup datas
  *  \class data_utia
  *  \brief Data interface for the [UTIA][utia] file format.
@@ -87,48 +89,6 @@ public:
 
 	virtual ~UTIA() {
 		delete[] this->Bd;
-	}
-
-	// Load data from a file
-    virtual void load(std::istream& input, const arguments& args) {
-
-#if 0 // FIXME: backport this
-		/* If the file is an OpenEXR image */
-		if(filename.substr(filename.find_last_of(".") + 1) == "exr") {
-			double* temp;
-			int W, H;
-			if(!t_EXR_IO<double>::LoadEXR(filename.c_str(), W, H, temp, 3) || W != npi*nti || H != ntv*npv) {
-				std::cerr << "<<ERROR>> Unable to open file '" << filename << "'" << std::endl;
-				throw;
-
-			} else {
-				/* Data copy */
-				for(int i=0; i<H; ++i)
-					for(int j=0; j<W; ++j){
-						int indexUTIA = i*W+j;
-						int indexEXR  = (H-i-1)*W+j;
-		    			Bd[indexUTIA + 0*nPerPlane] = temp[3*indexEXR + 0];
-		    			Bd[indexUTIA + 1*nPerPlane] = temp[3*indexEXR + 1];
-		    			Bd[indexUTIA + 2*nPerPlane] = temp[3*indexEXR + 2];
-		  			}
-
-				delete[] temp;
-			}
-
-		/* If the file is a binary */
-		} else
-#endif
-    {
-			int count = 0;
-			for(int isp=0;isp<planes;isp++)	{
-			  for(int ni=0;ni<nti*npi;ni++)
-			    for(int nv=0;nv<ntv*npv;nv++) {
-			    	input >> Bd[count++];
-			    }
-			}
-		}
-
-		std::cout << "<<INFO>> Successfully read BRDF" << std::endl;
 	}
 
 	virtual void save(const std::string& filename) const {
@@ -335,9 +295,55 @@ public:
 	virtual int size() const {
 		return nPerPlane;
 	}
+
+  friend data* load_data(std::istream&, const arguments&);
 };
 
 ALTA_DLL_EXPORT data* provide_data(const arguments&)
 {
     return new UTIA();
+}
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
+{
+#if 0 // FIXME: backport this
+		/* If the file is an OpenEXR image */
+		if(filename.substr(filename.find_last_of(".") + 1) == "exr") {
+        double* temp;
+        int W, H;
+        if(!t_EXR_IO<double>::LoadEXR(input, W, H, temp, 3) || W != npi*nti || H != ntv*npv) {
+            std::cerr << "<<ERROR>> Unable to open file '" << filename << "'" << std::endl;
+            throw;
+
+        } else {
+            /* Data copy */
+            for(int i=0; i<H; ++i)
+                for(int j=0; j<W; ++j){
+                    int indexUTIA = i*W+j;
+                    int indexEXR  = (H-i-1)*W+j;
+                    Bd[indexUTIA + 0*nPerPlane] = temp[3*indexEXR + 0];
+                    Bd[indexUTIA + 1*nPerPlane] = temp[3*indexEXR + 1];
+                    Bd[indexUTIA + 2*nPerPlane] = temp[3*indexEXR + 2];
+                }
+
+            delete[] temp;
+        }
+
+        /* If the file is a binary */
+		} else
+#endif
+
+    UTIA* result = new UTIA();
+
+    int count = 0;
+    for(int isp=0; isp < result->planes; isp++)	{
+        for(int ni=0; ni< result->nti * result->npi; ni++)
+            for(int nv=0; nv < result->ntv * result->npv; nv++) {
+                input >> result->Bd[count++];
+            }
+    }
+
+		std::cout << "<<INFO>> Successfully read BRDF" << std::endl;
+
+    return result;
 }

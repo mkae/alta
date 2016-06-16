@@ -23,6 +23,12 @@ using namespace alta;
 
 //#define RELATIVE_ERROR
 
+vertical_segment::vertical_segment(const parameters& params,
+                                   std::vector<vec>&& input_data)
+    : data(params), _data(input_data), _is_absolute(true), _dt(0.1)
+{
+}
+
 vertical_segment::vertical_segment(const parameters& params, unsigned int size):
     data(params), _is_absolute(true), _dt(0.1)
 {
@@ -56,26 +62,6 @@ vertical_segment::initializeToZero( unsigned int number_of_data_elements )
 	{
 		vec initial_element = vec::Zero( size_of_one_element );
 		_data.push_back( initial_element );
-	}
-}
-
-
-
-void vertical_segment::load(std::istream& input, const arguments& args)
-{
-	arguments header = arguments::parse_header(input);
-
-	// Default behaviour: parsing a file as TEXT file. Send a message error in case
-	// the user did not set it.
-	if(! header.is_defined("FORMAT")) {
-		std::cerr << "<<DEBUG>> The file format is undefined, assuming TEXT" << std::endl;
-	}
-
-	if (header["FORMAT"] == "binary") {
-		load_data_from_binary(input, header, *this);
-	} else {
-    // FIXME: ARGS is currently ignored.
-		load_data_from_text(input, header, *this);
 	}
 }
 

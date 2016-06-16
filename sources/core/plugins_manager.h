@@ -90,5 +90,7 @@ class plugins_manager
 		typedef function* (*FunctionPrototype)(const parameters&);
 		typedef fitter*   (*FitterPrototype)();
 		typedef data*     (*DataPrototype)(const arguments&);
+    typedef data*     (*LoadDataPrototype)(std::istream& input,
+                                           const arguments&);
 };
 }

@@ -9,6 +9,7 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #include <core/data.h>
+#include <core/data_storage.h>
 #include <core/vertical_segment.h>
 
 #include <cstdio>
@@ -151,15 +152,15 @@ class BrdfGrid : public vertical_segment {
 
       std::vector<int> _size;
 
-      BrdfGrid(const arguments& args) : vertical_segment()
+      BrdfGrid(const arguments& args)
+          : vertical_segment(alta::parameters(2, 3, params::STARK_2D,
+                                              params::RGB_COLOR),
+                             0)                   // XXX: size
       {
-         // Set the input and output parametrization
-         parameters p(2, 3, params::STARK_2D, params::RGB_COLOR);
-         setParametrization(p);
-
          initialize(args);
       }
 
+      // FIXME: Move this to constructor.
       void initialize(const arguments& args, bool preallocate = true) {
 
          // Allow to load a different parametrization depending on the
@@ -268,16 +269,6 @@ class BrdfGrid : public vertical_segment {
          }
       }
 
-      // Load data from a file
-      virtual void load(std::istream& input, const arguments& args)
-      {
-         arguments header = arguments::parse_header(input);
-         initialize(header, false);
-
-         // FIXME: ARGS is ignored.
-         load_data_from_text(input, header, *this);
-      }
-
       void save(const std::string& filename) const
       {
          std::ofstream file;
@@ -377,4 +368,18 @@ class BrdfGrid : public vertical_segment {
 ALTA_DLL_EXPORT data* provide_data(const arguments& args)
 {
     return new BrdfGrid(args);
+}
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input,
+                                const arguments& args)
+{
+    arguments header = arguments::parse_header(input);
+
+    BrdfGrid* result = new BrdfGrid(args);
+
+    // XXX: Should be done in constructor.
+    result->initialize(header, false);
+
+    load_data_from_text(input, header, *result);
+    return result;
 }

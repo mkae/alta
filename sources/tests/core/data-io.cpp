@@ -18,6 +18,7 @@
 #include <core/data.h>
 #include <core/data_storage.h>
 #include <core/vertical_segment.h>
+#include <core/plugins_manager.h>
 #include <tests.h>
 
 #include <string>
@@ -102,7 +103,6 @@ int main(int argc, char** argv)
 {
     std::string input_file;
     temporary_file temp_file1, temp_file2, temp_file3;
-    vertical_segment sample1, sample2, sample3;
 
     if (argc > 1)
         // Process the user-specified file.
@@ -122,39 +122,39 @@ int main(int argc, char** argv)
         input.open(input_file);
 
         // Use the standard load/save methods.
-        ((data&)sample1).load(input);
-        sample1.save(temp_file1);
+        auto sample1 = plugins_manager::load_data("vertical_segment", input);
+        sample1->save(temp_file1);
 
         std::ifstream temp1;
         temp1.open(temp_file1);
 
-        ((data&)sample2).load(temp1);
-        sample2.save(temp_file2);
+        auto sample2 = plugins_manager::load_data("vertical_segment", temp1);
+        sample2->save(temp_file2);
 
         // Now use the binary output format.
         std::ofstream out;
         out.open(temp_file3.name().c_str(), std::ofstream::binary);
-        save_data_as_binary(out, sample2);
+        save_data_as_binary(out, *sample2);
         out.close();
 
         // This should automatically load using the binary format loader.
         std::ifstream temp3;
         temp3.open(temp_file3);
-        ((data&)sample3).load(temp3);
+        auto sample3 = plugins_manager::load_data("vertical_segment", temp3);
+
+        TEST_ASSERT(sample1->equals(*sample2));
+        TEST_ASSERT(files_are_equal(temp_file1, temp_file2));
+        TEST_ASSERT(sample2->equals(*sample3));
+
+        TEST_ASSERT(sample1->min().size() == sample1->parametrization().dimX());
+        TEST_ASSERT(sample1->max().size() == sample1->parametrization().dimX());
+
+        TEST_ASSERT(sample1->min() == sample2->min());
+        TEST_ASSERT(sample1->max() == sample2->max());
+        TEST_ASSERT(sample1->min() == sample3->min());
+        TEST_ASSERT(sample1->max() == sample3->max());
     }
     CATCH_FILE_IO_ERROR(input_file);
-
-    TEST_ASSERT(sample1.equals(sample2));
-    TEST_ASSERT(files_are_equal(temp_file1, temp_file2));
-    TEST_ASSERT(sample2.equals(sample3));
-
-    TEST_ASSERT(sample1.min().size() == sample1.parametrization().dimX());
-    TEST_ASSERT(sample1.max().size() == sample1.parametrization().dimX());
-
-    TEST_ASSERT(sample1.min() == sample2.min());
-    TEST_ASSERT(sample1.max() == sample2.max());
-    TEST_ASSERT(sample1.min() == sample3.min());
-    TEST_ASSERT(sample1.max() == sample3.max());
 
     return EXIT_SUCCESS;
 }

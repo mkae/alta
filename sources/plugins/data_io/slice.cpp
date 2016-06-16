@@ -49,6 +49,8 @@ brdf_slice_parameters(const arguments& args)
     return result;
 }
 
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
+
 /*! \ingroup datas
  *  \class data_brdf_slice
  *  \brief Data interface for the BRDF slice file format.
@@ -103,13 +105,6 @@ class BrdfSlice : public data {
 		~BrdfSlice()
 		{
 			delete[] _data;
-		}
-
-		// Load data from a file
-		void load(std::istream& input, const arguments& args)
-		{
-			delete[] _data;
-			t_EXR_IO<double>::LoadEXR(input, width, height, _data);
 		}
 
 		void save(const std::string& filename) const
@@ -281,6 +276,8 @@ class BrdfSlice : public data {
 			}
 			return res ;
 		}
+
+    friend data* load_data(std::istream&, const arguments&);
 };
 
 ALTA_DLL_EXPORT data* provide_data(const arguments& args)
@@ -289,3 +286,13 @@ ALTA_DLL_EXPORT data* provide_data(const arguments& args)
 }
 
 
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
+{
+    BrdfSlice* result = new BrdfSlice(args);
+
+    delete[] result->_data;
+    t_EXR_IO<double>::LoadEXR(input, result->width, result->height,
+                              result->_data);
+
+    return result;
+}

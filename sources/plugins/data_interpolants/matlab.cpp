@@ -86,6 +86,9 @@ class MatlabInterpolant : public data
 			engClose(ep);
 		}
 
+    // FIXME: The following method should be converted to a 'load_data'
+    // function.
+#if 0
 		// Load data from a file
 		virtual void load(std::istream& input, const arguments& args)
 		{
@@ -128,6 +131,7 @@ class MatlabInterpolant : public data
 
 			x = mxCreateDoubleMatrix(1, dimX(), mxREAL);
 		}
+#endif
 
 		virtual void save(const std::string& filename) const
 		{

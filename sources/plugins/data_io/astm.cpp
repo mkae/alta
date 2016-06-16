@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <utility>
 
 using namespace alta;
 
@@ -50,128 +51,126 @@ class ASTM : public vertical_segment
 {
 
 public: //methods
-	ASTM() : vertical_segment() {
+    ASTM(const parameters& params, std::vector<vec>&& input_data)
+        : vertical_segment(params, std::move(input_data))
+    { }
 
-	}
+    ASTM(): vertical_segment() { }
+};
 
-   // Parse ASTM header.
-   // An ASTM header is composed of a KEY in capital letters and a list
-   // of string/numeric values. An ASTM header finishes after the key VARS.
-   //
-   arguments parse_header(std::istream& in) const {
+// Parse ASTM header.
+// An ASTM header is composed of a KEY in capital letters and a list
+// of string/numeric values. An ASTM header finishes after the key VARS.
+//
+static arguments parse_header(std::istream& in) {
 
-      arguments args;
-      std::string key, line;
+    arguments args;
+    std::string key, line;
 
-      while(in.good()) {
+    while(in.good()) {
 
-         // Get the current key
-         in >> key;
+        // Get the current key
+        in >> key;
 
-         // Extract the current line
-         std::getline(in, line);
+        // Extract the current line
+        std::getline(in, line);
 
-         // End of header
-         if(key == "VARS") {
+        // End of header
+        if(key == "VARS") {
             args.update(key, std::string("[") + line + std::string("]"));
             break;
-         } else {
+        } else {
             args.update(key, line);
-         }
-      }
+        }
+    }
 
-      return args;
-   }
+    return args;
+}
 
-   // Update the dimX, dimY and input and output dimension based on the
-   // values stored in the VARS list.
-   //
-   // The input parametrization can take the form:
-   //    + theta_i, phi_i, theta_s, phi_s
-   //    + theta_i, theta_s, phi_s
-   //
-   // The output parametrization can take the form:
-   //    + Integrated ..
-   //    + R, G, B
-   //
-   void update_params(const std::vector<std::string>& vars) {
+const parameters
+compute_parameters(const std::vector<std::string>& vars)
+{
+    // Update the dimX, dimY and input and output dimension based on the
+    // values stored in the VARS list.
+    //
+    // The input parametrization can take the form:
+    //    + theta_i, phi_i, theta_s, phi_s
+    //    + theta_i, theta_s, phi_s
+    //
+    // The output parametrization can take the form:
+    //    + Integrated ..
+    //    + R, G, B
+    //
+    unsigned int nX = 0, nY = 0;
 
-      unsigned int nX = 0, nY = 0;
-
-      for(auto it=vars.begin(); it!=vars.end(); it++) {
-         if(*it == "theta_i" || *it == "phi_i" ||
-            *it == "theta_s" || *it == "phi_s") {
+    for(auto it=vars.begin(); it!=vars.end(); it++) {
+        if(*it == "theta_i" || *it == "phi_i" ||
+           *it == "theta_s" || *it == "phi_s") {
             nX += 1;
-         } else {
+        } else {
             nY += 1;
-         }
-      }
+        }
+    }
 
-      auto out_param = [&]() {
-          if(vars.back() == "B") {
-              return params::RGB_COLOR;
-          } else if(vars.back().compare(0, 10, "Integrated") == 0) {
-              return params::INV_STERADIAN;
-          } else {
-              std::cout << "<<ERROR>> Output format not handled in \'data_astm\'" << std::endl;
-              return params::UNKNOWN_OUTPUT;
-          }
-      };
+    auto out_param = [&]() {
+        if(vars.back() == "B") {
+            return params::RGB_COLOR;
+        } else if(vars.back().compare(0, 10, "Integrated") == 0) {
+            return params::INV_STERADIAN;
+        } else {
+            std::cout << "<<ERROR>> Output format not handled in \'data_astm\'" << std::endl;
+            return params::UNKNOWN_OUTPUT;
+        }
+    };
 
-      parameters param(nX, nY,
-                       nX == 4 ? params::SPHERICAL_TL_PL_TV_PV : params::UNKNOWN_INPUT,
-                       out_param());
+    return parameters(nX, nY,
+                      nX == 4 ? params::SPHERICAL_TL_PL_TV_PV : params::UNKNOWN_INPUT,
+                      out_param());
+}
 
-      setParametrization(param);
-   }
-
-	// Load data from a file
-  virtual void load(std::istream& input, const arguments& args)
-	{
-		std::string line;
-
-		// Parse the header, get the output/input dimensions and params
-		arguments header = parse_header(input);
-      auto vars = header.get_vec<std::string>("VARS");
-      update_params(vars);
-
-      // Check data size from header
-      assert(header.is_defined("NUM_POINTS"));
-      int size = header.get_int("NUM_POINTS", 0);
-      initializeToZero(size);
-
-      // Size of the data
-      const int n = parametrization().dimX() + parametrization().dimY();
-      int i = 0;
-
-		while(input.good())
-		{
-			std::getline(input, line);
-
-         if(line.size() == 0 || line.rfind(',') == std::string::npos)
-            continue;
-
-         std::replace(line.begin(), line.end(), ',', ' ');
-
-         // Create a stream from the line data and extract it as
-         // a vec of dim parametrization().dimX() + parametrization().dimY().
-         std::stringstream stream(line);
-			vec x(n);
-			for(int i=0; i<n; ++i) {
-				stream >> x[i];
-			}
-
-			set(i++, x);
-		}
-
-      if(header.is_defined("NUM_POINTS")) {
-         assert(this->size() == header.get_int("NUM_POINTS"));
-      }
-	}
-};
 
 ALTA_DLL_EXPORT data* provide_data(const arguments&)
 {
     return new ASTM();
 }
 
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
+{
+		std::string line;
+
+		// Parse the header, get the output/input dimensions and params
+		arguments header = parse_header(input);
+    auto vars = header.get_vec<std::string>("VARS");
+    auto params = compute_parameters(vars);
+
+    // Check data size from header
+    assert(header.is_defined("NUM_POINTS"));
+    int size = header.get_int("NUM_POINTS", 0);
+
+    // Size of the data
+    std::vector<vec> data(size);
+    const int n = params.dimX() + params.dimY();
+    int i = 0;
+
+		while(input.good())
+		{
+        std::getline(input, line);
+
+        if(line.size() == 0 || line.rfind(',') == std::string::npos)
+            continue;
+
+        std::replace(line.begin(), line.end(), ',', ' ');
+
+        // Create a stream from the line data and extract it as
+        // a vec of dim parametrization().dimX() + parametrization().dimY().
+        std::stringstream stream(line);
+        vec x(n);
+        for(int i=0; i<n; ++i) {
+            stream >> x[i];
+        }
+
+        data[i++] = x;
+		}
+
+    return new ASTM(params, std::move(data));
+}

@@ -80,6 +80,9 @@ class vertical_segment : public data
 {
    public: // methods
 
+      vertical_segment(const parameters& params,
+                       std::vector<vec>&& data);
+
       vertical_segment(const parameters& params, unsigned int size);
 
       //! \brief Default constructor that does nothing at all.
@@ -92,20 +95,6 @@ class vertical_segment : public data
       vertical_segment( params::input in_param,
                       params::output out_param,
                       unsigned int size );
-
-
-      //! \brief Load data from a stream using the command line arguments.
-      //!
-      //! \details
-      //! Specific arguments for the vertical segment data
-      //!   --dt specify a value for the absolute/relative segment if not defined
-      //!        in the data
-      //!   --data-positive for the data to be positive
-      //!   --dt-relative use a relative segment intervale. The dt is used
-      //!     multipled by the data
-      virtual void load(std::istream& input,
-                        const arguments& args = arguments()) ;
-
 
       // Acces to data
       virtual vec get(int i) const ;

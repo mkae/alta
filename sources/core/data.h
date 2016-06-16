@@ -24,11 +24,6 @@
 #include "ptr.h"
 
 
-//namespace alta {
-//   class data;
-//}
-//void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data);
-
 namespace alta {
 
 /*! \brief A data object. Allows to load data from files.
@@ -52,10 +47,6 @@ class data
 
     // Virtual destructor
     virtual ~data() {}
-
-    // Load data from an input stream.
-    virtual void load(std::istream& input,
-                      const arguments& args = arguments()) = 0;
 
     // Save the data to a file
     virtual void save(const std::string& filename) const;
@@ -165,12 +156,6 @@ class data_params : public data
     virtual vec value(const vec&) const
     {
       NOT_IMPLEMENTED();
-    }
-
-    virtual void load(std::istream&, const arguments&)
-    {
-      std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
-      throw;
     }
 
     // Acces to data

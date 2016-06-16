@@ -12,6 +12,7 @@
 #include <core/vertical_segment.h>
 #include <core/common.h>
 #include <core/args.h>
+#include <core/plugins_manager.h>
 
 //#define USE_DELAUNAY
 #ifdef USE_DELAUNAY
@@ -72,10 +73,40 @@ class rbf_interpolant : public data
 
 	public:
 
-		rbf_interpolant() : _data(new vertical_segment())
+		rbf_interpolant(ptr<data> proxied_data)
+        : data(proxied_data->parametrization()),
+          _data(proxied_data),
+          _knn(3)
 		{
-			_knn = 3;
-		}
+        _min = _data->min();
+        _max = _data->max();
+
+#ifdef USE_DELAUNAY
+        dD = parametrization().dimX()+parametrization().dimY();
+        D  = new Delaunay_d(dD);
+        for(int i=0; i<_data->size(); ++i)
+        {
+            vec x = _data->get(i);
+
+            Point pt(dD, &x[0], &x[dD]);
+            D->insert(pt);
+        }
+
+        std::cout << "<<DEBUG>> number of points in the Delaunay triangulation: " << D->all_points().size() << std::endl;
+        std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
+#else
+        // Update the KDtreee by inserting all points
+        double* _d = new double[parametrization().dimX()*_data->size()];
+        flann::Matrix<double> pts(_d, _data->size(), parametrization().dimX());
+        for(int i=0; i<_data->size(); ++i)
+        {
+            vec x = _data->get(i);
+            memcpy(pts[i], &x[0], parametrization().dimX()*sizeof(double));
+        }
+        _kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
+        _kdtree->buildIndex();
+#endif
+    }
 
 		virtual ~rbf_interpolant()
 		{
@@ -85,48 +116,6 @@ class rbf_interpolant : public data
 		#else
 			if(D != NULL)
 				delete D;
-		#endif
-		}
-
-		// Load data from a file
-		virtual void load(std::istream& input, const arguments& args)
-		{
-			// Load the data
-      _data->load(input, args);
-
-			// Copy the informations
-      parameters p(_data->parametrization().dimX(),
-                   _data->parametrization().dimY(),
-                   _data->parametrization().input_parametrization(),
-                   _data->parametrization().output_parametrization());
-      setParametrization(p);
-			setMin(_data->min());
-			setMax(_data->max());
-
-		#ifdef USE_DELAUNAY
-			dD = parametrization().dimX()+parametrization().dimY();
-			D  = new Delaunay_d(dD);
-			for(int i=0; i<_data->size(); ++i)
-			{
-				vec x = _data->get(i);
-
-				Point pt(dD, &x[0], &x[dD]);
-				D->insert(pt);
-			}
-
-			std::cout << "<<DEBUG>> number of points in the Delaunay triangulation: " << D->all_points().size() << std::endl;
-			std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
-		#else
-			// Update the KDtreee by inserting all points
-			double* _d = new double[parametrization().dimX()*_data->size()];
-			flann::Matrix<double> pts(_d, _data->size(), parametrization().dimX());
-			for(int i=0; i<_data->size(); ++i)
-			{
-				vec x = _data->get(i);
-				memcpy(pts[i], &x[0], parametrization().dimX()*sizeof(double));
-			}
-			_kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
-			_kdtree->buildIndex();
 		#endif
 		}
 
@@ -236,7 +225,13 @@ class rbf_interpolant : public data
 		}
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
 {
-    return new rbf_interpolant();
+    // Load the data
+    ptr<data> proxied = plugins_manager::load_data("vertical_segment",
+                                                   input, args);
+
+    return new rbf_interpolant(proxied);
 }
+
+
