@@ -88,9 +88,9 @@ dependencies are met, and which of the optional dependencies are
 available.  All the compilation byproducts go to the
 <tt>sources/build</tt> sub-directory.
 
-Some of the missing dependencies, such as NlOpt, IpOpt, and CERES, are
-automatically downloaded from upstream when they are not found.  The
-downloaded files are integrity-checked, and then the software is built
+If Eigen could not be found, it is
+automatically downloaded from upstream.  The
+downloaded file is integrity-checked, and then the software is built
 and installed under the <tt>external/build</tt> sub-directory of the
 source tree.
 

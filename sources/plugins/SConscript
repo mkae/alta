@@ -94,6 +94,8 @@ if not GetOption('silent') and not GetOption('clean'):
     # of directories that contain several plugins.  (FIXME)
     map(display_status, omitted)
     print ""
+    print "  See 'documents/install.dox' or <http://alta.gforge.inria.fr/install.html>"
+    print "  for a list of optional dependencies and associated plugins."
     print "  See 'config.log' for details."
     print ""
 
