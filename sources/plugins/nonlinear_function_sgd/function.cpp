@@ -57,7 +57,9 @@ vec shifted_gamma_function::value(const vec& x) const
 
 	double const n_v = dot(n, ev);
 
-	return one_pi * inLight * (n_l * rho_d + rho_s.cwiseProduct(D(alpha, p, n_h, K_ap)).cwiseProduct(G1(n_l)).cwiseProduct(G1 (n_v)).cwiseProduct(Fresnel(F_0, F_1, v_h)));
+        // Tried it. It's worse. Back to previous one.
+	// return inLight * (n_l * rho_d +  one_pi * rho_s.cwiseProduct(D(alpha, p, n_h, K_ap)).cwiseProduct(G1(n_l)).cwiseProduct(G1 (n_v)).cwiseProduct(Fresnel(F_0, F_1, v_h)));
+	return one_pi * inLight * (rho_d + rho_s.cwiseProduct(D(alpha, p, n_h, K_ap)).cwiseProduct(G1(n_l)).cwiseProduct(G1 (n_v)).cwiseProduct(Fresnel(F_0, F_1, v_h)));
 }
 
 //! Number of parameters to this non-linear function

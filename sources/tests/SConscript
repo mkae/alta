@@ -176,7 +176,8 @@ CXX_TESTS = [ 'core/half-test-1.cpp',
               'core/half-test-3.cpp',
               'core/half-test-4.cpp',
               'core/params-test-1.cpp',
-              'core/data-io.cpp' ]
+              'core/data-io.cpp',
+              'core/nonlinear-fit.cpp' ]
 
 # Optionally, built the CppQuickCheck tests.
 if have_cppquickcheck:
@@ -324,7 +325,7 @@ if have_openexr:
                            ['--input',
                             test_byproduct('gold-metallic-paint.data'),
                             '--output',
-                            test_byproduct('gold-metallic-pain.brdf'),
+                            test_byproduct('gold-metallic-paint.brdf'),
                             '--func', 'rational_function_chebychev',
                             '--fitter', 'rational_fitter_leastsquare',
                             '--np', '100', '--nq', '50'],
@@ -333,15 +334,41 @@ if have_openexr:
   AlwaysBuild(cmd9)
   env.Alias('tests', cmd9)
 
-cmd10 = make_command_test('data2data',
+  cmd10 = make_command_test('data2brdf',
+                            ['--input',
+                             test_byproduct('gold-metallic-paint.data'),
+                             '--output',
+                             test_byproduct('gold-metallic-paint2.brdf'),
+                             '--func', '[nonlinear_function_diffuse, nonlinear_function_blinn]',
+                             '--fitter', 'nonlinear_fitter_eigen'],
+                            'nonlinear-eigen-fit')
+  env.Depends(cmd10, cmd6)
+  AlwaysBuild(cmd10)
+  env.Alias('tests', cmd10)
+
+  cmd11 = make_command_test('brdf2data',
+                            ['--input',
+                             test_byproduct('gold-metallic-paint2.brdf'),
+                             '--output',
+                             test_byproduct('gold-metallic-paint2.data'),
+                             '--data-file',
+                             test_byproduct('gold-metallic-paint.data'),
+                             '--data', 'vertical_segment'],
+                            'compound-function-to-vs')
+  env.Depends(cmd11, cmd9)
+  env.Depends(cmd11, cmd6)
+  AlwaysBuild(cmd11)
+  env.Alias('tests', cmd11)
+
+cmd20 = make_command_test('data2data',
                          ['--input',
                           test_byproduct('krylon_blue_RGB.astm'),
                           '--in-data', 'data_astm',
                           '--output',
                           test_byproduct('krylon.alta')],
                          'cornell-to-vs')
-env.Depends(cmd10, downloadKrylon)
-AlwaysBuild(cmd10)
+env.Depends(cmd20, downloadKrylon)
+AlwaysBuild(cmd20)
 
 
 # Print a summary of the tests.
@@ -349,7 +376,7 @@ AlwaysBuild(cmd10)
 def display_test_name(node):
   print "    " + os.path.basename(node.get_abspath())
 
-tests_node = env.Alias('tests', cmd10)
+tests_node = env.Alias('tests', cmd20)
 tests = tests_node[0].children()
 
 tests_actually_run = filter(lambda n: n.get_abspath().endswith(".log"),
