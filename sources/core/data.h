@@ -16,6 +16,7 @@
 #include <limits>
 #include <fstream>
 #include <cmath>
+#include <cassert>
 
 #include "common.h"
 #include "args.h"
@@ -34,6 +35,13 @@ class data
   public: // methods
 
     data(const parameters &p): _parameters(p) {}
+
+    data(const parameters& p, const vec& min, const vec& max)
+        : _parameters(p), _min(min), _max(max)
+    {
+        assert(min.size() == p.dimX());
+        assert(max.size() == p.dimX());
+    }
 
     /* TODO: Eventually mark the following constructors as deprecated.  */
 #pragma GCC diagnostic push

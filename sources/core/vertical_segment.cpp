@@ -29,6 +29,14 @@ vertical_segment::vertical_segment(const parameters& params,
 {
 }
 
+vertical_segment::vertical_segment(const parameters& params,
+                                   std::vector<vec>&& input_data,
+                                   const vec& min, const vec& max)
+    : data(params, min, max), _data(input_data),
+      _is_absolute(true), _dt(0.1)
+{
+}
+
 vertical_segment::vertical_segment(const parameters& params, unsigned int size):
     data(params), _is_absolute(true), _dt(0.1)
 {
