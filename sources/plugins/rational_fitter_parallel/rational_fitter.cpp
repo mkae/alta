@@ -59,16 +59,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
     std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
     std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
-    ptr<vertical_segment> vs(new vertical_segment());
-    parameters p(dat->parametrization().dimX(),
-                 dat->parametrization().dimY(),
-                 dat->parametrization().input_parametrization(),
-                 dat->parametrization().output_parametrization());
-
-    vs->setParametrization(p);
-    vs->setMin(dat->min());
-    vs->setMax(dat->max());
-
+    std::vector<vec> content(dat->size());
     for(int i=0; i<dat->size(); ++i)
     {
       const vec x = dat->get(i);
@@ -84,8 +75,13 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
               (1.0 + args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
       }
 
-      vs->set(y);
+      content[i] = std::move(y);
     }
+
+    ptr<vertical_segment> vs(new vertical_segment(dat->parametrization(),
+                                                  std::move(content)));
+    vs->setMin(dat->min());
+    vs->setMax(dat->max());
 
     d = vs;
   }
