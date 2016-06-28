@@ -23,9 +23,8 @@
 
 //using namespace alta;
 
-void alta::load_data_from_text(std::istream& input,
-                               const alta::arguments& header,
-                               alta::vertical_segment& result)
+alta::data* alta::load_data_from_text(std::istream& input,
+                                      const alta::arguments& header)
 {
   // FIXME: Eventually reinstate support for extra arguments when loading a
   // file.
@@ -57,16 +56,17 @@ void alta::load_data_from_text(std::istream& input,
   std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
 #endif
 
-  result._min.resize(dim.first);
-  result._max.resize(dim.first);
+  vec result_min(dim.first), result_max(dim.first);
 
   for(int k=0; k<dim.first; ++k)
   {
-      result._min[k] =  std::numeric_limits<double>::max();
-      result._max[k] = -std::numeric_limits<double>::max();
+      result_min[k] =  std::numeric_limits<double>::max();
+      result_max[k] = -std::numeric_limits<double>::max();
   }
 
   int vs_value = header.get_int("VS");
+
+  std::vector<vec> content;
 
   // Now read the body.
   while(input.good())
@@ -116,8 +116,7 @@ void alta::load_data_from_text(std::istream& input,
       if(args.is_defined("data-correct-cosine"))
       {
         double cart[6];
-        params::convert(&v[0], result.parametrization().input_parametrization(),
-                        params::CARTESIAN, cart);
+        params::convert(&v[0], in_param, params::CARTESIAN, cart);
         if(cart[5] > 0.0 && cart[2] > 0.0)
         {
           factor = 1.0/cart[5]*cart[2];
@@ -194,30 +193,32 @@ void alta::load_data_from_text(std::istream& input,
 #endif
       }
 
-      result._data.push_back(v) ;
-
       // Update min and max
       for(int k=0; k<dim.first; ++k)
       {
-        result._min[k] = std::min(result._min[k], v[k]);
-        result._max[k] = std::max(result._max[k], v[k]);
+        result_min[k] = std::min(result_min[k], v[k]);
+        result_max[k] = std::max(result_max[k], v[k]);
       }
+
+      content.push_back(std::move(v));
     }
   }
 
-  if(args.is_defined("data-correct-cosine"))
-    result.save("/tmp/data-corrected.dat");
-
   std::cout << "<<INFO>> loaded input stream" << std::endl ;
-  std::cout << "<<INFO>> data inside " << result._min << " ... "
-            << result._max << std::endl ;
+  std::cout << "<<INFO>> data inside " << result_min << " ... "
+            << result_max << std::endl ;
   std::cout << "<<INFO>> loading data input of R^"
             << dim.first
             << " -> R^" << dim.second << std::endl ;
-  std::cout << "<<INFO>> " << result._data.size() << " elements to fit" << std::endl ;
+  std::cout << "<<INFO>> " << content.size() << " elements to fit" << std::endl ;
 
   parameters param(dim.first, dim.second, in_param, out_param);
-  result.setParametrization(param);
+  data* result = new vertical_segment(param, std::move(content),
+                                      result_min, result_max);
+  if(args.is_defined("data-correct-cosine"))
+      result->save("/tmp/data-corrected.dat");
+
+  return result;
 }
 
 void alta::save_data_as_text(std::ostream& out, const alta::data &data)
@@ -283,9 +284,9 @@ void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
     out << std::endl << "#END_STREAM" << std::endl;
 }
 
-void alta::load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data)
+alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments& header)
 {
-        using namespace alta;
+    using namespace alta;
 
     // FIXME: For now we make a number of assumptions.
     assert(header["FORMAT"] == "binary");
@@ -299,13 +300,6 @@ void alta::load_data_from_binary(std::istream& in, const alta::arguments& header
 
     std::pair<int, int> dim = header.get_pair<int>("DIM");
     assert(dim.first > 0 && dim.second > 0);
-
-    // vertical_segment::set needs to know dimX and dimY, so we must already
-    // call 'setParametrization' once here.
-    parameters param(dim.first, dim.second,
-                     params::parse_input(header["PARAM_IN"]),
-                     params::parse_output(header["PARAM_OUT"]));
-    data.setParametrization(param);
 
     in.exceptions(std::ios_base::failbit);
 
@@ -323,7 +317,8 @@ void alta::load_data_from_binary(std::istream& in, const alta::arguments& header
          max[k] = -std::numeric_limits<double>::max();
       }
 
-    // TODO: Arrage to use mmap and make it zero-alloc and zero-copy.
+      // TODO: Arrange to use mmap and make it zero-alloc and zero-copy.
+      std::vector<vec> content(sample_count);
       for (int i = 0; i < sample_count; i++)
       {
          vec row = vec::Zero(dim.first + dim.second);
@@ -337,7 +332,7 @@ void alta::load_data_from_binary(std::istream& in, const alta::arguments& header
             in.read(ptr + total, expected - total);
          }
 
-         data.set(row);
+         content[i] = row;
 
          // Update min and max.
          for(int k = 0; k < dim.first; k++)
@@ -347,7 +342,9 @@ void alta::load_data_from_binary(std::istream& in, const alta::arguments& header
          }
       }
 
-    // TODO: Factorize this in data::set.
-		data.setMin(min);
-		data.setMax(max);
+    parameters param(dim.first, dim.second,
+                     params::parse_input(header["PARAM_IN"]),
+                     params::parse_output(header["PARAM_OUT"]));
+
+    return new alta::vertical_segment(param, std::move(content), min, max);
 }

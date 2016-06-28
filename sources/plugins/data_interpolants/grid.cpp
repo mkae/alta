@@ -380,6 +380,10 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input,
     // XXX: Should be done in constructor.
     result->initialize(header, false);
 
-    load_data_from_text(input, header, *result);
-    return result;
+#warning FIXME we are not returning a "BrdfGrid"
+    // We should probably rewrite this class as a transformation from 'data'
+    // to 'data'.
+
+    abort();
+    return load_data_from_text(input, header);
 }

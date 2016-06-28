@@ -85,9 +85,6 @@ class data
                         std::pow(1.0, -int(std::numeric_limits<double>::digits10 - 1)));
 
 
-    friend void load_data_from_binary(std::istream& in, const alta::arguments& header,
-                                      alta::data& data);
-
     const parameters& parametrization() const {
         return _parameters;
     }

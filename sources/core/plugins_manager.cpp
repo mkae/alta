@@ -11,7 +11,7 @@
 
 #include "plugins_manager.h"
 #include "rational_function.h"
-#include "vertical_segment.h"
+#include "data_storage.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -475,7 +475,6 @@ ptr<data> plugins_manager::load_data(const std::string& type, std::istream& inpu
     if (type.empty() || type == "vertical_segment")
     {
         auto header = arguments::parse_header(input);
-        auto vs = new vertical_segment();
 
         if(!header.is_defined("FORMAT")) {
             std::cerr << "<<DEBUG>> The file format is undefined, assuming TEXT"
@@ -483,13 +482,11 @@ ptr<data> plugins_manager::load_data(const std::string& type, std::istream& inpu
         }
 
         if (header["FORMAT"] == "binary") {
-            load_data_from_binary(input, header, *vs);
+            result = ptr<data>(load_data_from_binary(input, header));
         } else {
             // FIXME: ARGS is currently ignored.
-            load_data_from_text(input, header, *vs);
+            result = ptr<data>(load_data_from_text(input, header));
         }
-
-        result = ptr<data>(vs);
     }
     else
     {

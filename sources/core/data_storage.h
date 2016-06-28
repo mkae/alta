@@ -25,13 +25,11 @@ namespace alta
     void save_data_as_binary(std::ostream& out, const alta::data& data);
 
 
-    // Initialize DATA from the content of stream INPUT, which is in ALTA's
-    // native text format.
-    void load_data_from_text(std::istream& input,
-                             const alta::arguments& header,
-                             alta::vertical_segment &data);
+    // Return the data read from INPUT in ALTA's native text format.
+    data* load_data_from_text(std::istream& input,
+                              const alta::arguments& header);
 
-    // Initialize DATA from the binary-formatted stream IN.
-    void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data &data);
+    // Return the data read from the binary-formatted stream IN.
+    data* load_data_from_binary(std::istream& in, const alta::arguments& header);
 }
 

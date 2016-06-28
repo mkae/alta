@@ -122,10 +122,6 @@ class vertical_segment : public data
       // Get data size
       virtual int size() const ;
 
-      friend void load_data_from_text(std::istream& in,
-                                      const alta::arguments& header,
-                                      alta::vertical_segment& data);
-
    private: // method
 
   protected: // method
