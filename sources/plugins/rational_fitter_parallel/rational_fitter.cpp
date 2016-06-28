@@ -79,8 +79,7 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
     }
 
     ptr<vertical_segment> vs(new vertical_segment(dat->parametrization(),
-                                                  std::move(content),
-                                                  dat->min(), dat->max()));
+                                                  std::move(content)));
 
     d = vs;
   }

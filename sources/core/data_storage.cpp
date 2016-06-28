@@ -56,14 +56,6 @@ alta::data* alta::load_data_from_text(std::istream& input,
   std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
 #endif
 
-  vec result_min(dim.first), result_max(dim.first);
-
-  for(int k=0; k<dim.first; ++k)
-  {
-      result_min[k] =  std::numeric_limits<double>::max();
-      result_max[k] = -std::numeric_limits<double>::max();
-  }
-
   int vs_value = header.get_int("VS");
 
   std::vector<vec> content;
@@ -193,28 +185,18 @@ alta::data* alta::load_data_from_text(std::istream& input,
 #endif
       }
 
-      // Update min and max
-      for(int k=0; k<dim.first; ++k)
-      {
-        result_min[k] = std::min(result_min[k], v[k]);
-        result_max[k] = std::max(result_max[k], v[k]);
-      }
-
       content.push_back(std::move(v));
     }
   }
 
   std::cout << "<<INFO>> loaded input stream" << std::endl ;
-  std::cout << "<<INFO>> data inside " << result_min << " ... "
-            << result_max << std::endl ;
   std::cout << "<<INFO>> loading data input of R^"
             << dim.first
             << " -> R^" << dim.second << std::endl ;
   std::cout << "<<INFO>> " << content.size() << " elements to fit" << std::endl ;
 
   parameters param(dim.first, dim.second, in_param, out_param);
-  data* result = new vertical_segment(param, std::move(content),
-                                      result_min, result_max);
+  data* result = new vertical_segment(param, std::move(content));
   if(args.is_defined("data-correct-cosine"))
       result->save("/tmp/data-corrected.dat");
 
@@ -308,15 +290,6 @@ alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments&
          std::cerr << "<<ERROR>> Uncorrect or not samples count in the header, please check \'SAMPLE_COUNT\'" << std::endl;
       }
 
-    // Initialize the mininum and maximum values.
-    vec min(dim.first), max(dim.first);
-
-      for(int k = 0; k < dim.first; k++)
-      {
-         min[k] =  std::numeric_limits<double>::max();
-         max[k] = -std::numeric_limits<double>::max();
-      }
-
       // TODO: Arrange to use mmap and make it zero-alloc and zero-copy.
       std::vector<vec> content(sample_count);
       for (int i = 0; i < sample_count; i++)
@@ -333,18 +306,11 @@ alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments&
          }
 
          content[i] = row;
-
-         // Update min and max.
-         for(int k = 0; k < dim.first; k++)
-         {
-            min[k] = std::min(min[k], row[k]);
-            max[k] = std::max(max[k], row[k]);
-         }
       }
 
     parameters param(dim.first, dim.second,
                      params::parse_input(header["PARAM_IN"]),
                      params::parse_output(header["PARAM_OUT"]));
 
-    return new alta::vertical_segment(param, std::move(content), min, max);
+    return new alta::vertical_segment(param, std::move(content));
 }

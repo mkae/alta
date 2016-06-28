@@ -83,9 +83,6 @@ class vertical_segment : public data
       vertical_segment(const parameters& params,
                        std::vector<vec>&& data);
 
-      vertical_segment(const parameters& params,
-                       std::vector<vec>&& data,
-                       const vec& min, const vec& max);
 
       vertical_segment(const parameters& params, unsigned int size);
 

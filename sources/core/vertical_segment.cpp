@@ -23,17 +23,55 @@ using namespace alta;
 
 //#define RELATIVE_ERROR
 
-vertical_segment::vertical_segment(const parameters& params,
-                                   std::vector<vec>&& input_data)
-    : data(params), _data(input_data), _is_absolute(true), _dt(0.1)
+// Note: For some reason returning an rvalue here doesn't work, so let's hope
+// RVO comes into play.
+static vec data_min(unsigned int size, const std::vector<vec>& data)
 {
+    vec min(size);
+
+    for(int k = 0; k < size; ++k)
+    {
+        min[k] = std::numeric_limits<double>::max();
+    }
+
+    for (auto&& item: data)
+    {
+        for (int k = 0; k < size; ++k)
+        {
+            min[k] = std::min(min[k], item[k]);
+        }
+    }
+
+    return min;
 }
 
+static vec data_max(unsigned int size, const std::vector<vec>& data)
+{
+    vec max(size);
+
+    for(int k = 0; k < size; ++k)
+    {
+        max[k] = -std::numeric_limits<double>::max();
+    }
+
+    for (auto&& item: data)
+    {
+        for (int k = 0; k < size; ++k)
+        {
+            max[k] = std::max(max[k], item[k]);
+        }
+    }
+
+    return max;
+}
+
+
 vertical_segment::vertical_segment(const parameters& params,
-                                   std::vector<vec>&& input_data,
-                                   const vec& min, const vec& max)
-    : data(params, min, max), _data(input_data),
-      _is_absolute(true), _dt(0.1)
+                                   std::vector<vec>&& input_data)
+    : data(params,
+           data_min(params.dimX(), input_data),
+           data_max(params.dimX(), input_data)),
+      _data(input_data), _is_absolute(true), _dt(0.1)
 {
 }
 
