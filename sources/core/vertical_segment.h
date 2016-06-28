@@ -83,19 +83,21 @@ class vertical_segment : public data
       vertical_segment(const parameters& params,
                        std::vector<vec>&& data);
 
-
-      vertical_segment(const parameters& params, unsigned int size);
+      vertical_segment(const parameters& params, unsigned int size)
+          ALTA_DEPRECATED;
 
       //! \brief Default constructor that does nothing at all.
-      vertical_segment() {}
+      vertical_segment() ALTA_DEPRECATED {}
 
-      vertical_segment(unsigned int dim_X, unsigned int dim_Y, unsigned int size);
+      vertical_segment(unsigned int dim_X, unsigned int dim_Y, unsigned int size)
+          ALTA_DEPRECATED;
 
       //! \brief Construct vertical segment data for a given size and where the size of each element
       //! is also given. All data are initialized to zero
       vertical_segment( params::input in_param,
                       params::output out_param,
-                      unsigned int size );
+                      unsigned int size)
+          ALTA_DEPRECATED;
 
       // Acces to data
       virtual vec get(int i) const ;
