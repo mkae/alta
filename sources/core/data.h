@@ -96,12 +96,6 @@ class data
 
     /* Maximum values of the data */
 
-    //! \brief Set the minimum value the input can take
-    void setMin(const vec& min) ;
-
-    //! \brief Set the maximum value the input can take
-    void setMax(const vec& max) ;
-
     //! \brief Get the minimum value the input can take
     // FIXME: Return a reference.
     vec min() const { return _min; };

@@ -57,18 +57,3 @@ bool data::equals(const data& data, double epsilon)
 
     return true;
 }
-
-void data::setMin(const vec& min)
-{
-#ifdef DEBUG
-    assert(min.size() == _nX) ;
-#endif
-    _min = min ;
-}
-void data::setMax(const vec& max)
-{
-#ifdef DEBUG
-    assert(max.size() == _nX) ;
-#endif
-    _max = max ;
-}
