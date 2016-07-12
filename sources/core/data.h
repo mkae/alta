@@ -97,11 +97,10 @@ class data
     /* Maximum values of the data */
 
     //! \brief Get the minimum value the input can take
-    // FIXME: Return a reference.
-    vec min() const { return _min; };
+    const vec& min() const { return _min; };
 
     //! \brief Get the maximum value the input can take
-    vec max() const { return _max; };
+    const vec& max() const { return _max; };
 
   protected: // data
 
