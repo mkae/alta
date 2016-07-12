@@ -54,10 +54,6 @@ Optional dependencies that will allow more plugins to be built include:
 
   + [MATLAB][matlab] with the Engine library, for some plugins.
 
-For your convenience, some of these dependencies are shipped with ALTA,
-as noted above.  Others are automatically downloaded unless
-<tt>--no-externals</tt> is passed to <tt>scons</tt> (see below.)
-
 #### Note for Ceres installation for Debian/Ubuntu distribution
 To improve the numerical stability of the different solvers, it is highly recommended to install the following packages:
  + <tt>libatlas-base-dev</tt>
