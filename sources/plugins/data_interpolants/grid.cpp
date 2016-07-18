@@ -380,7 +380,9 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input,
     // XXX: Should be done in constructor.
     result->initialize(header, false);
 
-#warning FIXME we are not returning a "BrdfGrid"
+#ifdef __GNUC__
+# warning FIXME we are not returning a "BrdfGrid"
+#endif
     // We should probably rewrite this class as a transformation from 'data'
     // to 'data'.
 
