@@ -660,9 +660,15 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 
 	for(int k=0; k<_parameters.dimY(); ++k)
 	{
-        const rational_function_1d* rf = get(k);
-        rf->save_body(out, args);
-		  out << std::endl;
+      const rational_function_1d* rf = get(k);
+
+      // We're calling the 'get(int) const' method, which can return NULL.
+      // Skip them (XXX: is this the right thing to do?).
+      if (rf != NULL)
+      {
+          rf->save_body(out, args);
+          out << std::endl;
+      }
 	}
 }
 
