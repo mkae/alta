@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2014,2015 Inria
+   Copyright (C) 2014, 2015, 2016 Inria
    Copyright (C) 2015 Université de Montréal
 
    This file is part of ALTA.
@@ -63,8 +63,7 @@ struct python_arguments : public arguments {
  * function is here to accelerate the loading of data file.
  */
 ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
-	ptr<data> d = plugins_manager::get_data(plugin_name);
-	d->load(filename);
+  ptr<data> d = plugins_manager::load_data(filename, plugin_name);
 	return d;
 }
 ptr<data> get_data_with_args(const std::string& plugin_name, const python_arguments& args) {
@@ -80,15 +79,19 @@ ptr<data> get_data(const std::string& plugin_name) {
  *       Those function should disapear when the return type of get_Function
  *       in the plugin_manager will be ptr<function>.
  */
-ptr<function> get_function(const std::string& plugin_name) {
-    ptr<function> func(plugins_manager::get_function(plugin_name));
+ptr<function> get_function(const std::string& plugin_name,
+                           const parameters& params)
+{
+    ptr<function> func(plugins_manager::get_function(plugin_name,
+                                                     params));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
     }
-	return func;
+    return func;
 }
-ptr<function> get_function_from_args(const python_arguments& args) {
-    ptr<function> func(plugins_manager::get_function(args));
+ptr<function> get_function_from_args(const python_arguments& args,
+                                     const parameters& params) {
+    ptr<function> func(plugins_manager::get_function(args, params));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
     }
@@ -143,14 +146,15 @@ ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
 	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
 
-	arguments args;
-	compound_function* cf = new compound_function();
-
 	if(nf1 && nf2) {
-		cf->push_back(nf1, args);
-		cf->push_back(nf2, args);
-
-		return ptr<function>(cf);
+    std::vector<ptr<nonlinear_function> > functions;
+    functions.push_back(nf1);
+    functions.push_back(nf2);
+    std::vector<arguments> args;
+    args.push_back(alta::arguments());
+    args.push_back(alta::arguments());
+    auto cf = new compound_function(functions, args);
+    return ptr<function>(cf);
 
 	// Failure case, one of the function is a NULL ptr.
 	} else {
@@ -242,67 +246,31 @@ bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<functi
  * the command line arguments.
  * TODO: Add the command line arguments in the parameters
  */
-void data2data(const data* d_in, data* d_out)
+ptr<data> data2data(const data* d_in, const parameters& target)
 {
-   if(dynamic_cast<vertical_segment*>(d_out)!=NULL && d_out->size() == 0)
-   {
-      d_out->setParametrization(d_in->input_parametrization());
-      d_out->setDimX(d_in->dimX());
-      d_out->setDimY(d_in->dimY());
+    std::vector<vec> content(d_in->size());
+    for (auto i = 0; i < d_in->size(); ++i)
+    {
+        vec temp(target.dimX() + target.dimY());
 
-      // Init the min and max
-      vec _min(d_out->dimX()), _max(d_out->dimX());
-      for(auto k=0; k<d_out->dimX(); ++k)
-      {
-         _min[k] =  std::numeric_limits<double>::max() ;
-         _max[k] = -std::numeric_limits<double>::max() ;
-      }
+        // Copy the input vector
+        vec x = d_in->get(i);
+        params::convert(&x[0],
+                        d_in->parametrization().input_parametrization(),
+                        target.input_parametrization(),
+                        &temp[0]);
+        params::convert(&x[d_in->parametrization().dimX()],
+                        d_in->parametrization().output_parametrization(),
+                        d_in->parametrization().dimY(),
+                        target.output_parametrization(),
+                        target.dimY(),
+                        &temp[target.dimX()]);
+        content[i] = std::move(temp);
 
-      vec temp(d_out->dimX() + d_out->dimY());
-      for(auto i=0; i<d_in->size(); ++i)
-      {
-         // Copy the input vector
-         vec x = d_in->get(i);
-         params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
-         params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
-         d_out->set(temp);
+    }
 
-         // Update min and max
-         for(auto k=0; k<d_out->dimX(); ++k)
-         {
-            _min[k] = std::min(_min[k], temp[k]) ;
-            _max[k] = std::max(_max[k], temp[k]) ;
-         }
-      }
-
-      // Set the min and max
-      d_out->setMin(_min);
-      d_out->setMax(_max);
-   }
-   else
-   {
-      for(int i=0; i<d_out->size(); ++i)
-      {
-         vec temp(d_in->dimX());
-         vec cart(6);
-         vec y(d_in->dimY());
-
-         // Copy the input vector
-         vec x = d_out->get(i);
-         params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
-
-         if(cart[2] >= 0.0 || cart[5] >= 0.0) {
-            params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
-            y = d_in->value(temp);
-         } else {
-            y.setZero();
-         }
-
-         params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
-
-         d_out->set(i, x);
-      }
-   }
+    data* result = new vertical_segment(target, std::move(content));
+    return ptr<data>(result);
 }
 
 /* This function provides a similar behaviour that the brdf2data function.
@@ -317,21 +285,24 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 		return;
 	}
 
-	vec temp(f->dimX());
+	vec temp(f->parametrization().dimX());
 	for(int i=0; i<d->size(); ++i) {
 		// Copy the input vector
 		vec x = d->get(i);
 
 		// Convert the data to the function's input space.
-	    if(f->input_parametrization() == params::UNKNOWN_INPUT) {
-	    	memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
+      if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT) {
+	    	memcpy(&temp[0], &x[0], f->parametrization().dimX()*sizeof(double));
 	    } else {
-			params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
+			params::convert(&x[0],
+                      d->parametrization().input_parametrization(),
+                      f->parametrization().input_parametrization(),
+                      &temp[0]);
 		}
 		vec y = f->value(temp);
 
-		for(int j=0; j<d->dimY(); ++j) {
-			x[d->dimX() + j] = y[j];
+		for(int j=0; j<d->parametrization().dimY(); ++j) {
+			x[d->parametrization().dimX() + j] = y[j];
 		}
 
 		d->set(i, y);
@@ -354,6 +325,9 @@ bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
 }
 
 
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
+
 /* Exporting the ALTA module
  */
 BOOST_PYTHON_MODULE(alta)
@@ -368,10 +342,60 @@ BOOST_PYTHON_MODULE(alta)
 		.def("update", &arguments::update);
 
 
-   // Vec class
-   //
-   register_wrapper_vec();
+  // Vec class
+  //
+  register_wrapper_vec();
 
+  // 'parameters' class.
+  bp::class_<parameters>("parameters")
+      .def(bp::init<unsigned int, unsigned int, params::input, params::output>());
+
+  // Parameterization enums.
+
+#define PARAM_VALUE(name)                       \
+   .value(STRINGIFY(name), params:: name)
+
+  bp::enum_<params::input>("input_parametrization")
+      PARAM_VALUE(RUSIN_TH_PH_TD_PD)
+      PARAM_VALUE(RUSIN_TH_PH_TD)
+      PARAM_VALUE(RUSIN_TH_TD_PD)
+      PARAM_VALUE(RUSIN_TH_TD)
+      PARAM_VALUE(RUSIN_VH_VD)
+      PARAM_VALUE(RUSIN_VH)
+      PARAM_VALUE(COS_TH_TD)
+      PARAM_VALUE(COS_TH)
+      PARAM_VALUE(SCHLICK_TK_PK)
+      PARAM_VALUE(SCHLICK_VK)
+      PARAM_VALUE(SCHLICK_TL_TK_PROJ_DPHI)
+      PARAM_VALUE(COS_TK)
+      PARAM_VALUE(RETRO_TL_TVL_PROJ_DPHI)
+      PARAM_VALUE(STEREOGRAPHIC)
+      PARAM_VALUE(SPHERICAL_TL_PL_TV_PV)
+      PARAM_VALUE(COS_TLV)
+      PARAM_VALUE(COS_TLR)
+      PARAM_VALUE(ISOTROPIC_TV_TL)
+      PARAM_VALUE(ISOTROPIC_TV_TL_DPHI)
+      PARAM_VALUE(ISOTROPIC_TV_PROJ_DPHI)
+      PARAM_VALUE(ISOTROPIC_TL_TV_PROJ_DPHI)
+      PARAM_VALUE(ISOTROPIC_TD_PD)
+      PARAM_VALUE(STARK_2D)
+      PARAM_VALUE(STARK_3D)
+      PARAM_VALUE(NEUMANN_2D)
+      PARAM_VALUE(NEUMANN_3D)
+      PARAM_VALUE(CARTESIAN)
+      PARAM_VALUE(UNKNOWN_INPUT);
+
+  bp::enum_<params::output>("output_parametrization")
+      PARAM_VALUE(INV_STERADIAN)
+      PARAM_VALUE(INV_STERADIAN_COSINE_FACTOR)
+      PARAM_VALUE(ENERGY)
+      PARAM_VALUE(RGB_COLOR)
+      PARAM_VALUE(XYZ_COLOR)
+      PARAM_VALUE(UNKNOWN_OUTPUT);
+
+#undef PARAM_VALUE
+
+  bp::register_ptr_to_python<ptr<parameters>>();
 
 	// Function interface
 	//
@@ -400,8 +424,6 @@ BOOST_PYTHON_MODULE(alta)
 		.def("size", &data::size)
 		.def("get",  &data::get)
 		//.def("set",  &data::set)
-		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
-		.def("load", static_cast< void(data::*)(const std::string&, const arguments&)>(&data::load))
 		.def("save", &data::save);
 	bp::def("get_data",  get_data);
 	bp::def("get_data",  get_data_with_args);
