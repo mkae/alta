@@ -62,14 +62,14 @@ struct python_arguments : public arguments {
 /* Create a data object from a plugin's name and the data filename. This
  * function is here to accelerate the loading of data file.
  */
-ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
+static ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
   ptr<data> d = plugins_manager::load_data(filename, plugin_name);
 	return d;
 }
-ptr<data> get_data_with_args(const std::string& plugin_name, const python_arguments& args) {
+static ptr<data> get_data_with_args(const std::string& plugin_name, const python_arguments& args) {
 	return plugins_manager::get_data(plugin_name, args);
 }
-ptr<data> get_data(const std::string& plugin_name) {
+static ptr<data> get_data(const std::string& plugin_name) {
 	return plugins_manager::get_data(plugin_name);
 }
 
@@ -79,8 +79,8 @@ ptr<data> get_data(const std::string& plugin_name) {
  *       Those function should disapear when the return type of get_Function
  *       in the plugin_manager will be ptr<function>.
  */
-ptr<function> get_function(const std::string& plugin_name,
-                           const parameters& params)
+static ptr<function> get_function(const std::string& plugin_name,
+                                  const parameters& params)
 {
     ptr<function> func(plugins_manager::get_function(plugin_name,
                                                      params));
@@ -89,8 +89,8 @@ ptr<function> get_function(const std::string& plugin_name,
     }
     return func;
 }
-ptr<function> get_function_from_args(const python_arguments& args,
-                                     const parameters& params) {
+static ptr<function> get_function_from_args(const python_arguments& args,
+                                            const parameters& params) {
     ptr<function> func(plugins_manager::get_function(args, params));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
@@ -101,10 +101,10 @@ ptr<function> get_function_from_args(const python_arguments& args,
 /* Load a function object from a file. The arguments object is never used here.
  * The file is supposed to load the function correctly.
  */
-ptr<function> load_function(const std::string& filename) {
+static ptr<function> load_function(const std::string& filename) {
     return ptr<function>(plugins_manager::load_function(filename));
 }
-ptr<function> load_function_with_args(const std::string& filename, const arguments&) {
+static ptr<function> load_function_with_args(const std::string& filename, const arguments&) {
     return ptr<function>(plugins_manager::load_function(filename));
 }
 
@@ -112,8 +112,9 @@ ptr<function> load_function_with_args(const std::string& filename, const argumen
  *
  * TODO: Add exceptions
  */
-void load_from_file_with_args(const ptr<function>& func, const std::string& filename,
-                              const arguments& args) {
+static void load_from_file_with_args(const ptr<function>& func,
+                                     const std::string& filename,
+                                     const arguments& args) {
 
    // Open a stream
    std::ifstream file;
@@ -129,7 +130,7 @@ void load_from_file_with_args(const ptr<function>& func, const std::string& file
    // Load the function stream
    func->load(file);
 }
-void load_from_file(const ptr<function>& func, const std::string& filename) {
+static void load_from_file(const ptr<function>& func, const std::string& filename) {
 
    arguments args;
    load_from_file_with_args(func, filename, args);
@@ -141,7 +142,7 @@ void load_from_file(const ptr<function>& func, const std::string& filename) {
  * TODO: The compound and product function should store the shared pointer to the
  * function objects. They might stay in memory longer than the input functions.
  */
-ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
+static ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 	// Convert to a nonlinear function
 	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
 	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
@@ -162,7 +163,7 @@ ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 		return ptr<function>(NULL);
 	}
 }
-ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
+static ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
 	// Convert to a nonlinear function
 	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
 	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
@@ -181,7 +182,7 @@ ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
  *
  * TODO: Add the rational function interface
  */
-void set_function_params(ptr<function>& f, const vec& v) {
+static void set_function_params(ptr<function>& f, const vec& v) {
 
 	// Try to set the parameter as a nonlinear function
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
@@ -208,7 +209,7 @@ void set_function_params(ptr<function>& f, const vec& v) {
 	// }
 }
 
-vec get_function_params(ptr<function>& f) {
+static vec get_function_params(ptr<function>& f) {
 		// Try to set the parameter as a nonlinear function
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
 	if(nf) {
@@ -223,7 +224,7 @@ vec get_function_params(ptr<function>& f) {
 /* Save a function object to a file, without any argument option. This will save the function
  * object in ALTA's format.
  */
-void save_function_without_args(const ptr<function>& f, const std::string& filename) {
+static void save_function_without_args(const ptr<function>& f, const std::string& filename) {
    arguments args;
    f->save(filename, args);
 }
@@ -231,12 +232,16 @@ void save_function_without_args(const ptr<function>& f, const std::string& filen
 /* Fitter interface to allow to launch fit with and without providing an
  * arguments object.
  */
-bool fit_data_without_args(const ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func) {
+static bool fit_data_without_args(const ptr<fitter>& _fitter,
+                                  const ptr<data>& _data,
+                                  ptr<function>& _func) {
    arguments args;
    return _fitter->fit_data(_data, _func, args);
 }
 
-bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func, const arguments& args) {
+static bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data,
+                               ptr<function>& _func,
+                               const arguments& args) {
    _fitter->set_parameters(args);
    return _fitter->fit_data(_data, _func, args);
 }
@@ -246,7 +251,7 @@ bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<functi
  * the command line arguments.
  * TODO: Add the command line arguments in the parameters
  */
-ptr<data> data2data(const data* d_in, const parameters& target)
+static ptr<data> data2data(const data* d_in, const parameters& target)
 {
     std::vector<vec> content(d_in->size());
     for (auto i = 0; i < d_in->size(); ++i)
@@ -279,7 +284,7 @@ ptr<data> data2data(const data* d_in, const parameters& target)
  * be so when the data object is a laoded data sample or when the data type
  * has predefined sample sets.
  */
-void brdf2data(const ptr<function>& f, ptr<data>& d) {
+static void brdf2data(const ptr<function>& f, ptr<data>& d) {
 	if(d->size() == 0) {
 		std::cerr << "<<ERROR>> Please provide a data object with a sample structure or load a data file with defined positions." << std::endl;
 		return;
@@ -311,7 +316,7 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 
 /* Compute distance metric between 'in' and 'ref'.
  */
-bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
+static bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
    // Compute the metrics
    errors::metrics res;
    errors::compute(in.get(), ref.get(), nullptr, res);
