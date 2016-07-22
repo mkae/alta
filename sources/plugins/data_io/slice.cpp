@@ -72,7 +72,7 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
 class BrdfSlice : public data {
 	public:
 
-		int width, height, slice;
+		int _width, _height, _slice;
 		vec _max, _min;
 		double _phi;
 		double* _data;
@@ -82,9 +82,9 @@ class BrdfSlice : public data {
         : data(brdf_slice_parameters(args))
 		{
 			// Allocate data
-			width = 512; height = 512;
-			slice = 1;
-			_data = new double[3*width*height*slice];
+      _width = 512; _height = 512;
+			_slice = 1;
+			_data = new double[3 * _width * _height * _slice];
       if (args.is_defined("param") && parametrization().dimX() == 3)
           _phi = (M_PI / 180.0) * args.get_float("phi", 90);
       else
@@ -109,7 +109,7 @@ class BrdfSlice : public data {
 
 		void save(const std::string& filename) const
 		{
-			if(!t_EXR_IO<double>::SaveEXR(filename.c_str(), width, slice*height, _data))
+			if(!t_EXR_IO<double>::SaveEXR(filename.c_str(), _width, _slice*_height, _data))
 			{
 				std::cerr << "<<ERROR>> unable to save image file" << std::endl;
 			}
@@ -119,12 +119,12 @@ class BrdfSlice : public data {
 		vec get(int id) const
 		{
       vec res(parametrization().dimX() + parametrization().dimY());
-			const int i = id % width;
-			const int k = id / (width*height);
-			const int j = (id - k*width*height) / width;
+			const int i = id % _width;
+			const int k = id / (_width*_height);
+			const int j = (id - k*_width*_height) / _width;
 
-			res[0] = (i+0.5) * (_max[0]-_min[0]) / double(width)  + _min[0];
-			res[1] = (j+0.5) * (_max[1]-_min[1]) / double(height) + _min[1];
+			res[0] = (i+0.5) * (_max[0]-_min[0]) / double(_width)  + _min[0];
+			res[1] = (j+0.5) * (_max[1]-_min[1]) / double(_height) + _min[1];
 			if(parametrization().dimX() == 3) {
 				res[2] = _phi;
 			}
@@ -156,11 +156,11 @@ class BrdfSlice : public data {
 			assert(_x[0] <= _max[0] && _x[0] >= _min[0]);
 			assert(_x[1] <= _max[1] && _x[1] >= _min[1]);
 
-			const int i  = floor((_x[0]-_min[0]) * width  / (_max[0] - _min[0]));
-			const int j  = floor((_x[1]-_min[1]) * height / (_max[1] - _min[1]));
+			const int i  = floor((_x[0]-_min[0]) * _width  / (_max[0] - _min[0]));
+			const int j  = floor((_x[1]-_min[1]) * _height / (_max[1] - _min[1]));
 			const int k  = 0;
-			//const int k  = floor(x[2] * slice  / (M_PI));
-			const int id = i + j*width + k*width*height;
+			//const int k  = floor(x[2] * _slice  / (M_PI));
+			const int id = i + j*_width + k*_width*_height;
 
 			_data[3*id + 0] = _x[parametrization().dimX()+0];
 			_data[3*id + 1] = _x[parametrization().dimX()+1];
@@ -196,14 +196,14 @@ class BrdfSlice : public data {
 			assert(_x[0] <= 1.0 && x[0] >= 0.0);
 			assert(_x[1] <= 1.0 && x[1] >= 0.0);
 			*/
-			const int i  = floor((_x[0]-_min[0]) * width  / (_max[0] - _min[0]));
-			const int j  = floor((_x[1]-_min[1]) * height / (_max[1] - _min[1]));
+			const int i  = floor((_x[0]-_min[0]) * _width  / (_max[0] - _min[0]));
+			const int j  = floor((_x[1]-_min[1]) * _height / (_max[1] - _min[1]));
 			const int k  = 1;
-			//const int k  = floor(_x[2] * slice  / (M_PI));
-			const int id = (i + j*width)*k;
+			//const int k  = floor(_x[2] * _slice  / (M_PI));
+			const int id = (i + j*_width)*k;
 
-			if(i < 0 || i >= width)  { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
-			if(j < 0 || j >= height) { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
+			if(i < 0 || i >= _width)  { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
+			if(j < 0 || j >= _height) { std::cerr << "<<ERROR>> out of bounds: " << x << std::endl; }
 
 			vec res(3);
 			res[0] = _data[3*id + 0];
@@ -215,7 +215,7 @@ class BrdfSlice : public data {
 		// Get data size, e.g. the number of samples to fit
 		int size() const
 		{
-			return width*height*slice;
+			return _width*_height*_slice;
 		}
 
 		// Get min and max input space values
@@ -291,7 +291,7 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
     BrdfSlice* result = new BrdfSlice(args);
 
     delete[] result->_data;
-    t_EXR_IO<double>::LoadEXR(input, result->width, result->height,
+    t_EXR_IO<double>::LoadEXR(input, result->_width, result->_height,
                               result->_data);
 
     return result;
