@@ -70,13 +70,14 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
  *
  */
 class BrdfSlice : public data {
-	public:
-
+  private:
 		const int _width, _height, _slice;
 		vec _max, _min;
 		double _phi;
 		double* _data;
 		bool _reverse;
+
+  public:
 
 		BrdfSlice(const arguments& args,
               int width, int height, int slice,
@@ -218,6 +219,8 @@ class BrdfSlice : public data {
 			res[2] = _data[3*id + 2];
 			return res;
 		}
+
+  private:
 
 		// Get data size, e.g. the number of samples to fit
 		int size() const
