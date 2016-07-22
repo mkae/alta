@@ -72,19 +72,20 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
 class BrdfSlice : public data {
 	public:
 
-		int _width, _height, _slice;
+		const int _width, _height, _slice;
 		vec _max, _min;
 		double _phi;
 		double* _data;
 		bool _reverse;
 
-		BrdfSlice(const arguments& args)
-        : data(brdf_slice_parameters(args))
+		BrdfSlice(const arguments& args,
+              int width, int height, int slice,
+              double* content)
+        : data(brdf_slice_parameters(args)),
+          _width(width), _height(height), _slice(slice),
+          _data(content)
 		{
 			// Allocate data
-      _width = 512; _height = 512;
-			_slice = 1;
-			_data = new double[3 * _width * _height * _slice];
       if (args.is_defined("param") && parametrization().dimX() == 3)
           _phi = (M_PI / 180.0) * args.get_float("phi", 90);
       else
@@ -101,6 +102,12 @@ class BrdfSlice : public data {
 			_max = max();
 			_min = min();
 		}
+
+		BrdfSlice(const arguments& args)
+        : BrdfSlice(args, 512, 512, 1,
+                    new double[3 * 512 * 512])
+    {
+    }
 
 		~BrdfSlice()
 		{
@@ -288,11 +295,11 @@ ALTA_DLL_EXPORT data* provide_data(const arguments& args)
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
 {
-    BrdfSlice* result = new BrdfSlice(args);
+    int width, height, slice = 1;
+    double *data;
+    t_EXR_IO<double>::LoadEXR(input, width, height, data);
 
-    delete[] result->_data;
-    t_EXR_IO<double>::LoadEXR(input, result->_width, result->_height,
-                              result->_data);
+    BrdfSlice* result = new BrdfSlice(args, width, height, slice, data);
 
     return result;
 }
