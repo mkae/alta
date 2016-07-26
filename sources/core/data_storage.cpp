@@ -23,6 +23,126 @@
 
 //using namespace alta;
 
+static bool cosine_correction(vec& v, unsigned int dimX, unsigned int dimY,
+                              alta::params::input in_param)
+{
+    using namespace alta;
+
+    // Correction of the data by 1/cosine(theta_L)
+    double factor = 1.0;
+    double cart[6];
+    params::convert(&v[0], in_param, params::CARTESIAN, cart);
+    if(cart[5] > 0.0 && cart[2] > 0.0)
+    {
+        factor = 1.0/cart[5]*cart[2];
+        for(unsigned int i = 0; i < dimY; ++i)
+        {
+            v[i + dimX] /= factor;
+        }
+        return true;
+    }
+    else return false;
+}
+
+// Return true if V is between MIN and MAX.
+static bool within_bounds(const vec& v, unsigned int dimX,
+                          const vec& xmin, const vec& xmax,
+                          unsigned int dimY, const vec& ymin,
+                          const vec& ymax)
+{
+    bool is_in = true;
+
+    for(unsigned int i=0; i<dimX; ++i)
+    {
+        if(v[i] < xmin[i] || v[i] > xmax[i])
+        {
+            is_in = false ;
+        }
+    }
+    for(unsigned int i=0; i<dimY; ++i)
+    {
+        if(v[dimX+i] < ymin[i] || v[dimX+i] > ymax[i])
+        {
+            is_in = false ;
+        }
+    }
+
+    return is_in;
+}
+
+// The type of confidence interval.
+enum ci_kind
+{
+    NO_CONFIDENCE_INTERVAL = 0,
+    SYMMETRICAL_CONFIDENCE_INTERVAL,
+    ASYMMETRICAL_CONFIDENCE_INTERVAL
+};
+
+// Read a confidence interval on the output parameters from INPUT into V.
+static void read_confidence_interval(std::istream& input,
+                                     vec& v, ci_kind kind,
+                                     unsigned int dimX,
+                                     unsigned int dimY,
+                                     const alta::arguments& args)
+{
+    for(int i=0; i<dimY; ++i)
+    {
+        double min_dt = 0.0, max_dt = 0.0;
+
+        if(i == 0 && kind == ASYMMETRICAL_CONFIDENCE_INTERVAL)
+        {
+            input >> min_dt ;
+            input >> max_dt ;
+            min_dt = min_dt-v[dimX+i];
+            max_dt = max_dt-v[dimX+i];
+        }
+        else if(i == 0 && kind == SYMMETRICAL_CONFIDENCE_INTERVAL)
+        {
+            double dt ;
+            input >> dt ;
+            min_dt = -dt;
+            max_dt =  dt;
+        }
+        else
+        {
+            // Confidence interval data not provided in INPUT.
+            double dt = args.get_float("dt", 0.1f);
+            min_dt = -dt;
+            max_dt =  dt;
+        }
+
+        if(args.is_defined("dt-relative"))
+        {
+            v[dimX +   dimY+i] = v[dimX + i] * (1.0 + min_dt) ;
+            v[dimX + 2*dimY+i] = v[dimX + i] * (1.0 + max_dt) ;
+        }
+        else if(args.is_defined("dt-max"))
+        {
+            v[dimX +   dimY+i] = v[dimX + i] + std::max(v[dimX + i] * min_dt, min_dt);
+            v[dimX + 2*dimY+i] = v[dimX + i] + std::max(v[dimX + i] * max_dt, max_dt);
+        }
+        else
+        {
+            v[dimX +   dimY+i] = v[dimX + i] + min_dt ;
+            v[dimX + 2*dimY+i] = v[dimX + i] + max_dt ;
+        }
+
+        // You can enforce the vertical segment to stay in the positive
+        // region using the --data-positive command line argument. Note
+        // that the data point is also clamped to zero if negative.
+        if(args.is_defined("dt-positive"))
+        {
+            v[dimX +          i] = std::max(v[dimX +          i], 0.0);
+            v[dimX +   dimY+i] = std::max(v[dimX +   dimY+i], 0.0);
+            v[dimX + 2*dimY+i] = std::max(v[dimX + 2*dimY+i], 0.0);
+        }
+
+#ifdef DEBUG
+        std::cout << "<<DEBUG>> vs = [" << v[dimX +   dimY+i] << ", " << v[dimX + 2*dimY+i] << "]" << std::endl;
+#endif
+    }
+}
+
 alta::data* alta::load_data_from_text(std::istream& input,
                                       const alta::arguments& header)
 {
@@ -57,6 +177,10 @@ alta::data* alta::load_data_from_text(std::istream& input,
 #endif
 
   int vs_value = header.get_int("VS");
+  ci_kind kind =
+      vs_value == 2 ? ASYMMETRICAL_CONFIDENCE_INTERVAL
+      : (vs_value == 1 ? SYMMETRICAL_CONFIDENCE_INTERVAL
+         : NO_CONFIDENCE_INTERVAL);
 
   std::vector<vec> content;
 
@@ -82,108 +206,18 @@ alta::data* alta::load_data_from_text(std::istream& input,
       }
 
       // If data is not in the interval of fit
-      bool is_in = true ;
-      for(int i=0; i<dim.first; ++i)
-      {
-        if(v[i] < min[i] || v[i] > max[i])
-        {
-          is_in = false ;
-        }
-      }
-      for(int i=0; i<dim.second; ++i)
-      {
-        if(v[dim.first+i] < ymin[i] || v[dim.first+i] > ymax[i])
-        {
-          is_in = false ;
-        }
-      }
-      if(!is_in)
-      {
-        continue ;
-      }
+      if (!within_bounds(v, dim.first, min, max, dim.second, ymin, ymax))
+          continue;
 
-//      /*
-      // Correction of the data by 1/cosine(theta_L)
-      double factor = 1.0;
       if(args.is_defined("data-correct-cosine"))
       {
-        double cart[6];
-        params::convert(&v[0], in_param, params::CARTESIAN, cart);
-        if(cart[5] > 0.0 && cart[2] > 0.0)
-        {
-          factor = 1.0/cart[5]*cart[2];
-          for(int i=0; i<dim.second; ++i)
-          {
-            v[i + dim.first] /= factor;
-          }
-        }
-        else
-        {
-          continue;
-        }
+          if (!cosine_correction(v, dim.first, dim.second, in_param))
+              continue;
       }
-      // End of correction
-//      */
 
-      // Check if the data containt a vertical segment around the mean
-      // value.
-      for(int i=0; i<dim.second; ++i)
-      {
-        double min_dt = 0.0;
-        double max_dt = 0.0;
-
-
-        if(i == 0 && vs_value == 2)
-        {
-          linestream >> min_dt ;
-          linestream >> max_dt ;
-          min_dt = min_dt-v[dim.first+i];
-          max_dt = max_dt-v[dim.first+i];
-        }
-        else if(i == 0 && vs_value == 1)
-        {
-          double dt ;
-          linestream >> dt ;
-          min_dt = -dt;
-          max_dt =  dt;
-        }
-        else
-        {
-          double dt = args.get_float("dt", 0.1f);
-          min_dt = -dt;
-          max_dt =  dt;
-        }
-
-        if(args.is_defined("dt-relative"))
-        {
-               v[dim.first +   dim.second+i] = v[dim.first + i] * (1.0 + min_dt) ;
-          v[dim.first + 2*dim.second+i] = v[dim.first + i] * (1.0 + max_dt) ;
-        }
-        else if(args.is_defined("dt-max"))
-        {
-               v[dim.first +   dim.second+i] = v[dim.first + i] + std::max(v[dim.first + i] * min_dt, min_dt);
-          v[dim.first + 2*dim.second+i] = v[dim.first + i] + std::max(v[dim.first + i] * max_dt, max_dt);
-        }
-        else
-        {
-          v[dim.first +   dim.second+i] = v[dim.first + i] + min_dt ;
-          v[dim.first + 2*dim.second+i] = v[dim.first + i] + max_dt ;
-        }
-
-        // You can enforce the vertical segment to stay in the positive
-        // region using the --data-positive command line argument. Note
-        // that the data point is also clamped to zero if negative.
-        if(args.is_defined("dt-positive"))
-        {
-          v[dim.first +          i] = std::max(v[dim.first +          i], 0.0);
-          v[dim.first +   dim.second+i] = std::max(v[dim.first +   dim.second+i], 0.0);
-          v[dim.first + 2*dim.second+i] = std::max(v[dim.first + 2*dim.second+i], 0.0);
-        }
-
-#ifdef DEBUG
-                std::cout << "<<DEBUG>> vs = [" << v[dim.first +   dim.second+i] << ", " << v[dim.first + 2*dim.second+i] << "]" << std::endl;
-#endif
-      }
+      // Read the confidence interval data if available.
+      read_confidence_interval(linestream, v, kind,
+                               dim.first, dim.second, args);
 
       content.push_back(std::move(v));
     }
