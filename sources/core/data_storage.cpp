@@ -44,30 +44,14 @@ static bool cosine_correction(vec& v, unsigned int dimX, unsigned int dimY,
     else return false;
 }
 
+typedef Eigen::Ref<const vec> vecref;
+
 // Return true if V is between MIN and MAX.
-static bool within_bounds(const vec& v, unsigned int dimX,
-                          const vec& xmin, const vec& xmax,
-                          unsigned int dimY, const vec& ymin,
-                          const vec& ymax)
+static bool within_bounds(const vecref v,
+                          const vec& min, const vec& max)
 {
-    bool is_in = true;
-
-    for(unsigned int i=0; i<dimX; ++i)
-    {
-        if(v[i] < xmin[i] || v[i] > xmax[i])
-        {
-            is_in = false ;
-        }
-    }
-    for(unsigned int i=0; i<dimY; ++i)
-    {
-        if(v[dimX+i] < ymin[i] || v[dimX+i] > ymax[i])
-        {
-            is_in = false ;
-        }
-    }
-
-    return is_in;
+    return (v.array() < min.array()).all()
+        && (v.array() > max.array()).all();
 }
 
 // The type of confidence interval.
@@ -206,7 +190,9 @@ alta::data* alta::load_data_from_text(std::istream& input,
       }
 
       // If data is not in the interval of fit
-      if (!within_bounds(v, dim.first, min, max, dim.second, ymin, ymax))
+      if (!(within_bounds(v.segment(0, dim.first), min, max)
+            && within_bounds(v.segment(dim.first, dim.second),
+                             ymin, ymax)))
           continue;
 
       if(args.is_defined("data-correct-cosine"))
