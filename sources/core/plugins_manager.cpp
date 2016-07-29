@@ -463,7 +463,7 @@ ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
     else
     {
         std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
-        return ptr<data>(new vertical_segment()) ;
+        return ptr<data>(nullptr) ;
     }
 }
 
