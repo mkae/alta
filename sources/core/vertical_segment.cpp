@@ -81,23 +81,8 @@ vertical_segment::vertical_segment(const parameters& params, unsigned int size):
     initializeToZero(size);
 }
 
-vertical_segment::vertical_segment(unsigned int dim_X, 
-                                   unsigned int dim_Y, 
-                                   unsigned int size)
-	: data(dim_X, dim_Y), _is_absolute(true), _dt(0.1) 
-{
-	initializeToZero( size );
-}
 
-vertical_segment::vertical_segment( params::input in_param, 
-                                   	params::output out_param,
-                                   	unsigned int size )
-	: data( in_param, out_param), _is_absolute(true), _dt(0.1)
-{
-	initializeToZero( size );
-}
-
-void 
+void
 vertical_segment::initializeToZero( unsigned int number_of_data_elements )
 {
 	_data.clear();
