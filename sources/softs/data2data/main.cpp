@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 		std::cout << "<<INFO>> data will be outputed to ALTA format" << std::endl;
 	}
 
-	if(!d_in && !d_out)
+	if(!d_in || !d_out)
 	{
 		std::cerr << "<<ERROR>> cannot import or export data" << std::endl ;
 		return 1;
