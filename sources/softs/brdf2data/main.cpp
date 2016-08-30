@@ -78,18 +78,6 @@ int main(int argc, char** argv)
 	}
   CATCH_FILE_IO_ERROR(args["data-file"]);
 
-    // Get the output object. In the case where it is not a VS file, we use
-    // the load object.
-    ptr<data> d_out = plugins_manager::get_data(args["data"], args);
-    if(dynamic_pointer_cast<vertical_segment>(d) != NULL)
-    {
-        parameters p(d->parametrization().dimX(),
-                     d->parametrization().dimY(),
-                     d->parametrization().input_parametrization(),
-                     d->parametrization().output_parametrization());
-        d_out->setParametrization(p);
-    }
-
 	// Get the function file
 	function* f = NULL;
 	f = plugins_manager::load_function(args["input"]);
@@ -99,11 +87,17 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+  // Get the output object. In the case where it is not a VS file, we use the
+  // load object.
+  ptr<data> d_out = plugins_manager::get_data(args["data"],
+                                              d->size(),
+                                              dynamic_pointer_cast<vertical_segment>(d)
+                                              ? d->parametrization()
+                                              : f->parametrization(),
+                                              args);
+
 	if(d && f != NULL)
 	{
-		// Is the output data file already allocated and has the same size
-		// than the training data ?
-		const bool out_filled = d->size() == d_out->size();
 		const bool output_dif = args.is_defined("export-diff");
 
 		vec temp(f->parametrization().dimX());
@@ -125,17 +119,27 @@ int main(int argc, char** argv)
         }
         vec y = f->value(temp);
 
-        for(int j=0; j<d->parametrization().dimY(); ++j) {
-            x[d->parametrization().dimX() + j] =
-                (output_dif) ? x[d->parametrization().dimX() + j] - y[j] : y[j];
-        }
+        if (dynamic_pointer_cast<vertical_segment>(d_out))
+        {
+            // Vertical segment has a "scatter" representation, so we need to
+            // pass both X and Y.
+            vec z(d_out->parametrization().dimX()
+                  + d_out->parametrization().dimY());
 
-        // If the output data is already allocated and has the same size
-        // than the training data, we do simple copy of the index elements.
-        if(out_filled) {
+            for(int j=0; j<d->parametrization().dimX(); ++j) {
+                z[j] = x[j];
+            }
+            for(int j=0; j<d->parametrization().dimY(); ++j) {
+                z[d->parametrization().dimX() + j] =
+                    output_dif ? x[d->parametrization().dimX() + j] - y[j] : y[j];
+            }
+
+            d_out->set(i, z);
+        }
+        else
+        {
+            // Grid representation: only Y is stored.
             d_out->set(i, y);
-        } else {
-            d_out->set(x);
         }
 		}	
 

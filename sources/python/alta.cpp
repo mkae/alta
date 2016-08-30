@@ -66,11 +66,15 @@ static ptr<data> load_data(const std::string& plugin_name, const std::string& fi
   ptr<data> d = plugins_manager::load_data(filename, plugin_name);
 	return d;
 }
-static ptr<data> get_data_with_args(const std::string& plugin_name, const python_arguments& args) {
-	return plugins_manager::get_data(plugin_name, args);
+static ptr<data> get_data_with_args(const std::string& plugin_name,
+                                    size_t size,
+                                    const parameters& params,
+                                    const python_arguments& args) {
+  return plugins_manager::get_data(plugin_name, size, params, args);
 }
-static ptr<data> get_data(const std::string& plugin_name) {
-	return plugins_manager::get_data(plugin_name);
+static ptr<data> get_data(const std::string& plugin_name, size_t size,
+                          const parameters& params) {
+  return plugins_manager::get_data(plugin_name, size, params);
 }
 
 /* Creating functions for the plugins_manager calls

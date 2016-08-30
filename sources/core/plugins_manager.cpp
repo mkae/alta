@@ -442,14 +442,16 @@ ptr<function> plugins_manager::get_function(const std::string& n,
 }
 
 
-ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
+ptr<data> plugins_manager::get_data(const std::string& n, size_t size,
+                                    const parameters& params,
+                                    const arguments& args)
 {
     if(n.empty() || n == "vertical_segment")
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no data plugin specified, returning a vertical_segment loader" << std::endl;
 #endif
-        return ptr<data>(new vertical_segment());
+        return ptr<data>(new vertical_segment(params, size));
     }
 
    DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
@@ -458,7 +460,7 @@ ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using data provider in file \"" << n << "\"" << std::endl;
 #endif
-        return ptr<data>(myData(args));
+        return ptr<data>(myData(size, params, args));
     }
     else
     {

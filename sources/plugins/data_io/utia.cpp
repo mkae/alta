@@ -62,10 +62,8 @@ private:
 	double* Bd;
 
 public:
-	UTIA()
-      : data(alta::parameters(4, 3,
-                              params::SPHERICAL_TL_PL_TV_PV,
-                              params::RGB_COLOR))
+	UTIA(const parameters& params)
+      : data(params)
   {
 		this->step_t = 15;
 		this->step_p = 7.5;
@@ -299,9 +297,10 @@ public:
   friend data* load_data(std::istream&, const arguments&);
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* provide_data(size_t size, const parameters& params,
+                                   const arguments&)
 {
-    return new UTIA();
+    return new UTIA(params);
 }
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
@@ -333,7 +332,9 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
 		} else
 #endif
 
-    UTIA* result = new UTIA();
+    UTIA* result = new UTIA(alta::parameters(0, 0,
+                                             params::UNKNOWN_INPUT,
+                                             params::UNKNOWN_OUTPUT));
 
     int count = 0;
     for(int isp=0; isp < result->planes; isp++)	{

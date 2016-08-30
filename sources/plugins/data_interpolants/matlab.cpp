@@ -221,7 +221,7 @@ class MatlabInterpolant : public data
 		}
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* provide_data(size_t, const parameters&, const arguments&)
 {
     return new MatlabInterpolant();
 }

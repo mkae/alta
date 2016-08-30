@@ -79,10 +79,14 @@ private: // data
 	double *brdf ;
 	const int _nSlice;
 
+    MERL()
+        : MERL(parameters(3, 3, params::RUSIN_TH_TD_PD, params::RGB_COLOR))
+    { }
+
 public: // methods
 
-    MERL() :
-      data(parameters(3, 3, params::RUSIN_TH_TD_PD, params::RGB_COLOR)),
+    MERL(const parameters& params) :
+      data(params),
       _nSlice(BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2) {
 		brdf = new double[3*_nSlice];
 		std::fill(brdf, brdf + 3*_nSlice, 0.0);
@@ -97,6 +101,7 @@ public: // methods
     _max[1] = 0.5*M_PI;
     _max[2] = 2.0*M_PI;
     }
+
     ~MERL() {
     	delete[] brdf;
     }
@@ -460,9 +465,10 @@ static bool read_brdf(std::istream& input, double* &brdf)
 }
 
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* provide_data(size_t size, const parameters& params,
+                                   const arguments& args)
 {
-    return new MERL();
+    return new MERL(params);
 }
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)

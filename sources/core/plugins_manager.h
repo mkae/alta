@@ -55,7 +55,10 @@ class plugins_manager
 
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-		static ptr<data> get_data(const std::string& n, const arguments& args = arguments());
+		static ptr<data> get_data(const std::string& n,
+                              size_t size,
+                              const parameters& params,
+                              const arguments& args = arguments());
 
     //! \brief Load from INPUT an instance of TYPE and return it.
     static ptr<data> load_data(const std::string& type, std::istream& input,
@@ -89,7 +92,8 @@ class plugins_manager
 		// Object provider prototypes
 		typedef function* (*FunctionPrototype)(const parameters&);
 		typedef fitter*   (*FitterPrototype)();
-		typedef data*     (*DataPrototype)(const arguments&);
+		typedef data*     (*DataPrototype)(size_t size, const parameters& params,
+                                       const arguments&);
     typedef data*     (*LoadDataPrototype)(std::istream& input,
                                            const arguments&);
 };

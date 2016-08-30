@@ -152,10 +152,8 @@ class BrdfGrid : public vertical_segment {
 
       std::vector<int> _size;
 
-      BrdfGrid(const arguments& args)
-          : vertical_segment(alta::parameters(2, 3, params::STARK_2D,
-                                              params::RGB_COLOR),
-                             0)                   // XXX: size
+      BrdfGrid(size_t size, const parameters& params, const arguments& args)
+        : vertical_segment(params, size)
       {
          initialize(args);
       }
@@ -365,20 +363,17 @@ class BrdfGrid : public vertical_segment {
       }
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments& args)
+ALTA_DLL_EXPORT data* provide_data(size_t size,
+                                   const parameters& params,
+                                   const arguments& args)
 {
-    return new BrdfGrid(args);
+    return new BrdfGrid(size, params, args);
 }
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input,
                                 const arguments& args)
 {
     arguments header = arguments::parse_header(input);
-
-    BrdfGrid* result = new BrdfGrid(args);
-
-    // XXX: Should be done in constructor.
-    result->initialize(header, false);
 
 #ifdef __GNUC__
 # warning FIXME we are not returning a "BrdfGrid"
@@ -387,5 +382,12 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input,
     // to 'data'.
 
     abort();
+#if 0
+    BrdfGrid* result = new BrdfGrid(args);
+
+    // XXX: Should be done in constructor.
+    result->initialize(header, false);
+#endif
+
     return load_data_from_text(input, header);
 }

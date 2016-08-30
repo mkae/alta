@@ -55,7 +55,9 @@ public: //methods
         : vertical_segment(params, std::move(input_data))
     { }
 
-    ASTM(): vertical_segment() { }
+    ASTM(const parameters& params, size_t size)
+        : vertical_segment(params, size)
+    { }
 };
 
 // Parse ASTM header.
@@ -129,9 +131,10 @@ compute_parameters(const std::vector<std::string>& vars)
 }
 
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* provide_data(size_t size, const parameters& params,
+                                   const arguments&)
 {
-    return new ASTM();
+    return new ASTM(params, size);
 }
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)

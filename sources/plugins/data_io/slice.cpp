@@ -290,7 +290,8 @@ class BrdfSlice : public data {
     friend data* load_data(std::istream&, const arguments&);
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments& args)
+ALTA_DLL_EXPORT data* provide_data(size_t size, const parameters& params,
+                                   const arguments& args)
 {
     return new BrdfSlice(args);
 }

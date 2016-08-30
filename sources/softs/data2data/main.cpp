@@ -59,6 +59,28 @@
 
 using namespace alta;
 
+static parameters compute_parameters(const data& d_in,
+                                     const arguments& args)
+{
+    params::input param = params::parse_input(args["param"]);
+
+    if(param == params::UNKNOWN_INPUT
+       && d_in.parametrization().input_parametrization() != params::UNKNOWN_INPUT)
+    {
+        std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
+        param = d_in.parametrization().input_parametrization();
+    }
+    else if(param == params::UNKNOWN_INPUT)
+    {
+        std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    return alta::parameters(params::dimension(param),
+                            d_in.parametrization().dimY(),
+                            param, params::UNKNOWN_OUTPUT);
+}
+
 int main(int argc, char** argv)
 {
 	arguments args(argc, argv) ;
@@ -125,7 +147,10 @@ int main(int argc, char** argv)
 		std::cout << "<<INFO>> input data will be treated as ALTA format" << std::endl;
 	}
 
-	ptr<data> d_out = plugins_manager::get_data(args["out-data"], args) ;
+	ptr<data> d_out = plugins_manager::get_data(args["out-data"],
+                                              d_in->size(),
+                                              compute_parameters(*d_in, args),
+                                              args) ;
 	if(!d_out)
 	{
 		std::cout << "<<INFO>> data will be outputed to ALTA format" << std::endl;
@@ -140,34 +165,8 @@ int main(int argc, char** argv)
 	std::cout << "<<INFO>> conversion from " << params::get_name(d_in->parametrization().input_parametrization())
 	          << " to " << params::get_name(d_out->parametrization().input_parametrization()) << std::endl;
 
-   bool is_vs = dynamic_pointer_cast<vertical_segment>(d_out) &&
-                d_out->size() == 0;
-
-	if(is_vs || args.is_defined("splat"))
+	if(dynamic_pointer_cast<vertical_segment>(d_out) || args.is_defined("splat"))
 	{
-		if(dynamic_pointer_cast<vertical_segment>(d_out))
-		{
-			params::input param = params::parse_input(args["param"]);
-			if(param == params::UNKNOWN_INPUT
-         && d_in->parametrization().input_parametrization() != params::UNKNOWN_INPUT)
-			{
-				std::cout << "<<DEBUG>> using the input parametrization of the input file for the output file as well." << std::endl;
-				param = d_in->parametrization().input_parametrization();
-			}
-			else if(param == params::UNKNOWN_INPUT)
-			{
-				std::cerr << "<<ERROR>> no parametrization defined for input and output files." << std::endl;
-				return -1;
-			}
-
-      {
-          parameters p(params::dimension(param),
-                       d_in->parametrization().dimY(),
-                       param, params::UNKNOWN_OUTPUT);
-          d_out->setParametrization(p);
-      }
-		}
-
 		std::cout << "<<INFO>> output DIM = " << d_out->parametrization().dimX() << ", " << d_out->parametrization().dimY() << std::endl;
 
 		vec temp(d_out->parametrization().dimX() + d_out->parametrization().dimY());
@@ -185,7 +184,7 @@ int main(int argc, char** argv)
                       d_out->parametrization().output_parametrization(),
                       d_out->parametrization().dimY(),
                       &temp[d_out->parametrization().dimX()]);
-			d_out->set(temp);
+			d_out->set(i, temp);
 		}
 	}
 	else
