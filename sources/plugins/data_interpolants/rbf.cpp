@@ -134,11 +134,6 @@ class rbf_interpolant : public data
 			return get(i) ;
 		}
 
-		//! \todo Test this function
-		virtual void set(const vec& x)
-		{
-			NOT_IMPLEMENTED();
-		}
 		virtual void set(int i, const vec& x)
 		{
 			NOT_IMPLEMENTED();

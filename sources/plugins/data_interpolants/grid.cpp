@@ -310,10 +310,6 @@ class BrdfGrid : public vertical_segment {
          return get(i) ;
       }
 
-      void set(const vec& x)
-      {
-         NOT_IMPLEMENTED();
-      }
       void set(int id, const vec& x)
       {
          vertical_segment::set(id, x);

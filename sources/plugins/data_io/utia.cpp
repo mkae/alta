@@ -264,24 +264,6 @@ public:
 		return RGB;
 	}
 
-	// Set data
-	virtual void set(const vec& x) {
-		assert(x.size() == parametrization().dimX()+parametrization().dimY());
-
-		const double PI2 = M_PI*0.5;
-		if(x[0]>PI2 || x[2]>PI2) {
-			return;
-		}
-
-		int iti, ipi, itv, ipv;
-		vecToIndex(x, iti, ipi, itv, ipv);
-
-		const int index = ((iti*npi + ipi)*ntv + itv)*npv + ipv;
-		Bd[index + 0*nPerPlane] = x[parametrization().dimX() + 0];
-		Bd[index + 1*nPerPlane] = x[parametrization().dimX() + 1];
-		Bd[index + 2*nPerPlane] = x[parametrization().dimX() + 2];
-	}
-
 	virtual void set(int i, const vec& x) {
 		assert(x.size() == parametrization().dimY());
 		for(int isp=0; isp<planes; ++isp) {

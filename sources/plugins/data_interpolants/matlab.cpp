@@ -149,10 +149,6 @@ class MatlabInterpolant : public data
 			return get(i) ;
 		}
 
-		virtual void set(const vec& x)
-		{
-			NOT_IMPLEMENTED();
-		}
 		virtual void set(int i, const vec& x)
 		{
 			_data->set(i, x);

@@ -133,24 +133,6 @@ vec vertical_segment::get(int i) const
     return res ;
 }
 
-//! \todo Check the vertical segment size and if the data
-//! is not already present.
-void vertical_segment::set(const vec& x)
-{
-   // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),
-   // if it only has the size of a single value, then create the segment.
-   if(x.size() == _parameters.dimX() + 3*_parameters.dimY()) {
-      _data.push_back(x);
-
-   } else if(x.size() == _parameters.dimX() + _parameters.dimY()) {
-      _data.push_back(vs(x));
-
-   } else {
-      std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
-      throw;
-   }
-}
-
 void vertical_segment::set(int i, const vec& x)
 {
    // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),

@@ -96,8 +96,7 @@ class vertical_segment : public data
          NOT_IMPLEMENTED();
       }
 
-      //! \brief Put the sample inside the data
-      virtual void set(const vec& x);
+      //! \brief Put the sample inside the data at index I.
       virtual void set(int i, const vec& x);
 
       //! \brief Specific accessor to a vertical segment, this gives the

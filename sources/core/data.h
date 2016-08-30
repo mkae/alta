@@ -71,8 +71,7 @@ class data
     //! match the total dimension: dimX + dimY.
     virtual vec value(const vec& in) const = 0;
 
-    //! \brief Put the sample inside the data
-    virtual void set(const vec& x) = 0;
+    //! \brief Put the sample inside the data at index I.
     virtual void set(int i, const vec& x) = 0;
 
 
@@ -160,12 +159,6 @@ class data_params : public data
     virtual vec get(int i) const
     {
       return _data[i];
-    }
-
-    //! \todo This should crash at execution.
-    virtual void set(const vec& x)
-    {
-      this->set(x);
     }
 
     virtual void set(int i, const vec& x)

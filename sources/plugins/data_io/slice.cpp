@@ -149,31 +149,6 @@ class BrdfSlice : public data {
 			return res ;
 		}
 
-		//! \todo Test this function
-		void set(const vec& x)
-		{
-			// Copy vector is required
-			vec _x = x;
-
-			// Reverse the first part of the vector
-			if(_reverse) {
-          _x.segment(0, parametrization().dimX()).reverseInPlace();
-			}
-
-			assert(_x.size() == parametrization().dimX()+parametrization().dimY());
-			assert(_x[0] <= _max[0] && _x[0] >= _min[0]);
-			assert(_x[1] <= _max[1] && _x[1] >= _min[1]);
-
-			const int i  = floor((_x[0]-_min[0]) * _width  / (_max[0] - _min[0]));
-			const int j  = floor((_x[1]-_min[1]) * _height / (_max[1] - _min[1]));
-			const int k  = 0;
-			//const int k  = floor(x[2] * _slice  / (M_PI));
-			const int id = i + j*_width + k*_width*_height;
-
-			_data[3*id + 0] = _x[parametrization().dimX()+0];
-			_data[3*id + 1] = _x[parametrization().dimX()+1];
-			_data[3*id + 2] = _x[parametrization().dimX()+2];
-		}
 		void set(int id, const vec& x)
 		{
 			assert(x.size() == parametrization().dimX() + parametrization().dimY());

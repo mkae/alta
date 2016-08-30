@@ -147,25 +147,6 @@ public: // methods
 		return res ;
 	}
 
-	//! \todo Test this function
-	void set(const vec& x)
-	{
-		assert(x.size() == 6);
-		const int phid_ind = phi_diff_index(x[2]);
-		const int thed_ind = theta_diff_index(x[1]);
-		const int theh_ind = theta_half_index(x[0]);
-
-		const int i = (theh_ind*BRDF_SAMPLING_RES_THETA_D + thed_ind)*(BRDF_SAMPLING_RES_PHI_D/2) + phid_ind;
-#ifdef DEBUG
-		std::cout << "set -> " << i << " (" << theh_ind << ", " << thed_ind << ", " << phid_ind << ")" << std::endl;
-		std::cout << "       " << x[0] << ", " << x[1]  << ", " << x[2] << std::endl;
-	    std::cout << std::endl;
-#endif
-		brdf[i] = x[3] / RED_SCALE;
-		brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] = x[4] / GREEN_SCALE;
-		brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
-	}
-
 	void set(int i, const vec& x) {
     assert(x.size() == parametrization().dimY());
 		int iR = i;
