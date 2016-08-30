@@ -32,6 +32,15 @@ using namespace alta;
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
 
+#define STEP_T 15.
+#define STEP_P 7.5
+#define NTI    6
+#define NTV    6
+#define NPI    ((int)(360.f/STEP_P))
+#define NPV    ((int)(360.f/STEP_P))
+#define N_PER_PLANE (NTI * NPI * NTV * NPV)
+
+
 /*! \ingroup datas
  *  \class data_utia
  *  \brief Data interface for the [UTIA][utia] file format.
@@ -63,16 +72,16 @@ private:
 
 public:
 	UTIA(const parameters& params)
-      : data(params)
+      : data(params, N_PER_PLANE)
   {
-		this->step_t = 15;
-		this->step_p = 7.5;
-		this->nti = 6;
-		this->ntv = 6;
-		this->npi = (int)(360.f/step_p);
-		this->npv = (int)(360.f/step_p);
+		this->step_t = STEP_T;
+		this->step_p = STEP_P;
+		this->nti = NTI;
+		this->ntv = NTV;
+		this->npi = NPI;
+		this->npv = NPV;
 		this->planes = 3;
-		this->nPerPlane = nti*npi*ntv*npv;
+		this->nPerPlane = N_PER_PLANE;
 		this->Bd = new double[planes*nti*npi*ntv*npv];
 
 	    _min[0] = 0.0;
@@ -269,11 +278,6 @@ public:
 		for(int isp=0; isp<planes; ++isp) {
 			Bd[isp*nPerPlane + i] = x[isp];
 		}
-	}
-
-	// Get data size, e.g. the number of samples to fit
-	virtual int size() const {
-		return nPerPlane;
 	}
 
   friend data* load_data(std::istream&, const arguments&);

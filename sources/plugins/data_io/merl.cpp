@@ -73,6 +73,10 @@ using namespace alta;
 
 ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
 
+#define MERL_SIZE                                           \
+    (BRDF_SAMPLING_RES_THETA_H * BRDF_SAMPLING_RES_THETA_D  \
+     * BRDF_SAMPLING_RES_PHI_D / 2)
+
 class MERL : public data
 {
 private: // data
@@ -86,8 +90,7 @@ private: // data
 public: // methods
 
     MERL(const parameters& params) :
-      data(params),
-      _nSlice(BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2) {
+      data(params, MERL_SIZE), _nSlice(MERL_SIZE) {
 		brdf = new double[3*_nSlice];
 		std::fill(brdf, brdf + 3*_nSlice, 0.0);
 
@@ -184,13 +187,6 @@ public: // methods
 	    return res;
 	}
 
-
-	// Get data size, e.g. the number of samples to fit
-	int size() const {
-		return BRDF_SAMPLING_RES_THETA_H *
-	          BRDF_SAMPLING_RES_THETA_D *
-	          BRDF_SAMPLING_RES_PHI_D / 2 ;
-	}
 
 private: //methods
 

@@ -34,10 +34,11 @@ class data
 {
   public: // methods
 
-    data(const parameters &p): _parameters(p) {}
+    data(const parameters &p, int size)
+        : _parameters(p), _size(size) {}
 
-    data(const parameters& p, const vec& min, const vec& max)
-        : _parameters(p), _min(min), _max(max)
+    data(const parameters& p, int size, const vec& min, const vec& max)
+        : _parameters(p), _size(size), _min(min), _max(max)
     {
         assert(min.size() == p.dimX());
         assert(max.size() == p.dimX());
@@ -76,7 +77,7 @@ class data
 
 
     // Get data size, e.g. the number of samples to fit
-    virtual int size() const = 0 ;
+    int size() const { return _size; };
 
     //! \brief Return true if this object is equal to DATA ±ε.
     virtual bool equals(const data& data,
@@ -104,6 +105,7 @@ class data
   protected: // data
 
     parameters _parameters;
+    int _size;
     vec _min, _max;
 } ;
 
@@ -134,12 +136,13 @@ class data_params : public data
 
     //! \brief contructor requires the definition of a base class that
     //! has a parametrization, and a new parametrization.
-    data_params(const ptr<data> d, params::input new_param,
+    data_params(const ptr<data> d, int size, params::input new_param,
                 data_params::clustering method = data_params::NONE) :
       data(parameters(params::dimension(new_param),
                       d->parametrization().dimY(),
                       new_param,
-                      d->parametrization().output_parametrization())),
+                      d->parametrization().output_parametrization()),
+           size),
       _clustering_method(method)
     {
       std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
@@ -164,12 +167,6 @@ class data_params : public data
     virtual void set(int i, const vec& x)
     {
       this->set(i, x);
-    }
-
-    // Get data size, e.g. the number of samples to fit
-    virtual int size() const
-    {
-      return _data.size();
     }
 
   protected: // data

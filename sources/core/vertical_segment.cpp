@@ -68,7 +68,7 @@ static vec data_max(unsigned int size, const std::vector<vec>& data)
 
 vertical_segment::vertical_segment(const parameters& params,
                                    std::vector<vec>&& input_data)
-    : data(params,
+    : data(params, input_data.size(),
            data_min(params.dimX(), input_data),
            data_max(params.dimX(), input_data)),
       _data(input_data), _is_absolute(true), _dt(0.1)
@@ -76,7 +76,7 @@ vertical_segment::vertical_segment(const parameters& params,
 }
 
 vertical_segment::vertical_segment(const parameters& params, unsigned int size):
-    data(params), _is_absolute(true), _dt(0.1)
+    data(params, size), _is_absolute(true), _dt(0.1)
 {
     initializeToZero(size);
 }
@@ -147,11 +147,6 @@ void vertical_segment::set(int i, const vec& x)
       std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
       throw;
    }
-}
-
-int vertical_segment::size() const
-{
-	return _data.size() ;
 }
 
 vec vertical_segment::vs(const vec& x) const {

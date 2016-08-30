@@ -74,7 +74,8 @@ class rbf_interpolant : public data
 	public:
 
 		rbf_interpolant(ptr<data> proxied_data)
-        : data(proxied_data->parametrization()),
+        : data(proxied_data->parametrization(),
+               proxied_data->size()),
           _data(proxied_data),
           _knn(3)
 		{
@@ -210,13 +211,6 @@ class rbf_interpolant : public data
 		#endif
 
 		   return res;
-		}
-
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const
-		{
-			assert(_data);
-			return _data->size();
 		}
 };
 

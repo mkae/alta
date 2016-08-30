@@ -575,7 +575,8 @@ void plugins_manager::check_compatibility( ptr<data>& d,
     {
       std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->parametrization().input_parametrization()) << std::endl;
       std::cout << "<<INFO>> to " << params::get_name(f->parametrization().input_parametrization()) << std::endl;
-      ptr<data_params> dd = ptr<data_params>(new data_params(d, f->parametrization().input_parametrization()));
+      ptr<data_params> dd = ptr<data_params>(new data_params(d, d->size(),
+                                                             f->parametrization().input_parametrization()));
       d = dynamic_pointer_cast<data>(dd) ;
     }
     else

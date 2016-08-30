@@ -59,7 +59,7 @@ class MatlabInterpolant : public data
 
 	public: // methods
 		MatlabInterpolant()
-    : _data( ptr<data>( new vertical_segment() ) )
+    : _data( ptr<data>( new vertical_segment() ) ) // FIXME: size?
 		{
 			// Create matlab engine
 		#ifdef WIN32
@@ -208,12 +208,6 @@ class MatlabInterpolant : public data
 			}
 
 		   return res;
-		}
-
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const
-		{
-			return _data->size();
 		}
 };
 

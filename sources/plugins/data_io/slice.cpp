@@ -82,7 +82,8 @@ class BrdfSlice : public data {
 		BrdfSlice(const arguments& args,
               int width, int height, int slice,
               double* content)
-        : data(brdf_slice_parameters(args)),
+        : data(brdf_slice_parameters(args),
+               width * height * slice),
           _width(width), _height(height), _slice(slice),
           _data(content)
 		{
@@ -196,12 +197,6 @@ class BrdfSlice : public data {
 		}
 
   private:
-
-		// Get data size, e.g. the number of samples to fit
-		int size() const
-		{
-			return _width*_height*_slice;
-		}
 
 		// Get min and max input space values
 		vec min() const

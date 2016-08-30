@@ -107,9 +107,6 @@ class vertical_segment : public data
       //! ordinate segment.
       virtual void get(int i, vec& yl, vec& yu) const ;
 
-      // Get data size
-      virtual int size() const ;
-
    private: // method
 
   protected: // method
