@@ -86,9 +86,6 @@ class vertical_segment : public data
       vertical_segment(const parameters& params, unsigned int size)
           ALTA_DEPRECATED;
 
-      //! \brief Default constructor that does nothing at all.
-      vertical_segment() ALTA_DEPRECATED {}
-
       // Acces to data
       virtual vec get(int i) const ;
 
