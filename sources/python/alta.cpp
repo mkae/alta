@@ -257,28 +257,43 @@ static bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data,
  */
 static ptr<data> data2data(const data* d_in, const parameters& target)
 {
-    std::vector<vec> content(d_in->size());
-    for (auto i = 0; i < d_in->size(); ++i)
+    auto delete_array = [](double* array)
     {
-        vec temp(target.dimX() + target.dimY());
+        delete[] array;
+    };
 
+    // For each sample we store the X and Y values, followed by the
+    // confidence interval on Y.
+    size_t sample_size = target.dimX() + 3 * target.dimY();
+
+    double* content = new double[d_in->size() * sample_size];
+
+    for (auto sample = 0; sample < d_in->size(); sample++)
+    {
         // Copy the input vector
-        vec x = d_in->get(i);
+        vec x = d_in->get(sample);
         params::convert(&x[0],
                         d_in->parametrization().input_parametrization(),
                         target.input_parametrization(),
-                        &temp[0]);
+                        &content[sample * sample_size]);
         params::convert(&x[d_in->parametrization().dimX()],
                         d_in->parametrization().output_parametrization(),
                         d_in->parametrization().dimY(),
                         target.output_parametrization(),
                         target.dimY(),
-                        &temp[target.dimX()]);
-        content[i] = std::move(temp);
+                        &content[sample * sample_size + target.dimX()]);
 
+        // Set the confidence interval on Y to zero.
+        for (auto i = 0; i < 2 * target.dimY(); i++)
+        {
+            content[sample * sample_size + target.dimX() + target.dimY()
+                    + i] = 0.;
+        }
     }
 
-    data* result = new vertical_segment(target, std::move(content));
+    data* result = new vertical_segment(target, d_in->size(),
+                                        std::shared_ptr<double>(content,
+                                                                delete_array));
     return ptr<data>(result);
 }
 

@@ -51,8 +51,9 @@ class ASTM : public vertical_segment
 {
 
 public: //methods
-    ASTM(const parameters& params, std::vector<vec>&& input_data)
-        : vertical_segment(params, std::move(input_data))
+    ASTM(const parameters& params, size_t size,
+         std::shared_ptr<double> input_data)
+        : vertical_segment(params, size, input_data)
     { }
 
     ASTM(const parameters& params, size_t size)
@@ -151,12 +152,13 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
     int size = header.get_int("NUM_POINTS", 0);
 
     // Size of the data
-    std::vector<vec> data(size);
-    const int n = params.dimX() + params.dimY();
-    int i = 0;
+    size_t n = params.dimX() + params.dimY();
+    double* data = new double[size * n];
 
-		while(input.good())
-		{
+    for (size_t i = 0; i < size * n; i += n)
+    {
+        assert(input.good());
+
         std::getline(input, line);
 
         if(line.size() == 0 || line.rfind(',') == std::string::npos)
@@ -167,13 +169,10 @@ ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
         // Create a stream from the line data and extract it as
         // a vec of dim parametrization().dimX() + parametrization().dimY().
         std::stringstream stream(line);
-        vec x(n);
-        for(int i=0; i<n; ++i) {
-            stream >> x[i];
+        for(int j = 0; j < n; ++j) {
+            stream >> data[i + j];
         }
-
-        data[i++] = x;
 		}
 
-    return new ASTM(params, std::move(data));
+    return new ASTM(params, n, std::shared_ptr<double>(data));
 }

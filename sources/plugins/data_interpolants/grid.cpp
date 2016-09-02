@@ -199,16 +199,12 @@ class BrdfGrid : public vertical_segment {
 
          // Preallocate the grid data
          if(preallocate) {
-            initializeToZero(N);
-
             // Set the abscissa data
             vec x(parametrization().dimX() + parametrization().dimY());
             for(int n=0; n<N; ++n) {
                get_abscissa(n, x);
                set(n, x);
             }
-         } else {
-            _data.clear();
          }
 
          parameters p(nX, nY, in_param, out_param);

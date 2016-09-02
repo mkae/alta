@@ -21,30 +21,42 @@
 # include <endian.h>
 #endif
 
-//using namespace alta;
+using namespace Eigen;
 
-static bool cosine_correction(vec& v, unsigned int dimX, unsigned int dimY,
+// A deleter for arrays, to work around the lack of array support in C++11's
+// 'shared_ptr':
+// <http://stackoverflow.com/questions/8947579/why-isnt-there-a-stdshared-ptrt-specialisation#8947700>.
+static void delete_array(double *thing)
+{
+    delete[] thing;
+}
+
+
+static bool cosine_correction(vecref v, unsigned int dimX, unsigned int dimY,
                               alta::params::input in_param)
 {
     using namespace alta;
 
+    assert(v.size() == dimX + dimY);
+
     // Correction of the data by 1/cosine(theta_L)
     double factor = 1.0;
     double cart[6];
-    params::convert(&v[0], in_param, params::CARTESIAN, cart);
+    params::convert(&v(0), in_param, params::CARTESIAN, cart);
     if(cart[5] > 0.0 && cart[2] > 0.0)
     {
         factor = 1.0/cart[5]*cart[2];
         for(unsigned int i = 0; i < dimY; ++i)
         {
-            v[i + dimX] /= factor;
+            std::cout << "i = " << i << " dimx = " << dimX
+                      << " + = " << i + dimX << " | " << v.size()
+                      << std::endl;
+            v(i + dimX) /= factor;
         }
         return true;
     }
     else return false;
 }
-
-typedef Eigen::Ref<const vec> vecref;
 
 // Return true if V is between MIN and MAX.
 static bool within_bounds(const vecref v,
@@ -64,11 +76,13 @@ enum ci_kind
 
 // Read a confidence interval on the output parameters from INPUT into V.
 static void read_confidence_interval(std::istream& input,
-                                     vec& v, ci_kind kind,
+                                     vecref v, ci_kind kind,
                                      unsigned int dimX,
                                      unsigned int dimY,
                                      const alta::arguments& args)
 {
+    assert(v.size() == dimX + 3 * dimY);
+
     for(int i=0; i<dimY; ++i)
     {
         double min_dt = 0.0, max_dt = 0.0;
@@ -77,8 +91,8 @@ static void read_confidence_interval(std::istream& input,
         {
             input >> min_dt ;
             input >> max_dt ;
-            min_dt = min_dt-v[dimX+i];
-            max_dt = max_dt-v[dimX+i];
+            min_dt = min_dt-v(dimX + i);
+            max_dt = max_dt-v(dimX + i);
         }
         else if(i == 0 && kind == SYMMETRICAL_CONFIDENCE_INTERVAL)
         {
@@ -97,18 +111,18 @@ static void read_confidence_interval(std::istream& input,
 
         if(args.is_defined("dt-relative"))
         {
-            v[dimX +   dimY+i] = v[dimX + i] * (1.0 + min_dt) ;
-            v[dimX + 2*dimY+i] = v[dimX + i] * (1.0 + max_dt) ;
+            v(dimX +   dimY+i) = v(dimX + i) * (1.0 + min_dt) ;
+            v(dimX + 2*dimY+i) = v(dimX + i) * (1.0 + max_dt) ;
         }
         else if(args.is_defined("dt-max"))
         {
-            v[dimX +   dimY+i] = v[dimX + i] + std::max(v[dimX + i] * min_dt, min_dt);
-            v[dimX + 2*dimY+i] = v[dimX + i] + std::max(v[dimX + i] * max_dt, max_dt);
+            v(dimX +   dimY+i) = v(dimX + i) + std::max(v(dimX + i) * min_dt, min_dt);
+            v(dimX + 2*dimY+i) = v(dimX + i) + std::max(v(dimX + i) * max_dt, max_dt);
         }
         else
         {
-            v[dimX +   dimY+i] = v[dimX + i] + min_dt ;
-            v[dimX + 2*dimY+i] = v[dimX + i] + max_dt ;
+            v(dimX +   dimY+i) = v(dimX + i) + min_dt ;
+            v(dimX + 2*dimY+i) = v(dimX + i) + max_dt ;
         }
 
         // You can enforce the vertical segment to stay in the positive
@@ -116,9 +130,9 @@ static void read_confidence_interval(std::istream& input,
         // that the data point is also clamped to zero if negative.
         if(args.is_defined("dt-positive"))
         {
-            v[dimX +          i] = std::max(v[dimX +          i], 0.0);
-            v[dimX +   dimY+i] = std::max(v[dimX +   dimY+i], 0.0);
-            v[dimX + 2*dimY+i] = std::max(v[dimX + 2*dimY+i], 0.0);
+            v(dimX +        i) = std::max(v(dimX +        i), 0.0);
+            v(dimX +   dimY+i) = std::max(v(dimX +   dimY+i), 0.0);
+            v(dimX + 2*dimY+i) = std::max(v(dimX + 2*dimY+i), 0.0);
         }
 
 #ifdef DEBUG
@@ -147,6 +161,7 @@ alta::data* alta::load_data_from_text(std::istream& input,
   params::output out_param = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
 
   std::pair<int, int> dim = header.get_pair<int>("DIM");
+  size_t row_count = dim.first + 3 * dim.second;
 
   min = args.get_vec("min", dim.first, -std::numeric_limits<float>::max()) ;
   max = args.get_vec("max", dim.first,  std::numeric_limits<float>::max()) ;
@@ -165,8 +180,7 @@ alta::data* alta::load_data_from_text(std::istream& input,
       vs_value == 2 ? ASYMMETRICAL_CONFIDENCE_INTERVAL
       : (vs_value == 1 ? SYMMETRICAL_CONFIDENCE_INTERVAL
          : NO_CONFIDENCE_INTERVAL);
-
-  std::vector<vec> content;
+  std::vector<double> content;
 
   // Now read the body.
   while(input.good())
@@ -182,14 +196,24 @@ alta::data* alta::load_data_from_text(std::istream& input,
     }
     else
     {
+      auto start = content.size();
+
       // Read the data point x and y coordinates
-      vec v = vec::Zero(dim.first + 3*dim.second) ;
-      for(int i=0; i<dim.first+dim.second; ++i)
+      for(int i=0; i < dim.first + dim.second; ++i)
       {
-        linestream >> v[i] ;
+          double item;
+          linestream >> item;
+          content.push_back(item);
       }
 
+      // Save room for the confidence interval.
+      for (int i = 0; i < 2 * dim.second; i++)
+          content.push_back(0.);
+
       // If data is not in the interval of fit
+      // std::cout << " start = " << start << " rows = " << row_count
+      //           << " size = " << content.size() << "\n";
+      Map<VectorXd> v(&content[start], row_count);
       if (!(within_bounds(v.segment(0, dim.first), min, max)
             && within_bounds(v.segment(dim.first, dim.second),
                              ymin, ymax)))
@@ -197,15 +221,14 @@ alta::data* alta::load_data_from_text(std::istream& input,
 
       if(args.is_defined("data-correct-cosine"))
       {
-          if (!cosine_correction(v, dim.first, dim.second, in_param))
+          if (!cosine_correction(v.segment(0, dim.first + dim.second),
+                                 dim.first, dim.second, in_param))
               continue;
       }
 
       // Read the confidence interval data if available.
       read_confidence_interval(linestream, v, kind,
                                dim.first, dim.second, args);
-
-      content.push_back(std::move(v));
     }
   }
 
@@ -215,8 +238,15 @@ alta::data* alta::load_data_from_text(std::istream& input,
             << " -> R^" << dim.second << std::endl ;
   std::cout << "<<INFO>> " << content.size() << " elements to fit" << std::endl ;
 
+
+  double *raw_content = new double[content.size()];
+  memcpy(raw_content, content.data(), content.size() * sizeof(double));
+
   parameters param(dim.first, dim.second, in_param, out_param);
-  data* result = new vertical_segment(param, std::move(content));
+  size_t element_count = content.size() / row_count;
+  data* result = new vertical_segment(param, element_count,
+                                      std::shared_ptr<double>(raw_content,
+                                                                            delete_array));
   if(args.is_defined("data-correct-cosine"))
       result->save("/tmp/data-corrected.dat");
 
@@ -276,6 +306,7 @@ void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 
     for(int i=0; i < data.size(); ++i)
     {
+        // FIXME: Currently we are not saving the confidence interval here.
         vec sample = data.get(i);
         const double *numbers = sample.data();
 
@@ -311,26 +342,33 @@ alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments&
       }
 
       // TODO: Arrange to use mmap and make it zero-alloc and zero-copy.
-      std::vector<vec> content(sample_count);
-      for (int i = 0; i < sample_count; i++)
+      size_t rows = dim.first + 3 * dim.second;
+      double *content = new double[sample_count * rows];
+
+      for (std::streamsize i = 0; i < sample_count; i++)
       {
-         vec row = vec::Zero(dim.first + dim.second);
-         std::streamsize expected = row.size() * sizeof(double);
+          double* start = &content[i * rows];
+          std::streamsize byte_count =
+              (dim.first + dim.second) * sizeof(*content);
 
-         for (std::streamsize total = 0;
-               total < expected && !in.eof();
+          for (std::streamsize total = 0;
+               total < byte_count && !in.eof();
                total += in.gcount())
-         {
-            char* ptr = (char*)row.data();
-            in.read(ptr + total, expected - total);
-         }
+          {
+              in.read((char *) start + total, byte_count - total);
+          }
 
-         content[i] = row;
+          // XXX: Fill in the confidence interval values with zeros since we
+          // don't have those values.
+          content[i * rows + dim.first + dim.second] = 0.;
+          content[i * rows + dim.first + dim.second + 1] = 0.;
       }
 
     parameters param(dim.first, dim.second,
                      params::parse_input(header["PARAM_IN"]),
                      params::parse_output(header["PARAM_OUT"]));
 
-    return new alta::vertical_segment(param, std::move(content));
+    return new alta::vertical_segment(param, sample_count,
+                                      std::shared_ptr<double>(content,
+                                                                            delete_array));
 }

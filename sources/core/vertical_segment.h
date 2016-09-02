@@ -81,7 +81,8 @@ class vertical_segment : public data
    public: // methods
 
       vertical_segment(const parameters& params,
-                       std::vector<vec>&& data);
+                       size_t size,
+                       std::shared_ptr<double> data);
 
       vertical_segment(const parameters& params, unsigned int size)
           ALTA_DEPRECATED;
@@ -106,11 +107,20 @@ class vertical_segment : public data
 
    private: // method
 
-  protected: // method
+      //! \brief Return the number of columns in each row.
+      size_t column_number() const
+      {
+          return _parameters.dimX() + 3 * _parameters.dimY();
+      }
 
-      // Pre-allocate 'number_of_data_elements' elements for this data
-      // object. Note, the input and output dimension needs to be specified.
-      void initializeToZero( unsigned int number_of_data_elements );
+      // Return a matrix view of this data.
+      Eigen::Map<Eigen::MatrixXd> matrix_view() const
+      {
+          return Eigen::Map<Eigen::MatrixXd>(_data.get(), size(),
+                                             column_number());
+      }
+
+  protected: // method
 
       //! \brief From a correct input configuration 'x' with size
       //! dimX()+dimY(), generate a vertical ! segment satisfying this object's
@@ -119,9 +129,8 @@ class vertical_segment : public data
 
 	protected: // data
 
-		// Store for each point of data, the upper
-		// and lower value
-		std::vector<vec> _data ;
+      // Store for each point of data, the upper and lower value.
+      std::shared_ptr<double> _data;
 
       // Store the different arguments for the vertical segment: is it using
       // relative or absolute intervals? What is the dt used ?

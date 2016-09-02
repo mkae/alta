@@ -36,6 +36,8 @@
 #include <Eigen/Core>
 
 typedef Eigen::VectorXd vec;
+typedef Eigen::Ref<vec> vecref;
+typedef Eigen::Ref<const vec> const_vecref;
 
 // Convenience functions.
 static inline double norm(const vec& v)

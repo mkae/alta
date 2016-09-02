@@ -59,27 +59,30 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
     std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
     std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
-    std::vector<vec> content(dat->size());
+    size_t elem_size =
+        dat->parametrization().dimX() + 3*dat->parametrization().dimY();
+    double* content = new double[dat->size() * elem_size];
+
     for(int i=0; i<dat->size(); ++i)
     {
       const vec x = dat->get(i);
-      vec y(dat->parametrization().dimX() + 3*dat->parametrization().dimY());
 
-      for(int k=0; k<x.size()   ; ++k) { y[k]                               = x[k]; }
+      for(int k=0; k<x.size(); ++k) {
+          content[i + k] = x[k];
+      }
       for(int k=0; k<dat->parametrization().dimY(); ++k) {
-          y[k + dat->parametrization().dimX() + dat->parametrization().dimY()] =
+          content[i + k + dat->parametrization().dimX() + dat->parametrization().dimY()] =
               (1.0 - args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
       }
       for(int k=0; k<dat->parametrization().dimY(); ++k) {
-          y[k + dat->parametrization().dimX() + 2*dat->parametrization().dimY()] =
+          content[i + k + dat->parametrization().dimX() + 2*dat->parametrization().dimY()] =
               (1.0 + args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
       }
-
-      content[i] = std::move(y);
     }
 
     ptr<vertical_segment> vs(new vertical_segment(dat->parametrization(),
-                                                  std::move(content)));
+                                                  dat->size(),
+                                                  std::shared_ptr<double>(content)));
 
     d = vs;
   }
