@@ -29,12 +29,8 @@ using namespace Eigen;
 // RVO comes into play.
 static vec data_min(Ref<MatrixXd> data)
 {
-    vec min(data.rows());
-
-    for(int k = 0; k < data.rows(); ++k)
-    {
-        min[k] = std::numeric_limits<double>::max();
-    }
+    vec min = VectorXd::Constant(data.rows(),
+                                 std::numeric_limits<double>::max());
 
     for(int i = 0; i < data.cols(); i++)
     {
@@ -50,12 +46,8 @@ static vec data_min(Ref<MatrixXd> data)
 
 static vec data_max(Ref<MatrixXd> data)
 {
-    vec max(data.rows());
-
-    for(int k = 0; k < data.rows(); ++k)
-    {
-        max[k] = -std::numeric_limits<double>::max();
-    }
+    vec max = VectorXd::Constant(data.rows(),
+                                 -std::numeric_limits<double>::max());
 
     for(int i = 0; i < data.cols(); i++)
     {
