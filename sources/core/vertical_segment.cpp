@@ -81,12 +81,19 @@ vertical_segment::vertical_segment(const parameters& params,
 {
 }
 
-vertical_segment::vertical_segment(const parameters& params, unsigned int rows):
-    data(params, rows), _is_absolute(true), _dt(0.1)
+// Work around the lack of array support in C++11's 'shared_ptr'.
+static void delete_array(double *thing)
 {
-    _data =
-        std::shared_ptr<double>(new double[rows * column_number()]);
-    memset(_data.get(), '\0', sizeof(double) * rows * column_number());
+    delete[] thing;
+}
+
+vertical_segment::vertical_segment(const parameters& params, unsigned int rows):
+    // Create a data object with a "value-initialized" (i.e., zeroed) array.
+    vertical_segment(params, rows,
+                     std::shared_ptr<double>
+                     (new double[rows * (params.dimX() + 3 * params.dimY())]{},
+                      delete_array))
+{
 }
 
 
