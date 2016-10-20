@@ -46,7 +46,8 @@ bool rational_fitter_eigen::fit_data(const ptr<data>& dat, ptr<function>& fit, c
 	} 
 	
 	ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(!d)
+	if(!d
+     || d->confidence_interval_kind() != vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct data object to the fitter" << std::endl ;
 		return false ;

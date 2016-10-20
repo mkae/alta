@@ -64,20 +64,26 @@ static vec data_max(Ref<MatrixXd> data)
 // Return a matrix view of PTR showing only the 'dimX' first rows of that
 // matrix.
 static Ref<MatrixXd>
-x_view(double *ptr, size_t cols, const parameters& params)
+x_view(double *ptr, size_t cols, const parameters& params,
+       vertical_segment::ci_kind kind)
 {
+    auto stride = params.dimX() + params.dimY()
+        + vertical_segment::confidence_interval_columns(kind, params);
+
     return Map<MatrixXd, 0, OuterStride<> >(ptr, params.dimX(), cols,
-                                            OuterStride<>(params.dimX()
-                                                          + 3 * params.dimY()));
+                                            OuterStride<>(stride));
 }
 
 vertical_segment::vertical_segment(const parameters& params,
                                    size_t size,
-                                   std::shared_ptr<double> input_data)
+                                   std::shared_ptr<double> input_data,
+                                   ci_kind kind)
     : data(params, size,
-           data_min(x_view(input_data.get(), size, params)),
-           data_max(x_view(input_data.get(), size, params))),
-      _data(input_data), _is_absolute(true), _dt(0.1)
+           data_min(x_view(input_data.get(), size, params, kind)),
+           data_max(x_view(input_data.get(), size, params, kind))),
+      _data(input_data),
+      _ci_kind(kind),
+      _is_absolute(true), _dt(0.1)
 {
 }
 
@@ -99,6 +105,9 @@ vertical_segment::vertical_segment(const parameters& params, unsigned int rows):
 
 void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
 {
+    // Make sure we have the lower and upper bounds of Y.
+    assert(confidence_interval_kind() == ASYMMETRICAL_CONFIDENCE_INTERVAL);
+
     auto matrix = matrix_view();
 
 #ifdef DEBUG
@@ -118,6 +127,9 @@ void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
 
 void vertical_segment::get(int i, vec& yl, vec& yu) const
 {
+    // Make sure we have the lower and upper bounds of Y.
+    assert(confidence_interval_kind() == ASYMMETRICAL_CONFIDENCE_INTERVAL);
+
     auto matrix = matrix_view();
 
     yl.resize(_parameters.dimY()) ; yu.resize(_parameters.dimY()) ;

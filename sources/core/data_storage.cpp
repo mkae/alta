@@ -21,6 +21,7 @@
 # include <endian.h>
 #endif
 
+using namespace alta;
 using namespace Eigen;
 
 // A deleter for arrays, to work around the lack of array support in C++11's
@@ -66,17 +67,10 @@ static bool within_bounds(const vecref v,
         && (v.array() > max.array()).all();
 }
 
-// The type of confidence interval.
-enum ci_kind
-{
-    NO_CONFIDENCE_INTERVAL = 0,
-    SYMMETRICAL_CONFIDENCE_INTERVAL,
-    ASYMMETRICAL_CONFIDENCE_INTERVAL
-};
-
 // Read a confidence interval on the output parameters from INPUT into V.
 static void read_confidence_interval(std::istream& input,
-                                     vecref v, ci_kind kind,
+                                     vecref v,
+                                     vertical_segment::ci_kind kind,
                                      unsigned int dimX,
                                      unsigned int dimY,
                                      const alta::arguments& args)
@@ -87,14 +81,14 @@ static void read_confidence_interval(std::istream& input,
     {
         double min_dt = 0.0, max_dt = 0.0;
 
-        if(i == 0 && kind == ASYMMETRICAL_CONFIDENCE_INTERVAL)
+        if(i == 0 && kind == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
         {
             input >> min_dt ;
             input >> max_dt ;
             min_dt = min_dt-v(dimX + i);
             max_dt = max_dt-v(dimX + i);
         }
-        else if(i == 0 && kind == SYMMETRICAL_CONFIDENCE_INTERVAL)
+        else if(i == 0 && kind == vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL)
         {
             double dt ;
             input >> dt ;
@@ -176,10 +170,10 @@ alta::data* alta::load_data_from_text(std::istream& input,
 #endif
 
   int vs_value = header.get_int("VS");
-  ci_kind kind =
-      vs_value == 2 ? ASYMMETRICAL_CONFIDENCE_INTERVAL
-      : (vs_value == 1 ? SYMMETRICAL_CONFIDENCE_INTERVAL
-         : NO_CONFIDENCE_INTERVAL);
+  vertical_segment::ci_kind kind =
+      vs_value == 2 ? vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+      : (vs_value == 1 ? vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+         : vertical_segment::NO_CONFIDENCE_INTERVAL);
   std::vector<double> content;
 
   // Now read the body.

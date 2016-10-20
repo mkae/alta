@@ -54,7 +54,8 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
   }
 
   ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-  if(!d)
+  if(!d
+     || d->confidence_interval_kind() != vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
   {
     std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
     std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;

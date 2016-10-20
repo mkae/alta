@@ -78,11 +78,26 @@ namespace alta {
  */
 class vertical_segment : public data
 {
+   public: // types
+
+      // The type of confidence interval.
+      enum ci_kind
+      {
+          NO_CONFIDENCE_INTERVAL = 0,
+          SYMMETRICAL_CONFIDENCE_INTERVAL,
+          ASYMMETRICAL_CONFIDENCE_INTERVAL
+      };
+
+
    public: // methods
 
       vertical_segment(const parameters& params,
                        size_t size,
-                       std::shared_ptr<double> data);
+                       std::shared_ptr<double> data,
+
+                       // Currently we default to always storing asymmetrical
+                       // CI data for Y.
+                       ci_kind kind = ASYMMETRICAL_CONFIDENCE_INTERVAL);
 
       vertical_segment(const parameters& params, unsigned int size)
           ALTA_DEPRECATED;
@@ -105,25 +120,60 @@ class vertical_segment : public data
       //! ordinate segment.
       virtual void get(int i, vec& yl, vec& yu) const ;
 
-   private: // method
+      //! \brief Return the type of CI data provided by this object.
+      ci_kind confidence_interval_kind() const
+      {
+          return _ci_kind;
+      }
+
+      //! \brief Return the number of columns used to store confidence
+      //! interval data.
+      size_t confidence_interval_columns() const
+      {
+          return confidence_interval_columns(_ci_kind, _parameters);
+      }
+
+      //! \brief Return the number of columns used to store confidence
+      //! interval data for KIND.
+      static size_t confidence_interval_columns(ci_kind kind,
+                                                const parameters& params)
+      {
+          // Currently we're only storing CI data for Y, not for X.
+          switch (kind)
+          {
+          case NO_CONFIDENCE_INTERVAL:
+              return 0;
+          case SYMMETRICAL_CONFIDENCE_INTERVAL:
+              return params.dimY();
+          case ASYMMETRICAL_CONFIDENCE_INTERVAL:
+              return 2 * params.dimY();
+          default:
+              abort();
+          }
+      }
 
       //! \brief Return the number of columns in each row.
       size_t column_number() const
       {
-          return _parameters.dimX() + 3 * _parameters.dimY();
+          return _parameters.dimX() + _parameters.dimY()
+              + confidence_interval_columns();
       }
 
-      // Return a matrix view of the data: all the Xi and Yi followed by
-      // confidence interval data (lower and upper bound of the Yi).  Thus,
-      // it has (dimX + 3 * dimY) columns and SIZE rows.
+      //! \brief Return a matrix view of the data: all the Xi and Yi followed
+      // by confidence interval data (lower and upper bound of the Yi).
+      // Thus, it has (dimX + dimY + N * dimY) columns, where N is between 0
+      // and 2 depending on the confidence interval data available, and SIZE
+      // rows.
       Eigen::Map<Eigen::MatrixXd> matrix_view() const
       {
           return Eigen::Map<Eigen::MatrixXd>(_data.get(), size(),
                                              column_number());
       }
 
-      // Return a matrix view of DATA that excludes confidence interval data.
-      // It has (dimX + dimY) columns and SIZE rows.
+   private: // method
+
+      //! \brief Return a matrix view of DATA that excludes confidence
+      // interval data.  It has (dimX + dimY) columns and SIZE rows.
       Eigen::Map<Eigen::MatrixXd, 0, Eigen::OuterStride<> > data_view() const
       {
           return Eigen::Map<Eigen::MatrixXd, 0, Eigen::OuterStride<> >
@@ -142,6 +192,9 @@ class vertical_segment : public data
 
       // Store for each point of data, the upper and lower value.
       std::shared_ptr<double> _data;
+
+      // Type of confidence interval data available.
+      const ci_kind _ci_kind;
 
       // Store the different arguments for the vertical segment: is it using
       // relative or absolute intervals? What is the dt used ?
