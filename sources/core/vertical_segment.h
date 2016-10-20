@@ -113,11 +113,22 @@ class vertical_segment : public data
           return _parameters.dimX() + 3 * _parameters.dimY();
       }
 
-      // Return a matrix view of this data.
+      // Return a matrix view of the data: all the Xi and Yi followed by
+      // confidence interval data (lower and upper bound of the Yi).  Thus,
+      // it has (dimX + 3 * dimY) columns and SIZE rows.
       Eigen::Map<Eigen::MatrixXd> matrix_view() const
       {
           return Eigen::Map<Eigen::MatrixXd>(_data.get(), size(),
                                              column_number());
+      }
+
+      // Return a matrix view of DATA that excludes confidence interval data.
+      // It has (dimX + dimY) columns and SIZE rows.
+      Eigen::Map<Eigen::MatrixXd, 0, Eigen::OuterStride<> > data_view() const
+      {
+          return Eigen::Map<Eigen::MatrixXd, 0, Eigen::OuterStride<> >
+              (_data.get(), _parameters.dimX() + _parameters.dimY(), size(),
+               Eigen::OuterStride<>(column_number()));
       }
 
   protected: // method

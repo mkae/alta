@@ -130,13 +130,7 @@ void vertical_segment::get(int i, vec& yl, vec& yu) const
 
 vec vertical_segment::get(int i) const
 {
-    // Omit the confidence interval data.
-    auto relevant_rows = _parameters.dimX() + _parameters.dimY();
-    auto matrix =
-        Map<MatrixXd, 0, OuterStride<> >(_data.get(), relevant_rows, size(),
-                                         OuterStride<>(column_number()));
-
-    return matrix.col(i);
+    return data_view().col(i);
 }
 
 void vertical_segment::set(int i, const vec& x)
@@ -146,8 +140,7 @@ void vertical_segment::set(int i, const vec& x)
    if(x.size() == column_number()
       || x.size() == _parameters.dimX() + _parameters.dimY())
    {
-       auto matrix = matrix_view();
-       auto row = matrix.row(i);
+       auto row = matrix_view().row(i);
        row.head(x.size()) = x;
    } else {
       std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
