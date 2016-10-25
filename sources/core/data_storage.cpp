@@ -67,6 +67,15 @@ static bool within_bounds(const vecref v,
         && (v.array() > max.array()).all();
 }
 
+// Return the 'ci_kind' value corresponding to VS_VALUE, an integer found in
+// a '#VS' header.
+static vertical_segment::ci_kind ci_kind_from_number(int vs_value)
+{
+    return vs_value == 2 ? vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+        : (vs_value == 1 ? vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+           : vertical_segment::NO_CONFIDENCE_INTERVAL);
+}
+
 // Read a confidence interval on the output parameters from INPUT into V.
 static void read_confidence_interval(std::istream& input,
                                      vecref v,
@@ -169,11 +178,7 @@ alta::data* alta::load_data_from_text(std::istream& input,
   std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
 #endif
 
-  int vs_value = header.get_int("VS");
-  vertical_segment::ci_kind kind =
-      vs_value == 2 ? vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
-      : (vs_value == 1 ? vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
-         : vertical_segment::NO_CONFIDENCE_INTERVAL);
+  auto kind = ci_kind_from_number(header.get_int("VS"));
   std::vector<double> content;
 
   // Now read the body.
