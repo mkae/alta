@@ -76,6 +76,14 @@ static vertical_segment::ci_kind ci_kind_from_number(int vs_value)
            : vertical_segment::NO_CONFIDENCE_INTERVAL);
 }
 
+// Return the number used to represent KIND in '#VS' headers.
+static int number_from_ci_kind(vertical_segment::ci_kind kind)
+{
+    return kind == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+        ? 2 : (kind == vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+               ? 1 : 0);
+}
+
 // Read a confidence interval on the output parameters from INPUT into V.
 static void read_confidence_interval(std::istream& input,
                                      vecref v,
@@ -278,7 +286,10 @@ void alta::save_data_as_text(std::ostream& out, const alta::data &data)
 
 void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 {
-        using namespace alta;
+    using namespace alta;
+
+    // TODO: Support writing the confidence interval.
+    auto kind = vertical_segment::NO_CONFIDENCE_INTERVAL;
 
     out << "#DIM " << data.parametrization().dimX() << " " << data.parametrization().dimY() << std::endl;
     out << "#PARAM_IN  "
@@ -291,6 +302,7 @@ void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
     out << "#VERSION 0" << std::endl;
     out << "#PRECISION ieee754-double" << std::endl;
     out << "#SAMPLE_COUNT " << data.size() << std::endl;
+    out << "#VS " << number_from_ci_kind(kind) << std::endl;
 
     // FIXME: Note: on non-glibc systems, both macros may be undefined, so
     // the conditional is equivalent to "#if 0 == 0", which is usually what
@@ -333,6 +345,8 @@ alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments&
     std::pair<int, int> dim = header.get_pair<int>("DIM");
     assert(dim.first > 0 && dim.second > 0);
 
+    auto kind = ci_kind_from_number(header.get_int("VS"));
+
     in.exceptions(std::ios_base::failbit);
 
     int sample_count = header.get_int("SAMPLE_COUNT");
@@ -340,27 +354,22 @@ alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments&
          std::cerr << "<<ERROR>> Uncorrect or not samples count in the header, please check \'SAMPLE_COUNT\'" << std::endl;
       }
 
+      size_t ci_rows =
+          kind == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+          ? 2 : (kind == vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+                 ? 1 : 0);
+
+      size_t rows = dim.first + dim.second + ci_rows * dim.second;
+      size_t element_count = sample_count * rows;
+      double *content = new double[element_count];
+      size_t byte_count = element_count * sizeof *content;
+
       // TODO: Arrange to use mmap and make it zero-alloc and zero-copy.
-      size_t rows = dim.first + 3 * dim.second;
-      double *content = new double[sample_count * rows];
-
-      for (std::streamsize i = 0; i < sample_count; i++)
+      for (std::streamsize total = 0;
+           total < byte_count && !in.eof();
+           total += in.gcount())
       {
-          double* start = &content[i * rows];
-          std::streamsize byte_count =
-              (dim.first + dim.second) * sizeof(*content);
-
-          for (std::streamsize total = 0;
-               total < byte_count && !in.eof();
-               total += in.gcount())
-          {
-              in.read((char *) start + total, byte_count - total);
-          }
-
-          // XXX: Fill in the confidence interval values with zeros since we
-          // don't have those values.
-          content[i * rows + dim.first + dim.second] = 0.;
-          content[i * rows + dim.first + dim.second + 1] = 0.;
+          in.read((char *) content + total, byte_count - total);
       }
 
     parameters param(dim.first, dim.second,
@@ -369,5 +378,6 @@ alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments&
 
     return new alta::vertical_segment(param, sample_count,
                                       std::shared_ptr<double>(content,
-                                                                            delete_array));
+                                                              delete_array),
+                                      kind);
 }
