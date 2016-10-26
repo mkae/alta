@@ -153,6 +153,24 @@ int main(int argc, char** argv)
         TEST_ASSERT(sample1->max() == sample2->max());
         TEST_ASSERT(sample1->min() == sample3->min());
         TEST_ASSERT(sample1->max() == sample3->max());
+
+        // Make sure confidence interval data was preserved.
+        auto vs_sample1 = dynamic_pointer_cast<vertical_segment>(sample1);
+        auto vs_sample2 = dynamic_pointer_cast<vertical_segment>(sample2);
+        auto vs_sample3 = dynamic_pointer_cast<vertical_segment>(sample3);
+        TEST_ASSERT(vs_sample1 && vs_sample2 && vs_sample3);
+
+        TEST_ASSERT(vs_sample1->confidence_interval_kind()
+                    == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL);
+        TEST_ASSERT(vs_sample2->confidence_interval_kind()
+                    == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL);
+        TEST_ASSERT(vs_sample3->confidence_interval_kind()
+                    == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL);
+
+        // Compare the full "matrix views", which contains both X, Y, and the
+        // confidence interval on Y.
+        TEST_ASSERT(vs_sample1->matrix_view() == vs_sample2->matrix_view());
+        TEST_ASSERT(vs_sample1->matrix_view() == vs_sample3->matrix_view());
     }
     CATCH_FILE_IO_ERROR(input_file);
 

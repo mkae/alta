@@ -288,8 +288,10 @@ void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 {
     using namespace alta;
 
-    // TODO: Support writing the confidence interval.
-    auto kind = vertical_segment::NO_CONFIDENCE_INTERVAL;
+    auto maybe_vs = dynamic_cast<const vertical_segment*>(&data);
+    auto kind = maybe_vs != NULL
+        ? maybe_vs->confidence_interval_kind()
+        : vertical_segment::NO_CONFIDENCE_INTERVAL;
 
     out << "#DIM " << data.parametrization().dimX() << " " << data.parametrization().dimY() << std::endl;
     out << "#PARAM_IN  "
@@ -315,14 +317,27 @@ void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 
     out << "#BEGIN_STREAM" << std::endl;
 
-    for(int i=0; i < data.size(); ++i)
+    if (kind == vertical_segment::NO_CONFIDENCE_INTERVAL)
     {
-        // FIXME: Currently we are not saving the confidence interval here.
-        vec sample = data.get(i);
-        const double *numbers = sample.data();
+        // No confidence interval to be saved.
+        for(int i=0; i < data.size(); ++i)
+        {
+            vec sample = data.get(i);
+            const double *numbers = sample.data();
 
-        assert(sample.size() == data.parametrization().dimX() + data.parametrization().dimY());
-        out.write((const char *)numbers, sample.size() * sizeof(*numbers));
+            assert(sample.size() == data.parametrization().dimX() + data.parametrization().dimY());
+            out.write((const char *)numbers, sample.size() * sizeof(*numbers));
+        }
+    }
+    else
+    {
+        // Saving data along with the confidence interval.
+        auto matrix = maybe_vs->matrix_view();
+        auto byte_count = matrix.cols() * matrix.rows() * sizeof(double);
+
+        // MATRIX has no stride so we can access the underlying storage
+        // directly.
+        out.write((const char *)matrix.data(), byte_count);
     }
 
     out << std::endl << "#END_STREAM" << std::endl;
