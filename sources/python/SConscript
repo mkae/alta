@@ -19,7 +19,7 @@ bp_test_source = """
 int main(int argc, char** argv) {
 
 	boost::python::class_<alta::function, alta::ptr<alta::function>, boost::noncopyable>("function", boost::python::no_init);
-   boost::python::register_ptr_to_python<alta::ptr<function>>();
+   boost::python::register_ptr_to_python<alta::ptr<alta::function>>();
 
    return 0;
 }
