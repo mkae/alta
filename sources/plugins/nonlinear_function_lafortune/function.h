@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -44,11 +44,7 @@ class lafortune_function : public nonlinear_function
 
 	public: // methods
 
-        lafortune_function() : _n(1), _isotropic(false)
-        {
-            nonlinear_function::setParametrization(params::CARTESIAN);
-            nonlinear_function::setDimX(6);
-        }
+    lafortune_function(const parameters& params);
 
         // Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -78,16 +74,6 @@ class lafortune_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-#ifdef ADAPT_TO_PARAM
-			return _nX;
-#else
-			return 6;
-#endif
-		}
-
 		//! \brief Provide the parametrization of the input space of the function.
 		//! For this one, we fix that the parametrization is in THETAD_PHID
 		virtual params::input parametrization() const
@@ -107,9 +93,6 @@ class lafortune_function : public nonlinear_function
 			throw;
 #endif
 		}
-
-        //! \brief Set the number of output dimensions
-        void setDimY(int nY);
 
         //! \brief Set the number of lobes to be used in the fit
         void setNbLobes(int N);
@@ -145,5 +128,11 @@ class lafortune_function : public nonlinear_function
 
 		//!\brief Flags to get an isotropic lobe
 		bool _isotropic;
+
+    lafortune_function()
+        : nonlinear_function(6, 0,
+                             params::CARTESIAN, params::UNKNOWN_OUTPUT)
+    {
+    };
 } ;
 

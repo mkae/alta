@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -21,314 +21,378 @@
 # include <endian.h>
 #endif
 
-//using namespace alta;
+using namespace alta;
+using namespace Eigen;
 
-void alta::vertical_segment::load_data_from_text(std::istream& input,
-																					 const arguments& header,
-																					 alta::vertical_segment& result,
-																					 const arguments& args)
+// A deleter for arrays, to work around the lack of array support in C++11's
+// 'shared_ptr':
+// <http://stackoverflow.com/questions/8947579/why-isnt-there-a-stdshared-ptrt-specialisation#8947700>.
+static void delete_array(double *thing)
 {
-	vec min, max ;
-	vec ymin, ymax;
-
-	result._nX = 0 ; result._nY = 0 ;
-
-	if(! header.is_defined("DIM")) {
-		std::cerr << "<<ERROR>> Undefined dimensions ! ";
-		std::cerr << "Please add DIM [int] [int] into the file header." << std::endl;
-		throw;
-	}
-
-	params::input  in_param  = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
-	params::output out_param = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
-	result.setParametrizations(in_param, out_param);
-
-	std::pair<int, int> dim = header.get_pair<int>("DIM");
-	result.setDimX(dim.first);
-	result.setDimY(dim.second);
-
-	min = args.get_vec("min", result._nX, -std::numeric_limits<float>::max()) ;
-	max = args.get_vec("max", result._nX,  std::numeric_limits<float>::max()) ;
-#ifdef DEBUG
-	std::cout << "<<DEBUG>> data will remove outside of " << min << " -> " << max << " x-interval" << std::endl;
-#endif
-
-	ymin = args.get_vec("ymin", result._nY, -std::numeric_limits<float>::max()) ;
-	ymax = args.get_vec("ymax", result._nY,  std::numeric_limits<float>::max()) ;
-#ifdef DEBUG
-	std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
-#endif
-
-	for(int k=0; k<result.dimX(); ++k)
-	{
-			result._min[k] =  std::numeric_limits<double>::max() ;
-			result._max[k] = -std::numeric_limits<double>::max() ;
-	}
-
-	int vs_value = header.get_int("VS");
-
-	// Now read the body.
-	while(input.good())
-	{
-		std::string line ;
-		std::getline(input, line) ;
-		std::stringstream linestream(line) ;
-
-		// Discard comments and empty lines.
-		if(line.empty() || linestream.peek() == '#')
-		{
-			continue ;
-		}
-		else
-		{
-			// Read the data point x and y coordinates
-			vec v = vec::Zero(result.dimX() + 3*result.dimY()) ;
-			for(int i=0; i<result.dimX()+result.dimY(); ++i) 
-			{
-				linestream >> v[i] ;
-			}
-
-			// If data is not in the interval of fit
-			bool is_in = true ;
-			for(int i=0; i<result.dimX(); ++i)
-			{
-				if(v[i] < min[i] || v[i] > max[i])
-				{
-					is_in = false ;
-				}
-			}
-			for(int i=0; i<result.dimY(); ++i)
-			{
-				if(v[result.dimX()+i] < ymin[i] || v[result.dimX()+i] > ymax[i])
-				{
-					is_in = false ;
-				}
-			}
-			if(!is_in)
-			{
-				continue ;
-			}
-
-//			/*
-			// Correction of the data by 1/cosine(theta_L)
-			double factor = 1.0;
-			if(args.is_defined("data-correct-cosine"))
-			{
-				double cart[6];
-				params::convert(&v[0], result.input_parametrization(), params::CARTESIAN, cart);
-				if(cart[5] > 0.0 && cart[2] > 0.0)
-				{
-					factor = 1.0/cart[5]*cart[2];
-					for(int i=0; i<result.dimY(); ++i) 
-					{
-						v[i + result.dimX()] /= factor;
-					}
-				}
-				else
-				{
-					continue;
-				}
-			}
-			// End of correction
-//			*/
-
-			// Check if the data containt a vertical segment around the mean
-			// value.
-			for(int i=0; i<result.dimY(); ++i)
-			{
-				double min_dt = 0.0;
-				double max_dt = 0.0;
+    delete[] thing;
+}
 
 
-				if(i == 0 && vs_value == 2)
-				{
-					linestream >> min_dt ;
-					linestream >> max_dt ;
-					min_dt = min_dt-v[result.dimX()+i];
-					max_dt = max_dt-v[result.dimX()+i];
-				}
-				else if(i == 0 && vs_value == 1)
-				{
-					double dt ;
-					linestream >> dt ;
-					min_dt = -dt;
-					max_dt =  dt;
-				}
-				else
-				{
-					double dt = args.get_float("dt", 0.1f);
-					min_dt = -dt;
-					max_dt =  dt;
-				}
+static bool cosine_correction(vecref v, unsigned int dimX, unsigned int dimY,
+                              alta::params::input in_param)
+{
+    using namespace alta;
 
-				if(args.is_defined("dt-relative"))
-				{
-               v[result.dimX() +   result.dimY()+i] = v[result.dimX() + i] * (1.0 + min_dt) ;
-					v[result.dimX() + 2*result.dimY()+i] = v[result.dimX() + i] * (1.0 + max_dt) ;
-				}
-				else if(args.is_defined("dt-max"))
-				{
-               v[result.dimX() +   result.dimY()+i] = v[result.dimX() + i] + std::max(v[result.dimX() + i] * min_dt, min_dt);
-					v[result.dimX() + 2*result.dimY()+i] = v[result.dimX() + i] + std::max(v[result.dimX() + i] * max_dt, max_dt);
-				}
-				else
-				{
-					v[result.dimX() +   result.dimY()+i] = v[result.dimX() + i] + min_dt ;
-					v[result.dimX() + 2*result.dimY()+i] = v[result.dimX() + i] + max_dt ;
-				}
+    assert(v.size() == dimX + dimY);
 
-				// You can enforce the vertical segment to stay in the positive
-				// region using the --data-positive command line argument. Note
-				// that the data point is also clamped to zero if negative.
-				if(args.is_defined("dt-positive"))
-				{
-					v[result.dimX() +          i] = std::max(v[result.dimX() +          i], 0.0);
-					v[result.dimX() +   result.dimY()+i] = std::max(v[result.dimX() +   result.dimY()+i], 0.0);
-					v[result.dimX() + 2*result.dimY()+i] = std::max(v[result.dimX() + 2*result.dimY()+i], 0.0);
-				}
+    // Correction of the data by 1/cosine(theta_L)
+    double factor = 1.0;
+    double cart[6];
+    params::convert(&v(0), in_param, params::CARTESIAN, cart);
+    if(cart[5] > 0.0 && cart[2] > 0.0)
+    {
+        factor = 1.0/cart[5]*cart[2];
+        for(unsigned int i = 0; i < dimY; ++i)
+        {
+            std::cout << "i = " << i << " dimx = " << dimX
+                      << " + = " << i + dimX << " | " << v.size()
+                      << std::endl;
+            v(i + dimX) /= factor;
+        }
+        return true;
+    }
+    else return false;
+}
+
+// Return true if V is between MIN and MAX.
+static bool within_bounds(const vecref v,
+                          const vec& min, const vec& max)
+{
+    return (v.array() < min.array()).all()
+        && (v.array() > max.array()).all();
+}
+
+// Return the 'ci_kind' value corresponding to VS_VALUE, an integer found in
+// a '#VS' header.
+static vertical_segment::ci_kind ci_kind_from_number(int vs_value)
+{
+    return vs_value == 2 ? vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+        : (vs_value == 1 ? vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+           : vertical_segment::NO_CONFIDENCE_INTERVAL);
+}
+
+// Return the number used to represent KIND in '#VS' headers.
+static int number_from_ci_kind(vertical_segment::ci_kind kind)
+{
+    return kind == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+        ? 2 : (kind == vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+               ? 1 : 0);
+}
+
+// Read a confidence interval on the output parameters from INPUT into V.
+static void read_confidence_interval(std::istream& input,
+                                     vecref v,
+                                     vertical_segment::ci_kind kind,
+                                     unsigned int dimX,
+                                     unsigned int dimY,
+                                     const alta::arguments& args)
+{
+    assert(v.size() == dimX + 3 * dimY);
+
+    for(int i=0; i<dimY; ++i)
+    {
+        double min_dt = 0.0, max_dt = 0.0;
+
+        if(i == 0 && kind == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
+        {
+            input >> min_dt ;
+            input >> max_dt ;
+            min_dt = min_dt-v(dimX + i);
+            max_dt = max_dt-v(dimX + i);
+        }
+        else if(i == 0 && kind == vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL)
+        {
+            double dt ;
+            input >> dt ;
+            min_dt = -dt;
+            max_dt =  dt;
+        }
+        else
+        {
+            // Confidence interval data not provided in INPUT.
+            double dt = args.get_float("dt", 0.1f);
+            min_dt = -dt;
+            max_dt =  dt;
+        }
+
+        if(args.is_defined("dt-relative"))
+        {
+            v(dimX +   dimY+i) = v(dimX + i) * (1.0 + min_dt) ;
+            v(dimX + 2*dimY+i) = v(dimX + i) * (1.0 + max_dt) ;
+        }
+        else if(args.is_defined("dt-max"))
+        {
+            v(dimX +   dimY+i) = v(dimX + i) + std::max(v(dimX + i) * min_dt, min_dt);
+            v(dimX + 2*dimY+i) = v(dimX + i) + std::max(v(dimX + i) * max_dt, max_dt);
+        }
+        else
+        {
+            v(dimX +   dimY+i) = v(dimX + i) + min_dt ;
+            v(dimX + 2*dimY+i) = v(dimX + i) + max_dt ;
+        }
+
+        // You can enforce the vertical segment to stay in the positive
+        // region using the --data-positive command line argument. Note
+        // that the data point is also clamped to zero if negative.
+        if(args.is_defined("dt-positive"))
+        {
+            v(dimX +        i) = std::max(v(dimX +        i), 0.0);
+            v(dimX +   dimY+i) = std::max(v(dimX +   dimY+i), 0.0);
+            v(dimX + 2*dimY+i) = std::max(v(dimX + 2*dimY+i), 0.0);
+        }
 
 #ifdef DEBUG
-                std::cout << "<<DEBUG>> vs = [" << v[result.dimX() +   result.dimY()+i] << ", " << v[result.dimX() + 2*result.dimY()+i] << "]" << std::endl;
+        std::cout << "<<DEBUG>> vs = [" << v[dimX +   dimY+i] << ", " << v[dimX + 2*dimY+i] << "]" << std::endl;
 #endif
-			}
+    }
+}
 
-			result._data.push_back(v) ;
+alta::data* alta::load_data_from_text(std::istream& input,
+                                      const alta::arguments& header)
+{
+  // FIXME: Eventually reinstate support for extra arguments when loading a
+  // file.
+  static alta::arguments args;
 
-			// Update min and max
-			for(int k=0; k<result.dimX(); ++k)
-			{
-				result._min[k] = std::min(result._min[k], v[k]) ;
-				result._max[k] = std::max(result._max[k], v[k]) ;
-			}
-		}
-	}
+  vec min, max ;
+  vec ymin, ymax;
 
-	if(args.is_defined("data-correct-cosine"))
-		result.save("/tmp/data-corrected.dat");
+  if(! header.is_defined("DIM")) {
+    std::cerr << "<<ERROR>> Undefined dimensions ! ";
+    std::cerr << "Please add DIM [int] [int] into the file header." << std::endl;
+    throw;
+  }
 
-	std::cout << "<<INFO>> loaded input stream" << std::endl ;
-	std::cout << "<<INFO>> data inside " << result._min << " ... " << result._max << std::endl ;
-	std::cout << "<<INFO>> loading data input of R^" << result.dimX() << " -> R^" << result.dimY() << std::endl ;
-	std::cout << "<<INFO>> " << result._data.size() << " elements to fit" << std::endl ;
+  params::input  in_param  = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
+  params::output out_param = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
+
+  std::pair<int, int> dim = header.get_pair<int>("DIM");
+  size_t row_count = dim.first + 3 * dim.second;
+
+  min = args.get_vec("min", dim.first, -std::numeric_limits<float>::max()) ;
+  max = args.get_vec("max", dim.first,  std::numeric_limits<float>::max()) ;
+#ifdef DEBUG
+  std::cout << "<<DEBUG>> data will remove outside of " << min << " -> " << max << " x-interval" << std::endl;
+#endif
+
+  ymin = args.get_vec("ymin", dim.second, -std::numeric_limits<float>::max()) ;
+  ymax = args.get_vec("ymax", dim.second,  std::numeric_limits<float>::max()) ;
+#ifdef DEBUG
+  std::cout << "<<DEBUG>> data will remove outside of " << ymin << " -> " << ymax << " y-interval" << std::endl;
+#endif
+
+  auto kind = ci_kind_from_number(header.get_int("VS"));
+  std::vector<double> content;
+
+  // Now read the body.
+  while(input.good())
+  {
+    std::string line ;
+    std::getline(input, line) ;
+    std::stringstream linestream(line) ;
+
+    // Discard comments and empty lines.
+    if(line.empty() || linestream.peek() == '#')
+    {
+      continue ;
+    }
+    else
+    {
+      auto start = content.size();
+
+      // Read the data point x and y coordinates
+      for(int i=0; i < dim.first + dim.second; ++i)
+      {
+          double item;
+          linestream >> item;
+          content.push_back(item);
+      }
+
+      // Save room for the confidence interval.
+      for (int i = 0; i < 2 * dim.second; i++)
+          content.push_back(0.);
+
+      // If data is not in the interval of fit
+      // std::cout << " start = " << start << " rows = " << row_count
+      //           << " size = " << content.size() << "\n";
+      Map<VectorXd> v(&content[start], row_count);
+      if (!(within_bounds(v.segment(0, dim.first), min, max)
+            && within_bounds(v.segment(dim.first, dim.second),
+                             ymin, ymax)))
+          continue;
+
+      if(args.is_defined("data-correct-cosine"))
+      {
+          if (!cosine_correction(v.segment(0, dim.first + dim.second),
+                                 dim.first, dim.second, in_param))
+              continue;
+      }
+
+      // Read the confidence interval data if available.
+      read_confidence_interval(linestream, v, kind,
+                               dim.first, dim.second, args);
+    }
+  }
+
+  std::cout << "<<INFO>> loaded input stream" << std::endl ;
+  std::cout << "<<INFO>> loading data input of R^"
+            << dim.first
+            << " -> R^" << dim.second << std::endl ;
+  std::cout << "<<INFO>> " << content.size() << " elements to fit" << std::endl ;
+
+
+  double *raw_content = new double[content.size()];
+  memcpy(raw_content, content.data(), content.size() * sizeof(double));
+
+  parameters param(dim.first, dim.second, in_param, out_param);
+  size_t element_count = content.size() / row_count;
+  data* result = new vertical_segment(param, element_count,
+                                      std::shared_ptr<double>(raw_content,
+                                                                            delete_array));
+  if(args.is_defined("data-correct-cosine"))
+      result->save("/tmp/data-corrected.dat");
+
+  return result;
 }
 
 void alta::save_data_as_text(std::ostream& out, const alta::data &data)
 {
         using namespace alta;
 
-		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
-		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
-		out << "#PARAM_OUT " << params::get_name(data.output_parametrization()) << std::endl;
-		for(int i=0; i < data.size(); ++i)
-		{
-				vec x = data.get(i);
-				for(int j=0; j< data.dimX() + data.dimY(); ++j)
-				{
+    out << "#DIM " << data.parametrization().dimX() << " " << data.parametrization().dimY() << std::endl;
+    out << "#PARAM_IN  "
+        << params::get_name(data.parametrization().input_parametrization())
+        << std::endl;
+    out << "#PARAM_OUT "
+        << params::get_name(data.parametrization().output_parametrization())
+        << std::endl;
+
+    for(int i=0; i < data.size(); ++i)
+    {
+        vec x = data.get(i);
+        for(int j=0; j< data.parametrization().dimX() + data.parametrization().dimY(); ++j)
+        {
                     out << std::setprecision(std::numeric_limits<double>::digits10)
                         << x[j] << "\t";
-				}
-				out << std::endl;
-		}
+        }
+        out << std::endl;
+    }
 }
 
 void alta::save_data_as_binary(std::ostream &out, const alta::data& data)
 {
-        using namespace alta;
+    using namespace alta;
 
-		out << "#DIM " << data.dimX() << " " << data.dimY() << std::endl;
-		out << "#PARAM_IN  " << params::get_name(data.input_parametrization())  << std::endl;
-		out << "#PARAM_OUT " << params::get_name(data.output_parametrization()) << std::endl;
-		out << "#FORMAT binary" << std::endl;
-		out << "#VERSION 0" << std::endl;
-		out << "#PRECISION ieee754-double" << std::endl;
-		out << "#SAMPLE_COUNT " << data.size() << std::endl;
+    auto maybe_vs = dynamic_cast<const vertical_segment*>(&data);
+    auto kind = maybe_vs != NULL
+        ? maybe_vs->confidence_interval_kind()
+        : vertical_segment::NO_CONFIDENCE_INTERVAL;
 
-		// FIXME: Note: on non-glibc systems, both macros may be undefined, so
-		// the conditional is equivalent to "#if 0 == 0", which is usually what
-		// we want.
+    out << "#DIM " << data.parametrization().dimX() << " " << data.parametrization().dimY() << std::endl;
+    out << "#PARAM_IN  "
+        << params::get_name(data.parametrization().input_parametrization())
+        << std::endl;
+    out << "#PARAM_OUT "
+        << params::get_name(data.parametrization().output_parametrization())
+        << std::endl;
+    out << "#FORMAT binary" << std::endl;
+    out << "#VERSION 0" << std::endl;
+    out << "#PRECISION ieee754-double" << std::endl;
+    out << "#SAMPLE_COUNT " << data.size() << std::endl;
+    out << "#VS " << number_from_ci_kind(kind) << std::endl;
+
+    // FIXME: Note: on non-glibc systems, both macros may be undefined, so
+    // the conditional is equivalent to "#if 0 == 0", which is usually what
+    // we want.
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-		out << "#ENDIAN little" << std::endl;
+    out << "#ENDIAN little" << std::endl;
 #else
-		out << "#ENDIAN big" << std::endl;
+    out << "#ENDIAN big" << std::endl;
 #endif
 
-		out << "#BEGIN_STREAM" << std::endl;
+    out << "#BEGIN_STREAM" << std::endl;
 
-		for(int i=0; i < data.size(); ++i)
-		{
-				vec sample = data.get(i);
-				const double *numbers = sample.data();
+    if (kind == vertical_segment::NO_CONFIDENCE_INTERVAL)
+    {
+        // No confidence interval to be saved.
+        for(int i=0; i < data.size(); ++i)
+        {
+            vec sample = data.get(i);
+            const double *numbers = sample.data();
 
-				assert(sample.size() == data.dimX() + data.dimY());
-				out.write((const char *)numbers, sample.size() * sizeof(*numbers));
-		}
+            assert(sample.size() == data.parametrization().dimX() + data.parametrization().dimY());
+            out.write((const char *)numbers, sample.size() * sizeof(*numbers));
+        }
+    }
+    else
+    {
+        // Saving data along with the confidence interval.
+        auto matrix = maybe_vs->matrix_view();
+        auto byte_count = matrix.cols() * matrix.rows() * sizeof(double);
 
-		out << std::endl << "#END_STREAM" << std::endl;
+        // MATRIX has no stride so we can access the underlying storage
+        // directly.
+        out.write((const char *)matrix.data(), byte_count);
+    }
+
+    out << std::endl << "#END_STREAM" << std::endl;
 }
 
-void alta::load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data)
+alta::data* alta::load_data_from_binary(std::istream& in, const alta::arguments& header)
 {
-        using namespace alta;
+    using namespace alta;
 
-		// FIXME: For now we make a number of assumptions.
-		assert(header["FORMAT"] == "binary");
-		assert(header.get_int("VERSION") == 0);
-		assert(header["PRECISION"] == "ieee754-double");
+    // FIXME: For now we make a number of assumptions.
+    assert(header["FORMAT"] == "binary");
+    assert(header.get_int("VERSION") == 0);
+    assert(header["PRECISION"] == "ieee754-double");
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-		assert(header["ENDIAN"] == "little");
+    assert(header["ENDIAN"] == "little");
 #else
-		assert(header["ENDIAN"] == "big");
+    assert(header["ENDIAN"] == "big");
 #endif
 
-		data.setParametrizations(params::parse_input(header["PARAM_IN"]),
-										 params::parse_output(header["PARAM_OUT"]));
+    std::pair<int, int> dim = header.get_pair<int>("DIM");
+    assert(dim.first > 0 && dim.second > 0);
 
-		std::pair<int, int> dim = header.get_pair<int>("DIM");
-		data.setDimX(dim.first);
-		data.setDimY(dim.second);
-      assert(data.dimX() > 0 && data.dimY() > 0);
+    auto kind = ci_kind_from_number(header.get_int("VS"));
 
-		in.exceptions(std::ios_base::failbit);
+    in.exceptions(std::ios_base::failbit);
 
-		int sample_count = header.get_int("SAMPLE_COUNT");
+    int sample_count = header.get_int("SAMPLE_COUNT");
       if(sample_count <= 0) {
          std::cerr << "<<ERROR>> Uncorrect or not samples count in the header, please check \'SAMPLE_COUNT\'" << std::endl;
       }
 
-		// Initialize the mininum and maximum values.
-		vec min(dim.first), max(dim.first);
+      size_t ci_rows =
+          kind == vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL
+          ? 2 : (kind == vertical_segment::SYMMETRICAL_CONFIDENCE_INTERVAL
+                 ? 1 : 0);
 
-      for(int k = 0; k < dim.first; k++)
+      size_t rows = dim.first + dim.second + ci_rows * dim.second;
+      size_t element_count = sample_count * rows;
+      double *content = new double[element_count];
+      size_t byte_count = element_count * sizeof *content;
+
+      // TODO: Arrange to use mmap and make it zero-alloc and zero-copy.
+      for (std::streamsize total = 0;
+           total < byte_count && !in.eof();
+           total += in.gcount())
       {
-         min[k] =  std::numeric_limits<double>::max();
-         max[k] = -std::numeric_limits<double>::max();
+          in.read((char *) content + total, byte_count - total);
       }
 
-		// TODO: Arrage to use mmap and make it zero-alloc and zero-copy.
-      for (int i = 0; i < sample_count; i++)
-      {
-         vec row = vec::Zero(data.dimX() + data.dimY());
-         std::streamsize expected = row.size() * sizeof(double);
+    parameters param(dim.first, dim.second,
+                     params::parse_input(header["PARAM_IN"]),
+                     params::parse_output(header["PARAM_OUT"]));
 
-         for (std::streamsize total = 0;
-               total < expected && !in.eof();
-               total += in.gcount())
-         {
-            char* ptr = (char*)row.data();
-            in.read(ptr + total, expected - total);
-         }
-
-         data.set(row);
-
-         // Update min and max.
-         for(int k = 0; k < dim.first; k++)
-         {
-            min[k] = std::min(min[k], row[k]);
-            max[k] = std::max(max[k], row[k]);
-         }
-      }
-
-		// TODO: Factorize this in data::set.
-		data.setMin(min);
-		data.setMax(max);
+    return new alta::vertical_segment(param, sample_count,
+                                      std::shared_ptr<double>(content,
+                                                              delete_array),
+                                      kind);
 }

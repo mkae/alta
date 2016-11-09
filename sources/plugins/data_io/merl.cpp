@@ -70,70 +70,54 @@ using namespace alta;
  *   [merl]: http://people.csail.mit.edu/wojciech/BRDFDatabase/brdfs/
  *   [ngan]: http://people.csail.mit.edu/addy/research/brdf/
  */
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
+
+#define MERL_SIZE                                           \
+    (BRDF_SAMPLING_RES_THETA_H * BRDF_SAMPLING_RES_THETA_D  \
+     * BRDF_SAMPLING_RES_PHI_D / 2)
+
 class MERL : public data
 {
 private: // data
 	double *brdf ;
 	const int _nSlice;
 
+    MERL()
+        : MERL(parameters(3, 3, params::RUSIN_TH_TD_PD, params::RGB_COLOR))
+    { }
+
 public: // methods
 
-    MERL() : _nSlice(BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2) {
+    MERL(const parameters& params) :
+      data(params, MERL_SIZE), _nSlice(MERL_SIZE) {
 		brdf = new double[3*_nSlice];
 		std::fill(brdf, brdf + 3*_nSlice, 0.0);
 
-	    // Set the input and output parametrization
-	    _in_param  = params::RUSIN_TH_TD_PD;
-	    _out_param = params::RGB_COLOR;
-	    _nX = 3;
-	    _nY = 3;
+    _min.resize(3);
+    _min[0] = 0.0;
+    _min[1] = 0.0;
+    _min[2] = 0.0;
+
+    _max.resize(3);
+    _max[0] = 0.5*M_PI;
+    _max[1] = 0.5*M_PI;
+    _max[2] = 2.0*M_PI;
     }
+
     ~MERL() {
     	delete[] brdf;
     }
 
-    virtual vec min() const {
-       vec _min(3);
-       _min[0] = 0.0;
-       _min[1] = 0.0;
-       _min[2] = 0.0;
-       return _min;
-    }
-
-    virtual vec max() const {
-       vec _max(3);
-       _max[0] = 0.5*M_PI;
-       _max[1] = 0.5*M_PI;
-       _max[2] = 2.0*M_PI;
-       return _max;
-    }
-
-	// Load data from a file
-	void load(const std::string& filename)
-	{
-		if(!read_brdf(filename.c_str(), brdf))
-		{
-			std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
-			throw;
-		}
-	}
-	void load(const std::string& filename, const arguments&)
-	{
-		if(!read_brdf(filename.c_str(), brdf))
-		{
-			std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
-			throw;
-		}
-	}
 
 	void save(const std::string& filename) const
 	{
 		FILE *f = fopen(filename.c_str(), "wb");
 
 		int dims[3];
-		dims[0] = BRDF_SAMPLING_RES_PHI_D/2;
+		dims[0] = BRDF_SAMPLING_RES_THETA_H;
 		dims[1] = BRDF_SAMPLING_RES_THETA_D;
-		dims[2] = BRDF_SAMPLING_RES_THETA_H;
+		dims[2] = BRDF_SAMPLING_RES_PHI_D/2;
 
 		const int n = dims[0]*dims[1]*dims[2];
 
@@ -166,33 +150,14 @@ public: // methods
 		return res ;
 	}
 
-	//! \todo Test this function
-	void set(const vec& x)
-	{
-		assert(x.size() == 6);
-		const int phid_ind = phi_diff_index(x[2]);
-		const int thed_ind = theta_diff_index(x[1]);
-		const int theh_ind = theta_half_index(x[0]);
-
-		const int i = (theh_ind*BRDF_SAMPLING_RES_THETA_D + thed_ind)*(BRDF_SAMPLING_RES_PHI_D/2) + phid_ind;
-#ifdef DEBUG
-		std::cout << "set -> " << i << " (" << theh_ind << ", " << thed_ind << ", " << phid_ind << ")" << std::endl;
-		std::cout << "       " << x[0] << ", " << x[1]  << ", " << x[2] << std::endl;
-	    std::cout << std::endl;
-#endif
-		brdf[i] = x[3] / RED_SCALE;
-		brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D/2] = x[4] / GREEN_SCALE;
-		brdf[i + BRDF_SAMPLING_RES_THETA_H*BRDF_SAMPLING_RES_THETA_D*BRDF_SAMPLING_RES_PHI_D] = x[5] / BLUE_SCALE;
-	}
-
 	void set(int i, const vec& x) {
-		assert(x.size() == dimY());
+    assert(x.size() == parametrization().dimY());
 		int iR = i;
 		int iG = iR + _nSlice;
 		int iB = iG + _nSlice;
-		brdf[iR] = x[dimX()+0] / RED_SCALE;
-		brdf[iG] = x[dimX()+1] / GREEN_SCALE;
-		brdf[iB] = x[dimX()+2] / BLUE_SCALE;
+		brdf[iR] = x[parametrization().dimX()+0] / RED_SCALE;
+		brdf[iG] = x[parametrization().dimX()+1] / GREEN_SCALE;
+		brdf[iB] = x[parametrization().dimX()+2] / BLUE_SCALE;
 	}
 
 	vec value(const vec& in) const {
@@ -222,13 +187,6 @@ public: // methods
 	    return res;
 	}
 
-
-	// Get data size, e.g. the number of samples to fit
-	int size() const {
-		return BRDF_SAMPLING_RES_THETA_H *
-	          BRDF_SAMPLING_RES_THETA_D *
-	          BRDF_SAMPLING_RES_PHI_D / 2 ;
-	}
 
 private: //methods
 
@@ -462,36 +420,43 @@ private: //methods
 	}
 
 	// Read BRDF data
-	bool read_brdf(const char *filename, double* &brdf)
-	{
-		FILE *f = fopen(filename, "rb");
-		if (!f) {
-			std::cerr << "<<ERROR>> File \"" << filename << "\" is not present, please check path and use absolute path." << std::endl;
-			return false;
-		}
-
-		int dims[3];
-		fread(dims, sizeof(int), 3, f);
-		int n = dims[0] * dims[1] * dims[2];
-		if (n != BRDF_SAMPLING_RES_THETA_H *
-			 BRDF_SAMPLING_RES_THETA_D *
-			 BRDF_SAMPLING_RES_PHI_D / 2)
-		{
-			fprintf(stderr, "Dimensions don't match\n");
-			fclose(f);
-			return false;
-		}
-
-		fread(brdf, sizeof(double), 3*n, f);
-
-		fclose(f);
-		return true;
-	}
-
+  friend data* load_data(std::istream&, const arguments&);
 };
 
-
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+static bool read_brdf(std::istream& input, double* &brdf)
 {
-    return new MERL();
+		int dims[3];
+    input.read((char *) &dims, sizeof dims);
+		int n = dims[0] * dims[1] * dims[2];
+		if (n != BRDF_SAMPLING_RES_THETA_H *
+        BRDF_SAMPLING_RES_THETA_D *
+        BRDF_SAMPLING_RES_PHI_D / 2)
+		{
+        fprintf(stderr, "Dimensions don't match\n");
+        return false;
+		}
+
+    input.read((char *) brdf, 3 * n * sizeof(double));
+
+		return true;
+}
+
+
+ALTA_DLL_EXPORT data* provide_data(size_t size, const parameters& params,
+                                   const arguments& args)
+{
+    return new MERL(params);
+}
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
+{
+    MERL* result = new MERL();
+
+    if(!read_brdf(input, result->brdf))
+		{
+        std::cerr << "<<ERROR>> unable to load the data as a MERL file" << std::endl ;
+        throw;
+		}
+
+    return result;
 }

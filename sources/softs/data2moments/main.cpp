@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -81,17 +81,16 @@ int main(int argc, char** argv)
 
 	// Import data
 	ptr<data> d = NULL ;
-	d = plugins_manager::get_data(args["data"], args) ;
+	try
+	{
+      d = plugins_manager::load_data(args["input"], args["data"], args) ;
+	}
+	CATCH_FILE_IO_ERROR(args["input"]);
 
 	if(dynamic_pointer_cast<vertical_segment>(d)) {
 		std::cerr << "<<ERROR>> this data object is not interpolant." << std::endl;
 		return 1;
 	}
-	try
-	{
-		d->load(args["input"]);
-	}
-	CATCH_FILE_IO_ERROR(args["input"]);
 
 	// Create output file
 	std::ofstream file(args["output"].c_str(), std::ios_base::trunc);
@@ -100,8 +99,8 @@ int main(int argc, char** argv)
 	{
 		// Data parametrization
 		/*params::input data_param = d->parametrization();*/
-		const int nX = d->dimX();
-		const int nY = d->dimY();
+		const int nX = d->parametrization().dimX();
+		const int nY = d->parametrization().dimY();
 
 		// Raw moments
 		vec m_0(nY);
@@ -235,7 +234,9 @@ int main(int argc, char** argv)
 			vec x(nX);
 			for(int k=0; k<nX; ++k)
 			{
-				x[k] = d->min()[k] + (d->max()[k] - d->min()[k]) * (double(indices[k]) / samples[k]);
+				x[k] = d->min()[k]
+            + (d->max()[k] - d->min()[k])
+            * (double(indices[k]) / samples[k]);
 			}
 
 			// Get the value and compute the associated integral. Right now, the data

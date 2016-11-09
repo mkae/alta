@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -22,9 +22,25 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-    return new lafortune_function();
+    return new lafortune_function(params);
+}
+
+lafortune_function::lafortune_function(const parameters& params)
+{
+    auto nY = params.dimY();
+
+    // Update the length of the vectors
+    if(_isotropic)
+        _C.resize(_n*nY*2) ;
+    else
+        _C.resize(_n*nY*3) ;
+    _N.resize(_n*nY) ;
+    _kd.resize(nY);
+
+    for(int i=0; i<nY; ++i)
+        _kd[i] = 0.0;
 }
 
 // Overload the function operator
@@ -131,23 +147,6 @@ void lafortune_function::setNbLobes(int N)
 	 else
 		 _C.resize(_n*_nY*3) ;
     _N.resize(_n*_nY) ;
-}
-
-// Reset the output dimension
-void lafortune_function::setDimY(int nY)
-{
-    _nY = nY ;
-
-    // Update the length of the vectors
-	 if(_isotropic)
-		 _C.resize(_n*_nY*2) ;
-	 else
-		 _C.resize(_n*_nY*3) ;
-    _N.resize(_n*_nY) ;
-    _kd.resize(_nY);
-
-    for(int i=0; i<nY; ++i)
-        _kd[i] = 0.0;
 }
 
 //! Number of parameters to this non-linear function

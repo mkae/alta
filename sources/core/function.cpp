@@ -85,14 +85,14 @@ void function::save(const std::string& filename, const arguments& args) const
 	{
 		file << "vec brdf(const vec& in, const vec& file)" << std::endl;
 		file << "{" << std::endl;
-		file << "\tvec res(" << dimY() << ");" << std::endl;
+		file << "\tvec res(" << parametrization().dimY() << ");" << std::endl;
 		file << "\t";
 	}
 	else if(is_matlab)
 	{
 		file << "function res = brdf(in, file)" << std::endl;
 		file << "{" << std::endl;
-		file << "\tres = zeros(" << dimY() << ");" << std::endl;
+		file << "\tres = zeros(" << parametrization().dimY() << ");" << std::endl;
 		file << "\t";
 	}
 	else if(is_shader)
@@ -133,8 +133,8 @@ void function::save_header(std::ostream& out, const arguments& args) const
 	{
 		out << "#ALTA FUNC HEADER" << std::endl;
 		out << "#CMD " << args.get_cmd() << std::endl;
-		out << "#DIM " << _nX << " " << _nY << std::endl;
-		out << "#PARAM_IN  " << params::get_name(input_parametrization()) << std::endl;
+		out << "#DIM " << parametrization().dimX() << " " << parametrization().dimY() << std::endl;
+		out << "#PARAM_IN  " << params::get_name(parametrization().input_parametrization()) << std::endl;
 		//out << "#PARAM_OUT " << params::get_name(output_parametrization()) << std::endl;*
 		if(args.is_defined("export-append")) 
 		{
@@ -169,18 +169,21 @@ double function::L2_distance(const ptr<data>& d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-    vec x(dimX());
-    vec y(dimY());
+    vec x(parametrization().dimX());
+    vec y(parametrization().dimY());
 
-		if(input_parametrization() == params::UNKNOWN_INPUT)
+		if(parametrization().input_parametrization() == params::UNKNOWN_INPUT)
 		{
-			memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+			memcpy(&x[0], &dat[0], parametrization().dimX()*sizeof(double));
 		}
 		else
 		{
-			params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+      params::convert(&dat[0],
+                      d->parametrization().input_parametrization(),
+                      parametrization().input_parametrization(), &x[0]);
 		}
-		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->parametrization().dimX()],
+           parametrization().dimY()*sizeof(double));
 
     l2_dist += std::pow(norm(y-value(x)), 2);
 	}
@@ -194,37 +197,40 @@ double function::L2_distance(const ptr<data>& d) const
 //! \brief Linf norm to data.
 double function::Linf_distance(const ptr<data>& d) const
 {
-	vec mean = vec::Zero(dimY());
-	vec var  = vec::Zero(dimY());
+	vec mean = vec::Zero(parametrization().dimY());
+	vec var  = vec::Zero(parametrization().dimY());
 
 #ifdef DEBUG
-	std::cout << "<<DEBUG>> input param here = " << params::get_name(input_parametrization()) << std::endl;
+	std::cout << "<<DEBUG>> input param here = " << params::get_name(parametrization().input_parametrization()) << std::endl;
 #endif
 
 	double linf_dist = 0.0;
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-		vec x(dimX()), y(dimY());
+		vec x(parametrization().dimX()), y(parametrization().dimY());
 
     // Convert the position of the data sample to the parametrization
     // of the function.
-    if(input_parametrization() == params::UNKNOWN_INPUT)
+    if(parametrization().input_parametrization() == params::UNKNOWN_INPUT)
     {
-        memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+        memcpy(&x[0], &dat[0], parametrization().dimX()*sizeof(double));
     }
     else
     {
-        params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+        params::convert(&dat[0],
+                        d->parametrization().input_parametrization(),
+                        parametrization().input_parametrization(), &x[0]);
     }
 
 		// Copy the value part of the data vector in a vector to perform vector
 		// operations on it (used in the computation of the mean).
-    memcpy(&y[0], &dat[d->dimX()], d->dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->parametrization().dimX()],
+           d->parametrization().dimY() * sizeof(double));
 
 		// Take the componentwise-max of the two vectors.
 		const vec v = value(x);
-    for(int j=0; j<d->dimY(); ++j)
+    for(int j=0; j<d->parametrization().dimY(); ++j)
 		{
 			linf_dist = std::max<double>(linf_dist, std::abs(y[j]-v[j]));
 		}
@@ -237,27 +243,30 @@ double function::Linf_distance(const ptr<data>& d) const
 	for(int i=0; i<d->size(); ++i)
 	{
 		vec dat = d->get(i);
-		vec x(dimX()), y(d->dimY()), val(dimY());
+    vec x(parametrization().dimX()), y(d->parametrization().dimY()), val(parametrization().dimY());
 		
         // Convert the position of the data sample to the parametrization
         // of the function.
-        if(input_parametrization() == params::UNKNOWN_INPUT)
+        if(parametrization().input_parametrization() == params::UNKNOWN_INPUT)
         {
-            memcpy(&x[0], &dat[0], dimX()*sizeof(double));
+            memcpy(&x[0], &dat[0], parametrization().dimX()*sizeof(double));
         }
         else
         {
-            params::convert(&dat[0], d->input_parametrization(), input_parametrization(), &x[0]);
+            params::convert(&dat[0],
+                            d->parametrization().input_parametrization(),
+                            parametrization().input_parametrization(),
+                            &x[0]);
         }
 
 		// Copy the value part of the data vector in a vector to perform vector
 		// operations on it (used in the computation of the mean).
-		memcpy(&y[0], &dat[d->dimX()], dimY()*sizeof(double));
+    memcpy(&y[0], &dat[d->parametrization().dimX()], parametrization().dimY()*sizeof(double));
 
 		val = value(x);
-		for(int j=0; j<d->dimY(); ++j) 
+    for(int j=0; j<d->parametrization().dimY(); ++j)
 		{ 
-			y[j] = dat[d->dimX()+j]; 
+      y[j] = dat[d->parametrization().dimX()+j];
 			var[j] += pow(mean[j] - (val[j]-y[j]), 2) / double(d->size());
 		}
 	}
@@ -267,10 +276,13 @@ double function::Linf_distance(const ptr<data>& d) const
 	return linf_dist;
 }
 
-
-
+
 /*--- Non-linear functions implementation ----*/
-		
+
+nonlinear_function::nonlinear_function()
+{
+}
+
 bool nonlinear_function::load(std::istream& in)
 {
 	// Parse line until the next comment
@@ -396,11 +408,12 @@ vec compound_function::operator()(const vec& x) const
 }
 vec compound_function::value(const vec& x) const
 {
-	vec res = vec::Zero(dimY());
+	vec res = vec::Zero(parametrization().dimY());
 	for(unsigned int i=0; i<fs.size(); ++i)
 	{
-		vec temp_x(fs[i]->dimX());
-		params::convert(&x[0], input_parametrization(), fs[i]->input_parametrization(), &temp_x[0]);
+		vec temp_x(fs[i]->parametrization().dimX());
+    params::convert(&x[0], parametrization().input_parametrization(),
+                    fs[i]->parametrization().input_parametrization(), &temp_x[0]);
 		res = res + fs[i]->value(temp_x);
 	}
 	return res;
@@ -409,7 +422,7 @@ vec compound_function::value(const vec& x) const
 vec compound_function::parametersJacobian(const vec& x) const
 {
 	int nb_params = nbParameters();
-	vec jac = vec::Zero(nb_params*dimY());
+	vec jac = vec::Zero(nb_params*parametrization().dimY());
 
 	int start_i = 0;
 
@@ -423,13 +436,14 @@ vec compound_function::parametersJacobian(const vec& x) const
 		if(nb_f_params > 0 && !is_fixed[f])
 		{
 
-			vec temp_x(func->dimX());
-			params::convert(&x[0], input_parametrization(), func->input_parametrization(), &temp_x[0]);
+			vec temp_x(func->parametrization().dimX());
+      params::convert(&x[0], parametrization().input_parametrization(),
+                      func->parametrization().input_parametrization(), &temp_x[0]);
 			vec func_jac = func->parametersJacobian(temp_x);
 
 			for(int i=0; i<nb_f_params; ++i)
 			{
-				for(int y=0; y<dimY(); ++y)
+				for(int y=0; y<parametrization().dimY(); ++y)
 				{
 					jac[y*nb_params + (i+start_i)] = func_jac[y*nb_f_params + i];
 				}
@@ -442,33 +456,52 @@ vec compound_function::parametersJacobian(const vec& x) const
 	return jac;
 }
 
-void compound_function::push_back(const ptr<nonlinear_function>& f, const arguments& f_args)
+// Return the parameters of the composition of FUNCTIONS.
+static const parameters
+compound_parameters(const std::vector<ptr<nonlinear_function> >& functions)
 {
-	// Update the input param
-	if(input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		setParametrization(f->input_parametrization());
-	}
-	else if(input_parametrization() != f->input_parametrization())
-	{
-		setParametrization(params::CARTESIAN);
-	}
+    assert(functions.size() > 0);
 
-	// Update the output param
-	if(output_parametrization() == params::UNKNOWN_OUTPUT)
-	{
-		setParametrization(f->output_parametrization());
-	}
-	else if(output_parametrization() != f->output_parametrization())
-	{
-		std::cerr << "Creating a compound function with different output dimensions, this is not allowed" << std::endl;
-		throw;
-	}
+    parameters result = functions[0]->parametrization();
 
-	fs.push_back(f);
-	fs_args.push_back(f_args);
-	is_fixed.push_back(f_args.is_defined("fixed"));
+    for (auto f: functions)
+    {
+        auto input = f->parametrization().input_parametrization();
+        auto output = f->parametrization().output_parametrization();
+
+        if (result.input_parametrization() == params::UNKNOWN_INPUT)
+            result = alta::parameters(result.dimX(), result.dimY(),
+                                      input,
+                                      result.output_parametrization());
+        else if (result.input_parametrization() != input)
+            // Parametrization mismatch: fall back to Cartesian.
+            result = result.set_input(6, params::CARTESIAN);
+
+        if (result.output_parametrization() == params::UNKNOWN_OUTPUT)
+            result = alta::parameters(result.dimX(), result.dimY(),
+                                      result.input_parametrization(),
+                                      output);
+        else if (result.output_parametrization() != output)
+            abort();
+    }
+
+    return result;
 }
+
+compound_function::compound_function(const std::vector<ptr<nonlinear_function> >& functions,
+                                     const std::vector<arguments> args)
+    : nonlinear_function(compound_parameters(functions)),
+      fs(functions), fs_args(args)
+{
+    assert(functions.size() == args.size());
+
+    is_fixed.resize(functions.size());
+    for (unsigned int x = 0; x < functions.size(); x++)
+    {
+        is_fixed[x] = args[x].is_defined("fixed");
+    }
+}
+
 
 nonlinear_function* compound_function::operator[](int i) const
 {
@@ -500,39 +533,6 @@ bool compound_function::load(std::istream& in)
 	}
 	std::cout << "<<DEBUG>> number of correct function loaded in compound: " << nb_good  << " / " << fs.size() << std::endl;
 	return nb_good > 0;
-}
-
-void compound_function::setParametrization(params::input new_param)
-{
-	if(new_param == params::UNKNOWN_INPUT)
-		return;
-
-	// If there is more than one parametrization defined to this function, convert
-	// it to the parametrization that conserves the most degrees of freedom. Right now
-	// this is the CARTESIAN param. It might change in future release.
-	if(input_parametrization() != new_param)
-	{
-		function::setParametrization(params::CARTESIAN);
-		function::setDimX(6);
-	}
-
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			fs[i]->setParametrization(new_param);
-			fs[i]->setDimX(params::dimension(new_param));
-		}
-	}
-}
-		
-void compound_function::setParametrization(params::output new_param)
-{
-	parametrized::setParametrization(new_param);
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		fs[i]->setParametrization(new_param);
-	}
 }
 
 void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
@@ -639,31 +639,6 @@ void compound_function::bootstrap(const ::ptr<data> d, const arguments& args)
 		{
 			fs[i]->bootstrap(d, fs_args[i]);
 		}
-	}
-}
-
-void compound_function::setDimX(int nX) 
-{
-	if(input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		function::setDimX(nX);
-	}
-	
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		if(fs[i]->input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			fs[i]->setDimX(nX);
-		}
-	}
-}
-		
-void compound_function::setDimY(int nY)
-{
-	function::setDimY(nY);
-	for(unsigned int i=0; i<fs.size(); ++i)
-	{
-		fs[i]->setDimY(nY);
 	}
 }
 
@@ -837,28 +812,35 @@ void compound_function::save_call(std::ostream& out, const arguments& args) cons
 }
 
 
+
+// Return the parameters of the product of G1 and G2.
+static const parameters
+product_parameters(const ptr<nonlinear_function>& g1,
+                   const ptr<nonlinear_function>& g2)
+{
+    parameters result = g1->parametrization();
+
+    if(g1->parametrization().input_parametrization() !=
+       g2->parametrization().input_parametrization())
+    {
+        result = alta::parameters(6, result.dimY(),
+                                  params::CARTESIAN,
+                                  result.output_parametrization());
+    }
+
+    return result;
+}
 
 /*--- Product functions implementation ----*/
 
-product_function::product_function(const ptr<nonlinear_function>& g1, 
+product_function::product_function(const ptr<nonlinear_function>& g1,
                                    const ptr<nonlinear_function>& g2,
-                                   bool is_g1_fixed, bool is_g2_fixed) 
-: f1( g1 ),
+                                   bool is_g1_fixed, bool is_g2_fixed)
+: nonlinear_function(product_parameters(g1, g2)),
+  f1( g1 ),
 	f2( g2 ),
 	_is_fixed( std::pair<bool,bool>( is_g1_fixed, is_g2_fixed) )
 {
-	// If the two parametrization are different, use the CARTESIAN parametrization
-	// as the input parametrization, then do the convertion for all the functions.
-	if(g1->input_parametrization() != g2->input_parametrization())
-	{
-   	function::setParametrization(params::CARTESIAN);
-		function::setDimX(6);
-	}
-	else
-	{
-    function::setParametrization(g1->input_parametrization());
-		function::setDimX(g1->dimX());
-	}
 }
 
 product_function::~product_function()
@@ -874,14 +856,16 @@ vec product_function::value(const vec& x) const
 {
 	// Convert input space to the 1rst function parametrization and compute the
 	// output value
-	vec xf1(f1->dimX());
-	params::convert(&x[0], input_parametrization(), f1->input_parametrization(), &xf1[0]);
+	vec xf1(f1->parametrization().dimX());
+	params::convert(&x[0], parametrization().input_parametrization(),
+                  f1->parametrization().input_parametrization(), &xf1[0]);
 	vec f1res = f1->value(xf1);
 
 	// Convert input space to the 2nd function parametrization and compute the
 	// output value
-	vec xf2(f2->dimX());
-	params::convert(&x[0], input_parametrization(), f2->input_parametrization(), &xf2[0]);
+	vec xf2(f2->parametrization().dimX());
+	params::convert(&x[0], parametrization().input_parametrization(),
+                  f2->parametrization().input_parametrization(), &xf2[0]);
 	vec f2res = f2->value(xf2);
 
 	vec res = product(f1res, f2res);
@@ -1024,22 +1008,6 @@ void product_function::bootstrap(const ptr<data> d, const arguments& args)
 		f1->bootstrap(d, args);
 		f2->bootstrap(d, args);
 	}
-}
-		
-void product_function::setDimX(int nX) 
-{
-	f1->setDimX(nX);
-	f2->setDimX(nX);
-	
-	function::setDimX(f1->dimX());
-}
-
-void product_function::setDimY(int nY)
-{
-	f1->setDimY(nY);
-	f2->setDimY(nY);
-	
-	function::setDimY(f1->dimY());
 }
 
 void product_function::setMin(const vec& min) 
@@ -1217,10 +1185,12 @@ vec product_function::parametersJacobian(const vec& x) const
 
 
 	// Convert the input value x to the input space of the f1tion
-	vec xf2(f2->dimX());
-	params::convert(&x[0], input_parametrization(), f2->input_parametrization(), &xf2[0]);
-	vec xf1(f1->dimX());
-	params::convert(&x[0], input_parametrization(), f1->input_parametrization(), &xf1[0]);
+	vec xf2(f2->parametrization().dimX());
+	params::convert(&x[0], parametrization().input_parametrization(),
+                  f2->parametrization().input_parametrization(), &xf2[0]);
+	vec xf1(f1->parametrization().dimX());
+	params::convert(&x[0], parametrization().input_parametrization(),
+                  f1->parametrization().input_parametrization(), &xf1[0]);
 
 	//Value of each function for the given x
 	vec f1_value = f1->value(xf1);
@@ -1232,13 +1202,13 @@ vec product_function::parametersJacobian(const vec& x) const
 
 	// F = f2nel; f = f1tion
 	// d(F * f)(x) /dp = F(x) df(x) /dp + f(x) dF(x) / dp
-	//vec jac(nb_params*_nY);
+	//vec jac(nb_params*parametrization().dimY());
 	
 	//Forcing Zero by default
-	vec jac= vec::Zero( nb_params * dimY() );
+	vec jac= vec::Zero( nb_params * parametrization().dimY() );
 
 
-	for(int y=0; y<dimY(); ++y)
+	for(int y=0; y<parametrization().dimY(); ++y)
 	{
 		if( ! _is_fixed.first)
 		{
@@ -1266,32 +1236,6 @@ vec product_function::parametersJacobian(const vec& x) const
 	}
 
 	return jac;
-}
-
-//! \brief provide the outout parametrization of the object.
-params::output product_function::output_parametrization() const
-{
-	return f1->output_parametrization();
-}
-		
-void product_function::setParametrization(params::input new_param)
-{
-	if(f1->input_parametrization() == params::UNKNOWN_INPUT) 
-	{
-		f1->setParametrization(new_param); 
-		f1->setDimX(params::dimension(new_param));
-	}
-	if(f2->input_parametrization() == params::UNKNOWN_INPUT) 
-	{
-		f2->setParametrization(new_param);
-		f2->setDimX(params::dimension(new_param));
-	}
-}
-
-void product_function::setParametrization(params::output new_param)
-{
-	f1->setParametrization(new_param);
-	f2->setParametrization(new_param);
 }
 
 nonlinear_function* product_function::first() const

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -21,27 +21,29 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-	return new retro_schlick();
+	return new retro_schlick(params);
 }
 
-retro_schlick::retro_schlick()
+retro_schlick::retro_schlick(const alta::parameters& params):
+    nonlinear_function(params.set_input(6, params::CARTESIAN))
 {
-	setParametrization(params::CARTESIAN);
-	setDimX(6);
+    R.resize(params.dimY());
 }
 
 vec retro_schlick::value(const vec& x) const
 {
 	double xp[3], cart[6];
-	params::convert(&x[0], input_parametrization(), params::SCHLICK_VK, xp);
-	params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
+	params::convert(&x[0], _parameters.input_parametrization(),
+                  params::SCHLICK_VK, xp);
+	params::convert(&x[0], _parameters.input_parametrization(),
+                  params::CARTESIAN, cart);
 
 	const double dotRK = xp[2]*cart[2] - (xp[0]*cart[0] + xp[1]*cart[1]) ;
 
-	vec res(_nY);
-	for(int i=0; i<_nY; ++i)
+	vec res(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i] = R[i] + (1.0 - R[i]) * (pow(1.0 - dotRK, 5.0));
 	}
@@ -52,31 +54,33 @@ vec retro_schlick::value(const vec& x) const
 //! \brief Number of parameters to this non-linear function
 int retro_schlick::nbParameters() const 
 {
-	return dimY();
+	return _parameters.dimY();
 }
 
 //! \brief Get the vector of parameters for the function
 vec retro_schlick::parameters() const 
 {
-	vec p(dimY());
-	for(int i=0; i<dimY(); ++i) { p[i] = R[i]; }
+	vec p(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i) { p[i] = R[i]; }
 	return p;
 }
 
 //! \brief Update the vector of parameters for the function
 void retro_schlick::setParameters(const vec& p) 
 {
-	for(int i=0; i<dimY(); ++i) { R[i] = p[i]; }
+	for(int i=0; i<_parameters.dimY(); ++i) { R[i] = p[i]; }
 }
 
 //! \brief Obtain the derivatives of the function with respect to the
 //! parameters. 
 vec retro_schlick::parametersJacobian(const vec& x) const 
 {
-	const int nY = dimY();
+	const int nY = _parameters.dimY();
 	double xp[3], cart[6];
-	params::convert(&x[0], input_parametrization(), params::SCHLICK_VK, xp);
-	params::convert(&x[0], input_parametrization(), params::CARTESIAN, cart);
+	params::convert(&x[0], _parameters.input_parametrization(),
+                  params::SCHLICK_VK, xp);
+	params::convert(&x[0], _parameters.input_parametrization(),
+                  params::CARTESIAN, cart);
 
 	const double dotRK = xp[2]*cart[2] - (xp[0]*cart[0] + xp[1]*cart[1]) ;
 
@@ -99,20 +103,20 @@ vec retro_schlick::parametersJacobian(const vec& x) const
 
 vec retro_schlick::getParametersMin() const
 {
-	vec m = vec::Zero(dimY());
+	vec m = vec::Zero(_parameters.dimY());
 	return m;
 }
 
 vec retro_schlick::getParametersMax() const
 {
-	vec M(dimY());
-	for(int i=0; i<dimY(); ++i) { M[i] = 1.0; }
+	vec M(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i) { M[i] = 1.0; }
 	return M;
 }
 
 void retro_schlick::bootstrap(const ptr<data> d, const arguments& args)
 {
-	for(int i=0; i<dimY(); ++i) {R[i] = 0.5; }
+	for(int i=0; i<_parameters.dimY(); ++i) {R[i] = 0.5; }
 }
 
 //! Load function specific files
@@ -147,7 +151,7 @@ bool retro_schlick::load(std::istream& in)
 	}
 
 	// R [double]
-	for(int i=0; i<dimY(); ++i) {
+	for(int i=0; i<_parameters.dimY(); ++i) {
 		in >> token >> R[i];
 	}
 	return true;
@@ -160,7 +164,7 @@ void retro_schlick::save_call(std::ostream& out, const arguments& args) const
 	if(is_alta)
 	{
 		out << "#FUNC nonlinear_fresnel_retro_schlick" << std::endl ;
-		for(int i=0; i<dimY(); ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			out << "R " << R[i] << std::endl;
 		}
@@ -169,10 +173,10 @@ void retro_schlick::save_call(std::ostream& out, const arguments& args) const
 	else
 	{
 		out << "retro_schlick_fresnel(L, V, N, X, Y, vec3(";
-		for(int i=0; i<dimY(); ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 			out << R[i];
-			if(i < _nY-1) { out << ", "; }
+			if(i < _parameters.dimY()-1) { out << ", "; }
 		}
 		out << "))";
 	}

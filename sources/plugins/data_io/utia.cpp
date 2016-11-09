@@ -30,6 +30,17 @@
 
 using namespace alta;
 
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args);
+
+#define STEP_T 15.
+#define STEP_P 7.5
+#define NTI    6
+#define NTV    6
+#define NPI    ((int)(360.f/STEP_P))
+#define NPV    ((int)(360.f/STEP_P))
+#define N_PER_PLANE (NTI * NPI * NTV * NPV)
+
+
 /*! \ingroup datas
  *  \class data_utia
  *  \brief Data interface for the [UTIA][utia] file format.
@@ -60,29 +71,23 @@ private:
 	double* Bd;
 
 public:
-	UTIA() : data() {
-		this->step_t = 15;
-		this->step_p = 7.5;
-		this->nti = 6;
-		this->ntv = 6;
-		this->npi = (int)(360.f/step_p);
-		this->npv = (int)(360.f/step_p);
+	UTIA(const parameters& params)
+      : data(params, N_PER_PLANE)
+  {
+		this->step_t = STEP_T;
+		this->step_p = STEP_P;
+		this->nti = NTI;
+		this->ntv = NTV;
+		this->npi = NPI;
+		this->npv = NPV;
 		this->planes = 3;
-		this->nPerPlane = nti*npi*ntv*npv;
+		this->nPerPlane = N_PER_PLANE;
 		this->Bd = new double[planes*nti*npi*ntv*npv];
 
-		// Set the input and output parametrization
-	    _in_param  = params::SPHERICAL_TL_PL_TV_PV;
-	    _out_param = params::RGB_COLOR;
-	    setDimX(4);
-	    setDimY(3);
-
-	    _min.resize(4);
 	    _min[0] = 0.0;
 	    _min[1] = 0.0;
 	    _min[2] = 0.0;
 	    _min[3] = 0.0;
-	    _max.resize(4);
 	    _max[0] = 0.5*M_PI;
 	    _max[1] = 2.0*M_PI;
 	    _max[2] = 0.5*M_PI;
@@ -91,56 +96,6 @@ public:
 
 	virtual ~UTIA() {
 		delete[] this->Bd;
-	}
-
-	// Load data from a file
-	virtual void load(const std::string& filename) {
-
-		/* If the file is an OpenEXR image */
-		if(filename.substr(filename.find_last_of(".") + 1) == "exr") {
-			double* temp;
-			int W, H;
-			if(!t_EXR_IO<double>::LoadEXR(filename.c_str(), W, H, temp, 3) || W != npi*nti || H != ntv*npv) {
-				std::cerr << "<<ERROR>> Unable to open file '" << filename << "'" << std::endl;
-				throw;
-
-			} else {
-				/* Data copy */
-				for(int i=0; i<H; ++i)
-					for(int j=0; j<W; ++j){
-						int indexUTIA = i*W+j;
-						int indexEXR  = (H-i-1)*W+j;
-		    			Bd[indexUTIA + 0*nPerPlane] = temp[3*indexEXR + 0];
-		    			Bd[indexUTIA + 1*nPerPlane] = temp[3*indexEXR + 1];
-		    			Bd[indexUTIA + 2*nPerPlane] = temp[3*indexEXR + 2];
-		  			}
-
-				delete[] temp;
-			}
-
-		/* If the file is a binary */
-		} else {
-
-			std::ifstream stream(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-			/*
-			if (!stream.is_open()) {
-			  std::cerr << "<<ERROR>> Unable to open file '" << filename << "' !" << std::endl;
-			  throw;
-			}*/
-
-			int count = 0;
-			for(int isp=0;isp<planes;isp++)	{
-			  for(int ni=0;ni<nti*npi;ni++)
-			    for(int nv=0;nv<ntv*npv;nv++) {
-			    	stream >> Bd[count++];
-			    }
-			}
-		}
-
-		std::cout << "<<INFO>> Reading BRDF from file '" << filename << "' ...done" << std::endl;
-	}
-	virtual void load(const std::string& filename, const arguments&) {
-		load(filename);
 	}
 
 	virtual void save(const std::string& filename) const {
@@ -318,38 +273,64 @@ public:
 		return RGB;
 	}
 
-	// Set data
-	virtual void set(const vec& x) {
-		assert(x.size() == dimX()+dimY());
-
-		const double PI2 = M_PI*0.5;
-		if(x[0]>PI2 || x[2]>PI2) {
-			return;
-		}
-
-		int iti, ipi, itv, ipv;
-		vecToIndex(x, iti, ipi, itv, ipv);
-
-		const int index = ((iti*npi + ipi)*ntv + itv)*npv + ipv;
-		Bd[index + 0*nPerPlane] = x[dimX() + 0];
-		Bd[index + 1*nPerPlane] = x[dimX() + 1];
-		Bd[index + 2*nPerPlane] = x[dimX() + 2];
-	}
-
 	virtual void set(int i, const vec& x) {
-		assert(x.size() == dimY());
+		assert(x.size() == parametrization().dimY());
 		for(int isp=0; isp<planes; ++isp) {
 			Bd[isp*nPerPlane + i] = x[isp];
 		}
 	}
 
-	// Get data size, e.g. the number of samples to fit
-	virtual int size() const {
-		return nPerPlane;
-	}
+  friend data* load_data(std::istream&, const arguments&);
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* provide_data(size_t size, const parameters& params,
+                                   const arguments&)
 {
-    return new UTIA();
+    return new UTIA(params);
+}
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
+{
+#if 0 // FIXME: backport this
+		/* If the file is an OpenEXR image */
+		if(filename.substr(filename.find_last_of(".") + 1) == "exr") {
+        double* temp;
+        int W, H;
+        if(!t_EXR_IO<double>::LoadEXR(input, W, H, temp, 3) || W != npi*nti || H != ntv*npv) {
+            std::cerr << "<<ERROR>> Unable to open file '" << filename << "'" << std::endl;
+            throw;
+
+        } else {
+            /* Data copy */
+            for(int i=0; i<H; ++i)
+                for(int j=0; j<W; ++j){
+                    int indexUTIA = i*W+j;
+                    int indexEXR  = (H-i-1)*W+j;
+                    Bd[indexUTIA + 0*nPerPlane] = temp[3*indexEXR + 0];
+                    Bd[indexUTIA + 1*nPerPlane] = temp[3*indexEXR + 1];
+                    Bd[indexUTIA + 2*nPerPlane] = temp[3*indexEXR + 2];
+                }
+
+            delete[] temp;
+        }
+
+        /* If the file is a binary */
+		} else
+#endif
+
+    UTIA* result = new UTIA(alta::parameters(0, 0,
+                                             params::UNKNOWN_INPUT,
+                                             params::UNKNOWN_OUTPUT));
+
+    int count = 0;
+    for(int isp=0; isp < result->planes; isp++)	{
+        for(int ni=0; ni< result->nti * result->npi; ni++)
+            for(int nv=0; nv < result->ntv * result->npv; nv++) {
+                input >> result->Bd[count++];
+            }
+    }
+
+		std::cout << "<<INFO>> Successfully read BRDF" << std::endl;
+
+    return result;
 }

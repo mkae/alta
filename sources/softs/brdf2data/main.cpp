@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -70,25 +70,13 @@ int main(int argc, char** argv)
 	}
 	
 	// Get the associated data object and load the file is any
-	ptr<data> d = plugins_manager::get_data(args["data"], args) ;
-	if(args.is_defined("data-file"))
-	{
-			try
-			{
-				d->load(args["data-file"]);
-			}
-			CATCH_FILE_IO_ERROR(args["data-file"]);
-	}
+	ptr<data> d;
 
-    // Get the output object. In the case where it is not a VS file, we use
-    // the load object.
-    ptr<data> d_out = plugins_manager::get_data(args["data"], args);
-    if(dynamic_pointer_cast<vertical_segment>(d))
-    {
-        d_out->setDimX(d->dimX());
-        d_out->setDimY(d->dimY());
-        d_out->setParametrization(d->input_parametrization());
-    }
+  try
+  {
+      d = plugins_manager::load_data(args["data-file"], args["data"], args);
+	}
+  CATCH_FILE_IO_ERROR(args["data-file"]);
 
 	// Get the function file
 	function* f = NULL;
@@ -99,40 +87,60 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+  // Get the output object. In the case where it is not a VS file, we use the
+  // load object.
+  ptr<data> d_out = plugins_manager::get_data(args["data"],
+                                              d->size(),
+                                              dynamic_pointer_cast<vertical_segment>(d)
+                                              ? d->parametrization()
+                                              : f->parametrization(),
+                                              args);
+
 	if(d && f != NULL)
 	{
-		// Is the output data file already allocated and has the same size
-		// than the training data ?
-		const bool out_filled = d->size() == d_out->size();
 		const bool output_dif = args.is_defined("export-diff");
 
-		vec temp(f->dimX());
+		vec temp(f->parametrization().dimX());
 		for(int i=0; i<d->size(); ++i)
 		{
-			// Copy the input vector
-			vec x = d->get(i);
-			// Convert the data to the function's input space.
-            if(f->input_parametrization() == params::UNKNOWN_INPUT)
-            {
-            	memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
-            }
-            else
-            {
-				params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
-			}
-			vec y = f->value(temp);
+        // Copy the input vector
+        vec x = d->get(i);
+        // Convert the data to the function's input space.
+        if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
+        {
+            memcpy(&temp[0], &x[0], f->parametrization().dimX()*sizeof(double));
+        }
+        else
+        {
+            params::convert(&x[0],
+                            d->parametrization().input_parametrization(),
+                            f->parametrization().input_parametrization(),
+                            &temp[0]);
+        }
+        vec y = f->value(temp);
 
-			for(int j=0; j<d->dimY(); ++j) {
-				x[d->dimX() + j] = (output_dif) ? x[d->dimX() + j] - y[j] : y[j];
-			}
+        if (dynamic_pointer_cast<vertical_segment>(d_out))
+        {
+            // Vertical segment has a "scatter" representation, so we need to
+            // pass both X and Y.
+            vec z(d_out->parametrization().dimX()
+                  + d_out->parametrization().dimY());
 
-			// If the output data is already allocated and has the same size
-			// than the training data, we do simple copy of the index elements.
-			if(out_filled) {
-				d_out->set(i, y);
-			} else {
-            	d_out->set(x);
+            for(int j=0; j<d->parametrization().dimX(); ++j) {
+                z[j] = x[j];
             }
+            for(int j=0; j<d->parametrization().dimY(); ++j) {
+                z[d->parametrization().dimX() + j] =
+                    output_dif ? x[d->parametrization().dimX() + j] - y[j] : y[j];
+            }
+
+            d_out->set(i, z);
+        }
+        else
+        {
+            // Grid representation: only Y is stored.
+            d_out->set(i, y);
+        }
 		}	
 
         d_out->save(args["output"]);

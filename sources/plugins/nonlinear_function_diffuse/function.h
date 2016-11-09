@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -42,7 +42,7 @@ class diffuse_function : public nonlinear_function
 
     // Set the input parametrization to CARTESIAN to reduce the number
     // of transformations in a compound object.
-    diffuse_function();
+    diffuse_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -66,17 +66,13 @@ class diffuse_function : public nonlinear_function
 		virtual void setParameters(const vec& p) ;
 
 		//! \brief Obtain the derivatives of the function with respect to the
-		//! parameters. 
+		//! parameters.
 		virtual vec parametersJacobian(const vec& x) const ;
-
-		virtual void setDimY(int nY)
-		{
-			_nY = nY;
-			_kd.resize(nY);
-		}
 
 	private: // data
 
 		vec _kd;
+
+    diffuse_function() {};
 } ;
 

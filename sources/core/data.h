@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -16,6 +16,7 @@
 #include <limits>
 #include <fstream>
 #include <cmath>
+#include <cassert>
 
 #include "common.h"
 #include "args.h"
@@ -24,46 +25,43 @@
 #include "ptr.h"
 
 
-//namespace alta {
-//   class data;
-//}
-//void load_data_from_binary(std::istream& in, const alta::arguments& header, alta::data& data);
-
 namespace alta {
 
 /*! \brief A data object. Allows to load data from files.
  *  \ingroup core
  */
-class data : public parametrized
+class data
 {
-	public: // methods
+  public: // methods
 
-		data() : parametrized()
-		{}
+    data(const parameters &p, int size)
+        : _parameters(p), _size(size) {}
 
-		data( unsigned int dim_X, unsigned int dim_Y)
-			: parametrized( dim_X, dim_Y )
-		{
-		}
+    data(const parameters& p, int size, const vec& min, const vec& max)
+        : _parameters(p), _size(size), _min(min), _max(max)
+    {
+        assert(min.size() == p.dimX());
+        assert(max.size() == p.dimX());
+    }
 
-		data(params::input in_param, params::output out_param)
-		: parametrized( in_param, out_param)
-		{
+    /* TODO: Eventually mark the following constructors as deprecated.  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    data() {}
 
-		}
+    data(unsigned int dim_X, unsigned int dim_Y)
+      : _parameters(dim_X, dim_Y)
+    {}
+#pragma GCC diagnostic pop
 
-		// Virtual destructor
-		virtual ~data() {} 
+    // Virtual destructor
+    virtual ~data() {}
 
-		// Load data from a file
-		virtual void load(const std::string& filename) = 0 ;
-		virtual void load(const std::string& filename, const arguments& args) = 0 ;
+    // Save the data to a file
+    virtual void save(const std::string& filename) const;
 
-		// Save the data to a file
-		virtual void save(const std::string& filename) const;
-
-		// Acces to data
-		virtual vec get(int i) const = 0 ;
+    // Acces to data
+    virtual vec get(int i) const = 0 ;
 
     //! \brief Provide an evaluation of the data using interpolation. If
     //! the data object does not provide an interpolation mechanism, it
@@ -74,23 +72,41 @@ class data : public parametrized
     //! match the total dimension: dimX + dimY.
     virtual vec value(const vec& in) const = 0;
 
-		//! \brief Put the sample inside the data
-		virtual void set(const vec& x) = 0;
-		virtual void set(int i, const vec& x) = 0;
+    //! \brief Put the sample inside the data at index I.
+    virtual void set(int i, const vec& x) = 0;
 
 
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const = 0 ;
+    // Get data size, e.g. the number of samples to fit
+    int size() const { return _size; };
 
-		//! \brief Return true if this object is equal to DATA ±ε.
-		virtual bool equals(const data& data,
-												double epsilon =
+    //! \brief Return true if this object is equal to DATA ±ε.
+    virtual bool equals(const data& data,
+                        double epsilon =
                         std::pow(1.0, -int(std::numeric_limits<double>::digits10 - 1)));
 
-     friend void load_data_from_binary(std::istream& in, const alta::arguments& header,
-                                         alta::data& data);
 
-	protected: // data
+    const parameters& parametrization() const {
+        return _parameters;
+    }
+
+    void setParametrization(const parameters& p) {
+        _parameters = p;
+    }
+
+
+    /* Maximum values of the data */
+
+    //! \brief Get the minimum value the input can take
+    const vec& min() const { return _min; };
+
+    //! \brief Get the maximum value the input can take
+    const vec& max() const { return _max; };
+
+  protected: // data
+
+    parameters _parameters;
+    int _size;
+    vec _min, _max;
 } ;
 
 /*! \brief Change the parametrization of data to fit the parametrization of the
@@ -102,88 +118,62 @@ class data : public parametrized
  */
 class data_params : public data
 {
-	public: // structures
+  public: // structures
 
-		//! \brief when changing from a parametrization to another, you might
-		//! lose some dimensions. This list enumerate the different operators
-		//! that can be applied on the raw data to be clusterized.
-		//! \note by default we use <em>none</em>, but if the input space
-		//! dimension is reduced, the program will halt.
-		enum clustering
-		{
-			MEAN,
-			MEDIAN,
-			NONE
-		};
+    //! \brief when changing from a parametrization to another, you might
+    //! lose some dimensions. This list enumerate the different operators
+    //! that can be applied on the raw data to be clusterized.
+    //! \note by default we use <em>none</em>, but if the input space
+    //! dimension is reduced, the program will halt.
+    enum clustering
+    {
+      MEAN,
+      MEDIAN,
+      NONE
+    };
 
-	public: // methods
+  public: // methods
 
-		//! \brief contructor requires the definition of a base class that
-		//! has a parametrization, and a new parametrization.
-		data_params(const ptr<data> d, params::input new_param,
-		            data_params::clustering method = data_params::NONE) :
-			_clustering_method(method)
-		{
-			setParametrization(new_param);
-			setParametrization(d->output_parametrization());
+    //! \brief contructor requires the definition of a base class that
+    //! has a parametrization, and a new parametrization.
+    data_params(const ptr<data> d, int size, params::input new_param,
+                data_params::clustering method = data_params::NONE) :
+      data(parameters(params::dimension(new_param),
+                      d->parametrization().dimY(),
+                      new_param,
+                      d->parametrization().output_parametrization()),
+           size),
+      _clustering_method(method)
+    {
+      std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
+      //TODO
+      //clustering<data>(d, _nY, d->parametrization(), new_param, _data);
 
-			_nX = params::dimension(new_param);
-			_nY = d->dimY();
+      std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
+      save(std::string("cluster.gnuplot"));
+    }
 
-			std::cout << "<<INFO>> Reparametrization of the data" << std::endl;
-			//TODO
-			//clustering<data>(d, _nY, d->parametrization(), new_param, _data);
+    virtual vec value(const vec&) const
+    {
+      NOT_IMPLEMENTED();
+    }
 
-			std::cout << "<<INFO>> clustering left " << _data.size() << "/" << d->size() << " elements" << std::endl;
-			save(std::string("cluster.gnuplot"));
-		}
+    // Acces to data
+    virtual vec get(int i) const
+    {
+      return _data[i];
+    }
 
-		virtual vec value(const vec&) const
-		{
-			NOT_IMPLEMENTED();
-		}
+    virtual void set(int i, const vec& x)
+    {
+      this->set(i, x);
+    }
 
-		// Load data from a file
-		virtual void load(const std::string&)
-		{
-			std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
-			throw;
-		}
+  protected: // data
 
-		virtual void load(const std::string&, const arguments&)
-		{
-			std::cerr << "<<ERROR>> this data type cannot load data" << std::endl;
-			throw;
-		}
+    data_params::clustering _clustering_method;
 
-		// Acces to data
-		virtual vec get(int i) const
-		{
-			return _data[i];
-		}
-
-		//! \todo This should crash at execution.
-		virtual void set(const vec& x)
-		{
-			this->set(x);
-		}
-
-		virtual void set(int i, const vec& x)
-		{
-			this->set(i, x);
-		}
-
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const
-		{
-			return _data.size();
-		}
-
-	protected: // data
-
-		data_params::clustering _clustering_method;
-
-		std::vector<vec> _data;
+    std::vector<vec> _data;
 };
 }
 

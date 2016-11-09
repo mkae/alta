@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2013, 2014 Inria
+   Copyright (C) 2013, 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -40,18 +40,17 @@ bool rational_fitter_leastsquare::fit_data(const ptr<data>& dat, ptr<function>& 
 {
 	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
 	const ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(!r || !d)
+	if(!r || !d
+     || d->confidence_interval_kind() != vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;
 	}
 
-	// I need to set the dimension of the resulting function to be equal
-	// to the dimension of my fitting problem
-	r->setDimX(d->dimX()) ;
-	r->setDimY(d->dimY()) ;
-	r->setMin(d->min()) ;
-	r->setMax(d->max()) ;
+  // XXX: FIT and D may have different values of dimX() and dimY(), but
+  // this is fine: we convert values as needed in operator().
+	r->setMin(d->min());
+	r->setMax(d->max());
 
    _np = args.get_int("np", _np);
    _nq = args.get_int("nq", _nq);
@@ -88,7 +87,7 @@ bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int n
 {
     // For each output dimension (color channel for BRDFs) perform
     // a separate fit on the y-1D rational function.
-    for(int j=0; j<d->dimY(); ++j)
+    for(int j=0; j<d->parametrization().dimY(); ++j)
     {
         rational_function_1d* rs = r->get(j);
 
@@ -115,7 +114,7 @@ bool rational_fitter_leastsquare::fit_data(const ptr<vertical_segment>& d, int n
   VectorXd Y(d->size());
   for(int i=0; i<d->size(); ++i) 
   {
-    const double y = d->get(i)[d->dimX() + ny];
+    const double y = d->get(i)[d->parametrization().dimX() + ny];
     Y[i] = y;
     vec x = d->get(i);
     VectorXd::Map(&x[0], 1) /= scale;

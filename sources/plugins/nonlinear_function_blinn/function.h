@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -42,12 +42,7 @@ class blinn_function : public nonlinear_function
 
 	public: // methods
 
-		blinn_function()
-		{
-			setParametrization(params::COS_TH);
-			setDimX(1);
-			setDimY(1);	
-		}
+    blinn_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -71,7 +66,7 @@ class blinn_function : public nonlinear_function
 		//! exponent should not be either.
 		virtual vec getParametersMin() const
 		{
-			return vec::Zero(dimY()*2);
+			return vec::Zero(_parameters.dimY()*2);
 		}
 
 		//! \brief Update the vector of parameters for the function
@@ -81,30 +76,6 @@ class blinn_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 1 ;
-		}
-
-		//! \brief Provide the parametrization of the input space of the 
-		//! function.
-		virtual params::input input_parametrization() const
-		{
-			return params::COS_TH ;
-		}
-
-		void setDimY(int nY)
-		{
-			//CODE CONSISTENCY WITH THE OTHER PLUGIN
-			//_nY = nY ;
-			function::setDimY(nY);
-
-			// Update the length of the vectors
-			_ks.resize(_nY) ;
-			_N.resize(_nY) ;
-		}
-
 		void save_call(std::ostream& out, const arguments& args) const;
 		void save_body(std::ostream& out, const arguments& args) const;
 
@@ -112,5 +83,7 @@ class blinn_function : public nonlinear_function
 
 		//! \brief The blinn lobe parameters
 		vec _ks, _N;
+
+    blinn_function() {};
 } ;
 

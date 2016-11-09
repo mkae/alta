@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2014 Inria
+   Copyright (C) 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -28,11 +28,7 @@ class shifted_gamma_function : public nonlinear_function
 {
 	public: // methods
 
-		shifted_gamma_function()
-		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+    shifted_gamma_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -61,26 +57,6 @@ class shifted_gamma_function : public nonlinear_function
 		//! Obtain the derivatives of the function with respect to the 
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
-
-		//! Update the parameter vectors
-		void setDimY(int nY) {
-    		nonlinear_function::setDimY(nY);
-
-    		// Update the length of the vectors
-    		sh_c      = vec::Zero(nY);
-    		sh_theta0 = vec::Zero(nY);
-    		sh_k      = vec::Zero(nY);
-    		sh_lambda = vec::Zero(nY);
-    		p         = vec::Zero(nY);
-    		F_0       = vec::Zero(nY);
-    		F_1       = vec::Zero(nY);
-    		K_ap      = vec::Zero(nY);
-    		rho_d     = vec::Zero(nY);
-    		rho_s     = vec::Zero(nY);
-    		alpha     = vec::Zero(nY); 
-
-        alpha.fill(1.0);
-		}
 
     //! Load BRDF parameters from .brdf file
     virtual bool load(std::istream& in);
@@ -111,6 +87,8 @@ class shifted_gamma_function : public nonlinear_function
 
 		//! Color parameters
 		vec rho_d, rho_s, alpha;
+
+    shifted_gamma_function() {};
 } ;
 
 

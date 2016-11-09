@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -12,6 +12,7 @@
 #include <core/vertical_segment.h>
 #include <core/common.h>
 #include <core/args.h>
+#include <core/plugins_manager.h>
 
 //#define USE_DELAUNAY
 #ifdef USE_DELAUNAY
@@ -72,10 +73,41 @@ class rbf_interpolant : public data
 
 	public:
 
-		rbf_interpolant() : _data(new vertical_segment())
+		rbf_interpolant(ptr<data> proxied_data)
+        : data(proxied_data->parametrization(),
+               proxied_data->size()),
+          _data(proxied_data),
+          _knn(3)
 		{
-			_knn = 3;
-		}
+        _min = _data->min();
+        _max = _data->max();
+
+#ifdef USE_DELAUNAY
+        dD = parametrization().dimX()+parametrization().dimY();
+        D  = new Delaunay_d(dD);
+        for(int i=0; i<_data->size(); ++i)
+        {
+            vec x = _data->get(i);
+
+            Point pt(dD, &x[0], &x[dD]);
+            D->insert(pt);
+        }
+
+        std::cout << "<<DEBUG>> number of points in the Delaunay triangulation: " << D->all_points().size() << std::endl;
+        std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
+#else
+        // Update the KDtreee by inserting all points
+        double* _d = new double[parametrization().dimX()*_data->size()];
+        flann::Matrix<double> pts(_d, _data->size(), parametrization().dimX());
+        for(int i=0; i<_data->size(); ++i)
+        {
+            vec x = _data->get(i);
+            memcpy(pts[i], &x[0], parametrization().dimX()*sizeof(double));
+        }
+        _kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
+        _kdtree->buildIndex();
+#endif
+    }
 
 		virtual ~rbf_interpolant()
 		{
@@ -88,51 +120,6 @@ class rbf_interpolant : public data
 		#endif
 		}
 
-		// Load data from a file
-		virtual void load(const std::string& filename)
-		{
-			// Load the data
-			_data->load(filename);
-
-			// Copy the informations
-			setDimX(_data->dimX());
-			setDimY(_data->dimY());
-			setMin(_data->min());
-			setMax(_data->max());
-			setParametrization(_data->input_parametrization());
-			setParametrization(_data->output_parametrization());
-
-		#ifdef USE_DELAUNAY
-			dD = dimX()+dimY();
-			D  = new Delaunay_d(dD);
-			for(int i=0; i<_data->size(); ++i)
-			{
-				vec x = _data->get(i);
-
-				Point pt(dD, &x[0], &x[dD]);
-				D->insert(pt);
-			}
-
-			std::cout << "<<DEBUG>> number of points in the Delaunay triangulation: " << D->all_points().size() << std::endl;
-			std::cout << "<<DEBUG>> number of points in input: " << _data->size() << std::endl;
-		#else
-			// Update the KDtreee by inserting all points
-			double* _d = new double[dimX()*_data->size()];
-			flann::Matrix<double> pts(_d, _data->size(), dimX());
-			for(int i=0; i<_data->size(); ++i)
-			{
-				vec x = _data->get(i);
-				memcpy(pts[i], &x[0], dimX()*sizeof(double));
-			}
-			_kdtree = new flann::Index< flann::L2<double> >(pts, flann::KDTreeIndexParams(4));
-			_kdtree->buildIndex();
-		#endif
-		}
-		virtual void load(const std::string& filename, const arguments&)
-		{
-			load(filename);
-		}
-
 		virtual void save(const std::string& filename) const
 		{
 		}
@@ -140,7 +127,7 @@ class rbf_interpolant : public data
 		// Acces to data
 		virtual vec get(int id) const
 		{
-			vec res(dimX() + dimY()) ;
+			vec res(parametrization().dimX() + parametrization().dimY()) ;
 			return res ;
 		}
 		virtual vec operator[](int i) const
@@ -148,11 +135,6 @@ class rbf_interpolant : public data
 			return get(i) ;
 		}
 
-		//! \todo Test this function
-		virtual void set(const vec& x)
-		{
-			NOT_IMPLEMENTED();
-		}
 		virtual void set(int i, const vec& x)
 		{
 			NOT_IMPLEMENTED();
@@ -160,12 +142,12 @@ class rbf_interpolant : public data
 
 		virtual vec value(const vec& x) const
 		{
-			vec res = vec::Zero(dimY());
+			vec res = vec::Zero(parametrization().dimY());
 
 		#ifndef USE_DELAUNAY
 			// Query point
 			vec xc(x);
-			flann::Matrix<double> pts(&xc[0], 1, dimX());
+			flann::Matrix<double> pts(&xc[0], 1, parametrization().dimX());
 			std::vector< std::vector<int> >    indices;
 			std::vector< std::vector<double> > dists;
 
@@ -180,7 +162,7 @@ class rbf_interpolant : public data
 
 		      const double kernel = 1.0/(1.0E-10 + dists[0][i]);
 
-				res      += kernel * y.tail(_nY);
+        res      += kernel * y.tail(parametrization().dimY());
 				cum_dist += kernel;
 			}
 			if(cum_dist > 0.0)
@@ -190,7 +172,7 @@ class rbf_interpolant : public data
 		#else
 
 			Point pt_x(dD);
-			for(int j=0; j<dimX(); ++j) { pt_x[j] = x[j]; }
+			for(int j=0; j<parametrization().dimX(); ++j) { pt_x[j] = x[j]; }
 			S_handle simplex = D->locate(pt_x);
 
 			if(simplex == Delaunay_d::Simplex_handle())
@@ -207,21 +189,21 @@ class rbf_interpolant : public data
 
 				// Compute the distance between y and x
 				double dist = 0.0;
-				for(int i=0; i<dimX(); ++i) { dist += pow(y.homogeneous(i)-x[i], 2); }
+				for(int i=0; i<parametrization().dimX(); ++i) { dist += pow(y.homogeneous(i)-x[i], 2); }
 				dist = sqrt(dist);
 
 				// Interpolate the data
 				cum_dist += dist;
-				for(int i=0; i<dimY(); ++i)
+				for(int i=0; i<parametrization().dimY(); ++i)
 				{
-					res[i] += dist * y.homogeneous(dimX() + i);
+					res[i] += dist * y.homogeneous(parametrization().dimX() + i);
 				}
 
 			}
 
 			if(cum_dist > 0.0)
 			{
-				for(int j=0; j<dimY(); ++j)
+				for(int j=0; j<parametrization().dimY(); ++j)
 				{
 					res[j] /= cum_dist;
 				}
@@ -230,16 +212,15 @@ class rbf_interpolant : public data
 
 		   return res;
 		}
-
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const
-		{
-			assert(_data);
-			return _data->size();
-		}
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* load_data(std::istream& input, const arguments& args)
 {
-    return new rbf_interpolant();
+    // Load the data
+    ptr<data> proxied = plugins_manager::load_data("vertical_segment",
+                                                   input, args);
+
+    return new rbf_interpolant(proxied);
 }
+
+

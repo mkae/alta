@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -46,7 +46,8 @@ bool rational_fitter_cgal::fit_data(const ptr<data>& dat, ptr<function>& fit, co
 {
 	ptr<rational_function> r = dynamic_pointer_cast<rational_function>(fit) ;
 	const ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-	if(!r || !d)
+	if(!r || !d
+     || d->confidence_interval_kind() != vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
 	{
 		std::cerr << "<<ERROR>> not passing the correct class to the fitter" << std::endl ;
 		return false ;

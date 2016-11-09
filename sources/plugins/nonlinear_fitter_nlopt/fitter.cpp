@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -18,6 +18,7 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
 
 #include <core/common.h>
 
@@ -56,15 +57,18 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 	{
 		// Get the data sample and extract the value part
 		vec xi = d->get(s);
-		vec _di = vec(d->dimY());
-		for(int i=0; i<d->dimY(); ++i)
+		vec _di = vec(d->parametrization().dimY());
+		for(int i=0; i<d->parametrization().dimY(); ++i)
 		{
-			_di[i] = xi[d->dimX() + i];
+			_di[i] = xi[d->parametrization().dimX() + i];
 		}
 		
 		// Convert the sample point into the function space
-		vec x(f->dimX());
-		params::convert(&xi[0], d->input_parametrization(), f->input_parametrization(), &x[0]);
+		vec x(f->parametrization().dimX());
+		params::convert(&xi[0],
+                    d->parametrization().input_parametrization(),
+                    f->parametrization().input_parametrization(),
+                    &x[0]);
  
 		// Get the jacobian of the function at position x_i for the current
 		// set of parameters (set prior to function call)
@@ -78,7 +82,7 @@ void df(double* fjac, const nonlinear_function* f, const data* d)
 		{
 			// For each output channel, update the subpart of the
 			// vector row
-			for(int i=0; i<f->dimY(); ++i)
+			for(int i=0; i<f->parametrization().dimY(); ++i)
 			{
 				fjac[j] += 2 * _y[i] * _jac[i*f->nbParameters() + j];
 			}
@@ -104,19 +108,22 @@ double f(unsigned n, const double* x, double* dy, void* dat)
 	{
 		// Get the data sample and extract the value part
 		vec xi = _d->get(s);
-		vec _di = vec(_d->dimY());
-		for(int i=0; i<_d->dimY(); ++i)
+		vec _di = vec(_d->parametrization().dimY());
+		for(int i=0; i<_d->parametrization().dimY(); ++i)
 		{
-			_di[i] = xi[_d->dimX() + i];
+			_di[i] = xi[_d->parametrization().dimX() + i];
 		}
 
 		// Convert the sample point into the function space
-		vec x(_f->dimX());
-		params::convert(&xi[0], _d->input_parametrization(), _f->input_parametrization(), &x[0]);
+		vec x(_f->parametrization().dimX());
+		params::convert(&xi[0],
+                    _d->parametrization().input_parametrization(),
+                    _f->parametrization().input_parametrization(),
+                    &x[0]);
 
 		// Should add the resulting vector completely
 		vec _y = (*_f)(x) - _di;
-		for(int i=0; i<_f->dimY(); ++i)
+		for(int i=0; i<_f->parametrization().dimY(); ++i)
 		{
 			y += pow(_y[i], 2);
 		}
@@ -139,12 +146,10 @@ nonlinear_fitter_nlopt::~nonlinear_fitter_nlopt()
 
 bool nonlinear_fitter_nlopt::fit_data(const ptr<data>& d, ptr<function>& fit, const arguments &args)
 {
-	// I need to set the dimension of the resulting function to be equal
-	// to the dimension of my fitting problem
-	fit->setDimX(d->dimX()) ;
-	fit->setDimY(d->dimY()) ;
-	fit->setMin(d->min()) ;
-	fit->setMax(d->max()) ;
+  // XXX: FIT and D may have different values of dimX() and dimY(), but
+  // this is fine: we convert values as needed in operator().
+	fit->setMin(d->min());
+	fit->setMax(d->max());
 
 	// Convert the function and bootstrap it with the data
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(fit);

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -33,11 +33,7 @@ class schlick_fresnel : public nonlinear_function
 
 	public: // methods
 
-		schlick_fresnel()
-		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+    schlick_fresnel(const alta::parameters& params);
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
@@ -72,16 +68,11 @@ class schlick_fresnel : public nonlinear_function
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		//! \brief resize the parameter vector
-		virtual void setDimY(int nY)
-		{
-			function::setDimY(nY);
-			R.resize(nY);
-		}
-
 	private: // data
 
 		//! Fresnel reflectance at theta = 0
 		vec R;
+
+    schlick_fresnel() {};
 } ;
 

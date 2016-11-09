@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2014 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -54,37 +54,44 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
   }
 
   ptr<vertical_segment> d = dynamic_pointer_cast<vertical_segment>(dat) ;
-  if(!d)
+  if(!d
+     || d->confidence_interval_kind() != vertical_segment::ASYMMETRICAL_CONFIDENCE_INTERVAL)
   {
     std::cerr << "<<WARNING>> automatic convertion of the data object to vertical_segment," << std::endl;
     std::cerr << "<<WARNING>> we advise you to perform convertion with a separate command." << std::endl;
 
-    ptr<vertical_segment> vs(new vertical_segment());
-    vs->setDimX(dat->dimX());
-    vs->setDimY(dat->dimY());
-    vs->setMin(dat->min()) ;
-    vs->setMax(dat->max()) ;
+    size_t elem_size =
+        dat->parametrization().dimX() + 3*dat->parametrization().dimY();
+    double* content = new double[dat->size() * elem_size];
+
     for(int i=0; i<dat->size(); ++i)
     {
       const vec x = dat->get(i);
-      vec y(dat->dimX() + 3*dat->dimY());
 
-      for(int k=0; k<x.size()   ; ++k) { y[k]                               = x[k]; }
-      for(int k=0; k<dat->dimY(); ++k) { y[k + dat->dimX() +   dat->dimY()] = (1.0 - args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
-      for(int k=0; k<dat->dimY(); ++k) { y[k + dat->dimX() + 2*dat->dimY()] = (1.0 + args.get_float("dt", 0.1)) * x[k + dat->dimX()]; }
-
-      vs->set(y);
+      for(int k=0; k<x.size(); ++k) {
+          content[i + k] = x[k];
+      }
+      for(int k=0; k<dat->parametrization().dimY(); ++k) {
+          content[i + k + dat->parametrization().dimX() + dat->parametrization().dimY()] =
+              (1.0 - args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
+      }
+      for(int k=0; k<dat->parametrization().dimY(); ++k) {
+          content[i + k + dat->parametrization().dimX() + 2*dat->parametrization().dimY()] =
+              (1.0 + args.get_float("dt", 0.1)) * x[k + dat->parametrization().dimX()];
+      }
     }
+
+    ptr<vertical_segment> vs(new vertical_segment(dat->parametrization(),
+                                                  dat->size(),
+                                                  std::shared_ptr<double>(content)));
 
     d = vs;
   }
 
-  // I need to set the dimension of the resulting function to be equal
-  // to the dimension of my fitting problem
-  r->setDimX(d->dimX()) ;
-  r->setDimY(d->dimY()) ;
-  r->setMin(d->min()) ;
-  r->setMax(d->max()) ;
+  // XXX: FIT and D may have different values of dimX() and dimY(), but
+  // this is fine: we convert values as needed in operator().
+  r->setMin(d->min());
+  r->setMax(d->max());
 
   const int _min_np = args.get_int("min-np", 10);
   const int _max_np = args.get_int("np", _min_np);
@@ -134,17 +141,16 @@ bool rational_fitter_parallel::fit_data(const ptr<data>& dat, ptr<function>& fit
       ptr<rational_function> rk(NULL);
       #pragma omp critical (args)
       {
-        rk = dynamic_pointer_cast<rational_function>(ptr<function>(plugins_manager::get_function(args)));
+        rk = dynamic_pointer_cast<rational_function>(
+            ptr<function>(plugins_manager::get_function(args,
+                                                        r->parametrization())));
       }
       if(!rk)
       {
           std::cerr << "<<ERROR>> unable to obtain a rational function from the plugins manager" << std::endl;
           throw;
       }
-      rk->setParametrization(r->input_parametrization());
-      rk->setParametrization(r->output_parametrization());
-      rk->setDimX(r->dimX()) ;
-      rk->setDimY(r->dimY()) ;
+
       rk->setMin(r->min()) ;
       rk->setMax(r->max()) ;
 
@@ -217,7 +223,7 @@ bool rational_fitter_parallel::fit_data(const ptr<vertical_segment>& d, int np, 
                                         double& delta, double& linf_dist, double& l2_dist)
 {
   // Fit the different output dimension independantly
-  for(int j=0; j<d->dimY(); ++j)
+  for(int j=0; j<d->parametrization().dimY(); ++j)
   {
     vec p(np), q(nq);
     rational_function_1d* rf = r->get(j);

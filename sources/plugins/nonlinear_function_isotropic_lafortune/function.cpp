@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -21,9 +21,24 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new isotropic_lafortune_function();
+    return new isotropic_lafortune_function(params);
+}
+
+isotropic_lafortune_function::isotropic_lafortune_function(const alta::parameters& params):
+    nonlinear_function(params.set_input(6, params::CARTESIAN)),
+    _n(1)
+{
+    // Update the length of the vectors
+    _C.resize(_n*_parameters.dimY()*2) ;
+    _N.resize(_n*_parameters.dimY()) ;
+#ifdef USE_DIFFUSE
+    _kd.resize(_parameters.dimY());
+
+    for(int i=0; i<nY; ++i)
+        _kd[i] = 0.0;
+#endif
 }
 
 // Overload the function operator
@@ -34,7 +49,7 @@ vec isotropic_lafortune_function::operator()(const vec& x) const
 vec isotropic_lafortune_function::value(const vec& x) const 
 {
 	// Get BRDF value
-	vec res(dimY());
+	vec res(_parameters.dimY());
 
 	double dx, dy, dz;
 	dx = x[0]*x[3];
@@ -42,7 +57,7 @@ vec isotropic_lafortune_function::value(const vec& x) const
 	dz = x[2]*x[5];
 
 	// For each color channel
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 #ifdef WITH_DIFFUSE
 		res[i] = _kd[i];
@@ -81,7 +96,7 @@ vec isotropic_lafortune_function::value(const vec& x, const vec& p) const
 	assert(p.size() == nbParameters());
 
 	// Get BRDF value
-	vec res(dimY());
+	vec res(_parameters.dimY());
 
 	double dx, dy, dz;
 	dx = x[0]*x[3];
@@ -89,7 +104,7 @@ vec isotropic_lafortune_function::value(const vec& x, const vec& p) const
 	dz = x[2]*x[5];
 
 	// For each color channel
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		// Start with the diffuse term
 #ifdef WITH_DIFFUSE
@@ -102,9 +117,9 @@ vec isotropic_lafortune_function::value(const vec& x, const vec& p) const
 		for(int n=0; n<_n; ++n)
 		{
 			double Cx, Cz, N;
-			Cx = p[(n*dimY() + i)*3 + 0];
-			Cz = p[(n*dimY() + i)*3 + 1];
-			N  = p[(n*dimY() + i)*3 + 2];
+			Cx = p[(n*_parameters.dimY() + i)*3 + 0];
+			Cz = p[(n*_parameters.dimY() + i)*3 + 1];
+			N  = p[(n*_parameters.dimY() + i)*3 + 2];
 
 			const double d = Cx*(dx + dy) + Cz*dz;
 			if(d > 0.0)
@@ -124,42 +139,26 @@ void isotropic_lafortune_function::setNbLobes(int N)
     _n = N;
 
     // Update the length of the vectors
-    _C.resize(_n*_nY*2) ;
-    _N.resize(_n*_nY) ;
-}
-
-// Reset the output dimension
-void isotropic_lafortune_function::setDimY(int nY)
-{
-    _nY = nY ;
-
-    // Update the length of the vectors
-    _C.resize(_n*_nY*2) ;
-    _N.resize(_n*_nY) ;
-#ifdef USE_DIFFUSE
-    _kd.resize(_nY);
-
-    for(int i=0; i<nY; ++i)
-        _kd[i] = 0.0;
-#endif
+    _C.resize(_n*_parameters.dimY()*2) ;
+    _N.resize(_n*_parameters.dimY()) ;
 }
 
 //! Number of parameters to this non-linear function
 int isotropic_lafortune_function::nbParameters() const 
 {
-    return (3*_n)*dimY();
+    return (3*_n)*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec isotropic_lafortune_function::parameters() const 
 {
-    vec res((3*_n)*dimY());
+    vec res((3*_n)*_parameters.dimY());
     for(int n=0; n<_n; ++n)
-	    for(int i=0; i<dimY(); ++i)
+	    for(int i=0; i<_parameters.dimY(); ++i)
 		 {
-			  res[(n*dimY() + i)*3 + 0] = _C[(n*dimY() + i)*2 + 0];
-			  res[(n*dimY() + i)*3 + 1] = _C[(n*dimY() + i)*2 + 1];
-			  res[(n*dimY() + i)*3 + 2] = _N[n*dimY()  + i];
+			  res[(n*_parameters.dimY() + i)*3 + 0] = _C[(n*_parameters.dimY() + i)*2 + 0];
+			  res[(n*_parameters.dimY() + i)*3 + 1] = _C[(n*_parameters.dimY() + i)*2 + 1];
+			  res[(n*_parameters.dimY() + i)*3 + 2] = _N[n*_parameters.dimY()  + i];
 		 }
 
     return res;
@@ -168,13 +167,13 @@ vec isotropic_lafortune_function::parameters() const
 //! \brief get the min values for the parameters
 vec isotropic_lafortune_function::getParametersMin() const
 {
-    vec res((3*_n)*dimY());
+    vec res((3*_n)*_parameters.dimY());
     for(int n=0; n<_n; ++n)
-	    for(int i=0; i<dimY(); ++i)
+	    for(int i=0; i<_parameters.dimY(); ++i)
 		 {
-			  res[(n*dimY() + i)*3 + 0] = -std::numeric_limits<double>::max();
-			  res[(n*dimY() + i)*3 + 1] = -std::numeric_limits<double>::max();
-			  res[(n*dimY() + i)*3 + 2] = 0.0;
+			  res[(n*_parameters.dimY() + i)*3 + 0] = -std::numeric_limits<double>::max();
+			  res[(n*_parameters.dimY() + i)*3 + 1] = -std::numeric_limits<double>::max();
+			  res[(n*_parameters.dimY() + i)*3 + 2] = 0.0;
 		 }
 
     return res;
@@ -187,11 +186,11 @@ void isotropic_lafortune_function::setParameters(const vec& p)
 	assert(p.size() == nbParameters());
 
 	for(int n=0; n<_n; ++n)
-		for(int i=0; i<dimY(); ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
-			_C[(n*dimY() + i)*2 + 0] = p[(n*dimY() + i)*3 + 0];
-			_C[(n*dimY() + i)*2 + 1] = p[(n*dimY() + i)*3 + 1];
-			_N[n*dimY()  + i]        = p[(n*dimY() + i)*3 + 2];
+			_C[(n*_parameters.dimY() + i)*2 + 0] = p[(n*_parameters.dimY() + i)*3 + 0];
+			_C[(n*_parameters.dimY() + i)*2 + 1] = p[(n*_parameters.dimY() + i)*3 + 1];
+			_N[n*_parameters.dimY()  + i]        = p[(n*_parameters.dimY() + i)*3 + 2];
 		}
 }
 
@@ -204,14 +203,14 @@ vec isotropic_lafortune_function::parametersJacobian(const vec& x) const
 	dy = x[1]*x[4];
 	dz = x[2]*x[5];
 
-    vec jac(dimY()*nbParameters());
-	 for(int i=0; i<dimY(); ++i)
+    vec jac(_parameters.dimY()*nbParameters());
+	 for(int i=0; i<_parameters.dimY(); ++i)
 	 {
 		 for(int n=0; n<_n; ++n)
-			 for(int j=0; j<dimY(); ++j)
+			 for(int j=0; j<_parameters.dimY(); ++j)
 			 {
 				 // index of the current monochromatic lobe
-				 int index = i*nbParameters() + 3*(n*dimY() + j);
+				 int index = i*nbParameters() + 3*(n*_parameters.dimY() + j);
 				 
 				 double Cx, Cz, N;
 				 getCurrentLobe(n, j, Cx, Cz, N);
@@ -252,14 +251,14 @@ void isotropic_lafortune_function::bootstrap(const ptr<data> d, const arguments&
 #ifdef USE_DIFFUSE
     // Set the diffuse component
 	vec x0 = d->get(0);
-	for(int i=0; i<d->dimY(); ++i)
-		_kd[i] = x0[d->dimX() + i];
+	for(int i=0; i<d->_parameters.dimY(); ++i)
+		_kd[i] = x0[d->_parameters.dimX() + i];
 
 	for(int i=1; i<d->size(); ++i)
 	{
 		vec xi = d->get(i);
-		for(int j=0; j<d->dimY(); ++j)
-			_kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+		for(int j=0; j<d->_parameters.dimY(); ++j)
+			_kd[j] = std::min(xi[d->_parameters.dimX() + j], _kd[j]);
 	}
 	std::cout << "<<INFO>> found diffuse: " << _kd << std::endl;
 #endif
@@ -288,11 +287,11 @@ void isotropic_lafortune_function::bootstrap(const ptr<data> d, const arguments&
 				Cz  = 1;
 			}
 
-			for(int i=0; i<dimY(); ++i)
+			for(int i=0; i<_parameters.dimY(); ++i)
 			{
-				_C[(n*dimY() + i)*2 + 0] = Cxy;
-				_C[(n*dimY() + i)*2 + 1] = Cz;
-				_N[n*dimY()  + i]        = (double)_n;
+				_C[(n*_parameters.dimY() + i)*2 + 0] = Cxy;
+				_C[(n*_parameters.dimY() + i)*2 + 1] = Cz;
+				_N[n*_parameters.dimY()  + i]        = (double)_n;
 			}
 		}
 	}
@@ -301,11 +300,11 @@ void isotropic_lafortune_function::bootstrap(const ptr<data> d, const arguments&
 	else
 	{
 		for(int n=0; n<_n; ++n)
-			for(int i=0; i<dimY(); ++i)
+			for(int i=0; i<_parameters.dimY(); ++i)
 			{
-				_C[(n*dimY() + i)*2 + 0] = -1.0;
-				_C[(n*dimY() + i)*2 + 1] =  1.0;
-				_N[n*dimY()  + i]        = (double)_n;
+				_C[(n*_parameters.dimY() + i)*2 + 0] = -1.0;
+				_C[(n*_parameters.dimY() + i)*2 + 1] =  1.0;
+				_N[n*_parameters.dimY()  + i]        = (double)_n;
 			}
 	}
 }
@@ -387,12 +386,12 @@ bool isotropic_lafortune_function::load(std::istream& in)
 	// Parse the lobe
 	for(int n=0; n<_n; ++n)
 	{
-		for(int i=0; i<_nY; ++i)
+		for(int i=0; i<_parameters.dimY(); ++i)
 		{
 
-			in >> token >> _C[(n*_nY + i)*2 + 0];
-			in >> token >> _C[(n*_nY + i)*2 + 1];
-			in >> token >> _N[n*_nY + i];
+			in >> token >> _C[(n*_parameters.dimY() + i)*2 + 0];
+			in >> token >> _C[(n*_parameters.dimY() + i)*2 + 1];
+			in >> token >> _N[n*_parameters.dimY() + i];
 		}
 
 	}
@@ -415,11 +414,11 @@ void isotropic_lafortune_function::save_call(std::ostream& out, const arguments&
         for(int n=0; n<_n; ++n)
         {
 
-            for(int i=0; i<_nY; ++i)
+            for(int i=0; i<_parameters.dimY(); ++i)
             {
-                out << "Cxy " << _C[(n*_nY + i)*2 + 0] << std::endl;
-                out << "Cz  " << _C[(n*_nY + i)*2 + 1] << std::endl;
-                out << "N   " << _N[n*_nY + i] << std::endl;
+                out << "Cxy " << _C[(n*_parameters.dimY() + i)*2 + 0] << std::endl;
+                out << "Cz  " << _C[(n*_parameters.dimY() + i)*2 + 1] << std::endl;
+                out << "N   " << _N[n*_parameters.dimY() + i] << std::endl;
 
             }
 
@@ -432,24 +431,24 @@ void isotropic_lafortune_function::save_call(std::ostream& out, const arguments&
         for(int n=0; n<_n; ++n)
         {
             out << "lafortune(L, V, N, X, Y, vec3(";
-            for(int i=0; i<_nY; ++i)
+            for(int i=0; i<_parameters.dimY(); ++i)
             {
-                out << _C[(n*_nY + i)*2 + 0];
-                if(i < _nY-1) { out << ", "; }
+                out << _C[(n*_parameters.dimY() + i)*2 + 0];
+                if(i < _parameters.dimY()-1) { out << ", "; }
             }
 
             out << "), vec3(";
-            for(int i=0; i<_nY; ++i)
+            for(int i=0; i<_parameters.dimY(); ++i)
             {
-                out << _C[(n*_nY + i)*2 + 1];
-                if(i < _nY-1) { out << ", "; }
+                out << _C[(n*_parameters.dimY() + i)*2 + 1];
+                if(i < _parameters.dimY()-1) { out << ", "; }
             }
 
             out << "), vec3(";
-            for(int i=0; i<_nY; ++i)
+            for(int i=0; i<_parameters.dimY(); ++i)
             {
-                out << _N[n*_nY + i];
-                if(i < _nY-1) { out << ", "; }
+                out << _N[n*_parameters.dimY() + i];
+                if(i < _parameters.dimY()-1) { out << ", "; }
             }
 
             // For multiple lobes, add a sum sign

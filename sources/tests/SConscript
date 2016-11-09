@@ -10,6 +10,7 @@ env = env.Clone()
 have_openexr = openexr_available(env)
 conf = Configure(env)
 have_cppquickcheck = conf.CheckLibWithHeader('cppqc', 'cppqc.h', 'C++')
+have_nonlinear_fitter_eigen = conf.CheckCXXHeader('unsupported/Eigen/LevenbergMarquardt')
 env = conf.Finish()
 
 # Add the directory of <tests.h> to the include path.
@@ -334,31 +335,33 @@ if have_openexr:
   AlwaysBuild(cmd9)
   env.Alias('tests', cmd9)
 
-  cmd10 = make_command_test('data2brdf',
-                            ['--input',
-                             test_byproduct('gold-metallic-paint.data'),
-                             '--output',
-                             test_byproduct('gold-metallic-paint2.brdf'),
-                             '--func', '[nonlinear_function_diffuse, nonlinear_function_blinn]',
-                             '--fitter', 'nonlinear_fitter_eigen'],
-                            'nonlinear-eigen-fit')
-  env.Depends(cmd10, cmd6)
-  AlwaysBuild(cmd10)
-  env.Alias('tests', cmd10)
+  if have_nonlinear_fitter_eigen:
+    cmd10 = make_command_test('data2brdf',
+                              ['--input',
+                               test_byproduct('gold-metallic-paint.data'),
+                               '--output',
+                               test_byproduct('gold-metallic-paint2.brdf'),
+                               '--func', '[nonlinear_function_diffuse, nonlinear_function_blinn]',
+                               '--fitter', 'nonlinear_fitter_eigen'],
+                              'nonlinear-eigen-fit')
+    env.Depends(cmd10, cmd6)
+    AlwaysBuild(cmd10)
+    env.Alias('tests', cmd10)
 
-  cmd11 = make_command_test('brdf2data',
-                            ['--input',
-                             test_byproduct('gold-metallic-paint2.brdf'),
-                             '--output',
-                             test_byproduct('gold-metallic-paint2.data'),
-                             '--data-file',
-                             test_byproduct('gold-metallic-paint.data'),
-                             '--data', 'vertical_segment'],
-                            'compound-function-to-vs')
-  env.Depends(cmd11, cmd9)
-  env.Depends(cmd11, cmd6)
-  AlwaysBuild(cmd11)
-  env.Alias('tests', cmd11)
+    cmd11 = make_command_test('brdf2data',
+                              ['--input',
+                               test_byproduct('gold-metallic-paint2.brdf'),
+                               '--output',
+                               test_byproduct('gold-metallic-paint2.data'),
+                               '--data-file',
+                               test_byproduct('gold-metallic-paint.data'),
+                               '--data', 'vertical_segment'],
+                              'compound-function-to-vs')
+    env.Depends(cmd11, cmd10)
+    env.Depends(cmd11, cmd9)
+    env.Depends(cmd11, cmd6)
+    AlwaysBuild(cmd11)
+    env.Alias('tests', cmd11)
 
 cmd20 = make_command_test('data2data',
                          ['--input',

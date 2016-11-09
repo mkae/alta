@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -29,11 +29,7 @@ class smith : public nonlinear_function//fresnel
 
 	public: // methods
 
-		smith()
-		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+    smith(const alta::parameters& params);
 
 		//! \brief Load function specific files
 		virtual bool load(std::istream& in) ;
@@ -65,18 +61,13 @@ class smith : public nonlinear_function//fresnel
 		//! \brief Boostrap the function by defining the diffuse term
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		//! \brief resize the parameter vector
-		virtual void setDimY(int nY)
-		{
-			function::setDimY(nY);
-			w.resize(nY);
-		}
-
 	private: // data
 
 		//! Fresnel reflectance at theta = 0 ?
 		//! RP: I DOUBLT IT . Seems to be a brute copy and paste ???
 		//! RP: w^2 should be the mean-square surface slope
 		vec w;
+
+    smith() {};
 } ;
 

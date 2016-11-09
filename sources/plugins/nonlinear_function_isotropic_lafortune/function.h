@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -61,11 +61,7 @@ class isotropic_lafortune_function : public nonlinear_function
 
 	public: // methods
 
-		isotropic_lafortune_function() : _n(1) 
-		{ 
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+    isotropic_lafortune_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -100,15 +96,6 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 6;
-		}
-		
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
-
 		//! \brief Set the number of lobes to be used in the fit
 		void setNbLobes(int N);
 
@@ -118,10 +105,12 @@ class isotropic_lafortune_function : public nonlinear_function
 		//! n for the color channel number c.
 		inline void getCurrentLobe(int n, int c, double& Cx, double& Cz, double& N) const 
 		{
-			Cx = _C[(n*_nY + c)*2 + 0];
-			Cz = _C[(n*_nY + c)*2 + 1];
-			N  = _N[n*_nY + c];
+			Cx = _C[(n*_parameters.dimY() + c)*2 + 0];
+			Cz = _C[(n*_parameters.dimY() + c)*2 + 1];
+			N  = _N[n*_parameters.dimY() + c];
 		}
+
+    isotropic_lafortune_function() {};
 
 
 	private: // data

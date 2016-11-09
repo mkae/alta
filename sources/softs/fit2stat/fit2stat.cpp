@@ -43,21 +43,21 @@ class Error
 public:
   static vec meanSquareError(ptr<data> const & data, ptr<function> const & f )
   {
-    vec mse = vec::Zero( f->dimY() );
+    vec mse = vec::Zero( f->parametrization().dimY() );
 
-    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
     
-    //Note that: data_x = dat.head( data->dimX() );
-    //           data_y = dat.tail( data->dimY() );
-    vec f_y = vec::Zero( f->dimY() );
+    //Note that: data_x = dat.head( data->parametrization().dimX() );
+    //           data_y = dat.tail( data->parametrization().dimY() );
+    vec f_y = vec::Zero( f->parametrization().dimY() );
     
     for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       dat = data->get(i); 
 
-      f_y = f->value(dat.head( data->dimX() ) );
+      f_y = f->value(dat.head( data->parametrization().dimX() ) );
 
-      mse += (f_y - dat.tail( data->dimY() ) ).array().square().matrix();
+      mse += (f_y - dat.tail( data->parametrization().dimY() ) ).array().square().matrix();
     }
     
     return mse * (1.0 / data->size() );
@@ -82,21 +82,21 @@ class Norm
   public:
   static vec L2( ptr<data> const & data, ptr<function> const & f )
   {
-    vec l2 = vec::Zero( f->dimY() );
+    vec l2 = vec::Zero( f->parametrization().dimY() );
 
-    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
     
-    //Note that: data_x = dat.head( data->dimX() );
-    //           data_y = dat.tail( data->dimY() );
-    vec f_y = vec::Zero( f->dimY() );
+    //Note that: data_x = dat.head( data->parametrization().dimX() );
+    //           data_y = dat.tail( data->parametrization().dimY() );
+    vec f_y = vec::Zero( f->parametrization().dimY() );
     
     for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       dat = data->get(i);
 
-      f_y = f->value(dat.head( data->dimX() ) );
+      f_y = f->value(dat.head( data->parametrization().dimX() ) );
       
-      l2 += ( f_y - dat.tail( data->dimY() )).array().square().matrix();
+      l2 += ( f_y - dat.tail( data->parametrization().dimY() )).array().square().matrix();
 
     }
     return l2.cwiseSqrt();
@@ -104,14 +104,14 @@ class Norm
 
   static vec weightedL2( ptr<data> const & data, ptr<function> const & f, vec const & weights)
   {
-    vec l2 = vec::Zero( f->dimY() );
+    vec l2 = vec::Zero( f->parametrization().dimY() );
 
-    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
     for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       dat = data->get(i);
-      l2 += ((f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )) * weights[i]).array().square().matrix();
+      l2 += ((f->value(dat.head( data->parametrization().dimX() )) - dat.tail( data->parametrization().dimY() )) * weights[i]).array().square().matrix();
 
     }
     return l2.cwiseSqrt();
@@ -119,17 +119,17 @@ class Norm
 
   static vec LInf( ptr<data> const & data, ptr<function> const & f )
   {
-    vec max = vec::Zero( f->dimY() );
+    vec max = vec::Zero( f->parametrization().dimY() );
 
-    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
   
     for(unsigned int i=0; i < data->size(); i++)
     {
       dat = data->get(i);          
-      //vec const data_x = dat.head( data->dimX() );
-      //vec const data_y = dat.tail( data->dimY() );
+      //vec const data_x = dat.head( data->parametrization().dimX() );
+      //vec const data_y = dat.tail( data->parametrization().dimY() );
 
-      max =  max.cwiseMax( (f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )).cwiseAbs() );
+      max =  max.cwiseMax( (f->value(dat.head( data->parametrization().dimX() )) - dat.tail( data->parametrization().dimY() )).cwiseAbs() );
 
     }
     return max;
@@ -137,17 +137,17 @@ class Norm
 
   static vec L1( ptr<data> const & data, ptr<function> const & f )
   {
-    vec L1 = vec::Zero( f->dimY() );
+    vec L1 = vec::Zero( f->parametrization().dimY() );
 
-    vec dat = vec::Zero( data->dimX() + data->dimY() );
+    vec dat = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
 
     for(unsigned int i=0; i < (unsigned int ) data->size(); i++)
     {
       dat = data->get(i);          
-      //vec const data_x = dat.head( data->dimX() );
-      //vec const data_y = dat.tail( data->dimY() );
+      //vec const data_x = dat.head( data->parametrization().dimX() );
+      //vec const data_y = dat.tail( data->parametrization().dimY() );
 
-      L1 += (f->value(dat.head( data->dimX() )) - dat.tail( data->dimY() )).cwiseAbs();
+      L1 += (f->value(dat.head( data->parametrization().dimX() )) - dat.tail( data->parametrization().dimY() )).cwiseAbs();
 
     }
     return L1;
@@ -165,20 +165,20 @@ class Norm
     // This is another strategy to compute the norm
     // First we put all the data into Eigen::Array
     // Then we perform the computation on the big array directly
-    Eigen::ArrayXd  a_Lp = Eigen::ArrayXd::Zero( f->dimY() );    
-    Eigen::ArrayXXd  all_data_y( data->size(), f->dimY() );
-    all_data_y.setZero(data->size(), f->dimY());
+    Eigen::ArrayXd  a_Lp = Eigen::ArrayXd::Zero( f->parametrization().dimY() );    
+    Eigen::ArrayXXd  all_data_y( data->size(), f->parametrization().dimY() );
+    all_data_y.setZero(data->size(), f->parametrization().dimY());
 
-    Eigen::ArrayXXd  all_y_fx( data->size(), f->dimY() );
-    all_y_fx.setZero(data->size(), f->dimY());
+    Eigen::ArrayXXd  all_y_fx( data->size(), f->parametrization().dimY() );
+    all_y_fx.setZero(data->size(), f->parametrization().dimY());
 
     //timer chrono;
     //chrono.start();
     for(unsigned int i=0; i < (unsigned int) data->size(); i++)
     {
       Eigen::ArrayXd const dat = data->get(i);          
-      Eigen::ArrayXd const data_x = dat.head( data->dimX() );
-      Eigen::ArrayXd const data_y = dat.tail( data->dimY() );
+      Eigen::ArrayXd const data_x = dat.head( data->parametrization().dimX() );
+      Eigen::ArrayXd const data_y = dat.tail( data->parametrization().dimY() );
       Eigen::ArrayXd const y_fx = f->value(data_x);
       
       all_data_y.row(i) = data_y;
@@ -213,9 +213,9 @@ bool convertDataToFunctionParam(ptr<data> const & data,
                                 vertical_segment* & converted_data )
 {
   conversion_necessary = true;
-  if( data->input_parametrization() == f->input_parametrization() )
+  if( data->parametrization().input_parametrization() == f->parametrization().input_parametrization() )
   {
-    if( data->output_parametrization() == f->output_parametrization() )
+    if( data->parametrization().output_parametrization() == f->parametrization().output_parametrization() )
     {
       conversion_necessary = false;
       return true;
@@ -223,30 +223,32 @@ bool convertDataToFunctionParam(ptr<data> const & data,
     else // Ouput parametrizations are different. 
          // Output parametrization of  the Function prevails
     {
-      converted_data = new vertical_segment( data->input_parametrization(), 
-                                             f->output_parametrization(),
-                                             data->size() );
-      converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+      parameters p(f->parametrization().dimX(), f->parametrization().dimY(),
+                   f->parametrization().input_parametrization(),
+                   f->parametrization().output_parametrization());
+      converted_data = new vertical_segment(p, data->size());
 
-      //Note that: data_x = dat.head( data->dimX() );
-      //           data_y = dat.tail( data->dimY() );
-      vec dat        = vec::Zero( data->dimX() + data->dimY() );
-      vec data_x     = vec::Zero( data->dimX() );
-      vec data_y     = vec::Zero( data->dimY() );
-      vec new_data_y = vec::Zero( f->dimY() );
-      vec new_data   = vec::Zero(data->dimX() + f->dimY() );
+      //Note that: data_x = dat.head( data->parametrization().dimX() );
+      //           data_y = dat.tail( data->parametrization().dimY() );
+      vec dat        = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
+      vec data_x     = vec::Zero( data->parametrization().dimX() );
+      vec data_y     = vec::Zero( data->parametrization().dimY() );
+      vec new_data_y = vec::Zero( f->parametrization().dimY() );
+      vec new_data   = vec::Zero(data->parametrization().dimX() + f->parametrization().dimY() );
 
       for( unsigned int i=0; i < converted_data->size(); i++)
       {
         dat = data->get(i);          
-        data_x = dat.head( data->dimX() );
-        data_y = dat.tail( data->dimY() );
+        data_x = dat.head( data->parametrization().dimX() );
+        data_y = dat.tail( data->parametrization().dimY() );
 
-        params::convert( &data_y[0], data->output_parametrization(), data->dimY(),
-                        f->output_parametrization(), f->dimY(),  &new_data_y[0]);
+        params::convert(&data_y[0],
+                        data->parametrization().output_parametrization(),
+                        data->parametrization().dimY(),
+                        f->parametrization().output_parametrization(), f->parametrization().dimY(),  &new_data_y[0]);
 
-        new_data.head( data->dimX() ) = data_x;
-        new_data.tail( f->dimY() )    = new_data_y;
+        new_data.head( data->parametrization().dimX() ) = data_x;
+        new_data.tail( f->parametrization().dimY() )    = new_data_y;
 
         converted_data->set(i, new_data );
       }
@@ -257,34 +259,37 @@ bool convertDataToFunctionParam(ptr<data> const & data,
   {
     // Output param are the same
     // Converting to the function input parametrization
-    if( data->output_parametrization() == f->output_parametrization() ) 
+    if( data->parametrization().output_parametrization() == f->parametrization().output_parametrization() ) 
     {
+      parameters p(f->parametrization().dimX(), f->parametrization().dimY(),
+                   f->parametrization().input_parametrization(), f->parametrization().output_parametrization());
 
-      converted_data = new vertical_segment( f->dimX(), f->dimY(), data->size() );
-      converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+      converted_data = new vertical_segment(p, data->size());
+
+      //Note that: data_x = dat.head( data->parametrization().dimX() );
+      //           data_y = dat.tail( data->parametrization().dimY() );
+      vec dat        = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
+      vec data_x     = vec::Zero( data->parametrization().dimX() );
+      vec data_y     = vec::Zero( data->parametrization().dimY() );
       
-      //Note that: data_x = dat.head( data->dimX() );
-      //           data_y = dat.tail( data->dimY() );
-      vec dat        = vec::Zero( data->dimX() + data->dimY() );
-      vec data_x     = vec::Zero( data->dimX() );
-      vec data_y     = vec::Zero( data->dimY() );
-      
-      vec new_data = vec::Zero( f->dimX() + f->dimY() );
-      vec new_data_y = vec::Zero( f->dimY() );
-      vec new_data_x = vec::Zero( f->dimX() );
+      vec new_data = vec::Zero( f->parametrization().dimX() + f->parametrization().dimY() );
+      vec new_data_y = vec::Zero( f->parametrization().dimY() );
+      vec new_data_x = vec::Zero( f->parametrization().dimX() );
 
       for( unsigned int i=0; i < (unsigned int) converted_data->size(); i++)
       {
 
         dat = data->get(i);
-        data_x = dat.head( data->dimX() );
-        data_y = dat.tail( data->dimY() );
+        data_x = dat.head( data->parametrization().dimX() );
+        data_y = dat.tail( data->parametrization().dimY() );
         
-        params::convert( &data_x[0], data->input_parametrization() , 
-                        f->input_parametrization(), &new_data_x[0] );
+        params::convert(&data_x[0],
+                        data->parametrization().input_parametrization(),
+                        f->parametrization().input_parametrization(),
+                        &new_data_x[0]);
 
-        new_data.head( f->dimX() ) = new_data_x;
-        new_data.tail( f->dimY() ) = data_y;
+        new_data.head( f->parametrization().dimX() ) = new_data_x;
+        new_data.tail( f->parametrization().dimY() ) = data_y;
 
         converted_data->set(i, new_data );
       }//end of for-loop
@@ -292,15 +297,15 @@ bool convertDataToFunctionParam(ptr<data> const & data,
     }
     else //EVERYTHING IS DIFFERENT ! ALL TO FUNCTION PARAMETRIZATIONS
     {
-      //       unsigned int const new_size = f->dimX() + f->dimY();
-      // converted_data = new vertical_segment( f->dimX(), f->dimY(), data->size() );
-      // converted_data->setParametrizations( f->input_parametrization(), f->output_parametrization() );
+      //       unsigned int const new_size = f->parametrization().dimX() + f->parametrization().dimY();
+      // converted_data = new vertical_segment( f->parametrization().dimX(), f->parametrization().dimY(), data->size() );
+      // converted_data->setParametrizations( f->parametrization().input_parametrization(), f->parametrization().output_parametrization() );
       
       // for( unsigned int i=0; i < converted_data->size(); i++)
       // {
       //   vec const dat = data->get(i);
-      //   vec const data_x = dat.head( data->dimX() );
-      //   vec const data_y = dat.tail( data->dimY() );
+      //   vec const data_x = dat.head( data->parametrization().dimX() );
+      //   vec const data_y = dat.tail( data->parametrization().dimY() );
       // }
       NOT_IMPLEMENTED();
     }
@@ -319,13 +324,13 @@ void computeCosineFactorsFromData( ptr<data> const & data,
   cosine_theta_view.setZero( data->size() );
   cosine_theta_light.setZero( data->size() );
   
-  if( data->input_parametrization() == params::CARTESIAN)
+  if( data->parametrization().input_parametrization() == params::CARTESIAN)
   {
-    vec data_x = vec::Zero( data->dimX() );
+    vec data_x = vec::Zero( data->parametrization().dimX() );
 
     for( unsigned int i=0; i < data->size(); i++)
     {
-      data_x = (data->get(i)).head( data->dimX() );
+      data_x = (data->get(i)).head( data->parametrization().dimX() );
       cosine_theta_light[i] = data_x[2];
       cosine_theta_view[i]  = data_x[5];
     }
@@ -342,15 +347,15 @@ void  demultiplexData( ptr<data> const & data,
                        Eigen::ArrayXXd & o_data_y )
 {
 
-  vec dat        = vec::Zero( data->dimX() + data->dimY() );
-  vec data_x     = vec::Zero( data->dimX() );
-  vec data_y     = vec::Zero( data->dimY() );
+  vec dat        = vec::Zero( data->parametrization().dimX() + data->parametrization().dimY() );
+  vec data_x     = vec::Zero( data->parametrization().dimX() );
+  vec data_y     = vec::Zero( data->parametrization().dimY() );
       
   for( unsigned int i=0; i < data->size(); i++)
   {
     dat    = data->get(i);
-    data_x = dat.head( data->dimX() );
-    data_y = dat.tail( data->dimY() );
+    data_x = dat.head( data->parametrization().dimX() );
+    data_y = dat.tail( data->parametrization().dimY() );
 
     o_data_x.row(i) = data_x;
     o_data_y.row(i) = data_y;
@@ -461,15 +466,15 @@ main(int argc, char* argv[])
   }
 
   std::cout << "<<INFO>> Loading data ..." << std::endl;
-  ptr<vertical_segment> vs_data = ptr<vertical_segment>(new vertical_segment());
-  //ptr<data> vs_data = plugins_manager::get_data("vertical_segment");
-  
+  ptr<data> vs_data;
+
   timer  t;
   try
   {
     t.start();
-    vs_data->load(args["input"], args);  
-      t.stop();
+    vs_data = plugins_manager::load_data(args["input"],
+                                         "vertical_segment", args);
+    t.stop();
   }
   catch(...)
   {
@@ -479,7 +484,7 @@ main(int argc, char* argv[])
 
   std::cout << "<<INFO>> DATA LOADED in " << t << std::endl;
   t.reset();
-  std::cout << "<<INFO>> DATA Y dimension :" << vs_data->dimY() << std::endl;
+  std::cout << "<<INFO>> DATA Y dimension :" << vs_data->parametrization().dimY() << std::endl;
 
 
 
@@ -493,16 +498,13 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> BRDF File Loaded. Starting to compute statistics ... " << std::endl;
 
 
-  //Conversion 
-  ptr<data> generic_data = dynamic_pointer_cast<data>( vs_data );
-
   vertical_segment*   conv_vs = NULL;
   bool conversion_necessary = true;
   std::cout << "<<INFO>> Converting data to function parametrization if needed" << std::endl;
 
   
   t.start();
-  convertDataToFunctionParam( generic_data, brdf, conversion_necessary, conv_vs );
+  convertDataToFunctionParam( vs_data, brdf, conversion_necessary, conv_vs );
   t.stop();
   std::cout << "<<INFO>> Data converted in " << t << std::endl;
   t.reset();
@@ -515,12 +517,12 @@ main(int argc, char* argv[])
   }
   else
   {
-    converted_data = generic_data;
+    converted_data = vs_data;
   }
 
   //Here we go new way and faster because we evaluate the function just once
-  Eigen::ArrayXXd data_x =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimX() );
-  Eigen::ArrayXXd data_y =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->dimY() ) ;
+  Eigen::ArrayXXd data_x =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->parametrization().dimX() );
+  Eigen::ArrayXXd data_y =  Eigen::ArrayXXd::Zero( converted_data->size(), converted_data->parametrization().dimY() ) ;
 
   t.start();
   demultiplexData( converted_data, data_x, data_y );
@@ -528,7 +530,7 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> Demultiplex data in " << t << std::endl;
   t.reset();
 
-  Eigen::ArrayXXd f_y    = Eigen::ArrayXXd::Zero( converted_data->size(), brdf->dimY() ) ;
+  Eigen::ArrayXXd f_y    = Eigen::ArrayXXd::Zero( converted_data->size(), brdf->parametrization().dimY() ) ;
 
   t.start();
   evaluateFunctionAtData( data_x, brdf, f_y );
@@ -536,13 +538,13 @@ main(int argc, char* argv[])
   std::cout << "<<INFO>> Evaluate function for all data in  " << t << std::endl;
   t.reset();
    
-  Eigen::VectorXd L1_norm   = Eigen::VectorXd::Zero( brdf->dimY() );
-  Eigen::VectorXd L2_norm   = Eigen::VectorXd::Zero( brdf->dimY() );
-  Eigen::VectorXd L3_norm   = Eigen::VectorXd::Zero( brdf->dimY() );
-  Eigen::VectorXd LInf_norm = Eigen::VectorXd::Zero( brdf->dimY() );
+  Eigen::VectorXd L1_norm   = Eigen::VectorXd::Zero( brdf->parametrization().dimY() );
+  Eigen::VectorXd L2_norm   = Eigen::VectorXd::Zero( brdf->parametrization().dimY() );
+  Eigen::VectorXd L3_norm   = Eigen::VectorXd::Zero( brdf->parametrization().dimY() );
+  Eigen::VectorXd LInf_norm = Eigen::VectorXd::Zero( brdf->parametrization().dimY() );
 
-  Eigen::VectorXd mse       = Eigen::VectorXd::Zero( brdf->dimY() );
-  Eigen::VectorXd rmse      = Eigen::VectorXd::Zero( brdf->dimY() );
+  Eigen::VectorXd mse       = Eigen::VectorXd::Zero( brdf->parametrization().dimY() );
+  Eigen::VectorXd rmse      = Eigen::VectorXd::Zero( brdf->parametrization().dimY() );
 
   t.start();
   fastNormComputation( data_y, f_y, L1_norm, L2_norm, L3_norm, LInf_norm, mse, rmse);
@@ -654,7 +656,7 @@ main(int argc, char* argv[])
       {
         fwriter << "#FIT2STATS EXPORT. DIMENSIONS ARE THE ONE FROM THE BRDF FUNCTION" << std::endl;
         fwriter << "#CMD " << args.get_cmd() << std::endl;
-        fwriter << "#DIM " << brdf->dimX() << " " << brdf->dimY() << std::endl;
+        fwriter << "#DIM " << brdf->parametrization().dimX() << " " << brdf->parametrization().dimY() << std::endl;
         fwriter << std::endl;
 
         fwriter << "L1 :" << L1_norm << std::endl;
@@ -680,14 +682,14 @@ main(int argc, char* argv[])
 
   //Comparisons with the norm methods provided in function.cpp
   t.start();
-  double const L2   = brdf->L2_distance( generic_data ) ;
+  double const L2   = brdf->L2_distance( vs_data ) ;
   t.stop();
   std::cout << "<<INFO>> L2, (computed from function)  distance to data = " << L2  
             << " (computed in " << t << ")" << std::endl;
   t.reset();
 
   t.start();
-  double const Linf = brdf->Linf_distance( generic_data );  
+  double const Linf = brdf->Linf_distance( vs_data );
   t.stop();
   std::cout << "<<INFO>> Linf distance to data = " << Linf 
             << " (computed in " << t << ")" << std::endl;

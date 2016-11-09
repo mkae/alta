@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -15,9 +15,9 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-    return new rational_function_legendre();
+    return new rational_function_legendre(params);
 }
 
 rational_function_legendre_1d::rational_function_legendre_1d()
@@ -50,7 +50,7 @@ double rational_function_legendre_1d::p(const vec& x, int i) const
 {
 	std::vector<int> deg = index2degree(i);
 	double res = 1.0;
-	for(int k=0; k<dimX(); ++k)
+	for(int k=0; k<_parameters.dimX(); ++k)
 	{
 		res *= legendre(2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5), deg[k]);
 	}
@@ -63,9 +63,19 @@ double rational_function_legendre_1d::q(const vec& x, int i) const
 }
 
 
+rational_function_legendre::rational_function_legendre(const parameters& params)
+    : rational_function(params)
+{
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 rational_function_legendre::rational_function_legendre()
 {
 }
+
+#pragma GCC diagnostic pop
 
 rational_function_legendre::~rational_function_legendre()
 {

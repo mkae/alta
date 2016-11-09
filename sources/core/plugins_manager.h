@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2015 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -17,6 +17,7 @@
 #include "args.h"
 #include "function.h"
 #include "data.h"
+#include "params.h"
 #include "fitter.h"
 #include "args.h"
 #include "clustering.h"
@@ -42,17 +43,31 @@ class plugins_manager
 		//! \details
 		//! This function attemps to load the shared object file specified in the
 		//! <code>--func filename</code>.
-		static function* get_function(const arguments& args) ;
+		static function* get_function(const arguments& args,
+                                  const parameters& params);
 
 		//! \brief load a function from the ALTA input file.
 		static function* load_function(const std::string& filename);
 		
 		//! \brief load a function from the ALTA input file.
-		static ptr<function> get_function(const std::string& n);
+		static ptr<function> get_function(const std::string& n,
+                                      const parameters& params);
 
 		//! \brief get an instance of the data that is defined in the plugin with
 		//! filename n. Return null if no one exist.
-		static ptr<data> get_data(const std::string& n, const arguments& args = arguments());
+		static ptr<data> get_data(const std::string& n,
+                              size_t size,
+                              const parameters& params,
+                              const arguments& args = arguments());
+
+    //! \brief Load from INPUT an instance of TYPE and return it.
+    static ptr<data> load_data(const std::string& type, std::istream& input,
+                               const arguments& args = arguments());
+
+    //! \brief Load from FILE an instance of TYPE and return it.
+    static ptr<data> load_data(const std::string& file,
+                               const std::string& type,
+                               const arguments& args = arguments());
 
 		//! \brief get an instance of the fitter that is defined in the plugin with
 		//! filename n. Return null if no one exist.
@@ -75,8 +90,11 @@ class plugins_manager
 	private: //data
 
 		// Object provider prototypes
-		typedef function* (*FunctionPrototype)();
+		typedef function* (*FunctionPrototype)(const parameters&);
 		typedef fitter*   (*FitterPrototype)();
-		typedef data*     (*DataPrototype)(const arguments&);
+		typedef data*     (*DataPrototype)(size_t size, const parameters& params,
+                                       const arguments&);
+    typedef data*     (*LoadDataPrototype)(std::istream& input,
+                                           const arguments&);
 };
 }

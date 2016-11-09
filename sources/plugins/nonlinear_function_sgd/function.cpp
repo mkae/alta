@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2014 Inria
+   Copyright (C) 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -21,10 +21,32 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new shifted_gamma_function();
+    return new shifted_gamma_function(params);
 }
+
+shifted_gamma_function::shifted_gamma_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN))
+{
+    auto nY = params.dimY();
+
+    // Update the length of the vectors
+    sh_c      = vec::Zero(nY);
+    sh_theta0 = vec::Zero(nY);
+    sh_k      = vec::Zero(nY);
+    sh_lambda = vec::Zero(nY);
+    p         = vec::Zero(nY);
+    F_0       = vec::Zero(nY);
+    F_1       = vec::Zero(nY);
+    K_ap      = vec::Zero(nY);
+    rho_d     = vec::Zero(nY);
+    rho_s     = vec::Zero(nY);
+    alpha     = vec::Zero(nY); 
+
+    alpha.fill(1.0);
+}
+
 
 // Overload the function operator
 vec shifted_gamma_function::operator()(const vec& x) const 
@@ -65,13 +87,13 @@ vec shifted_gamma_function::value(const vec& x) const
 //! Number of parameters to this non-linear function
 int shifted_gamma_function::nbParameters() const 
 {
-	return 11*dimY();
+	return 11*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec shifted_gamma_function::parameters() const 
 {
-	const int n = dimY();
+	const int n = _parameters.dimY();
 
 	vec res(nbParameters());
 	for(int i=0; i<n; ++i) {
@@ -94,7 +116,7 @@ vec shifted_gamma_function::parameters() const
 //! Update the vector of parameters for the function
 void shifted_gamma_function::setParameters(const vec& pi) 
 {
-	const int n = dimY();
+	const int n = _parameters.dimY();
 	for(int i=0; i<n; ++i) {
 		sh_c[i]      = pi[i +  0*n];
 		sh_theta0[i] = pi[i +  1*n];
@@ -115,7 +137,7 @@ void shifted_gamma_function::setParameters(const vec& pi)
 //! parameters. \TODO
 vec shifted_gamma_function::parametersJacobian(const vec& x) const {
 	
-	const int n = dimY();
+	const int n = _parameters.dimY();
     vec jac(n*nbParameters());
 
 	 for(int i=0; i<n; ++i) {
@@ -130,8 +152,8 @@ vec shifted_gamma_function::parametersJacobian(const vec& x) const {
 		
 vec shifted_gamma_function::Fresnel(const vec& F0, const vec& F1, double V_H) const
 {
-	vec F(dimY());
-	for(int i=0; i<dimY(); ++i) {
+	vec F(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i) {
 		F[i] = F0[i] - V_H*F1[i] + (1.0 - F0[i])*pow(1.0 - V_H, 5.0);
 	}
 	return F;
@@ -143,8 +165,8 @@ vec shifted_gamma_function::D(const vec& _alpha, const vec& _p,
 	double cos2 = cos_h*cos_h;
 	double tan2 = (1.-cos2)/cos2;
 
-	vec D(dimY());
-	for(int i=0; i<dimY(); ++i) {
+	vec D(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i) {
 		const double ax      = _alpha[i] + tan2/_alpha[i];
 		const double exp_pow = exp(-ax) / pow(ax, _p[i]);
 
@@ -157,8 +179,8 @@ vec shifted_gamma_function::D(const vec& _alpha, const vec& _p,
 
 vec shifted_gamma_function::G1(double theta) const
 {
-	vec G1(dimY());
-	for(int i=0; i<dimY(); ++i)
+	vec G1(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		const double exp_shc = exp(sh_c[i] * pow(std::max<double>(acos(theta) - sh_theta0[i],0.), sh_k[i]));
 		G1[i] =  1.0 + sh_lambda[i] * (1.0 - exp_shc);
@@ -200,67 +222,67 @@ bool shifted_gamma_function::load(std::istream& in)
 	}
 
 	//Diffuse part first
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> rho_d[i];
 	}
 
 	//Specular part 
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> rho_s[i];
 	}
 
 	//Alpha
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> alpha[i];
 	}
 
 	//Power
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> p[i];
 	}
 
 	//F0
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> F_0[i];
 	}
 
 	//F1
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> F_1[i];
 	}
 
 	//K_alpha_p
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> K_ap[i];
 	}
 
 	//Lambda
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> sh_lambda[i];
 	}
 
 	// c
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> sh_c[i];
 	}
 
 	//k
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> sh_k[i];
 	}
 
 	//theta_o
-	for( unsigned int i=0; i < dimY(); i++)
+	for( unsigned int i=0; i < _parameters.dimY(); i++)
 	{
 		in >> token >> sh_theta0[i];
 	}

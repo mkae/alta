@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -9,6 +9,7 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #include <core/data.h>
+#include <core/data_storage.h>
 #include <core/vertical_segment.h>
 
 #include <cstdio>
@@ -20,7 +21,7 @@
 
 using namespace alta;
 
-vec get_min(const params::input& param) {
+static vec get_min(const params::input& param) {
 
    vec res(params::dimension(param));
    switch(param)
@@ -76,7 +77,7 @@ vec get_min(const params::input& param) {
    return res;
 }
 
-vec get_max(const params::input& param) {
+static vec get_max(const params::input& param) {
 
    vec res(params::dimension(param));
    switch(param)
@@ -151,64 +152,63 @@ class BrdfGrid : public vertical_segment {
 
       std::vector<int> _size;
 
-      BrdfGrid(const arguments& args) : vertical_segment()
+      BrdfGrid(size_t size, const parameters& params, const arguments& args)
+        : vertical_segment(params, size)
       {
-         // Set the input and output parametrization
-         _in_param  = params::STARK_2D;
-         _out_param = params::RGB_COLOR;
-         _nX = 2;
-         _nY = 3;
-
          initialize(args);
       }
 
+      // FIXME: Move this to constructor.
       void initialize(const arguments& args, bool preallocate = true) {
 
          // Allow to load a different parametrization depending on the
          // parameters provided.
+         params::input in_param;
+         params::output out_param;
+         int nX, nY;
+
          if(args.is_defined("PARAM_IN")) {
-            _in_param = params::parse_input(args["PARAM_IN"]);
+            in_param = params::parse_input(args["PARAM_IN"]);
          } else if(args.is_defined("param")) {
-            _in_param = params::parse_input(args["param"]);
+            in_param = params::parse_input(args["param"]);
          }
-         _nX = params::dimension(_in_param);
+         nX = params::dimension(in_param);
 
          if(args.is_defined("PARAM_OUT")) {
-            _out_param = params::parse_output(args["PARAM_OUT"]);
+            out_param = params::parse_output(args["PARAM_OUT"]);
          }
-         _nY = params::dimension(_out_param);
+         nY = params::dimension(out_param);
 
          // Get the grid size, by default use an 10^dimX grid
          int N = 1;
          if(args.is_defined("grid-size") && args.is_vec("grid-size")) {
             _size = args.get_vec<int>("grid-size");
-            assert(_size.size() == _nX);
+            assert(_size.size() == nX);
 
-            for(int i=0; i<_nX; ++i) {
+            for(int i=0; i<nX; ++i) {
                N *= _size[i];
             }
          } else {
-            for(int i=0; i<_nX; ++i) {
+            for(int i=0; i<nX; ++i) {
                _size.push_back(10);
                N *= 10;
             }
          }
-         _min = get_min(_in_param);
-         _max = get_max(_in_param);
+         _min = get_min(in_param);
+         _max = get_max(in_param);
 
          // Preallocate the grid data
          if(preallocate) {
-            initializeToZero(N);
-
             // Set the abscissa data
-            vec x(dimX() + dimY());
+            vec x(parametrization().dimX() + parametrization().dimY());
             for(int n=0; n<N; ++n) {
                get_abscissa(n, x);
                set(n, x);
             }
-         } else {
-            _data.clear();
          }
+
+         parameters p(nX, nY, in_param, out_param);
+         setParametrization(p);
       }
 
       inline int get_index(const vec& x) const {
@@ -220,7 +220,7 @@ class BrdfGrid : public vertical_segment {
       inline int get_index(const std::vector<int>& k) const {
 
          int N = 0;
-         for(int i=0; i<_nX; ++i) {
+         for(int i=0; i<parametrization().dimX(); ++i) {
             N = N*_size[i] + k[i];
          }
          return N;
@@ -228,8 +228,8 @@ class BrdfGrid : public vertical_segment {
 
       inline std::vector<int> get_indices(const vec& x) const {
 
-         std::vector<int> k(dimX());
-         for(int i=0; i<_nX; ++i) {
+         std::vector<int> k(parametrization().dimX());
+         for(int i = 0; i < parametrization().dimX(); ++i) {
             k[i] = floor((_size[i]-1)*(x[i]-_min[i]) / (_max[i]-_min[i]));
          }
          return k;
@@ -238,12 +238,12 @@ class BrdfGrid : public vertical_segment {
       inline std::vector<int> get_indices(int N) const {
 
          // Variables
-         std::vector<int> k(dimX());
+         std::vector<int> k(parametrization().dimX());
          int K = N;
 
          // Generate the k-th coordinate
-         k[_nX-1] = K % _size[_nX-1];
-         for(int i=_nX-2; i>=0; --i) {
+         k[parametrization().dimX()-1] = K % _size[parametrization().dimX()-1];
+         for(int i=parametrization().dimX()-2; i>=0; --i) {
             K    = (K-k[i+1]) / _size[i+1];
             k[i] = K % _size[i];
          }
@@ -258,25 +258,9 @@ class BrdfGrid : public vertical_segment {
 
          // Evaluate the abscissa from the vector indices and
          // the min and max. The grid exactly map [0..1]
-         for(int i=0; i<_nX; ++i) {
+         for(int i = 0; i < parametrization().dimX(); ++i) {
             x[i] = _min[i] + (_max[i]-_min[i]) * k[i] / (_size[i]-1);
          }
-      }
-
-      // Load data from a file
-      void load(const std::string& filename, const arguments& args)
-      {
-         std::ifstream file;
-
-         // Raise an exception when 'open' fails.
-         file.exceptions (std::ios::failbit);
-         file.open(filename.c_str());
-         file.exceptions (std::ios::goodbit);
-
-         arguments header = arguments::parse_header(file);
-         initialize(header, false);
-
-         load_data_from_text(file, header, *this, args);
       }
 
       void save(const std::string& filename) const
@@ -293,7 +277,7 @@ class BrdfGrid : public vertical_segment {
          for(int i=0; i < size(); ++i)
          {
             vec x = get(i);
-            for(int j=0; j < _nX + _nY; ++j)
+            for(int j=0; j < parametrization().dimX() + parametrization().dimY(); ++j)
             {
                file << x[j] << "\t";
             }
@@ -305,27 +289,23 @@ class BrdfGrid : public vertical_segment {
 
       void save_header(std::ostream& out) const {
          out << "#ALTA HEADER BEGIN" << std::endl;
-         out << "#DIM " << dimX() << " " << dimY() << std::endl;
-         out << "#PARAM_IN  " << params::get_name(_in_param)  << std::endl;
-         out << "#PARAM_OUT " << params::get_name(_out_param) << std::endl;
+         out << "#DIM " << parametrization().dimX() << " "
+             << parametrization().dimY() << std::endl;
+         out << "#PARAM_IN  "
+             << params::get_name(parametrization().input_parametrization())
+             << std::endl;
+         out << "#PARAM_OUT "
+             << params::get_name(parametrization().output_parametrization())
+             << std::endl;
          out << "#grid-size " << _size << std::endl;
          out << "#ALTA HEADER END" << std::endl;
       }
 
-      // Acces to data
-      vec get(int id) const
-      {
-         return vertical_segment::get(id) ;
-      }
       inline vec operator[](int i) const
       {
          return get(i) ;
       }
 
-      void set(const vec& x)
-      {
-         NOT_IMPLEMENTED();
-      }
       void set(int id, const vec& x)
       {
          vertical_segment::set(id, x);
@@ -341,22 +321,22 @@ class BrdfGrid : public vertical_segment {
          const vec x0 = get(id);
 
          // Compute the weights
-         vec alphas(_nX);
-         for(int i=0; i<_nX; ++i) {
+         vec alphas(parametrization().dimX());
+         for(int i = 0; i < parametrization().dimX(); ++i) {
             const auto xdiff = (_size[i]-1) * (x[i]-x0[i]) / (_max[i]-_min[i]);
             alphas[i] = clamp(xdiff, 0.0, 1.0);
             assert(alphas[i] >= 0.0 && alphas[i] <= 1.0);
          }
 
          // Result vector
-         vec y = vec::Zero(_nY);
-         const unsigned int D = pow(2, _nX);
+         vec y = vec::Zero(parametrization().dimY());
+         const unsigned int D = pow(2, parametrization().dimX());
          for(unsigned int d=0; d<D; ++d) {
 
             double alpha = 1.0; // Global alpha
             int    cid_s = 0;   // Id shift
 
-            for(int i=0; i<_nX; ++i) {
+            for(int i=0; i<parametrization().dimX(); ++i) {
                bool bitset = ((1 << i) & d);
                auto calpha =  (bitset) ? alphas[i] : 1.0-alphas[i];
 
@@ -367,14 +347,39 @@ class BrdfGrid : public vertical_segment {
             if(id+cid_s > size())
                cid_s = 0;
 
-            y += alpha * get(id+cid_s).segment(_nX, _nY);
+            y += alpha * get(id+cid_s).segment(parametrization().dimX(),
+                                               parametrization().dimY());
          }
 
          return y;
       }
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments& args)
+ALTA_DLL_EXPORT data* provide_data(size_t size,
+                                   const parameters& params,
+                                   const arguments& args)
 {
-    return new BrdfGrid(args);
+    return new BrdfGrid(size, params, args);
+}
+
+ALTA_DLL_EXPORT data* load_data(std::istream& input,
+                                const arguments& args)
+{
+    arguments header = arguments::parse_header(input);
+
+#ifdef __GNUC__
+# warning FIXME we are not returning a "BrdfGrid"
+#endif
+    // We should probably rewrite this class as a transformation from 'data'
+    // to 'data'.
+
+    abort();
+#if 0
+    BrdfGrid* result = new BrdfGrid(args);
+
+    // XXX: Should be done in constructor.
+    result->initialize(header, false);
+#endif
+
+    return load_data_from_text(input, header);
 }

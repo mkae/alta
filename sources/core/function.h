@@ -1,7 +1,7 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
    Copyright (C) 2013 CNRS
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -34,9 +34,19 @@ namespace alta {
  *  Any function used by the fitting algorithm should overload publicly this
  *  interface.
  */
-class function : public parametrized
+class function
 {
 	public: // methods
+
+    function() ALTA_DEPRECATED
+        : _min(vec::Zero(0)), _max(vec::Zero(0)) { };
+
+    function(const parameters& params):
+        _parameters(params),
+        _min(vec::Zero(params.dimX())),
+        _max(vec::Zero(params.dimX()))
+    {};
+
 
 		/* NEEDED FUNCTIONS */
 
@@ -100,7 +110,31 @@ class function : public parametrized
 		//! hemisphere.
 		double Linf_distance(const ptr<data>& d) const ;
 
+
+    // Definition domain of the function.
+    virtual void setMin(const vec& min) { _min = min; }
+    virtual void setMax(const vec& max) { _max = max; }
+    virtual vec min() const { return _min; }
+    virtual vec max() const { return _max; }
+
+    const parameters& parametrization() const {
+        return _parameters;
+    }
+
+    void setParametrization(const parameters& p) {
+        _parameters = p;
+    }
+
+protected:
+    // Input and output parametrization
+    parameters _parameters;
+    vec _min, _max;
 };
+
+// Suppress warnings about the synthesized zero-argument constructors.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 
 /*! \brief Non-linear function interface
  *  \ingroup core
@@ -118,6 +152,10 @@ class function : public parametrized
 class nonlinear_function: public function
 {
 	public: // methods
+
+    nonlinear_function() ALTA_DEPRECATED;
+
+    nonlinear_function(const parameters& params): function(params) {};
 
 		//! \brief Provide a first rough fit of the function.
 		//!
@@ -174,18 +212,15 @@ class compound_function: public nonlinear_function
 {
 	public: // methods
 
+    compound_function(const std::vector<ptr<nonlinear_function> >& functions,
+                      const std::vector<arguments> args);
+
 		//Destructor
 		virtual ~compound_function();
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const;
 		virtual vec value(const vec& x) const;
-
-		//! Provide a vector like interface
-		//! This function allows to put a new nonlinear function \a f in the 
-		//! compound object. This function will be processed for nonlinear
-		//! optimisation only if \a fixed equals true.
-		virtual void push_back(const ptr<nonlinear_function>& f, const arguments& f_args);
 
 		//! \brief Access to the i-th function of the compound
 		nonlinear_function* operator[](int i) const;
@@ -218,12 +253,6 @@ class compound_function: public nonlinear_function
 		//! Local bootstrap can not overload the global bootstrap.
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		//! Set the dimension of the input space of the function
-		virtual void setDimX(int nX);
-
-		//! Set the dimension of the output space of the function
-		virtual void setDimY(int nY);
-
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min);
 		virtual void setMax(const vec& max);
@@ -254,15 +283,6 @@ class compound_function: public nonlinear_function
 		// dimension first, then parameters.
 		virtual vec parametersJacobian(const vec& x) const;
 
-		//! \brief can set the input parametrization of a non-parametrized
-		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input new_param);
-
-		//! \brief can set the output parametrization of a non-parametrized
-		//! function. Throw an exception if it tries to erase a previously
-		//! defined one.
-		virtual void setParametrization(params::output new_param);
-
 		//! \brief save function specific data. This has no use for ALTA export
 		//! but allows to factorize the code in the C++ or matlab export by
 		//! defining function calls that are common to all the plugins.
@@ -272,6 +292,9 @@ class compound_function: public nonlinear_function
 		//! coefficients will be exported. For a C++ or matlab export, the call
 		//! to the associated function will be done.
 		virtual void save_call(std::ostream& out, const arguments& args) const;
+
+  private:
+    compound_function() ALTA_DEPRECATED { abort(); }
 
 	protected:
 		std::vector<ptr<nonlinear_function>> fs;
@@ -288,6 +311,8 @@ class compound_function: public nonlinear_function
 class product_function : public nonlinear_function
 {
 	public: // methods
+
+    product_function() ALTA_DEPRECATED;
 
 		//! \brief Constructor of the product function, affect the two function
 		//! to already created nonlinear_function objects.
@@ -337,22 +362,10 @@ class product_function : public nonlinear_function
 		//! \brief Provide a first rough fit of the function. 
 		virtual void bootstrap(const ptr<data> d, const arguments& args);
 
-		// Set the dimension of the input/output space of the function
-		virtual void setDimX(int nX);
-		virtual void setDimY(int nY);
-
 		// Acces to the domain of definition of the function
 		virtual void setMin(const vec& min);
 		virtual void setMax(const vec& max);
 		
-		//! Provide the output parametrization of the object.
-		virtual params::output output_parametrization() const;
-		
-		//! Set the input/output parametrization of a non-parametrized
-		//! object. Print an error if it is already defined.
-		virtual void setParametrization(params::input  new_param);
-		virtual void setParametrization(params::output new_param);
-
 		//! \brief Number of parameters to this non-linear function
 		virtual int nbParameters() const;
 		
@@ -384,11 +397,12 @@ class cosine_function : public nonlinear_function
 	public:
 		// Set the input parametrization to CARTESIAN to reduce the number
 		// of transformations in a compound object.
-		cosine_function()
-		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+    cosine_function():
+       nonlinear_function(alta::parameters(6, 0,
+                                           params::CARTESIAN,
+                                           params::UNKNOWN_OUTPUT))
+    {
+    }
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const 
@@ -397,8 +411,10 @@ class cosine_function : public nonlinear_function
 		}
 		virtual vec value(const vec& x) const
 		{
-			vec res(dimY());
-			for(int i=0; i<dimY(); ++i) { res[i] = ((x[2] > 0.0) ? x[2] : 0.0) * ((x[5] > 0.0) ? x[5] : 0.0); }
+			vec res(parametrization().dimY());
+			for(int i=0; i<parametrization().dimY(); ++i) {
+          res[i] = ((x[2] > 0.0) ? x[2] : 0.0) * ((x[5] > 0.0) ? x[5] : 0.0);
+      }
 			return res;
 		}
 
@@ -429,3 +445,5 @@ class cosine_function : public nonlinear_function
 		}
 };
 }
+
+#pragma GCC diagnostic pop

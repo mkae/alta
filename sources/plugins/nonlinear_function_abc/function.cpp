@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -22,9 +22,9 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const parameters& params)
 {
-    return new abc_function();
+    return new abc_function(params);
 }
 
 // Overload the function operator
@@ -36,10 +36,10 @@ vec abc_function::value(const vec& x) const
 {
 
 	// Compute the Shadow term to init res
-	vec res = vec::Zero(dimY());
+	vec res = vec::Zero(_parameters.dimY());
 	const double hn = 1.0 - x[0];
 
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		if(hn >= 0.0 && hn <= 1.0)
 		{
@@ -53,28 +53,17 @@ vec abc_function::value(const vec& x) const
 	return res;
 }
 
-// Reset the output dimension
-void abc_function::setDimY(int nY)
-{
-    _nY = nY ;
-
-    // Update the length of the vectors
-    _a.resize(_nY) ;
-    _b.resize(_nY) ;
-    _c.resize(_nY) ;
-}
-
 //! Number of parameters to this non-linear function
 int abc_function::nbParameters() const 
 {
-	return 3*dimY();
+	return 3*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec abc_function::parameters() const 
 {
 	vec res(nbParameters());
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*3 + 0] = _a[i];
 		res[i*3 + 1] = _b[i];
@@ -87,7 +76,7 @@ vec abc_function::parameters() const
 vec abc_function::getParametersMin() const
 {
 	vec res(nbParameters());
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		res[i*3 + 0] = 0.0;
 		res[i*3 + 1] = 0.0;
@@ -100,7 +89,7 @@ vec abc_function::getParametersMin() const
 //! Update the vector of parameters for the function
 void abc_function::setParameters(const vec& p) 
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_a[i]  = p[i*3 + 0];
 		_b[i]  = p[i*3 + 1];
@@ -113,10 +102,10 @@ void abc_function::setParameters(const vec& p)
 //! \todo finish. 
 vec abc_function::parametersJacobian(const vec& x) const 
 {
-    vec jac(dimY()*nbParameters());
-	 for(int i=0; i<dimY(); ++i)
+    vec jac(_parameters.dimY()*nbParameters());
+	 for(int i=0; i<_parameters.dimY(); ++i)
 	 {
-		 for(int j=0; j<dimY(); ++j)
+		 for(int j=0; j<_parameters.dimY(); ++j)
 		 {
 			 if(i == j)
 			 {
@@ -156,7 +145,7 @@ vec abc_function::parametersJacobian(const vec& x) const
 		
 void abc_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-	for(int i=0; i<dimY(); ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		_a[i]  = 1.0;
 		_b[i]  = 1.0;
@@ -165,13 +154,19 @@ void abc_function::bootstrap(const ptr<data> d, const arguments& args)
 	
 	if(args.is_defined("param"))
 	{
-		setParametrization(params::parse_input(args["param"]));
+      alta::parameters new_params(_parameters.dimX(), _parameters.dimY(),
+                                  params::parse_input(args["param"]),
+                                  _parameters.output_parametrization());
+      setParametrization(new_params);
 	}
 	else
 	{
-		setParametrization(params::COS_TH);
+      alta::parameters new_params(_parameters.dimX(), _parameters.dimY(),
+                                  params::COS_TH,
+                                  _parameters.output_parametrization());
+      setParametrization(new_params);
 	}
-	if(params::dimension(input_parametrization()) != 1)
+	if(params::dimension(_parameters.input_parametrization()) != 1)
 	{
 		std::cerr << "<<ERROR>> the parametrization specifed in the file for the ABC model is incorrect" << std::endl;
 	}
@@ -215,14 +210,18 @@ bool abc_function::load(std::istream& in)
         return false;
 	}
 	in >> token;
-	setParametrization(params::parse_input(token));
-	if(params::dimension(input_parametrization()) != 1)
+
+	setParametrization(alta::parameters(_parameters.dimX(), _parameters.dimY(),
+                                      params::parse_input(token),
+                                      _parameters.output_parametrization()));
+
+	if(params::dimension(_parameters.input_parametrization()) != 1)
 	{
 		std::cerr << "<<ERROR>> the parametrization specifed in the file for the ABC model is incorrect" << std::endl;
 	}
 
 	// Parse the lobe
-	for(int i=0; i<_nY; ++i)
+	for(int i=0; i<parametrization().dimY(); ++i)
 	{
 
 		in >> token >> _a[i];
@@ -240,9 +239,10 @@ void abc_function::save_call(std::ostream& out, const arguments& args) const
     if(is_alta)
     {
 		out << "#FUNC nonlinear_function_abc" << std::endl ;
-		out << "#PARAM " << params::get_name(input_parametrization()) << std::endl;
+		out << "#PARAM " << params::get_name(_parameters.input_parametrization())
+        << std::endl;
 
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << "a  " << _a[i]  << std::endl;
 			 out << "b  " << _b[i]  << std::endl;
@@ -254,24 +254,24 @@ void abc_function::save_call(std::ostream& out, const arguments& args) const
 	 else
 	 {
 		 out << "abc(L, V, N, X, Y, vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << _a[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < parametrization().dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << _b[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < parametrization().dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<parametrization().dimY(); ++i)
 		 {
 			 out << _c[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < parametrization().dimY()-1) { out << ", "; }
 		 }
 		 out << "))";
 	 }

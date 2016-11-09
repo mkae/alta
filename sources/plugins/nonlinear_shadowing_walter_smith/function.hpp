@@ -44,7 +44,7 @@ class WalterSmith : public nonlinear_function
 
   public: // methods
 
-    WalterSmith();
+    WalterSmith(const alta::parameters&);
 
     //! \brief Load function specific files
     virtual bool load(std::istream& in) ;
@@ -76,9 +76,6 @@ class WalterSmith : public nonlinear_function
 
     //! \brief Boostrap the function by defining the diffuse term
     virtual void bootstrap(const ptr<data> d, const arguments& args);
-
-    //! \brief resize the parameter vector
-    virtual void setDimY(int nY);
 
   private:
     double shadowTerm( double a ) const;
@@ -142,6 +139,7 @@ class WalterSmith : public nonlinear_function
   double const SQRT_PI;
   #endif
 
+  WalterSmith(): LOCAL_EPSILON(0.) {};
 } ;
 
 

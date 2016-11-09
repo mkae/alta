@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -18,175 +18,162 @@
 #include <algorithm>
 #include <cmath>
 #include <cassert>
+#include <cstring>
 
 using namespace alta;
+using namespace Eigen;
 
 //#define RELATIVE_ERROR
 
-vertical_segment::vertical_segment(unsigned int dim_X, 
-                                   unsigned int dim_Y, 
-                                   unsigned int size)
-	: data(dim_X, dim_Y), _is_absolute(true), _dt(0.1) 
+// Note: For some reason returning an rvalue here doesn't work, so let's hope
+// RVO comes into play.
+static vec data_min(Ref<MatrixXd> data)
 {
-	initializeToZero( size );
+    vec min = VectorXd::Constant(data.rows(),
+                                 std::numeric_limits<double>::max());
+
+    for(int i = 0; i < data.cols(); i++)
+    {
+        auto col = data.col(i);
+        for (int k = 0; k < data.rows(); ++k)
+        {
+            min[k] = std::min(min[k], col[k]);
+        }
+    }
+
+    return min;
 }
 
-vertical_segment::vertical_segment( params::input in_param, 
-                                   	params::output out_param,
-                                   	unsigned int size )
-	: data( in_param, out_param), _is_absolute(true), _dt(0.1)
+static vec data_max(Ref<MatrixXd> data)
 {
-	initializeToZero( size );
+    vec max = VectorXd::Constant(data.rows(),
+                                 -std::numeric_limits<double>::max());
+
+    for(int i = 0; i < data.cols(); i++)
+    {
+        auto col = data.col(i);
+        for (int k = 0; k < data.rows(); ++k)
+        {
+            max[k] = std::max(max[k], col[k]);
+        }
+    }
+
+    return max;
 }
 
-void 
-vertical_segment::initializeToZero( unsigned int number_of_data_elements )
+// Return a matrix view of PTR showing only the 'dimX' first rows of that
+// matrix.
+static Ref<MatrixXd>
+x_view(double *ptr, size_t cols, const parameters& params,
+       vertical_segment::ci_kind kind)
 {
-	_data.clear();
+    auto stride = params.dimX() + params.dimY()
+        + vertical_segment::confidence_interval_columns(kind, params);
 
-	unsigned int const  size_of_one_element = dimX() + 3*dimY();
-	
-	for( unsigned int i=0; i < number_of_data_elements; i++)
-	{
-		vec initial_element = vec::Zero( size_of_one_element );
-		_data.push_back( initial_element );
-	}
+    return Map<MatrixXd, 0, OuterStride<> >(ptr, params.dimX(), cols,
+                                            OuterStride<>(stride));
 }
 
-
-
-void vertical_segment::load(const std::string& filename) 
+vertical_segment::vertical_segment(const parameters& params,
+                                   size_t size,
+                                   std::shared_ptr<double> input_data,
+                                   ci_kind kind)
+    : data(params, size,
+           data_min(x_view(input_data.get(), size, params, kind)),
+           data_max(x_view(input_data.get(), size, params, kind))),
+      _data(input_data),
+      _ci_kind(kind),
+      _is_absolute(true), _dt(0.1)
 {
-	arguments args ;
-	load(filename, args) ;
 }
 
-void vertical_segment::load(const std::string& filename, const arguments& args) 
+// Work around the lack of array support in C++11's 'shared_ptr'.
+static void delete_array(double *thing)
 {
-	std::ifstream file;
-
-	// Raise an exception when 'open' fails.
-	file.exceptions (std::ios::failbit);
-	file.open(filename.c_str());
-	file.exceptions (std::ios::goodbit);
-
-	arguments header = arguments::parse_header(file);
-
-	// Default behaviour: parsing a file as TEXT file. Send a message error in case
-	// the user did not set it.
-	if(! header.is_defined("FORMAT")) {
-		std::cerr << "<<DEBUG>> The file format is undefined, assuming TEXT" << std::endl;
-	}
-
-	if (header["FORMAT"] == "binary") {
-
-#ifdef _WIN32
-      // On MS Windows strange things happen when the ifstream is not opened in
-      // binary mode.  To avoid having badbit set after a few entries read, we
-      // close and re-open the file with correct flags.
-      file.close();
-      file.open(filename.c_str(), std::ifstream::binary);
-      header = arguments::parse_header(file);
-#endif
-
-		load_data_from_binary(file, header, *this);
-	} else {
-		load_data_from_text(file, header, *this, args);
-	}
-
-	file.close();
+    delete[] thing;
 }
+
+vertical_segment::vertical_segment(const parameters& params, unsigned int rows):
+    // Create a data object with a "value-initialized" (i.e., zeroed) array.
+    vertical_segment(params, rows,
+                     std::shared_ptr<double>
+                     (new double[rows * (params.dimX() + 3 * params.dimY())]{},
+                      delete_array))
+{
+}
+
 
 void vertical_segment::get(int i, vec& x, vec& yl, vec& yu) const
 {
+    // Make sure we have the lower and upper bounds of Y.
+    assert(confidence_interval_kind() == ASYMMETRICAL_CONFIDENCE_INTERVAL);
+
+    auto matrix = matrix_view();
+
 #ifdef DEBUG
-    assert(i >= 0 && i < _data.size());
+    assert(i >= 0 && i < matrix.size());
 #endif
-    x.resize(dimX()); yl.resize(dimY()) ; yu.resize(dimY()) ;
-    for(int j=0; j<dimX(); ++j)
+    x.resize(_parameters.dimX()); yl.resize(_parameters.dimY()) ; yu.resize(_parameters.dimY()) ;
+    for(int j=0; j<_parameters.dimX(); ++j)
     {
-        x[j] = _data[i][j];
+        x[j] = matrix(i, j);
     }
-    for(int j=0; j<dimY(); ++j)
+    for(int j=0; j<_parameters.dimY(); ++j)
     {
-        yl[j] = _data[i][dimX() + 1*dimY() + j];
-        yu[j] = _data[i][dimX() + 2*dimY() + j];
+        yl[j] = matrix(i, _parameters.dimX() + 1*_parameters.dimY() + j);
+        yu[j] = matrix(i, _parameters.dimX() + 2*_parameters.dimY() + j);
     }
 }
-		
+
 void vertical_segment::get(int i, vec& yl, vec& yu) const
 {
-	yl.resize(dimY()) ; yu.resize(dimY()) ;
-	for(int j=0; j<dimY(); ++j)	
-	{
-		yl[j] = _data[i][dimX() + dimY() + j] ;
-		yu[j] = _data[i][dimX() + 2*dimY() + j] ;
-	}
+    // Make sure we have the lower and upper bounds of Y.
+    assert(confidence_interval_kind() == ASYMMETRICAL_CONFIDENCE_INTERVAL);
+
+    auto matrix = matrix_view();
+
+    yl.resize(_parameters.dimY()) ; yu.resize(_parameters.dimY()) ;
+    for(int j=0; j<_parameters.dimY(); ++j)
+    {
+        yl[j] = matrix(i, _parameters.dimX() + _parameters.dimY() + j);
+        yu[j] = matrix(i, _parameters.dimX() + 2*_parameters.dimY() + j);
+    }
 }
 
-vec vertical_segment::get(int i) const 
+vec vertical_segment::get(int i) const
 {
-	//SLOW !!!!! and useless 
-	// call _data[i]
-    const int n = dimX() + dimY();
-    vec res = _data[i].head(n);
-    
-    return res ;
-}
-
-//! \todo Check the vertical segment size and if the data
-//! is not already present.
-void vertical_segment::set(const vec& x)
-{
-   // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),
-   // if it only has the size of a single value, then create the segment.
-   if(x.size() == dimX() + 3*dimY()) {
-      _data.push_back(x);
-
-   } else if(x.size() == dimX() + dimY()) {
-      _data.push_back(vs(x));
-
-   } else {
-      std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
-      throw;
-   }
+    return data_view().col(i);
 }
 
 void vertical_segment::set(int i, const vec& x)
 {
    // Check if the input data 'x' has the size of a vertical segment (i.e. dimX+3*dimY),
    // if it only has the size of a single value, then create the segment.
-   if(x.size() == dimX() + 3*dimY()) {
-      _data[i] = x;
-
-   } else if(x.size() == dimX() + dimY()) {
-      _data[i] = vs(x);
-
+   if(x.size() == column_number()
+      || x.size() == _parameters.dimX() + _parameters.dimY())
+   {
+       auto row = matrix_view().row(i);
+       row.head(x.size()) = x;
    } else {
       std::cerr << "<<ERROR>> Passing an incorrect element to vertical_segment::set" << std::endl;
       throw;
    }
 }
 
-int vertical_segment::size() const
-{
-	return _data.size() ;
-}
-
 vec vertical_segment::vs(const vec& x) const {
-   vec y(dimX() + 3*dimY());
+   vec y(_parameters.dimX() + 3*_parameters.dimY());
 
    // Copy the head of each vector
-   y.head(dimX() + dimY()) = x.head(dimX() + dimY());
+   y.head(_parameters.dimX() + _parameters.dimY()) = x.head(_parameters.dimX() + _parameters.dimY());
    
-   for(unsigned int i=0; i<dimY(); ++i) {
-      const double val = x[i + dimX()];
+   for(unsigned int i=0; i<_parameters.dimY(); ++i) {
+      const double val = x[i + _parameters.dimX()];
       if(_is_absolute) {
-         y[i + dimX()+1*dimY()] = val - _dt;
-         y[i + dimX()+2*dimY()] = val + _dt;
+         y[i + _parameters.dimX()+1*_parameters.dimY()] = val - _dt;
+         y[i + _parameters.dimX()+2*_parameters.dimY()] = val + _dt;
       } else {
-         y[i + dimX()+1*dimY()] = val * (1.0 - _dt);
-         y[i + dimX()+2*dimY()] = val * (1.0 + _dt);
+         y[i + _parameters.dimX()+1*_parameters.dimY()] = val * (1.0 - _dt);
+         y[i + _parameters.dimX()+2*_parameters.dimY()] = val * (1.0 + _dt);
       }
    }
 

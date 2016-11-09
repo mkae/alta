@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013 Inria
+   Copyright (C) 2013, 2016 Inria
    Copyright (C) 2015 CNRS
 
    This file is part of ALTA.
@@ -59,7 +59,7 @@ class MatlabInterpolant : public data
 
 	public: // methods
 		MatlabInterpolant()
-    : _data( ptr<data>( new vertical_segment() ) )
+    : _data( ptr<data>( new vertical_segment() ) ) // FIXME: size?
 		{
 			// Create matlab engine
 		#ifdef WIN32
@@ -86,11 +86,14 @@ class MatlabInterpolant : public data
 			engClose(ep);
 		}
 
+    // FIXME: The following method should be converted to a 'load_data'
+    // function.
+#if 0
 		// Load data from a file
-		virtual void load(const std::string& filename)
+		virtual void load(std::istream& input, const arguments& args)
 		{
 			// Load the data
-			_data->load(filename);
+      _data->load(input, args);
 
 			// Copy the informations
 			setDimX(_data->dimX());
@@ -128,10 +131,7 @@ class MatlabInterpolant : public data
 
 			x = mxCreateDoubleMatrix(1, dimX(), mxREAL);
 		}
-		virtual void load(const std::string& filename, const arguments&)
-		{
-			load(filename);
-		}
+#endif
 
 		virtual void save(const std::string& filename) const
 		{
@@ -149,10 +149,6 @@ class MatlabInterpolant : public data
 			return get(i) ;
 		}
 
-		virtual void set(const vec& x)
-		{
-			NOT_IMPLEMENTED();
-		}
 		virtual void set(int i, const vec& x)
 		{
 			_data->set(i, x);
@@ -213,15 +209,9 @@ class MatlabInterpolant : public data
 
 		   return res;
 		}
-
-		// Get data size, e.g. the number of samples to fit
-		virtual int size() const
-		{
-			return _data->size();
-		}
 };
 
-ALTA_DLL_EXPORT data* provide_data(const arguments&)
+ALTA_DLL_EXPORT data* provide_data(size_t, const parameters&, const arguments&)
 {
     return new MatlabInterpolant();
 }

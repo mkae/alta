@@ -108,28 +108,28 @@ struct iterator_vec {
 
 /* Specific function call to acces a vector's element
  */
-double vec_get_item(const vec& x, int i) {
+static double vec_get_item(const vec& x, int i) {
 	return x[i];
 }
 
 /* Specific function call to set a vector's element
  */
-void vec_set_item(vec& x, int i, double a) {
+static void vec_set_item(vec& x, int i, double a) {
 	x[i] = a;
 }
 
 /* Operators on vec
  */
-inline vec vec_add(const vec& a, const vec& b) {
+static vec vec_add(const vec& a, const vec& b) {
    return a + b;
 }
-inline vec vec_sub(const vec& a, const vec& b) {
+static vec vec_sub(const vec& a, const vec& b) {
    return a - b;
 }
 
 /* Specific convert a vec to a string
  */
-std::string vec_str(const vec& x) {
+static std::string vec_str(const vec& x) {
    std::stringstream stream;
    stream << "[";
    for(int i=0; i<x.size(); ++i) {
@@ -142,7 +142,7 @@ std::string vec_str(const vec& x) {
 
 /* Register the vector class to boost python
  */
-void register_wrapper_vec() {
+static void register_wrapper_vec() {
 
    converter_vec_list::register_converter();
 

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -48,11 +48,14 @@ class abc_function : public nonlinear_function
 
 	public: // methods
 
-		abc_function()
-		{
-			setParametrization(params::COS_TH);
-			setDimX(1);
-		}
+    abc_function(const alta::parameters& params)
+        : nonlinear_function(params)
+    {
+        // Update the length of the vectors
+        _a.resize(params.dimY());
+        _b.resize(params.dimY());
+        _c.resize(params.dimY());
+    }
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -86,11 +89,10 @@ class abc_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
-
 	private: // data
 
 		vec _a, _b, _c; // Lobes data
+
+    abc_function() {};
 } ;
 

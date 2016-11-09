@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -38,11 +38,7 @@ class beckmann_function : public nonlinear_function
 
 	public: // methods
 
-		beckmann_function()
-		{
-			setParametrization(params::CARTESIAN);
-			setDimX(6);
-		}
+	  beckmann_function(const alta::parameters& params);
 
 		// Overload the function operator
 		virtual vec operator()(const vec& x) const ;
@@ -79,18 +75,11 @@ class beckmann_function : public nonlinear_function
 		//! parameters. 
 		virtual vec parametersJacobian(const vec& x) const ;
 
-		//! \brief Provide the dimension of the input space of the function
-		virtual int dimX() const
-		{
-			return 6;
-		}
-
-		//! \brief Set the number of output dimensions
-		void setDimY(int nY);
-
 	private: // data
 
 		vec _ks; //Specular coefficients. One per color/wavelength
 		vec _a; // Roughness parameters.  One per color/wavelength
+
+    beckmann_function();
 } ;
 

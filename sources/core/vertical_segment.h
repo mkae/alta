@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014, 2015 Inria
+   Copyright (C) 2013, 2014, 2015, 2016 Inria
 
    This file is part of ALTA.
 
@@ -78,34 +78,29 @@ namespace alta {
  */
 class vertical_segment : public data
 {
+   public: // types
+
+      // The type of confidence interval.
+      enum ci_kind
+      {
+          NO_CONFIDENCE_INTERVAL = 0,
+          SYMMETRICAL_CONFIDENCE_INTERVAL,
+          ASYMMETRICAL_CONFIDENCE_INTERVAL
+      };
+
+
    public: // methods
 
-      //! \brief Default constructor that does nothing at all.
-      vertical_segment() {}
+      vertical_segment(const parameters& params,
+                       size_t size,
+                       std::shared_ptr<double> data,
 
-      vertical_segment(unsigned int dim_X, unsigned int dim_Y, unsigned int size);
+                       // Currently we default to always storing asymmetrical
+                       // CI data for Y.
+                       ci_kind kind = ASYMMETRICAL_CONFIDENCE_INTERVAL);
 
-      //! \brief Construct vertical segment data for a given size and where the size of each element
-      //! is also given. All data are initialized to zero
-      vertical_segment( params::input in_param,
-                      params::output out_param,
-                      unsigned int size );
-
-
-      // Load data from a file
-      virtual void load(const std::string& filename) ;
-
-      //! \brief Load data from a file using the command line arguments
-      //!
-      //! \details
-      //! Specific arguments for the vertical segment data
-      //!   --dt specify a value for the absolute/relative segment if not defined
-      //!        in the data
-      //!   --data-positive for the data to be positive
-      //!   --dt-relative use a relative segment intervale. The dt is used
-      //!     multipled by the data
-      virtual void load(const std::string& filename, const arguments& args) ;
-
+      vertical_segment(const parameters& params, unsigned int size)
+          ALTA_DEPRECATED;
 
       // Acces to data
       virtual vec get(int i) const ;
@@ -114,8 +109,7 @@ class vertical_segment : public data
          NOT_IMPLEMENTED();
       }
 
-      //! \brief Put the sample inside the data
-      virtual void set(const vec& x);
+      //! \brief Put the sample inside the data at index I.
       virtual void set(int i, const vec& x);
 
       //! \brief Specific accessor to a vertical segment, this gives the
@@ -126,21 +120,68 @@ class vertical_segment : public data
       //! ordinate segment.
       virtual void get(int i, vec& yl, vec& yu) const ;
 
-      // Get data size
-      virtual int size() const ;
+      //! \brief Return the type of CI data provided by this object.
+      ci_kind confidence_interval_kind() const
+      {
+          return _ci_kind;
+      }
+
+      //! \brief Return the number of columns used to store confidence
+      //! interval data.
+      size_t confidence_interval_columns() const
+      {
+          return confidence_interval_columns(_ci_kind, _parameters);
+      }
+
+      //! \brief Return the number of columns used to store confidence
+      //! interval data for KIND.
+      static size_t confidence_interval_columns(ci_kind kind,
+                                                const parameters& params)
+      {
+          // Currently we're only storing CI data for Y, not for X.
+          switch (kind)
+          {
+          case NO_CONFIDENCE_INTERVAL:
+              return 0;
+          case SYMMETRICAL_CONFIDENCE_INTERVAL:
+              return params.dimY();
+          case ASYMMETRICAL_CONFIDENCE_INTERVAL:
+              return 2 * params.dimY();
+          default:
+              abort();
+          }
+      }
+
+      //! \brief Return the number of columns in each row.
+      size_t column_number() const
+      {
+          return _parameters.dimX() + _parameters.dimY()
+              + confidence_interval_columns();
+      }
+
+      //! \brief Return a matrix view of the data: all the Xi and Yi followed
+      // by confidence interval data (lower and upper bound of the Yi).
+      // Thus, it has (dimX + dimY + N * dimY) columns, where N is between 0
+      // and 2 depending on the confidence interval data available, and SIZE
+      // rows.
+      Eigen::Map<Eigen::MatrixXd> matrix_view() const
+      {
+          return Eigen::Map<Eigen::MatrixXd>(_data.get(), size(),
+                                             column_number());
+      }
 
    private: // method
 
+      //! \brief Return a matrix view of DATA that excludes confidence
+      // interval data.  It has (dimX + dimY) columns and SIZE rows.
+      Eigen::Map<Eigen::MatrixXd, 0, Eigen::OuterStride<> > data_view() const
+      {
+          return Eigen::Map<Eigen::MatrixXd, 0, Eigen::OuterStride<> >
+              (_data.get(), _parameters.dimX() + _parameters.dimY(), size(),
+               Eigen::OuterStride<>(column_number()));
+      }
+
   protected: // method
-
-      // Pre-allocate 'number_of_data_elements' elements for this data
-      // object. Note, the input and output dimension needs to be specified.
-      void initializeToZero( unsigned int number_of_data_elements );
-
-      static void load_data_from_text(std::istream& input,
-                                                      const arguments& header,
-                                                      vertical_segment& result,
-                                                      const arguments& args);
 
       //! \brief From a correct input configuration 'x' with size
       //! dimX()+dimY(), generate a vertical ! segment satisfying this object's
@@ -149,9 +190,11 @@ class vertical_segment : public data
 
 	protected: // data
 
-		// Store for each point of data, the upper
-		// and lower value
-		std::vector<vec> _data ;
+      // Store for each point of data, the upper and lower value.
+      std::shared_ptr<double> _data;
+
+      // Type of confidence interval data available.
+      const ci_kind _ci_kind;
 
       // Store the different arguments for the vertical segment: is it using
       // relative or absolute intervals? What is the dt used ?

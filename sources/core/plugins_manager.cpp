@@ -11,7 +11,7 @@
 
 #include "plugins_manager.h"
 #include "rational_function.h"
-#include "vertical_segment.h"
+#include "data_storage.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -31,32 +31,32 @@ using namespace alta;
 //! prepending 'lib' depending on the plateform.
 static std::string library_name(const std::string name)
 {
-	std::string filename;
+  std::string filename;
 
-	const int n = name.length();
+  const int n = name.length();
 #if defined( _WIN32)
-	if(name.substr(n-4, n) != std::string("dll")) {
-		filename.append(name);
-		filename.append(".dll");
-	}
+  if(name.substr(n-4, n) != std::string("dll")) {
+    filename.append(name);
+    filename.append(".dll");
+  }
 #elif defined(__APPLE__)
-	if(name.substr(n-5, n) != std::string("dylib")) {
-		filename.append("lib");
-		filename.append(name);
-		filename.append(".dylib");
-	}
+  if(name.substr(n-5, n) != std::string("dylib")) {
+    filename.append("lib");
+    filename.append(name);
+    filename.append(".dylib");
+  }
 #else
-	if(name.substr(n-2, n) != std::string("so")) {
-		filename.append("lib");
-		filename.append(name);
-		filename.append(".so");
-	}
+  if(name.substr(n-2, n) != std::string("so")) {
+    filename.append("lib");
+    filename.append(name);
+    filename.append(".so");
+  }
 #endif
-	else {
-		filename.append(name);
-	}
+  else {
+    filename.append(name);
+  }
 
-	return filename;
+  return filename;
 }
 
 // Return the plugin search path based on the 'ALTA_PLUGIN_PATH' environment
@@ -65,14 +65,14 @@ static std::string library_name(const std::string name)
 static std::list<std::string> plugin_search_path()
 {
   std::list<std::string> dirs;
-	std::string obj_str ;
-	const char *env_str = std::getenv("ALTA_PLUGIN_PATH");
+  std::string obj_str ;
+  const char *env_str = std::getenv("ALTA_PLUGIN_PATH");
 
-	if(env_str == NULL) {
-		obj_str = "";
-	} else {
+  if(env_str == NULL) {
+    obj_str = "";
+  } else {
     obj_str = env_str;
-	}
+  }
 
   if (obj_str.empty())
       // Always add at least the system's plugin directory.
@@ -110,8 +110,8 @@ static T open_library(const std::string& filename, const char* function)
 {
   auto directories = plugin_search_path();
 
-	for (auto&& directory: directories)
-	{
+  for (auto&& directory: directories)
+  {
     auto libname = directory + "/" + library_name(filename);
 
 #ifdef _WIN32
@@ -123,9 +123,9 @@ static T open_library(const std::string& filename, const char* function)
         if(res == NULL)
         {
 #ifdef DEBUG_CORE
-			  std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+        std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
 #endif
-			  continue;
+        continue;
         }
 #ifdef DEBUG_CORE
         std::cout << "<<DEBUG>> will provide a " << function << " for library \"" << filename << "\"" << std::endl;
@@ -138,15 +138,15 @@ static T open_library(const std::string& filename, const char* function)
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
         std::cerr << "          cause: \"" << GetLastError() << "\"" << std::endl;
 #endif
-		 continue;
+     continue;
     }
 #else
     void* handle = dlopen(libname.c_str(), RTLD_GLOBAL | RTLD_LAZY);
 
-	 if(handle != NULL)
-	 {
-		 void (*res)();
-		 *(void **)(&res) = dlsym(handle, function);
+   if(handle != NULL)
+   {
+     void (*res)();
+     *(void **)(&res) = dlsym(handle, function);
 
         if(dlerror() != NULL)
         {
@@ -164,83 +164,76 @@ static T open_library(const std::string& filename, const char* function)
     {
 #ifdef DEBUG_CORE
         std::cerr << "<<ERROR>> unable to load the dynamic library file \"" << libname << "\"" << std::endl;
-		  std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
+      std::cerr << "          cause: \"" << dlerror() << "\"" << std::endl;
 #endif
         continue;
     }
 #endif
-	}
+  }
 
-	std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
-	return NULL;
+  std::cerr << "<<ERROR>> unable to load the symbol \"" << function << "\" from " << filename << std::endl;
+  return NULL;
 }
 
 //! \brief load a function from the ALTA input file.
 function* plugins_manager::load_function(const std::string& filename)
 {
-	std::ifstream file;
-	file.open(filename.c_str()) ;
-	if(!file.is_open())
-	{
-		std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
-		return NULL;
-	}
+  std::ifstream file;
+  file.open(filename.c_str()) ;
+  if(!file.is_open())
+  {
+    std::cerr << "<<ERROR>> unable to open file \"" << filename << "\"" << std::endl ;
+    return NULL;
+  }
 
-	// Set the precision of the input
-	file.precision(10);
+  // Set the precision of the input
+  file.precision(10);
 
-	// Parameters of the function object
-	int nX, nY;
-	params::input param_in   = params::UNKNOWN_INPUT;
-	params::output param_out = params::UNKNOWN_OUTPUT;
-	arguments args;
+  // Parameters of the function object
+  params::input param_in   = params::UNKNOWN_INPUT;
+  params::output param_out = params::UNKNOWN_OUTPUT;
+  arguments args;
 
-	// Test for the first line of the file. Should be a ALTA FUNC HEADER
-	std::string line ;
-	std::getline(file, line) ;
-	if(line != "#ALTA FUNC HEADER")
-	{
-		std::cerr << "<<ERROR>> this is not a function file" << std::endl;
+  // Test for the first line of the file. Should be a ALTA FUNC HEADER
+  std::string line ;
+  std::getline(file, line) ;
+  if(line != "#ALTA FUNC HEADER")
+  {
+    std::cerr << "<<ERROR>> this is not a function file" << std::endl;
 
     //RP: Returning NULL immediately now
     return NULL;
-	}
-
-	// Parse the header for the function command line and the dimension
-	// of the function
-	arguments header = arguments::parse_header(file);
-
-	std::pair<int, int> dim = header.get_pair<int>("DIM");
-	nX = dim.first;
-	nY = dim.second;
-
-	param_in = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
-	param_out = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
-	args = arguments::create_arguments(header["CMD"]);
-
-	// Create the function from the command line
-	function* f = get_function(args);
-	f->setDimX(nX);
-	f->setDimY(nY);
-  if(f->input_parametrization() == params::UNKNOWN_INPUT)
-  {
-    f->setParametrization(param_in);
   }
-	f->setParametrization(param_out);
 
-	// Load the function part from the file object
+  // Parse the header for the function command line and the dimension
+  // of the function
+  arguments header = arguments::parse_header(file);
+
+  std::pair<int, int> dim = header.get_pair<int>("DIM");
+
+  param_in = params::parse_input(header.get_string("PARAM_IN", "UNKNOWN_INPUT"));
+  param_out = params::parse_output(header.get_string("PARAM_OUT", "UNKNOWN_OUTPUT"));
+  args = arguments::create_arguments(header["CMD"]);
+
+  parameters params(dim.first, dim.second, param_in, param_out);
+
+  // Create the function from the command line
+  function* f = get_function(args, params);
+
+  // Load the function part from the file object
   if( f->load(file) )
   {
     return f;
   }
 
   std::cout << "<<ERROR>> COULD NOT LOAD THE BRDF from File " << filename << std::endl;
-	 return NULL;
+   return NULL;
 }
 
 //! Get an instance of the function selected based on the name <em>n</em>.
 //! Return NULL if none exists.
-function* plugins_manager::get_function(const arguments& args)
+function* plugins_manager::get_function(const arguments& args,
+                                        const parameters& params)
 {
   #ifdef DEBUG
   std::cout << __FILE__ << " " << __LINE__ << std::endl;
@@ -252,7 +245,7 @@ function* plugins_manager::get_function(const arguments& args)
     #ifdef DEBUG
     std::cout << "<<DEBUG>> no function plugin specified, returning a rational function" << std::endl;
     #endif
-    return new rational_function();
+    return new rational_function(params);
   }
 
   // The function to be returned.
@@ -272,11 +265,11 @@ function* plugins_manager::get_function(const arguments& args)
         return NULL;
     }
 
-	 //! create a *compound* class to store multiple ! functions in it.
-    compound_function* compound = new compound_function();
+   //! For each args_vec element, create a function object and add ! it to the
+   //compound one.
+    std::vector<ptr<nonlinear_function> > functions(args_vec.size());
+    std::vector<arguments> function_args(args_vec.size());
 
-	 //! For each args_vec element, create a function object and add ! it to the
-	 //compound one.
     for(unsigned int i=0; i<args_vec.size(); ++i)
     {
       std::string n("--func ");
@@ -291,7 +284,7 @@ function* plugins_manager::get_function(const arguments& args)
       arguments temp_args = arguments::create_arguments(n);
 
       //Recursive call
-      function* f = get_function(temp_args);
+      function* f = get_function(temp_args, params);
       nonlinear_function *nl_f = dynamic_cast<nonlinear_function*>(f);
       if(nl_f == NULL)
       {
@@ -299,12 +292,17 @@ function* plugins_manager::get_function(const arguments& args)
       }
       else
       {
-          compound->push_back(ptr<nonlinear_function>(nl_f), temp_args);
+          functions[i] = ptr<nonlinear_function>(nl_f);
+          function_args[i] = temp_args;
       }
     }
 
-		  //! return the compound class 
-		  func = compound;
+    //! create a *compound* class to store multiple ! functions in it.
+    compound_function* compound = new compound_function(functions, function_args);
+
+
+      //! return the compound class
+      func = compound;
       #ifdef DEBUG
       std::cout << __FILE__ << " " << __LINE__ << " WE HAVE A COMPOUND " << std::endl;
       #endif
@@ -319,12 +317,12 @@ function* plugins_manager::get_function(const arguments& args)
       std::cout << "<<DEBUG>> using function provider in file \"" << filename << "\"" << std::endl;
       #endif
       
-      func =  myFunction();
+      func =  myFunction(params);
     }
     else
     {
       std::cerr << "<<ERROR>> no function provider found in file \"" << filename << "\"" << std::endl;
-      return new rational_function() ;
+      return new rational_function(params) ;
     }
   }
 
@@ -358,13 +356,13 @@ function* plugins_manager::get_function(const arguments& args)
        std::string fname = args["fresnel"];
        if(fname.empty()) // Nothing to do except print error, no plugin defined
        {
-      	 std::cerr << "<<ERROR>> Fresnel plugin not defined" << std::endl;
-      	 std::cerr << "<<ERROR>> using --fresnel alone is not permitted" << std::endl;
-      	 return func;
+         std::cerr << "<<ERROR>> Fresnel plugin not defined" << std::endl;
+         std::cerr << "<<ERROR>> using --fresnel alone is not permitted" << std::endl;
+         return func;
        }
        else // Case where the fresnel parameters is only the plugin filename
        {
-      	 n.append(fname);
+         n.append(fname);
        }
       }
 
@@ -372,8 +370,10 @@ function* plugins_manager::get_function(const arguments& args)
       std::cout << __FILE__ << " " << __LINE__ << std::endl;
       std::cout << " n = " << n << std::endl;
       #endif
-       
-      nonlinear_function* func_fres = dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n)));
+
+      nonlinear_function* func_fres =
+          dynamic_cast<nonlinear_function*>(get_function(arguments::create_arguments(n),
+                                                         params));
       if(func_fres != NULL)
       {
         bool const fresnel_is_fixed = (args.is_defined("fixed-fresnel")) ? (true) : (false);
@@ -397,17 +397,17 @@ function* plugins_manager::get_function(const arguments& args)
         std::cerr << "<<ERROR>> the right part of the product is not a nonlinear function. Will use only the left part." << std::endl;
         return func;
       }
-	 }
+   }
 
    
 /*
-	 // Correction of the data by 1/cosine(theta_L)
-	 if(args.is_defined("data-correct-cosine"))
-	 {
-		 nonlinear_function* cosine = new cosine_function();
-		 func = new product_function(cosine, dynamic_cast<nonlinear_function*>(func));
-	 }
-	 // End of correction
+   // Correction of the data by 1/cosine(theta_L)
+   if(args.is_defined("data-correct-cosine"))
+   {
+     nonlinear_function* cosine = new cosine_function();
+     func = new product_function(cosine, dynamic_cast<nonlinear_function*>(func));
+   }
+   // End of correction
 */
 
 
@@ -415,7 +415,8 @@ function* plugins_manager::get_function(const arguments& args)
 }
 
 
-ptr<function> plugins_manager::get_function(const std::string& n)
+ptr<function> plugins_manager::get_function(const std::string& n,
+                                            const parameters& params)
 {
     if(n.empty())
     {
@@ -425,13 +426,13 @@ ptr<function> plugins_manager::get_function(const std::string& n)
         return NULL;
     }
 
-	 FunctionPrototype myFunc = open_library<FunctionPrototype>(n, "provide_function");
+   FunctionPrototype myFunc = open_library<FunctionPrototype>(n, "provide_function");
     if(myFunc != NULL)
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using function provider in file \"" << n << "\"" << std::endl;
 #endif
-        return ptr<function>(myFunc());
+        return ptr<function>(myFunc(params));
     }
     else
     {
@@ -441,30 +442,85 @@ ptr<function> plugins_manager::get_function(const std::string& n)
 }
 
 
-ptr<data> plugins_manager::get_data(const std::string& n, const arguments& args)
+ptr<data> plugins_manager::get_data(const std::string& n, size_t size,
+                                    const parameters& params,
+                                    const arguments& args)
 {
     if(n.empty() || n == "vertical_segment")
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> no data plugin specified, returning a vertical_segment loader" << std::endl;
 #endif
-        return ptr<data>(new vertical_segment());
+        return ptr<data>(new vertical_segment(params, size));
     }
 
-	 DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
+   DataPrototype myData = open_library<DataPrototype>(n, "provide_data");
     if(myData != NULL)
     {
 #ifdef DEBUG
         std::cout << "<<DEBUG>> using data provider in file \"" << n << "\"" << std::endl;
 #endif
-        return ptr<data>(myData(args));
+        return ptr<data>(myData(size, params, args));
     }
     else
     {
         std::cerr << "<<ERROR>> no data provider found in file \"" << n << "\"" << std::endl;
-        return ptr<data>(new vertical_segment()) ;
+        return ptr<data>(nullptr) ;
     }
 }
+
+ptr<data> plugins_manager::load_data(const std::string& type, std::istream& input,
+                                     const arguments& args)
+{
+    ptr<data> result;
+
+    if (type.empty() || type == "vertical_segment")
+    {
+        auto header = arguments::parse_header(input);
+
+        if(!header.is_defined("FORMAT")) {
+            std::cerr << "<<DEBUG>> The file format is undefined, assuming TEXT"
+                      << std::endl;
+        }
+
+        if (header["FORMAT"] == "binary") {
+            result = ptr<data>(load_data_from_binary(input, header));
+        } else {
+            // FIXME: ARGS is currently ignored.
+            result = ptr<data>(load_data_from_text(input, header));
+        }
+    }
+    else
+    {
+        LoadDataPrototype load;
+        load = open_library<LoadDataPrototype>(type, "load_data");
+        if (load != NULL) result = ptr<data>(load(input, args));
+    }
+
+    return result;
+}
+
+// Load data from an input file.
+ptr<data> plugins_manager::load_data(const std::string& file,
+                                     const std::string& type,
+                                     const arguments& args)
+{
+    std::ifstream stream;
+
+    // Raise an exception when 'open' fails, and open in binary mode to
+    // placate Windows.
+    stream.exceptions(std::ios::failbit);
+    stream.open(file.c_str(), std::ifstream::binary);
+    stream.exceptions(std::ios::goodbit);
+    ptr<data> result = load_data(type, stream, args);
+    stream.close();                          // FIXME: make it auto-close
+
+    return result;
+}
+
+
+
+
 ptr<fitter> plugins_manager::get_fitter(const std::string& n)
 {
     if(n.empty())
@@ -494,49 +550,56 @@ void plugins_manager::check_compatibility( ptr<data>& d,
                                            const ptr<function>& f,
                                            const arguments& args)
 {
-	if(d->input_parametrization() == params::UNKNOWN_INPUT &&
-		f->input_parametrization() == params::UNKNOWN_INPUT)
-	{
-		std::cout << "<<WARNING>> both function and data objects have no parametrization" << std::endl;
-	}
-	else
-	{
-		if(d->input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
-		}
+  if(d->parametrization().input_parametrization() == params::UNKNOWN_INPUT &&
+    f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
+  {
+    std::cout << "<<WARNING>> both function and data objects have no parametrization" << std::endl;
+  }
+  else
+  {
+    if(d->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
+    {
+      std::cout << "<<WARNING>> unknown parametrization for data" << std::endl;
+    }
 
-		if(f->input_parametrization() == params::UNKNOWN_INPUT)
-		{
-			std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
-			f->setParametrization(d->input_parametrization());
-		}
-		else if(d->input_parametrization() != f->input_parametrization() && args.is_defined("change-param"))
-		{
-			std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->input_parametrization()) << std::endl;
-      std::cout << "<<INFO>> to " << params::get_name(f->input_parametrization()) << std::endl;
-			ptr<data_params> dd = ptr<data_params>(new data_params(d, f->input_parametrization()));
-			d = dynamic_pointer_cast<data>(dd) ;
-		}
-		else
-		{
-			std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
-		}
-	}
+    if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT)
+    {
+      std::cout << "<<DEBUG>> function will take the parametrization of the data" << std::endl;
+      parameters params(f->parametrization().dimX(),
+                        f->parametrization().dimY(),
+                        d->parametrization().input_parametrization(),
+                        f->parametrization().output_parametrization());
+      f->setParametrization(params);
+    }
+    else if(d->parametrization().input_parametrization() != f->parametrization().input_parametrization() && args.is_defined("change-param"))
+    {
+      std::cout << "<<INFO>> has to change the parametrization of the input data " << params::get_name(d->parametrization().input_parametrization()) << std::endl;
+      std::cout << "<<INFO>> to " << params::get_name(f->parametrization().input_parametrization()) << std::endl;
+      ptr<data_params> dd = ptr<data_params>(new data_params(d, d->size(),
+                                                             f->parametrization().input_parametrization()));
+      d = dynamic_pointer_cast<data>(dd) ;
+    }
+    else
+    {
+      std::cout << "<<DEBUG>> no change was made to the parametrization" << std::endl;
+    }
+  }
 
-	if(f->dimY() != d->dimY())
-	{
-    f->setDimY(d->dimY());
-	}
+  if(f->parametrization().dimY() != d->parametrization().dimY())
+  {
+    abort();
+    // FIXME: Used to be this:
+    // f->setDimY(d->parametrization().dimY());
+  }
 
-	/*
-	// Check is the data has to be clusterized
-	if(args.is_defined("cluster-dim"))
-	{
-	clustering* cluster = new clustering(d, args);
-	d = cluster;
-	}
-	*/
+  /*
+  // Check is the data has to be clusterized
+  if(args.is_defined("cluster-dim"))
+  {
+  clustering* cluster = new clustering(d, args);
+  d = cluster;
+  }
+  */
 }
 
 // \todo implement the Darwin (MACOS) version.
@@ -545,10 +608,10 @@ void plugins_manager::check_compatibility( ptr<data>& d,
 #include <windows.h>
 size_t plugins_manager::get_system_memory()
 {
-	MEMORYSTATUSEX status;
-	status.dwLength = sizeof(status);
-	GlobalMemoryStatusEx(&status);
-	return status.ullTotalPhys;
+  MEMORYSTATUSEX status;
+  status.dwLength = sizeof(status);
+  GlobalMemoryStatusEx(&status);
+  return status.ullTotalPhys;
 }
 #elif defined(__APPLE__)
 #include <unistd.h>
@@ -561,7 +624,7 @@ size_t plugins_manager::get_system_memory()
   mib[0] = CTL_HW;
   mib[1] = HW_MEMSIZE;    
   int64_t size = 0;   
-	size_t len = sizeof( size );
+  size_t len = sizeof( size );
   if ( sysctl( mib, 2, &size, &len, NULL, 0 ) == 0 )
     return (size_t)size;
   
@@ -571,8 +634,8 @@ size_t plugins_manager::get_system_memory()
 #include <unistd.h>
 size_t plugins_manager::get_system_memory()
 {
-	long pages = sysconf(_SC_PHYS_PAGES);
-	long page_size = sysconf(_SC_PAGE_SIZE);
-	return pages * page_size;
+  long pages = sysconf(_SC_PHYS_PAGES);
+  long page_size = sysconf(_SC_PAGE_SIZE);
+  return pages * page_size;
 }
 #endif

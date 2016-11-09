@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -21,10 +21,19 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new blinn_function();
+    return new blinn_function(params);
 }
+
+blinn_function::blinn_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(1, params::COS_TH))
+{
+    // Update the length of the vectors
+    _ks.resize(_parameters.dimY()) ;
+    _N.resize(_parameters.dimY()) ;
+}
+
 
 // Overload the function operator
 vec blinn_function::operator()(const vec& x) const 
@@ -33,8 +42,8 @@ vec blinn_function::operator()(const vec& x) const
 }
 vec blinn_function::value(const vec& x) const 
 {
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
 		 // Check if the cosine is below the hoziron
 		 if(x[0] > 0.0)
@@ -89,7 +98,7 @@ bool blinn_function::load(std::istream& in)
 
     // ks [double]
 	 // N  [double]
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         in >> token >> _ks[i];
         in >> token >>  _N[i];
@@ -104,14 +113,14 @@ bool blinn_function::load(std::istream& in)
 //! Number of parameters to this non-linear function
 int blinn_function::nbParameters() const 
 {
-    return 2*dimY();
+    return 2*_parameters.dimY();
 }
 
 //! Get the vector of parameters for the function
 vec blinn_function::parameters() const 
 {
-    vec res(2*dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(2*_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i*2 + 0] = _ks[i];
         res[i*2 + 1] = _N[i];
@@ -123,7 +132,7 @@ vec blinn_function::parameters() const
 //! Update the vector of parameters for the function
 void blinn_function::setParameters(const vec& p) 
 {
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         _ks[i] = p[i*2 + 0];
         _N[i]  = p[i*2 + 1];
@@ -134,9 +143,9 @@ void blinn_function::setParameters(const vec& p)
 //! parameters. 
 vec blinn_function::parametersJacobian(const vec& x) const 
 {
-    vec jac(dimY()*nbParameters());
-	 for(int i=0; i<dimY(); ++i)
-		 for(int j=0; j<dimY(); ++j)
+    vec jac(_parameters.dimY()*nbParameters());
+	 for(int i=0; i<_parameters.dimY(); ++i)
+		 for(int j=0; j<_parameters.dimY(); ++j)
 		 {
 			 if(i == j)
 			 {
@@ -168,7 +177,7 @@ vec blinn_function::parametersJacobian(const vec& x) const
 
 void blinn_function::bootstrap(const ptr<data> d, const arguments& args)
 {
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         _ks[i] = 1.0;
         _N[i]  = 10.0;
@@ -184,7 +193,7 @@ void blinn_function::save_call(std::ostream& out,
     {
 		out << "#FUNC nonlinear_function_blinn" << std::endl ;
 
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << "Ks " << _ks[i] << std::endl;
 			 out << "N  " <<  _N[i] << std::endl;
@@ -195,17 +204,17 @@ void blinn_function::save_call(std::ostream& out,
 	 else
 	 {
 		 out << "blinn(L, V, N, X, Y, vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _ks[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "), vec3(";
-		 for(int i=0; i<_nY; ++i)
+		 for(int i=0; i<_parameters.dimY(); ++i)
 		 {
 			 out << _N[i];
-			 if(i < _nY-1) { out << ", "; }
+			 if(i < _parameters.dimY()-1) { out << ", "; }
 		 }
 
 		 out << "))";

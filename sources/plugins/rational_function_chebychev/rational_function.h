@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -28,8 +28,10 @@ class rational_function_chebychev_1d : public rational_function_1d
 {
 public: // methods
 
-    rational_function_chebychev_1d() ;
-    rational_function_chebychev_1d(int nX, int np, int nq) ;
+    rational_function_chebychev_1d(const parameters&, int np, int nq);
+
+    rational_function_chebychev_1d() ALTA_DEPRECATED;
+    rational_function_chebychev_1d(int nX, int np, int nq) ALTA_DEPRECATED;
     virtual ~rational_function_chebychev_1d() {}
 
     // Get the p_i and q_j function
@@ -63,9 +65,11 @@ class rational_function_chebychev : public rational_function
 {
 	public: // methods
 
-		rational_function_chebychev() ;
-		virtual ~rational_function_chebychev() ;
-		
+    rational_function_chebychev(const alta::parameters& params,
+                                int np = 0, int nq = 0);
+		rational_function_chebychev() ALTA_DEPRECATED;
+		virtual ~rational_function_chebychev();
+
 		//! Get the 1D function associated with color channel i. If no one exist, 
 		//! this function allocates a new element. If i > nY, it returns NULL.
 		virtual rational_function_1d* get(int i) ;

@@ -54,10 +54,6 @@ Optional dependencies that will allow more plugins to be built include:
 
   + [MATLAB][matlab] with the Engine library, for some plugins.
 
-For your convenience, some of these dependencies are shipped with ALTA,
-as noted above.  Others are automatically downloaded unless
-<tt>--no-externals</tt> is passed to <tt>scons</tt> (see below.)
-
 #### Note for Ceres installation for Debian/Ubuntu distribution
 To improve the numerical stability of the different solvers, it is highly recommended to install the following packages:
  + <tt>libatlas-base-dev</tt>
@@ -88,9 +84,9 @@ dependencies are met, and which of the optional dependencies are
 available.  All the compilation byproducts go to the
 <tt>sources/build</tt> sub-directory.
 
-Some of the missing dependencies, such as NlOpt, IpOpt, and CERES, are
-automatically downloaded from upstream when they are not found.  The
-downloaded files are integrity-checked, and then the software is built
+If Eigen could not be found, it is
+automatically downloaded from upstream.  The
+downloaded file is integrity-checked, and then the software is built
 and installed under the <tt>external/build</tt> sub-directory of the
 source tree.
 

@@ -44,11 +44,11 @@ int main(int argc, char *argv[])
         input_file = data_dir + "/" + data_file;
     }
 
-    auto data = ptr<alta::data>(new vertical_segment());
-    data->load(input_file);
+    auto data = plugins_manager::load_data(input_file, "vertical_segment");
 
     for (auto&& fitter_name: fitters) {
-        auto function = plugins_manager::get_function("nonlinear_function_diffuse");
+        auto function = plugins_manager::get_function("nonlinear_function_diffuse",
+                                                      data->parametrization());
         TEST_ASSERT(function != NULL);
 
         auto fitter = plugins_manager::get_fitter(fitter_name);
@@ -60,8 +60,11 @@ int main(int argc, char *argv[])
             TEST_ASSERT(fitter->fit_data(data, function, arguments()));
 
             // Verify basic properties of FUNCTION.
-            TEST_ASSERT(function->dimX() == data->dimX());
-            TEST_ASSERT(function->dimY() == data->dimY());
+            // XXX: "nonlinear_function_diffuse" always has dimX = 6.
+            TEST_ASSERT(function->parametrization().dimX()
+                        >= data->parametrization().dimX());
+            TEST_ASSERT(function->parametrization().dimY()
+                        >= data->parametrization().dimY());
         } else {
             std::cerr << "skipping fitter '" << fitter_name << "'\n";
         }

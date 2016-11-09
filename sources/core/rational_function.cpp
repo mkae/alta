@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -20,16 +20,18 @@
 
 using namespace alta;
 
-rational_function_1d::rational_function_1d()
+rational_function_1d::rational_function_1d(const parameters& params,
+                                           unsigned int np, unsigned int nq,
+                                           bool separable)
+    : function(params), _separable(separable)
 {
+    resize(np, nq);
 }
 
 rational_function_1d::rational_function_1d(int nX, unsigned int np, unsigned int nq, 
-                                           bool separable) 
+                                           bool separable):
+    function(parameters(nX, 1, params::UNKNOWN_INPUT, params::UNKNOWN_OUTPUT))
 {
-	setDimX(nX);
-	setDimY(1);
-
 	resize(np, nq);
 	_separable = separable;
 }
@@ -54,7 +56,7 @@ bool rational_function_1d::load(std::istream& in)
 	// TODO: Check if the indices match the current index?
 	for(int j=0; j<_np; ++j)
 	{
-		for(int k=0; k<_nX; ++k)
+		for(int k=0; k<_parameters.dimX(); ++k)
 		{
 			in >> token;
 		}
@@ -65,7 +67,7 @@ bool rational_function_1d::load(std::istream& in)
 	// TODO: Check if the indices match the current index?
 	for(int j=0; j<_nq; ++j)
 	{
-		for(int k=0; k<_nX; ++k)
+		for(int k=0; k<_parameters.dimX(); ++k)
 		{
 			in >> token;
 		}
@@ -96,7 +98,7 @@ void rational_function_1d::save_body(std::ostream& out, const arguments& args) c
 		 out << "#NQ " << nq << std::endl;
 		 for(unsigned int i=0; i<np; ++i)
 		 {
-			 for(int j=0; j<dimX(); ++j)
+			 for(int j=0; j<_parameters.dimX(); ++j)
 			 {
 				 out << _p_coeffs[i].deg[j] << "\t" ;
 			 }
@@ -105,7 +107,7 @@ void rational_function_1d::save_body(std::ostream& out, const arguments& args) c
 
 		 for(unsigned int i=0; i<nq; ++i)
 		 {
-			 for(int j=0; j<dimX(); ++j)
+			 for(int j=0; j<_parameters.dimX(); ++j)
 			 {
 				 out << _q_coeffs[i].deg[j] << "\t" ;
 			 }
@@ -119,9 +121,9 @@ void rational_function_1d::save_body(std::ostream& out, const arguments& args) c
 		 for(unsigned int i=0; i<np; ++i)
 		 {
 			 out << _p_coeffs[i].a;
-			 for(int k=0; k<dimX(); ++k)
+			 for(int k=0; k<_parameters.dimX(); ++k)
 			 {
-				 if(k != dimX()-1) { out << ".*"; }
+				 if(k != _parameters.dimX()-1) { out << ".*"; }
 				 out << "x(k).^" << _q_coeffs[i].deg[k];
 			 }
 			 if(i != np-1) { out << " + "; }
@@ -131,9 +133,9 @@ void rational_function_1d::save_body(std::ostream& out, const arguments& args) c
 		 for(unsigned int i=0; i<nq; ++i)
 		 {
 			 out << _p_coeffs[i].a << "x.^" << i;
-			 for(int k=0; k<dimX(); ++k)
+			 for(int k=0; k<_parameters.dimX(); ++k)
 			 {
-				 if(k != dimX()-1) { out << ".*"; }
+				 if(k != _parameters.dimX()-1) { out << ".*"; }
 				 out << "x(k).^" << _q_coeffs[i].deg[k];
 			 }
 			 if(i != nq-1) { out << " + "; }
@@ -204,7 +206,7 @@ void rational_function_1d::resize(unsigned int np, unsigned int nq)
 	// It is not possible to resize the multi-dimensional vector
 	// if the input dimensions size is not defined. This can
 	// happen at the creation of the rational function object.
-	if(dimX() == 0) { return; }
+	if(_parameters.dimX() == 0) { return; }
 
 	// Resize the numerator
 	if(_p_coeffs.size() != np)
@@ -331,13 +333,13 @@ void rational_function_1d::populate(std::vector<int>& vec, int N, int M, int j)
 
 std::vector<int> rational_function_1d::index2degree(int i) const
 {
-	std::vector<int> deg ; deg.assign(dimX(), 0) ;
+	std::vector<int> deg ; deg.assign(_parameters.dimX(), 0) ;
 
 	if(i == 0)
 		return deg ;
 	
 	// The case of one dimensional signals is trivial
-	if(dimX() == 1)
+	if(_parameters.dimX() == 1)
 	{
 		deg[0] = i;
 		return deg;
@@ -348,16 +350,16 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 	if(_separable)
 	{
 		const int index = i-1;
-		const int base  = index / dimX() + 1;
-		for(int k=0; k<dimX(); ++k)
+		const int base  = index / _parameters.dimX() + 1;
+		for(int k=0; k<_parameters.dimX(); ++k)
 		{
-			deg[k] = (index % dimX() == k) ? base : 0;
+			deg[k] = (index % _parameters.dimX() == k) ? base : 0;
 		}
 	}
 	else
 #endif
 	{
-		if(dimX() == 2)
+		if(_parameters.dimX() == 2)
 		{
 			int Nk = 1 ;
 			int k  = 1 ;
@@ -375,17 +377,17 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 		{
 			int Nk = 1 ;
 			int k  = 1 ;
-			int dk = estimate_dk(k, dimX()) ;
+			int dk = estimate_dk(k, _parameters.dimX()) ;
 			while(!(i >= Nk && i < Nk+dk))
 			{
 				Nk += dk ;
 				++k ;
-				dk = estimate_dk(k, dimX()) ;
+				dk = estimate_dk(k, _parameters.dimX()) ;
 			}
 
 			// Populate the vector from front to back
 			int j = i-Nk ;
-			populate(deg, dimX(), k, j) ;
+			populate(deg, _parameters.dimX(), k, j) ;
 		}
 	}
 
@@ -403,7 +405,7 @@ std::vector<int> rational_function_1d::index2degree(int i) const
 double rational_function_1d::p(const vec& x, int i) const
 {
 	double res = 1.0;
-	for(int k=0; k<dimX(); ++k)
+	for(int k=0; k<_parameters.dimX(); ++k)
 	{
 		const double xp = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
 		res *= pow(xp, _p_coeffs[i].deg[k]) ;
@@ -414,7 +416,7 @@ double rational_function_1d::p(const vec& x, int i) const
 double rational_function_1d::q(const vec& x, int i) const 
 {
 	double res = 1.0;
-	for(int k=0; k<dimX(); ++k)
+	for(int k=0; k<_parameters.dimX(); ++k)
 	{
 		const double xp = 2.0*((x[k] - _min[k]) / (_max[k]-_min[k]) - 0.5);
 		res *= pow(xp, _q_coeffs[i].deg[k]) ;
@@ -482,6 +484,10 @@ std::ostream& operator<< (std::ostream& out, const rational_function_1d& r)
 }
 
 #ifndef TODO
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 rational_function::rational_function() : np(0), nq(0)
 {
 }
@@ -489,6 +495,19 @@ rational_function::rational_function() : np(0), nq(0)
 
 rational_function::rational_function(int np, int nq) : np(np), nq(nq)
 {
+}
+
+rational_function_1d::rational_function_1d()
+{
+}
+
+#pragma GCC diagnostic pop
+
+rational_function::rational_function(const parameters& params,
+                                     int np, int nq):
+    function(params), np(np), nq(nq)
+{
+    rs.resize(params.dimY());
 }
 
 //! \todo clean memory here
@@ -510,18 +529,18 @@ void rational_function::update(int i, rational_function_1d* r)
 rational_function_1d* rational_function::get(int i)
 {
 	// Check for consistency in the index of color channel
-	if(i < _nY)
+	if(i < _parameters.dimY())
 	{
 		if(rs[i] == NULL)
 		{
-			rs[i] = new rational_function_1d(dimX(), np, nq);
+			rs[i] = new rational_function_1d(_parameters.dimX(), np, nq);
 
 			// Test if the input domain is not empty. If one dimension of
 			// the input domain is a point, I manually inflate this dimension
 			// to avoid numerical issues.
 			vec _min = min();
 			vec _max = max();
-			for(int k=0; k<dimX(); ++k)
+			for(int k=0; k<_parameters.dimX(); ++k)
 			{
 				if(_min[k] == _max[k]) 
 				{
@@ -545,7 +564,7 @@ rational_function_1d* rational_function::get(int i)
 rational_function_1d* rational_function::get(int i) const
 {
 	// Check for consistency in the index of color channel
-	if(i < _nY)
+	if(i < _parameters.dimY())
 	{
 		return rs[i];
 	}
@@ -560,9 +579,9 @@ rational_function_1d* rational_function::get(int i) const
 
 vec rational_function::value(const vec& x) const
 {
-	vec res(_nY) ;
+	vec res(_parameters.dimY()) ;
 
-	for(int k=0; k<_nY; ++k)
+	for(int k=0; k<_parameters.dimY(); ++k)
 	{
 		res[k] = rs[k]->value(x)[0] ;
 	}
@@ -602,14 +621,14 @@ bool rational_function::load(std::istream& in)
 	}
 
 	// Check for the MIN and MAX vector
-	vec min(dimX()), max(dimX());
+	vec min(_parameters.dimX()), max(_parameters.dimX());
 	in >> token;
    if(token.compare("#MIN") != 0) 
 	{
 		std::cerr << "<<ERROR>> the min value for the input space is not defined." << std::endl; 
 		return false;
 	}
-	for(int k=0; k<dimX(); ++k) {in >> min[k];}
+	for(int k=0; k<_parameters.dimX(); ++k) {in >> min[k];}
 	setMin(min);
 
 	in >> token;
@@ -618,10 +637,10 @@ bool rational_function::load(std::istream& in)
 		std::cerr << "<<ERROR>> the max value for the input space is not defined." << std::endl; 
 		return false;
 	}
-	for(int k=0; k<dimX(); ++k) {in >> max[k]; }
+	for(int k=0; k<_parameters.dimX(); ++k) {in >> max[k]; }
 	setMax(max);
 
-	for(int i=0; i<_nY; ++i)
+	for(int i=0; i<_parameters.dimY(); ++i)
 	{
 		// Update the i_th color channel
 		if(!get(i)->load(in)) { return false; }
@@ -636,20 +655,26 @@ void rational_function::save_call(std::ostream& out, const arguments& args) cons
 	out.precision(64);
 	out << std::scientific;
 	out << "#FUNC rational_function" << std::endl;
-	out << "#MIN "; for(int k=0; k<_nX; ++k) { out << _min[k] << " "; } out << std::endl;
-	out << "#MAX "; for(int k=0; k<_nX; ++k) { out << _max[k] << " "; } out << std::endl; 
+	out << "#MIN "; for(int k=0; k<_parameters.dimX(); ++k) { out << _min[k] << " "; } out << std::endl;
+	out << "#MAX "; for(int k=0; k<_parameters.dimX(); ++k) { out << _max[k] << " "; } out << std::endl; 
 
-	for(int k=0; k<_nY; ++k)
+	for(int k=0; k<_parameters.dimY(); ++k)
 	{
-        const rational_function_1d* rf = get(k);
-        rf->save_body(out, args);
-		  out << std::endl;
+      const rational_function_1d* rf = get(k);
+
+      // We're calling the 'get(int) const' method, which can return NULL.
+      // Skip them (XXX: is this the right thing to do?).
+      if (rf != NULL)
+      {
+          rf->save_body(out, args);
+          out << std::endl;
+      }
 	}
 }
 
 std::ostream& operator<< (std::ostream& out, const rational_function& r)
 {
-	for(int i=0; i<r.dimY(); ++i)
+  for(int i=0; i < r.parametrization().dimY(); ++i)
 	{
 		rational_function_1d* rf = r.get(i);
 		out << "dimension " << i << ": ";

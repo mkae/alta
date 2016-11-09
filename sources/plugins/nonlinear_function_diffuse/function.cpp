@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -21,16 +21,15 @@
 
 using namespace alta;
 
-ALTA_DLL_EXPORT function* provide_function()
+ALTA_DLL_EXPORT function* provide_function(const alta::parameters& params)
 {
-    return new diffuse_function();
+    return new diffuse_function(params);
 }
 
-diffuse_function::diffuse_function() 
-    : _kd( vec::Zero( dimY() ) )
+diffuse_function::diffuse_function(const alta::parameters& params)
+    : nonlinear_function(params.set_input(6, params::CARTESIAN)),
+      _kd( vec::Zero(params.dimY()))
 {
-    setParametrization(params::CARTESIAN);
-    setDimX(6);
 }
 
 
@@ -42,8 +41,8 @@ vec diffuse_function::operator()(const vec& x) const
 }
 vec diffuse_function::value(const vec& x) const 
 {
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i] = _kd[i];
     }
@@ -83,7 +82,7 @@ bool diffuse_function::load(std::istream &in)
     }
 
     // kd [double]
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         in >> token >> _kd[i];
     }
@@ -98,7 +97,7 @@ void diffuse_function::save_call(std::ostream& out, const arguments& args) const
     if(is_alta)
     {
         out << "#FUNC nonlinear_function_diffuse" << std::endl ;
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
             out << "kd " << _kd[i] << std::endl;
         }
@@ -107,9 +106,9 @@ void diffuse_function::save_call(std::ostream& out, const arguments& args) const
     else
     {
         out << "vec3(";
-        for(int i=0; i<dimY(); ++i)
+        for(int i=0; i<_parameters.dimY(); ++i)
         {
-            out << _kd[i]; if(i < dimY()-1) { out << ", "; }
+            out << _kd[i]; if(i < _parameters.dimY()-1) { out << ", "; }
         }
         out << ")";
     }
@@ -120,7 +119,7 @@ void diffuse_function::save_call(std::ostream& out, const arguments& args) const
 int diffuse_function::nbParameters() const 
 {
 #ifdef FIT_DIFFUSE
-    return dimY();
+    return _parameters.dimY();
 #else
     return 0;
 #endif
@@ -130,8 +129,8 @@ int diffuse_function::nbParameters() const
 vec diffuse_function::parameters() const 
 {
 #ifdef FIT_DIFFUSE
-    vec res(dimY());
-    for(int i=0; i<dimY(); ++i)
+    vec res(_parameters.dimY());
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         res[i*3 + 0] = _kd[i];
     }
@@ -145,7 +144,7 @@ vec diffuse_function::parameters() const
 void diffuse_function::setParameters(const vec& p) 
 {
 #ifdef FIT_DIFFUSE
-    for(int i=0; i<dimY(); ++i)
+    for(int i=0; i<_parameters.dimY(); ++i)
     {
         _kd[i] = p[i];
     }
@@ -157,19 +156,19 @@ void diffuse_function::setParameters(const vec& p)
 vec diffuse_function::parametersJacobian(const vec& x) const 
 {
 #ifdef FIT_DIFFUSE
-	vec jac(dimY());
-	for(int i=0; i<dimY(); ++i)
-		for(int j=0; j<dimY(); ++j)
+	vec jac(_parameters.dimY());
+	for(int i=0; i<_parameters.dimY(); ++i)
+		for(int j=0; j<_parameters.dimY(); ++j)
 		{
 			if(i == j)
 			{
 				// df / dk_d
-				jac[i*dimY() + j] = 1.0;
+				jac[i*_parameters.dimY() + j] = 1.0;
 
 			}
 			else
 			{
-				jac[i*dimY() + j] = 0.0;
+				jac[i*_parameters.dimY() + j] = 0.0;
 			}
 		}
 #else
@@ -197,38 +196,43 @@ void diffuse_function::bootstrap(const ptr<data> d, const arguments& args)
         // By taking the minimum value of the BRDF
     {
         // Set the diffuse component
-        if(params::is_cosine_weighted(d->output_parametrization()) || args.is_defined("cos-fit"))
+        if(params::is_cosine_weighted(d->parametrization().output_parametrization())
+           || args.is_defined("cos-fit"))
         {
             vec cart(6);
 
-            for(int i=0; i<d->dimY(); ++i)
+            for(int i=0; i<d->parametrization().dimY(); ++i)
                 _kd[i] = std::numeric_limits<double>::max();
 
             for(int i=1; i<d->size(); ++i)
             {
                 vec x = d->get(i);
-                params::convert(&x[0], d->input_parametrization(), params::CARTESIAN, &cart[0]);
+                params::convert(&x[0],
+                                d->parametrization().input_parametrization(),
+                                params::CARTESIAN,
+                                &cart[0]);
                 double cosine = (cart[2] > 0.0 ? cart[2] : 0.0) * (cart[5] > 0.0 ? cart[5] : 0.0);
 
                 if(cosine > 0.0)
                 {
-                    for(int j=0; j<d->dimY(); ++j)
+                    for(int j=0; j<d->parametrization().dimY(); ++j)
                     {
-                        _kd[j] = std::min(x[d->dimX() + j] / cosine, _kd[j]);
+                        _kd[j] = std::min(x[d->parametrization().dimX() + j] / cosine, _kd[j]);
                     }
                 }
             }
         }
         else
         {
-            for(int i=0; i<d->dimY(); ++i)
+            for(int i=0; i<d->parametrization().dimY(); ++i)
                 _kd[i] = std::numeric_limits<double>::max();
 
             for(int i=0; i<d->size(); ++i)
             {
                 vec xi = d->get(i);
-                for(int j=0; j<d->dimY(); ++j)
-                    _kd[j] = std::min(xi[d->dimX() + j], _kd[j]);
+                for(int j=0; j<d->parametrization().dimY(); ++j)
+                    _kd[j] = std::min(xi[d->parametrization().dimX() + j],
+                                      _kd[j]);
             }
         }
     }//end of else case

@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2013, 2014 Inria
+   Copyright (C) 2013, 2014, 2016 Inria
 
    This file is part of ALTA.
 
@@ -41,9 +41,13 @@ class rational_function_1d : public function
 {
 	public: // methods
 
-		rational_function_1d() ;
+		rational_function_1d(const parameters& params,
+                         unsigned int np = 0, unsigned int nq = 0,
+                         bool separable = false);
+
+    rational_function_1d() ALTA_DEPRECATED;
 		rational_function_1d(int nX, unsigned int np, unsigned int nq, 
-									bool separable = false) ;
+									bool separable = false) ALTA_DEPRECATED;
 		virtual ~rational_function_1d() {}
 
 
@@ -176,8 +180,12 @@ class rational_function : public function
 
 	public: // methods
 
-		rational_function() ;
-		rational_function(int np, int nq) ;
+		rational_function() ALTA_DEPRECATED;
+		rational_function(int np, int nq) ALTA_DEPRECATED;
+
+    rational_function(const parameters& params,
+                      int np = 0, int nq = 0);
+
 		virtual ~rational_function() ;
 
 		// Overload the function operator
@@ -190,10 +198,10 @@ class rational_function : public function
 		// Update the function
 		virtual void update(const ptr<rational_function>& r) 
 		{
-			assert(r->dimX() == dimX());
-			assert(r->dimY() == dimY());
+      assert(r->parametrization().dimX() == _parameters.dimX());
+      assert(r->parametrization().dimY() == _parameters.dimY());
 
-			for(int k=0; k<dimY(); ++k) 
+			for(int k=0; k < _parameters.dimY(); ++k)
 			{
 				get(k)->update(r->get(k));
 			}
@@ -203,14 +211,17 @@ class rational_function : public function
 		//! Get the 1D function associated with color channel i. If no one exist, 
 		//! this function allocates a new element. If i > nY, it returns NULL.
 		virtual rational_function_1d* get(int i) ;
-		virtual rational_function_1d* get(int i) const ;
+		virtual rational_function_1d* get(int i) const ALTA_DEPRECATED;
 
 		//! Set the dimension of the output space of the function. This function 
 		//! will update the size of the rs vector size.
-		virtual void setDimY(int nY) 
-		{ 
-			_nY = nY ;
-			rs.resize(nY);
+		virtual void setDimY(int nY)
+		{
+      parameters new_params(_parameters.dimX(), nY,
+                            _parameters.input_parametrization(),
+                            _parameters.output_parametrization());
+      _parameters = new_params;
+      rs.resize(nY);
 		}
 
 		//! \brief Set the size of the rational function. Any newly created 1D 
@@ -226,7 +237,7 @@ class rational_function : public function
 		virtual void clear()
 		{
 			rs.clear();
-			rs.resize(_nY);
+			rs.resize(_parameters.dimY());
 		}
 
 		virtual void setMin(const vec& min)

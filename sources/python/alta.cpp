@@ -1,6 +1,6 @@
 /* ALTA --- Analysis of Bidirectional Reflectance Distribution Functions
 
-   Copyright (C) 2014,2015 Inria
+   Copyright (C) 2014, 2015, 2016 Inria
    Copyright (C) 2015 Université de Montréal
 
    This file is part of ALTA.
@@ -62,16 +62,19 @@ struct python_arguments : public arguments {
 /* Create a data object from a plugin's name and the data filename. This
  * function is here to accelerate the loading of data file.
  */
-ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
-	ptr<data> d = plugins_manager::get_data(plugin_name);
-	d->load(filename);
+static ptr<data> load_data(const std::string& plugin_name, const std::string& filename) {
+  ptr<data> d = plugins_manager::load_data(filename, plugin_name);
 	return d;
 }
-ptr<data> get_data_with_args(const std::string& plugin_name, const python_arguments& args) {
-	return plugins_manager::get_data(plugin_name, args);
+static ptr<data> get_data_with_args(const std::string& plugin_name,
+                                    size_t size,
+                                    const parameters& params,
+                                    const python_arguments& args) {
+  return plugins_manager::get_data(plugin_name, size, params, args);
 }
-ptr<data> get_data(const std::string& plugin_name) {
-	return plugins_manager::get_data(plugin_name);
+static ptr<data> get_data(const std::string& plugin_name, size_t size,
+                          const parameters& params) {
+  return plugins_manager::get_data(plugin_name, size, params);
 }
 
 /* Creating functions for the plugins_manager calls
@@ -80,15 +83,19 @@ ptr<data> get_data(const std::string& plugin_name) {
  *       Those function should disapear when the return type of get_Function
  *       in the plugin_manager will be ptr<function>.
  */
-ptr<function> get_function(const std::string& plugin_name) {
-    ptr<function> func(plugins_manager::get_function(plugin_name));
+static ptr<function> get_function(const std::string& plugin_name,
+                                  const parameters& params)
+{
+    ptr<function> func(plugins_manager::get_function(plugin_name,
+                                                     params));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
     }
-	return func;
+    return func;
 }
-ptr<function> get_function_from_args(const python_arguments& args) {
-    ptr<function> func(plugins_manager::get_function(args));
+static ptr<function> get_function_from_args(const python_arguments& args,
+                                            const parameters& params) {
+    ptr<function> func(plugins_manager::get_function(args, params));
     if(!func) {
     	std::cerr << "<<ERROR>> no function created" << std::endl;
     }
@@ -98,10 +105,10 @@ ptr<function> get_function_from_args(const python_arguments& args) {
 /* Load a function object from a file. The arguments object is never used here.
  * The file is supposed to load the function correctly.
  */
-ptr<function> load_function(const std::string& filename) {
+static ptr<function> load_function(const std::string& filename) {
     return ptr<function>(plugins_manager::load_function(filename));
 }
-ptr<function> load_function_with_args(const std::string& filename, const arguments&) {
+static ptr<function> load_function_with_args(const std::string& filename, const arguments&) {
     return ptr<function>(plugins_manager::load_function(filename));
 }
 
@@ -109,8 +116,9 @@ ptr<function> load_function_with_args(const std::string& filename, const argumen
  *
  * TODO: Add exceptions
  */
-void load_from_file_with_args(const ptr<function>& func, const std::string& filename,
-                              const arguments& args) {
+static void load_from_file_with_args(const ptr<function>& func,
+                                     const std::string& filename,
+                                     const arguments& args) {
 
    // Open a stream
    std::ifstream file;
@@ -126,7 +134,7 @@ void load_from_file_with_args(const ptr<function>& func, const std::string& file
    // Load the function stream
    func->load(file);
 }
-void load_from_file(const ptr<function>& func, const std::string& filename) {
+static void load_from_file(const ptr<function>& func, const std::string& filename) {
 
    arguments args;
    load_from_file_with_args(func, filename, args);
@@ -138,19 +146,20 @@ void load_from_file(const ptr<function>& func, const std::string& filename) {
  * TODO: The compound and product function should store the shared pointer to the
  * function objects. They might stay in memory longer than the input functions.
  */
-ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
+static ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 	// Convert to a nonlinear function
 	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
 	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
 
-	arguments args;
-	compound_function* cf = new compound_function();
-
 	if(nf1 && nf2) {
-		cf->push_back(nf1, args);
-		cf->push_back(nf2, args);
-
-		return ptr<function>(cf);
+    std::vector<ptr<nonlinear_function> > functions;
+    functions.push_back(nf1);
+    functions.push_back(nf2);
+    std::vector<arguments> args;
+    args.push_back(alta::arguments());
+    args.push_back(alta::arguments());
+    auto cf = new compound_function(functions, args);
+    return ptr<function>(cf);
 
 	// Failure case, one of the function is a NULL ptr.
 	} else {
@@ -158,7 +167,7 @@ ptr<function> add_function(const ptr<function>& f1, const ptr<function>& f2) {
 		return ptr<function>(NULL);
 	}
 }
-ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
+static ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
 	// Convert to a nonlinear function
 	ptr<nonlinear_function> nf1 = dynamic_pointer_cast<nonlinear_function>(f1);
 	ptr<nonlinear_function> nf2 = dynamic_pointer_cast<nonlinear_function>(f2);
@@ -177,7 +186,7 @@ ptr<function> mult_function(const ptr<function>& f1, const ptr<function>& f2) {
  *
  * TODO: Add the rational function interface
  */
-void set_function_params(ptr<function>& f, const vec& v) {
+static void set_function_params(ptr<function>& f, const vec& v) {
 
 	// Try to set the parameter as a nonlinear function
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
@@ -204,7 +213,7 @@ void set_function_params(ptr<function>& f, const vec& v) {
 	// }
 }
 
-vec get_function_params(ptr<function>& f) {
+static vec get_function_params(ptr<function>& f) {
 		// Try to set the parameter as a nonlinear function
 	ptr<nonlinear_function> nf = dynamic_pointer_cast<nonlinear_function>(f);
 	if(nf) {
@@ -219,7 +228,7 @@ vec get_function_params(ptr<function>& f) {
 /* Save a function object to a file, without any argument option. This will save the function
  * object in ALTA's format.
  */
-void save_function_without_args(const ptr<function>& f, const std::string& filename) {
+static void save_function_without_args(const ptr<function>& f, const std::string& filename) {
    arguments args;
    f->save(filename, args);
 }
@@ -227,12 +236,16 @@ void save_function_without_args(const ptr<function>& f, const std::string& filen
 /* Fitter interface to allow to launch fit with and without providing an
  * arguments object.
  */
-bool fit_data_without_args(const ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func) {
+static bool fit_data_without_args(const ptr<fitter>& _fitter,
+                                  const ptr<data>& _data,
+                                  ptr<function>& _func) {
    arguments args;
    return _fitter->fit_data(_data, _func, args);
 }
 
-bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<function>& _func, const arguments& args) {
+static bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data,
+                               ptr<function>& _func,
+                               const arguments& args) {
    _fitter->set_parameters(args);
    return _fitter->fit_data(_data, _func, args);
 }
@@ -242,67 +255,46 @@ bool fit_data_with_args(ptr<fitter>& _fitter, const ptr<data>& _data, ptr<functi
  * the command line arguments.
  * TODO: Add the command line arguments in the parameters
  */
-void data2data(const data* d_in, data* d_out)
+static ptr<data> data2data(const data* d_in, const parameters& target)
 {
-   if(dynamic_cast<vertical_segment*>(d_out)!=NULL && d_out->size() == 0)
-   {
-      d_out->setParametrization(d_in->input_parametrization());
-      d_out->setDimX(d_in->dimX());
-      d_out->setDimY(d_in->dimY());
+    auto delete_array = [](double* array)
+    {
+        delete[] array;
+    };
 
-      // Init the min and max
-      vec _min(d_out->dimX()), _max(d_out->dimX());
-      for(auto k=0; k<d_out->dimX(); ++k)
-      {
-         _min[k] =  std::numeric_limits<double>::max() ;
-         _max[k] = -std::numeric_limits<double>::max() ;
-      }
+    // For each sample we store the X and Y values, followed by the
+    // confidence interval on Y.
+    size_t sample_size = target.dimX() + 3 * target.dimY();
 
-      vec temp(d_out->dimX() + d_out->dimY());
-      for(auto i=0; i<d_in->size(); ++i)
-      {
-         // Copy the input vector
-         vec x = d_in->get(i);
-         params::convert(&x[0], d_in->parametrization(), d_out->parametrization(), &temp[0]);
-         params::convert(&x[d_in->dimX()], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &temp[d_out->dimX()]);
-         d_out->set(temp);
+    double* content = new double[d_in->size() * sample_size];
 
-         // Update min and max
-         for(auto k=0; k<d_out->dimX(); ++k)
-         {
-            _min[k] = std::min(_min[k], temp[k]) ;
-            _max[k] = std::max(_max[k], temp[k]) ;
-         }
-      }
+    for (auto sample = 0; sample < d_in->size(); sample++)
+    {
+        // Copy the input vector
+        vec x = d_in->get(sample);
+        params::convert(&x[0],
+                        d_in->parametrization().input_parametrization(),
+                        target.input_parametrization(),
+                        &content[sample * sample_size]);
+        params::convert(&x[d_in->parametrization().dimX()],
+                        d_in->parametrization().output_parametrization(),
+                        d_in->parametrization().dimY(),
+                        target.output_parametrization(),
+                        target.dimY(),
+                        &content[sample * sample_size + target.dimX()]);
 
-      // Set the min and max
-      d_out->setMin(_min);
-      d_out->setMax(_max);
-   }
-   else
-   {
-      for(int i=0; i<d_out->size(); ++i)
-      {
-         vec temp(d_in->dimX());
-         vec cart(6);
-         vec y(d_in->dimY());
+        // Set the confidence interval on Y to zero.
+        for (auto i = 0; i < 2 * target.dimY(); i++)
+        {
+            content[sample * sample_size + target.dimX() + target.dimY()
+                    + i] = 0.;
+        }
+    }
 
-         // Copy the input vector
-         vec x = d_out->get(i);
-         params::convert(&x[0], d_out->parametrization(), params::CARTESIAN, &cart[0]);
-
-         if(cart[2] >= 0.0 || cart[5] >= 0.0) {
-            params::convert(&cart[0], params::CARTESIAN, d_in->parametrization(), &temp[0]);
-            y = d_in->value(temp);
-         } else {
-            y.setZero();
-         }
-
-         params::convert(&y[0], d_in->output_parametrization(), d_in->dimY(), d_out->output_parametrization(), d_out->dimY(), &x[d_out->dimX()]);
-
-         d_out->set(i, x);
-      }
-   }
+    data* result = new vertical_segment(target, d_in->size(),
+                                        std::shared_ptr<double>(content,
+                                                                delete_array));
+    return ptr<data>(result);
 }
 
 /* This function provides a similar behaviour that the brdf2data function.
@@ -311,27 +303,30 @@ void data2data(const data* d_in, data* d_out)
  * be so when the data object is a laoded data sample or when the data type
  * has predefined sample sets.
  */
-void brdf2data(const ptr<function>& f, ptr<data>& d) {
+static void brdf2data(const ptr<function>& f, ptr<data>& d) {
 	if(d->size() == 0) {
 		std::cerr << "<<ERROR>> Please provide a data object with a sample structure or load a data file with defined positions." << std::endl;
 		return;
 	}
 
-	vec temp(f->dimX());
+	vec temp(f->parametrization().dimX());
 	for(int i=0; i<d->size(); ++i) {
 		// Copy the input vector
 		vec x = d->get(i);
 
 		// Convert the data to the function's input space.
-	    if(f->input_parametrization() == params::UNKNOWN_INPUT) {
-	    	memcpy(&temp[0], &x[0], f->dimX()*sizeof(double));
+      if(f->parametrization().input_parametrization() == params::UNKNOWN_INPUT) {
+	    	memcpy(&temp[0], &x[0], f->parametrization().dimX()*sizeof(double));
 	    } else {
-			params::convert(&x[0], d->parametrization(), f->parametrization(), &temp[0]);
+			params::convert(&x[0],
+                      d->parametrization().input_parametrization(),
+                      f->parametrization().input_parametrization(),
+                      &temp[0]);
 		}
 		vec y = f->value(temp);
 
-		for(int j=0; j<d->dimY(); ++j) {
-			x[d->dimX() + j] = y[j];
+		for(int j=0; j<d->parametrization().dimY(); ++j) {
+			x[d->parametrization().dimX() + j] = y[j];
 		}
 
 		d->set(i, y);
@@ -340,7 +335,7 @@ void brdf2data(const ptr<function>& f, ptr<data>& d) {
 
 /* Compute distance metric between 'in' and 'ref'.
  */
-bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
+static bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
    // Compute the metrics
    errors::metrics res;
    errors::compute(in.get(), ref.get(), nullptr, res);
@@ -353,6 +348,9 @@ bp::dict data2stats(const ptr<data>& in, const ptr<data>& ref) {
    return py_res;
 }
 
+
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x)  STRINGIFY_(x)
 
 /* Exporting the ALTA module
  */
@@ -368,10 +366,60 @@ BOOST_PYTHON_MODULE(alta)
 		.def("update", &arguments::update);
 
 
-   // Vec class
-   //
-   register_wrapper_vec();
+  // Vec class
+  //
+  register_wrapper_vec();
 
+  // 'parameters' class.
+  bp::class_<parameters>("parameters")
+      .def(bp::init<unsigned int, unsigned int, params::input, params::output>());
+
+  // Parameterization enums.
+
+#define PARAM_VALUE(name)                       \
+   .value(STRINGIFY(name), params:: name)
+
+  bp::enum_<params::input>("input_parametrization")
+      PARAM_VALUE(RUSIN_TH_PH_TD_PD)
+      PARAM_VALUE(RUSIN_TH_PH_TD)
+      PARAM_VALUE(RUSIN_TH_TD_PD)
+      PARAM_VALUE(RUSIN_TH_TD)
+      PARAM_VALUE(RUSIN_VH_VD)
+      PARAM_VALUE(RUSIN_VH)
+      PARAM_VALUE(COS_TH_TD)
+      PARAM_VALUE(COS_TH)
+      PARAM_VALUE(SCHLICK_TK_PK)
+      PARAM_VALUE(SCHLICK_VK)
+      PARAM_VALUE(SCHLICK_TL_TK_PROJ_DPHI)
+      PARAM_VALUE(COS_TK)
+      PARAM_VALUE(RETRO_TL_TVL_PROJ_DPHI)
+      PARAM_VALUE(STEREOGRAPHIC)
+      PARAM_VALUE(SPHERICAL_TL_PL_TV_PV)
+      PARAM_VALUE(COS_TLV)
+      PARAM_VALUE(COS_TLR)
+      PARAM_VALUE(ISOTROPIC_TV_TL)
+      PARAM_VALUE(ISOTROPIC_TV_TL_DPHI)
+      PARAM_VALUE(ISOTROPIC_TV_PROJ_DPHI)
+      PARAM_VALUE(ISOTROPIC_TL_TV_PROJ_DPHI)
+      PARAM_VALUE(ISOTROPIC_TD_PD)
+      PARAM_VALUE(STARK_2D)
+      PARAM_VALUE(STARK_3D)
+      PARAM_VALUE(NEUMANN_2D)
+      PARAM_VALUE(NEUMANN_3D)
+      PARAM_VALUE(CARTESIAN)
+      PARAM_VALUE(UNKNOWN_INPUT);
+
+  bp::enum_<params::output>("output_parametrization")
+      PARAM_VALUE(INV_STERADIAN)
+      PARAM_VALUE(INV_STERADIAN_COSINE_FACTOR)
+      PARAM_VALUE(ENERGY)
+      PARAM_VALUE(RGB_COLOR)
+      PARAM_VALUE(XYZ_COLOR)
+      PARAM_VALUE(UNKNOWN_OUTPUT);
+
+#undef PARAM_VALUE
+
+  bp::register_ptr_to_python<ptr<parameters>>();
 
 	// Function interface
 	//
@@ -400,8 +448,6 @@ BOOST_PYTHON_MODULE(alta)
 		.def("size", &data::size)
 		.def("get",  &data::get)
 		//.def("set",  &data::set)
-		.def("load", static_cast< void(data::*)(const std::string&)>(&data::load))
-		.def("load", static_cast< void(data::*)(const std::string&, const arguments&)>(&data::load))
 		.def("save", &data::save);
 	bp::def("get_data",  get_data);
 	bp::def("get_data",  get_data_with_args);
