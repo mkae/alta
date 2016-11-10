@@ -1,0 +1,22 @@
+dist: trusty
+sudo: required
+language: c++
+compiler: clang
+
+before_install:
+   - sudo apt-get update  -qq -y
+   - sudo apt-get install -qq -y libopenexr-dev cmake
+   - sudo apt-get install -qq -y libboost-python-dev
+   - sudo apt-get install -qq -y libnlopt-dev
+   - sudo apt-get install -qq -y coinor-libipopt-dev liblapack-dev libblas-dev libgfortran-4.8-dev
+
+install:
+   - scons
+   - scons python -i
+
+script:
+   - scons tests
+   - scons tests python -i
+
+after_failure:
+   - cat config.log
